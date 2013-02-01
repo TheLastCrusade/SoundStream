@@ -9,7 +9,23 @@ import java.nio.ByteBuffer;
 
 import android.util.Log;
 
+/**
+ * This class prepares message data to be sent or received.  It implements the following simple protocol:
+ *  4 byte length of the message, not including the length (using java.nio.ByteBuffer)
+ *  String canonical class name
+ *  \n character
+ *  Message data
+ *  ...
+ *  
+ * This protocol supports stacking multiple messages (in that same format) into the same stream.  Each message will
+ * have a length that describes that message.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class Messenger {
+
+    private static final char END_OF_CLASS_CHAR = '\n';
 
     private static final String TAG = "Messenger";
 
@@ -17,21 +33,63 @@ public class Messenger {
 
     private IMessage receivedMessage;
 
-    private boolean messageStarted = false;
-    private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
     private int messageLength;
 
-    public OutputStream serializeMessage(IMessage message) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(message.getClass().getCanonicalName().getBytes());
-        baos.write('\n');
-        message.serialize(baos);
-        return baos;
+    private ByteArrayOutputStream inputBuffer = new ByteArrayOutputStream();
+
+    private ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
+
+    /**
+     * Serialize a message into the output buffer.  This will append to the output
+     * buffer, to stack multiple messages next to each other.  See clearOutputBuffer
+     * to clear this buffer.
+     * 
+     * @param message
+     * @throws IOException
+     */
+    public void serializeMessage(IMessage message) throws IOException {
+        int start = outputBuffer.size();
+        outputBuffer.write(new byte[4]);
+        outputBuffer.write(message.getClass().getCanonicalName().getBytes());
+        outputBuffer.write(END_OF_CLASS_CHAR);
+
+        message.serialize(outputBuffer);
+        //write the length to the first 4 bytes of this message
+        byte[] bytes = outputBuffer.toByteArray();
+        ByteBuffer bb = ByteBuffer.wrap(bytes, start, 4);
+        int len = outputBuffer.size() - start - 4;
+        bb.putInt(len);
+        
+        outputBuffer.reset();
+        outputBuffer.write(bytes);
     }
 
     /**
-     * NOTE: this may block if InputStream blocks on read, and doesnt support available properly
+     * Clear the output buffer of all messages.
+     * 
+     */
+    public void clearOutputBuffer() {
+        outputBuffer.reset();
+    }
+
+    /**
+     * Get the output buffer for this messenger.
+     * 
+     * @return
+     */
+    public ByteArrayOutputStream getOutputBuffer() {
+        return outputBuffer;
+    }
+
+    /**
+     * Deserialize a message in the input stream, and store the result in the receivedMessage field.
+     * This may be called multiple times with partial messages (in case the message is not all here yet).
+     * 
+     * Only one received message may be held at a time, so be prepared to call getReceivedMessage if this
+     * method returns true.
+     * 
+     * This is designed to not block if data is unavailable, but it may block if InputStream blocks on read,
+     *  and doesn't support available properly
      * 
      * @param input
      * @return
@@ -42,33 +100,41 @@ public class Messenger {
         boolean processed = false;
         //read all we can
         while(input.available() > 0) {
-            buffer.write(input.read());
+            inputBuffer.write(input.read());
         }
 
         //if we need to, consume the message length (to make sure we read until we have a complete message)
-        if (this.messageLength <= 0 && buffer.size() >= SIZE_LEN) {
-            byte[] bytes = buffer.toByteArray();
+        if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
+            byte[] bytes = inputBuffer.toByteArray();
             ByteBuffer bb = ByteBuffer.wrap(bytes, 0, SIZE_LEN);
             //this actually consumes the first 4 bytes (removes it from the stream)
-            buffer.reset();
-            buffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
+            inputBuffer.reset();
+            inputBuffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
             this.messageLength = bb.getInt();
         }
         //check to see if we can process this message
-        if (this.messageLength > 0 && buffer.size() >= this.messageLength) {
+        if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength) {
             processed = processAndConsumeMessage();
         }
         return processed;
     }
     
+    /**
+     * Process and consume one message contained in the input buffer.  This will modify the contents of the
+     * input buffer when successful and when an error is occurred (the message in error is thrown away).
+     * 
+     * TODO: this needs better error handling.
+     * 
+     * @return True if a message was processed, false if not
+     */
     private boolean processAndConsumeMessage() {
         boolean processed = false;
         //REVIEW: character encoding issues may arise, but since we're controlling the class names
         // we should be able to decide how to handle these
-        byte[] bytes = buffer.toByteArray();
+        byte[] bytes = inputBuffer.toByteArray();
         try {
             int nameEnd;
-            for (nameEnd = 0; nameEnd < bytes.length && bytes[nameEnd] != '\n'; nameEnd++) {}
+            for (nameEnd = 0; nameEnd < bytes.length && bytes[nameEnd] != END_OF_CLASS_CHAR; nameEnd++) {}
             String messageName = new String(bytes, 0, nameEnd);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes, nameEnd + 1, this.messageLength - (nameEnd + 1));
 
@@ -93,14 +159,19 @@ public class Messenger {
             
         } finally {
             //consume this message either way
-            int bufferLen = buffer.size();
-            buffer.reset();
-            buffer.write(bytes, this.messageLength, bufferLen - this.messageLength);
+            int bufferLen = inputBuffer.size();
+            inputBuffer.reset();
+            inputBuffer.write(bytes, this.messageLength, bufferLen - this.messageLength);
             this.messageLength = 0;
         }
         return processed;
     }
 
+    /**
+     * Get the last received message processed by this messenger.
+     * 
+     * @return
+     */
     public IMessage getReceivedMessage() {
         return receivedMessage;
     }

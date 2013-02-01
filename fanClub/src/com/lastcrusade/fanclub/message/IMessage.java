@@ -26,5 +26,5 @@ public interface IMessage {
      */
     public void deserialize(InputStream  input) throws IOException;
 
-    public void serialize(  OutputStream output);
+    public void serialize(  OutputStream output) throws IOException;
 }

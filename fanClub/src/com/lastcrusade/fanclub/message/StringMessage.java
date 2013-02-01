@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * A simple implementation of IMessage for sending strings back and forth.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class StringMessage implements IMessage {
 
     private static final int STRING_MESSAGE_VERSION = 1;
@@ -27,14 +33,15 @@ public class StringMessage implements IMessage {
     }
 
     @Override
-    public void serialize(OutputStream output) {
+    public void serialize(OutputStream output) throws IOException {
+        output.write(this.getString().getBytes());
     }
 
     public String getString() {
         return string;
     }
 
-    private void setString(String string) {
+    public void setString(String string) {
         this.string = string;
     }
 }

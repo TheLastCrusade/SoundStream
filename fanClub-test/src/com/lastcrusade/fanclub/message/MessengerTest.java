@@ -7,25 +7,15 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
 public class MessengerTest {
 
-    private int bytesToLength(byte[] bytes) {
-        return bytes[0] + bytes[1] << 8 + bytes[2] << 16 + bytes[3] << 24;
-    }
-
-    private byte[] lengthToBytes(int length) {
-        byte[] lenBytes = new byte[4];
-        lenBytes[0] = (byte)(length & 0xFF);
-        lenBytes[1] = (byte)((length >>  8) & 0xFF);
-        lenBytes[2] = (byte)((length >> 16) & 0xFF);
-        lenBytes[3] = (byte)((length >> 24) & 0xFF);
-        return lenBytes;
-    }
-
+    //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
+    
     @Test
     public void testDeserializeMessage() throws IOException {
         
@@ -54,7 +44,7 @@ public class MessengerTest {
     @Test
     public void testDeserializeMessageMultiple() throws IOException {
 
-        //test the simple case (one message within the stream)
+        //test multiple complete messages in one stream
         Messenger messenger = new Messenger();
         //build up a TestMessage object
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -89,6 +79,82 @@ public class MessengerTest {
         assertEquals(0, bais.available());
     }
 
+    @Test
+    public void testSerializeMessage() throws IOException {
+        
+        Messenger messenger = new Messenger();
+        
+        StringMessage message = new StringMessage();
+        String testMessage = "This is a test of the messaging system";
+        message.setString(testMessage);
+        messenger.serializeMessage(message);
+        InputStream is = simulateSendAndReceive(messenger.getOutputBuffer());
+        
+        Messenger rcvMessenger = new Messenger();
+        //attempt to deserialize the second message
+        assertTrue(rcvMessenger.deserializeMessage(is));
+        
+        //and check the deserialized message
+        IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+        assertNotNull(rcvMessage);
+        assertTrue(rcvMessage instanceof StringMessage);
+        assertEquals(testMessage, ((StringMessage)rcvMessage).getString());
+
+        //make sure all bytes are consumed
+        assertEquals(0, is.available());
+    }
+
+    @Test
+    public void testSerializeMessageMultiple() throws IOException {
+        
+        //next test 2 messages in the stream, to make sure the messages are consumed properly
+        Messenger messenger = new Messenger();
+        
+        StringMessage message = new StringMessage();
+        String testMessage = "This is a test of the messaging system";
+        message.setString(testMessage);
+        messenger.serializeMessage(message);
+        String testMessage2 = "This is another test of the messaging system";
+        message = new StringMessage();
+        message.setString(testMessage2);
+        messenger.serializeMessage(message);
+        InputStream is = simulateSendAndReceive(messenger.getOutputBuffer());
+        
+        Messenger rcvMessenger = new Messenger();
+        //attempt to deserialize the second message
+        assertTrue(rcvMessenger.deserializeMessage(is));
+        
+        //and check the deserialized message
+        IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+        assertNotNull(rcvMessage);
+        assertTrue(rcvMessage instanceof StringMessage);
+        assertEquals(testMessage, ((StringMessage)rcvMessage).getString());
+
+        //attempt to deserialize the second message
+        assertTrue(rcvMessenger.deserializeMessage(is));
+        
+        //and check the deserialized message
+        rcvMessage = rcvMessenger.getReceivedMessage();
+        assertNotNull(rcvMessage);
+        assertTrue(rcvMessage instanceof StringMessage);
+        assertEquals(testMessage2, ((StringMessage)rcvMessage).getString());
+        //make sure all bytes are consumed
+        assertEquals(0, is.available());
+    }
+
+    private InputStream simulateSendAndReceive(
+            ByteArrayOutputStream outputBuffer) {
+        return new ByteArrayInputStream(outputBuffer.toByteArray());
+    }
+
+    /**
+     * NOTE: keep this separate, so we have independent verification of the Messenger.  This lets
+     * us use the independently verified side to test the other side of the messenger.
+     * @param className
+     * @param testMessage
+     * @param baos
+     * @throws IOException
+     */
     private void appendMessage(String className,
             String testMessage, ByteArrayOutputStream baos) throws IOException {
         //only write the length bytes the first time through
