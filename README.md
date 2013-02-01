@@ -15,16 +15,16 @@ These steps will create your own private repo and allow you to pull in changes f
 
 '''
 git clone https://github.com/[your-user-name]/[repo-name].git
-# Clones your fork of the repo into the current directory in terminal
+\# Clones your fork of the repo into the current directory in terminal
 '''
 
 3. Add a remote for the main repo to your own. When a repo is cloned, it has a default remote called 'origin' that points to your fork. The following commands will add another remote called 'upstream' that points to the main repo.
 
 '''
 cd [repo-name]
-# Changes the active directory in the prompt to your fork that you just cloned
+\# Changes the active directory in the prompt to your fork that you just cloned
 git remote add upstream https://github.com/[main-repo-user-name]/[repo-name].git
-# Assigns the original repo to a remote called "upstream"
+\# Assigns the original repo to a remote called "upstream"
 '''
 
 ### Pull in Changes from the Main Repo to Your Repo
@@ -33,9 +33,9 @@ These steps will pull in the latest changes into your own repo from the main rep
 
 '''
 git fetch upstream
-# Fetches any new changes from the original repo
+\# Fetches any new changes from the original repo
 git merge upstream/master
-# Merges any changes fetched into your working files
+\# Merges any changes fetched into your working files
 '''
 
 Optionally, after these commands, you can commit and push these changes to your repo.
