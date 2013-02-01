@@ -13,15 +13,14 @@ These steps will create your own private repo and allow you to pull in changes f
 1. On the Github page for the main repo, click the "Fork" button at the top. This will copy over the repo to your own account.
 2. Clone\(copy\) the repo in your own account onto your computer.
 
-    git clone git@github.com:[your user name]/[repo name].git
+    git clone https://github.com/[your user name]/[repo name].git
     # Clones your fork of the repo into the current directory in terminal
 
 3. Add a remote for the main repo to your own. When a repo is cloned, it has a default remote called 'origin' that points to your fork. The following commands will add another remote called 'upstream' that points to the main repo.
 
     cd [repo name]
     # Changes the active directory in the prompt to your fork that you just cloned
-
-    git remote add upstream git@github.com:[main repo user name]/[repo name].git
+    git remote add upstream https://github.com/[main repo user name]/[repo name].git
     # Assigns the original repo to a remote called "upstream"
 
 ### Pull in Changes from the Main Repo to Your Repo
