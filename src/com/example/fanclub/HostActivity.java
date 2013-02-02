@@ -2,7 +2,9 @@ package com.example.fanclub;
 
 import java.io.IOException;
 
-import android.R;
+import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.util.Toaster;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,7 +36,7 @@ public class HostActivity extends Activity {
 		
 		try {
 			checkAndEnableBluetooth(adapter);
-		} catch(BluetoothNotFoundException e) {
+		} catch(BluetoothNotEnabledException e) {
 			Toaster.toast(this, "Unable to enable bluetooth adapter");
 			e.printStackTrace();
 			return;
@@ -71,7 +73,7 @@ public class HostActivity extends Activity {
 		if(!adapter.isEnabled()) {
 			adapter.enable();
 			if(!adapter.isEnabled()) {
-				throw new BluetoothNotFoundException();
+				throw new BluetoothNotEnabledException();
 			}
 		}
 	}
