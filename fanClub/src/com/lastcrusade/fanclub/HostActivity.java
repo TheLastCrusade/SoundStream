@@ -1,4 +1,4 @@
-package com.example.fanclub;
+package com.lastcrusade.fanclub;
 
 import java.io.IOException;
 
@@ -11,12 +11,14 @@ import android.os.Message;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class HostActivity extends Activity {
@@ -37,7 +39,7 @@ public class HostActivity extends Activity {
 		try {
 			checkAndEnableBluetooth(adapter);
 		} catch(BluetoothNotEnabledException e) {
-			Toaster.toast(this, "Unable to enable bluetooth adapter");
+			Toaster.tToast(this, "Unable to enable bluetooth adapter");
 			e.printStackTrace();
 			return;
 		}
@@ -60,7 +62,7 @@ public class HostActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				onHelloButtonClicked();
+				//onHelloButtonClicked();
 			}
 		});
 	}
@@ -117,7 +119,7 @@ public class HostActivity extends Activity {
 	}
 	
 	protected void onDeviceFound(BluetoothAdapter adapter, Intent intent) {
-		BluetoothDevice device = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_DEVICE);
+		BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 		Log.w(TAG, "Device found: " + device.getName() + "(" + device.getAddress() + ")");
 		adapter.cancelDiscovery();
 		

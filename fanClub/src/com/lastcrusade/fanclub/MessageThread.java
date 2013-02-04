@@ -1,4 +1,4 @@
-package com.example.fanclub;
+package com.lastcrusade.fanclub;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
