@@ -39,11 +39,10 @@ public class HostActivity extends Activity {
 		
 		try {
 		    BluetoothUtils.checkAndEnableBluetooth(this, adapter);
-		} catch(BluetoothNotEnabledException e) {
-		    Toaster.iToast(this, "Unable to enable bluetooth adapter");
-			e.printStackTrace();
-			return;
-		}
+        } catch (BluetoothNotEnabledException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } 
 		
 		registerReceivers(adapter);
 		
