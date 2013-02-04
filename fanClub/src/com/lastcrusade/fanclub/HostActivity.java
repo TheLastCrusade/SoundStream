@@ -39,7 +39,7 @@ public class HostActivity extends Activity {
 		try {
 			checkAndEnableBluetooth(adapter);
 		} catch(BluetoothNotEnabledException e) {
-			Toaster.tToast(this, "Unable to enable bluetooth adapter");
+		    Toaster.iToast(this, "Unable to enable bluetooth adapter");
 			e.printStackTrace();
 			return;
 		}
@@ -53,7 +53,11 @@ public class HostActivity extends Activity {
 			public void onClick(View v) {
 				((Button)findViewById(R.id.button0)).setEnabled(false);
 				Log.w(TAG, "Starting Discovery");
-				adapter.startDiscovery();
+				if(adapter == null){
+                    Toaster.iToast(HostActivity.this, "Device may not support bluetooth");
+				} else {
+				    adapter.startDiscovery();
+				}
 			}
 		});
 		
@@ -62,7 +66,7 @@ public class HostActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				//onHelloButtonClicked();
+                Toaster.iToast(HostActivity.this, "Testing stack");
 			}
 		});
 	}
@@ -136,13 +140,13 @@ public class HostActivity extends Activity {
 			this.connectThread.start();
 		} catch(IOException e) {
 			e.printStackTrace();
-			Toaster.tToast(this, "Unable to create ConnectThread to connect to server");
+			Toaster.iToast(this, "Unable to create ConnectThread to connect to server");
 		}
 	}
 	
 	protected void onReadMessage(String string, int arg1) {
 		Log.w(TAG, "Message received: " + string);
-		Toaster.tToast(this, string);
+		Toaster.iToast(this, string);
 	}
 	
 	protected void onDiscoveryFinished(BluetoothAdapter adapter) {

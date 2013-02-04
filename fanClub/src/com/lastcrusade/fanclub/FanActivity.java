@@ -35,7 +35,7 @@ public class FanActivity extends Activity {
 		if (!adapter.isEnabled()) {
             adapter.enable();
             if (!adapter.isEnabled()) {
-                Toaster.tToast(this, "Unable to enable bluetooth adapter.");
+                Toaster.iToast(this, "Unable to enable bluetooth adapter.");
                 return;
             }
         }
@@ -105,7 +105,7 @@ public class FanActivity extends Activity {
             @Override
             public void run() {
                 synchronized(msgMutex) {
-                    Toaster.tToast(FanActivity.this, message.toString());
+                    Toaster.iToast(FanActivity.this, message.toString());
                     message = new StringBuilder();
                 }
             }
