@@ -72,11 +72,13 @@ public class HostActivity extends Activity {
 	}
 	
 	private void checkAndEnableBluetooth(BluetoothAdapter adapter) throws BluetoothNotEnabledException {
-		if(!adapter.isEnabled()) {
+		if(adapter != null && !adapter.isEnabled()) {
 			adapter.enable();
 			if(!adapter.isEnabled()) {
 				throw new BluetoothNotEnabledException();
 			}
+		} else {
+		    Log.e(TAG, "Device may not support bluetooth");
 		}
 	}
 	
