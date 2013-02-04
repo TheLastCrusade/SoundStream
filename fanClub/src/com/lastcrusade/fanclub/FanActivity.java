@@ -30,7 +30,7 @@ public class FanActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fan);
-		
+
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if (!adapter.isEnabled()) {
             adapter.enable();

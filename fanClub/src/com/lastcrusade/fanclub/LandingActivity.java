@@ -23,6 +23,14 @@ public class LandingActivity extends Activity {
             }
         });
 
+        ((Button)findViewById(R.id.btn_fan)).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                transitionTo(FanActivity.class);
+            }
+        });
+
 	}
 
 	@Override

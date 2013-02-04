@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.util.Toaster;
+import com.lastcrusade.fanclub.util.BluetoothUtils;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,7 +38,7 @@ public class HostActivity extends Activity {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		
 		try {
-			checkAndEnableBluetooth(adapter);
+		    BluetoothUtils.checkAndEnableBluetooth(this, adapter);
 		} catch(BluetoothNotEnabledException e) {
 		    Toaster.iToast(this, "Unable to enable bluetooth adapter");
 			e.printStackTrace();
@@ -48,7 +49,7 @@ public class HostActivity extends Activity {
 		
 		Button button = (Button)this.findViewById(R.id.button0);
 		button.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				((Button)findViewById(R.id.button0)).setEnabled(false);
@@ -73,17 +74,6 @@ public class HostActivity extends Activity {
 	
 	private String formatSong(Song song) {
 		return String.format("%s by %s on their hit album %s", song.getName(), song.getArtist(), song.getAlbum());
-	}
-	
-	private void checkAndEnableBluetooth(BluetoothAdapter adapter) throws BluetoothNotEnabledException {
-		if(adapter != null && !adapter.isEnabled()) {
-			adapter.enable();
-			if(!adapter.isEnabled()) {
-				throw new BluetoothNotEnabledException();
-			}
-		} else {
-		    Log.e(TAG, "Device may not support bluetooth");
-		}
 	}
 	
 	private void registerReceivers(final BluetoothAdapter adapter) {
