@@ -6,7 +6,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 public class Toaster {
-    private static int duration = Toast.LENGTH_LONG;
+    private static int duration = Toast.LENGTH_SHORT;
     private static int methodDepth = 3;
 
     public static void iToast(Context context, String s) {
