@@ -25,7 +25,7 @@ public class Toaster {
         iToast(context, context.getString(resId));
     }
 
-    public static void iToast(Context context, int resId, Object ... formatArgs) {
+    public static void iToast(Context context, int resId, Object... formatArgs) {
         iToast(context, context.getString(resId, formatArgs));
     }
 
