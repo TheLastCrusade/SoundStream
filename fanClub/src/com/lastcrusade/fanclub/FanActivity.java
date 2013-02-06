@@ -3,6 +3,7 @@ package com.lastcrusade.fanclub;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.Toaster;
 
 import android.os.Bundle;
@@ -30,17 +31,17 @@ public class FanActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fan);
-		
+
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (!adapter.isEnabled()) {
-            adapter.enable();
-            if (!adapter.isEnabled()) {
-                Toaster.tToast(this, "Unable to enable bluetooth adapter.");
-                return;
-            }
+		try {
+            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
+        } catch(BluetoothNotEnabledException e) { //TODO This should be in BluetoothUtils?
+            Toaster.iToast(this, "Unable to enable bluetooth adapter");
+            e.printStackTrace();
+            return;
         }
 		
-		enableDiscovery();
+		BluetoothUtils.enableDiscovery(this);
 		
 		final Handler handler = new Handler(new Handler.Callback() {
 			
@@ -54,38 +55,44 @@ public class FanActivity extends Activity {
 			}
 		});
 		
-		try {
-			mmServerSocket = adapter.listenUsingRfcommWithServiceRecord(HOST_NAME,
-                    UUID.fromString(this.getString(R.string.app_uuid))
-                 );
-			if(mmServerSocket != null){
-                Log.i(TAG, "Server Socket Made");
+        try {
+            if (adapter == null) {
+                Toaster.eToast(this, "Unable to enable bluetooth adapter");
             } else {
-                Log.w(TAG, "Server Socket NOT made");
-            }
-			
-			new Thread() {
-                public void run() {
-                    BluetoothSocket socket = null;
-                    try {
-                        while(true) {
-                            // If a connection was accepted
-                            socket = mmServerSocket.accept(); //blocking call
-                            if (socket != null) {
-                                Log.i(TAG, "Connection accepted");
-                                connectedThread = new MessageThread(socket, handler);
-                                connectedThread.start();
+                mmServerSocket = adapter.listenUsingRfcommWithServiceRecord(
+                        HOST_NAME,
+                        UUID.fromString(this.getString(R.string.app_uuid)));
+                if (mmServerSocket != null) {
+                    Log.i(TAG, "Server Socket Made");
+                } else {
+                    Log.w(TAG, "Server Socket NOT made");
+                }
+
+                new Thread() {
+                    public void run() {
+                        BluetoothSocket socket = null;
+                        try {
+                            while (true) {
+                                // If a connection was accepted
+                                socket = mmServerSocket.accept(); // blocking
+                                                                  // call
+                                if (socket != null) {
+                                    Log.i(TAG, "Connection accepted");
+                                    connectedThread = new MessageThread(socket,
+                                            handler);
+                                    connectedThread.start();
+                                }
                             }
+                        } catch (IOException e) {
+                            Log.w(TAG, e.getStackTrace().toString());
                         }
-                    } catch (IOException e) {
-                        Log.w(TAG, e.getStackTrace().toString());
-                    }
-                };
-            }.start();
-		} catch (IOException e){
+                    };
+                }.start();
+            }
+        } catch (IOException e) {
             Log.w(TAG, e.getStackTrace().toString());
         }
-	}
+    }
 	
 	protected void onReadMessage(String string, int arg1) {
         synchronized(msgMutex) {
@@ -105,7 +112,7 @@ public class FanActivity extends Activity {
             @Override
             public void run() {
                 synchronized(msgMutex) {
-                    Toaster.tToast(FanActivity.this, message.toString());
+                    Toaster.iToast(FanActivity.this, message.toString());
                     message = new StringBuilder();
                 }
             }
@@ -113,12 +120,6 @@ public class FanActivity extends Activity {
         }, delayMillis);
     }
 	
-	private void enableDiscovery() {
-		Intent discoverableIntent = new
-		        Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-		        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-		        startActivity(discoverableIntent);
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

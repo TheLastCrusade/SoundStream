@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.util.Toaster;
+import com.lastcrusade.fanclub.util.BluetoothUtils;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,23 +38,26 @@ public class HostActivity extends Activity {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		
 		try {
-			checkAndEnableBluetooth(adapter);
-		} catch(BluetoothNotEnabledException e) {
-			Toaster.tToast(this, "Unable to enable bluetooth adapter");
-			e.printStackTrace();
-			return;
-		}
+		    BluetoothUtils.checkAndEnableBluetooth(this, adapter);
+        } catch (BluetoothNotEnabledException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } 
 		
 		registerReceivers(adapter);
 		
 		Button button = (Button)this.findViewById(R.id.button0);
 		button.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				((Button)findViewById(R.id.button0)).setEnabled(false);
 				Log.w(TAG, "Starting Discovery");
-				adapter.startDiscovery();
+				if(adapter == null){
+                    Toaster.iToast(HostActivity.this, "Device may not support bluetooth");
+				} else {
+				    adapter.startDiscovery();
+				}
 			}
 		});
 		
@@ -62,22 +66,13 @@ public class HostActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				//onHelloButtonClicked();
+                Toaster.iToast(HostActivity.this, "Testing stack");
 			}
 		});
 	}
 	
 	private String formatSong(Song song) {
 		return String.format("%s by %s on their hit album %s", song.getName(), song.getArtist(), song.getAlbum());
-	}
-	
-	private void checkAndEnableBluetooth(BluetoothAdapter adapter) throws BluetoothNotEnabledException {
-		if(!adapter.isEnabled()) {
-			adapter.enable();
-			if(!adapter.isEnabled()) {
-				throw new BluetoothNotEnabledException();
-			}
-		}
 	}
 	
 	private void registerReceivers(final BluetoothAdapter adapter) {
@@ -134,13 +129,13 @@ public class HostActivity extends Activity {
 			this.connectThread.start();
 		} catch(IOException e) {
 			e.printStackTrace();
-			Toaster.tToast(this, "Unable to create ConnectThread to connect to server");
+			Toaster.iToast(this, "Unable to create ConnectThread to connect to server");
 		}
 	}
 	
 	protected void onReadMessage(String string, int arg1) {
 		Log.w(TAG, "Message received: " + string);
-		Toaster.tToast(this, string);
+		Toaster.iToast(this, string);
 	}
 	
 	protected void onDiscoveryFinished(BluetoothAdapter adapter) {
