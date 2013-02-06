@@ -3,6 +3,8 @@ package com.lastcrusade.fanclub;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.lastcrusade.fanclub.util.ConnectionUtils;
+
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -17,10 +19,6 @@ public class ConnectThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private Context mmContext;
-
-    public static final String ACTION_CONNECTED    = "edu.gatech.thelastcrusade.bluetooth_test.action.CONNECTED";
-    public static final String ACTION_DISCONNECTED = "edu.gatech.thelastcrusade.bluetooth_test.action.DISCONNECTED";
-    public static final String EXTRA_SOCKET        = "edu.gatech.thelastcrusade.bluetooth_test.extra.SOCKET";
 
     public ConnectThread(Context context, BluetoothDevice device) throws IOException {
         mmContext = context;
@@ -50,35 +48,13 @@ public class ConnectThread extends Thread {
             return;
         }
 
-        notifyConnected();
+        ConnectionUtils.notifyConnected(mmContext);
     }
 
     public BluetoothSocket getSocket() {
         return mmSocket;
     }
 
-    /**
-     * Notify the UI or any listeners that the socket is connected 
-     * 
-     */
-    private void notifyConnected() {
-        Intent intent = new Intent();
-        intent.setAction(ACTION_CONNECTED);
-//        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        mmContext.sendBroadcast(intent);
-    }
-
-//    /**
-//     * Notify the UI or any listeners that the socket is disconnected 
-//     * 
-//     */
-//    private void notifyDisconnected() {
-//        Intent intent = new Intent();
-//        intent.setAction(ACTION_DISCONNECTED);
-//        intent.addCategory(Intent.CATEGORY_DEFAULT);
-//        mmContext.sendBroadcast(intent);
-//    }
-//    
     /** Will cancel an in-progress connection, and close the socket */
     public void cancel() {
         try {
