@@ -19,42 +19,43 @@ import android.view.Menu;
 
 public class FanActivity extends Activity {
 
-	private StringBuilder message = new StringBuilder();
-	private Object msgMutex = new Object();
-	
-	private final String TAG = "FanActivity";
-	private BluetoothServerSocket mmServerSocket;
-	private String HOST_NAME = "Patty Placeholder's party";
-	protected MessageThread connectedThread;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_fan);
+    private StringBuilder message = new StringBuilder();
+    private Object msgMutex = new Object();
 
-		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		try {
+    private final String TAG = "FanActivity";
+    private BluetoothServerSocket mmServerSocket;
+    private String HOST_NAME = "Patty Placeholder's party";
+    protected MessageThread connectedThread;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_fan);
+
+        final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        try {
             BluetoothUtils.checkAndEnableBluetooth(this, adapter);
-        } catch(BluetoothNotEnabledException e) { //TODO This should be in BluetoothUtils?
+        } catch (BluetoothNotEnabledException e) { // TODO This should be in
+                                                   // BluetoothUtils?
             Toaster.iToast(this, "Unable to enable bluetooth adapter");
             e.printStackTrace();
             return;
         }
-		
-		BluetoothUtils.enableDiscovery(this);
-		
-		final Handler handler = new Handler(new Handler.Callback() {
-			
-			@Override
-			public boolean handleMessage(Message msg) {
-				if (msg.what == MessageThread.MESSAGE_READ) {
+
+        BluetoothUtils.enableDiscovery(this);
+
+        final Handler handler = new Handler(new Handler.Callback() {
+
+            @Override
+            public boolean handleMessage(Message msg) {
+                if (msg.what == MessageThread.MESSAGE_READ) {
                     onReadMessage(msg.obj.toString(), msg.arg1);
                     return true;
                 }
-				return false;
-			}
-		});
-		
+                return false;
+            }
+        });
+
         try {
             if (adapter == null) {
                 Toaster.eToast(this, "Unable to enable bluetooth adapter");
@@ -93,9 +94,9 @@ public class FanActivity extends Activity {
             Log.w(TAG, e.getStackTrace().toString());
         }
     }
-	
-	protected void onReadMessage(String string, int arg1) {
-        synchronized(msgMutex) {
+
+    protected void onReadMessage(String string, int arg1) {
+        synchronized (msgMutex) {
             if (message.length() > 0) {
                 message.append("\n");
             } else {
@@ -104,28 +105,27 @@ public class FanActivity extends Activity {
             message.append(string);
         }
     }
-	
-	private void startDelayedDisplayMessage() {
-        int delayMillis = 2000; /*2s*/
+
+    private void startDelayedDisplayMessage() {
+        int delayMillis = 2000; /* 2s */
         new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
-                synchronized(msgMutex) {
+                synchronized (msgMutex) {
                     Toaster.iToast(FanActivity.this, message.toString());
                     message = new StringBuilder();
                 }
             }
-            
+
         }, delayMillis);
     }
-	
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_fan, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.activity_fan, menu);
+        return true;
+    }
 
 }
