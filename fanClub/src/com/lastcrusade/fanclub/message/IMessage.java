@@ -8,13 +8,6 @@ import java.io.Serializable;
 public interface IMessage {
 
     /**
-     * Get the message version, which is used to determine wireline compatibility.
-     * 
-     * @return
-     */
-    public int getMessageVersion();
-
-    /**
      * Deserialize a message that has been received in an input stream.  This will be
      * called if a message of this type is received.
      * 
