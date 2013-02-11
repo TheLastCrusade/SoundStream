@@ -31,6 +31,8 @@ public class Messenger {
 
     private static final int SIZE_LEN = 4;
 
+    //TODO: add messenger version into the message protocol (see serialize/deserializeMessage)
+    private static final int MESSENGER_VERSION = 1;
     private IMessage receivedMessage;
 
     private int messageLength;
@@ -68,17 +70,20 @@ public class Messenger {
      * Clear the output buffer of all messages.
      * 
      */
-    public void clearOutputBuffer() {
+    public void clearOutputBytes() {
         outputBuffer.reset();
     }
 
     /**
-     * Get the output buffer for this messenger.
+     * Get the output bytes for this messenger.  This should contain all of the serialized messages
+     * since the last time the messenger was cleared.
+     * 
+     * NOTE: this method will not clear the messenger itself.
      * 
      * @return
      */
-    public ByteArrayOutputStream getOutputBuffer() {
-        return outputBuffer;
+    public byte[] getOutputBytes() {
+        return outputBuffer.toByteArray();
     }
 
     /**

@@ -7,14 +7,14 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 
 /**
  * This thread is responsible for establishing a connection to a discovered device.
  * 
  * @author Jesse Rosalia
  */
-public class ConnectThread extends Thread {
-    private final BluetoothSocket mmSocket;
+public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocket> {
     private final BluetoothDevice mmDevice;
     private Context mmContext;
 
@@ -24,66 +24,50 @@ public class ConnectThread extends Thread {
 
     public ConnectThread(Context context, BluetoothDevice device) throws IOException {
         mmContext = context;
-        // Use a temporary object that is later assigned to mmSocket,
-        // because mmSocket is final
-        BluetoothSocket tmp = null;
         mmDevice = device;
-
-        // Get a BluetoothSocket to connect with the given BluetoothDevice
-        // MY_UUID is the app's UUID string, also used by the server code
-        UUID uuid = UUID.fromString(context.getString(R.string.app_uuid));
-        tmp = device.createRfcommSocketToServiceRecord(uuid);
-        mmSocket = tmp;
     }
-
-    public void run() {
+    
+    @Override
+    protected BluetoothSocket doInBackground(Void... params) {
+        BluetoothSocket socket = null;
         try {
+            // Get a BluetoothSocket to connect with the given BluetoothDevice
+            // MY_UUID is the app's UUID string, also used by the server code
+            UUID uuid = UUID.fromString(mmContext.getString(R.string.app_uuid));
+            // Use a temporary object that is later assigned to mmSocket,
+            // because mmSocket is final
+            socket = mmDevice.createRfcommSocketToServiceRecord(uuid);
             // Connect the device through the socket. This will block
             // until it succeeds or throws an exception
-            mmSocket.connect();
+            socket.connect();
         } catch (IOException connectException) {
             // Unable to connect; close the socket and get out
             try {
-                mmSocket.close();
+                if (socket != null) {
+                    socket.close();
+                }
             } catch (IOException closeException) {
             }
-            return;
+            return null;
         }
 
-        notifyConnected();
+        return socket;
     }
 
-    public BluetoothSocket getSocket() {
-        return mmSocket;
+    @Override
+    protected void onPostExecute(BluetoothSocket result) {
+        if (result != null) {
+            onConnected(result);
+        }
     }
-
-    /**
-     * Notify the UI or any listeners that the socket is connected 
-     * 
-     */
-    private void notifyConnected() {
-        Intent intent = new Intent();
-        intent.setAction(ACTION_CONNECTED);
-//        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        mmContext.sendBroadcast(intent);
-    }
-
-//    /**
-//     * Notify the UI or any listeners that the socket is disconnected 
-//     * 
-//     */
-//    private void notifyDisconnected() {
-//        Intent intent = new Intent();
-//        intent.setAction(ACTION_DISCONNECTED);
-//        intent.addCategory(Intent.CATEGORY_DEFAULT);
-//        mmContext.sendBroadcast(intent);
+    
+    protected abstract void onConnected(BluetoothSocket socket);
+    
+//    /** Will cancel an in-progress connection, and close the socket */
+//    public void cancel() {
+//        try {
+//            mmSocket.close();
+//        } catch (IOException e) {
+//        }
 //    }
-//    
-    /** Will cancel an in-progress connection, and close the socket */
-    public void cancel() {
-        try {
-            mmSocket.close();
-        } catch (IOException e) {
-        }
-    }
 }
