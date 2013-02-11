@@ -1,12 +1,14 @@
 package com.lastcrusade.fanclub;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+
+import com.lastcrusade.fanclub.message.IMessage;
+import com.lastcrusade.fanclub.message.Messenger;
 
 /**
  * This thread is responsible for sending and receiving messages once the connection has been established.
@@ -24,8 +26,11 @@ public class MessageThread extends Thread {
  
     private int   messageNumber = 0;
     private Handler mmHandler;
+
+    //NOTE: Messenger is stateless
+    private final Messenger mmMessenger;
     public MessageThread(BluetoothSocket socket, Handler handler) {
-        super("MessageThread-" + socket.getRemoteDevice().getName());
+        super("MessageThread-" + safeSocketName(socket));
         mmSocket  = socket;
         mmHandler = handler;
         InputStream tmpIn = null;
@@ -40,23 +45,25 @@ public class MessageThread extends Thread {
  
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
+        
+        mmMessenger = new Messenger();
     }
  
+    private static String safeSocketName(BluetoothSocket socket) {
+        return socket != null && socket.getRemoteDevice() != null ? socket.getRemoteDevice().getName() : "UnknownSocket";
+    }
+
     public void run() {
-        byte[] buffer = new byte[1024];  // buffer store for the stream
-        int bytes; // bytes returned from read()
- 
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
-                // Read from the InputStream
-                bytes = mmInStream.read(buffer);
-                //NOTE: for now, assume all strings
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                baos.write(buffer, 0, bytes);
-                this.messageNumber++; //one more message
-                mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, baos.toString())
-                        .sendToTarget();
+                //attempt to deserialize from the socket input stream
+                boolean messageRecvd = mmMessenger.deserializeMessage(mmInStream);
+                if (messageRecvd) {
+                    //dispatch the message to the 
+                    mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, mmMessenger.getReceivedMessage())
+                            .sendToTarget();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 break;
@@ -70,10 +77,15 @@ public class MessageThread extends Thread {
     }
  
     /* Call this from the main activity to send data to the remote device */
-    public void write(byte[] bytes) {
+    public void write(IMessage message) {
         try {
+            mmMessenger.serializeMessage(message);
+            byte[] bytes = mmMessenger.getOutputBytes();
             mmOutStream.write(bytes);
-        } catch (IOException e) { }
+            mmMessenger.clearOutputBytes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
  
     /* Call this from the main activity to shutdown the connection */

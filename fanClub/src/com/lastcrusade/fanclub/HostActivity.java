@@ -2,25 +2,29 @@ package com.lastcrusade.fanclub;
 
 import java.io.IOException;
 
-import com.lastcrusade.fanclub.model.Song;
-import com.lastcrusade.fanclub.util.Toaster;
-import com.lastcrusade.fanclub.util.BluetoothUtils;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+
+import com.lastcrusade.fanclub.message.FindNewFansMessage;
+import com.lastcrusade.fanclub.message.IMessage;
+import com.lastcrusade.fanclub.message.StringMessage;
+import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.util.BluetoothUtils;
+import com.lastcrusade.fanclub.util.Toaster;
 
 public class HostActivity extends Activity {
 
@@ -82,7 +86,6 @@ public class HostActivity extends Activity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(ConnectThread.ACTION_CONNECTED);
         this.registerReceiver(new BroadcastReceiver() {
 
             @Override
@@ -96,27 +99,34 @@ public class HostActivity extends Activity {
                 } else if (intent.getAction().equals(
                         BluetoothDevice.ACTION_FOUND)) {
                     onDeviceFound(adapter, intent);
-                } else if (intent.getAction().equals(
-                        ConnectThread.ACTION_CONNECTED)) {
-                    onConnected(adapter, intent);
                 }
             }
         }, filter);
     }
 
-    protected void onConnected(BluetoothAdapter adapter, Intent intent) {
+    /**
+     * 
+     * NOTE: must be run on the UI thread.
+     * 
+     * @param socket
+     */
+    protected void onConnectedFan(BluetoothSocket socket) {
         Log.w(TAG, "Connected to server");
         Handler handler = new Handler(new Handler.Callback() {
 
             @Override
             public boolean handleMessage(Message msg) {
                 if (msg.what == MessageThread.MESSAGE_READ) {
-                    onReadMessage(msg.obj.toString(), msg.arg1);
+                    onReadMessage(msg.arg1, (IMessage)msg.obj);
                     return true;
                 }
                 return false;
             }
         });
+        
+        //create the message thread, which will be responsible for reading and writing messages
+        this.messageThread = new MessageThread(socket, handler);
+        this.messageThread.start();
     }
 
     protected void onDeviceFound(BluetoothAdapter adapter, Intent intent) {
@@ -134,8 +144,15 @@ public class HostActivity extends Activity {
             }
         }
         try {
-            this.connectThread = new ConnectThread(this, device);
-            this.connectThread.start();
+            this.connectThread = new ConnectThread(this, device) {
+
+                @Override
+                protected void onConnected(BluetoothSocket socket) {
+                    onConnectedFan(socket);
+                }
+                
+            };
+            this.connectThread.execute();
         } catch (IOException e) {
             e.printStackTrace();
             Toaster.iToast(this,
@@ -143,9 +160,17 @@ public class HostActivity extends Activity {
         }
     }
 
-    protected void onReadMessage(String string, int arg1) {
-        Log.w(TAG, "Message received: " + string);
-        Toaster.iToast(this, string);
+    protected void onReadMessage(int messageNo, IMessage message) {
+        Log.w(TAG, "Message received: " + messageNo);
+        if (message instanceof StringMessage) {
+            StringMessage sm = (StringMessage)message;
+            Toaster.iToast(this, sm.getString());
+        }
+
+        if (message instanceof FindNewFansMessage) {
+            //TODO: this may need to be more robust, as discovery typically only lasts for 12 seconds
+            BluetoothUtils.enableDiscovery(this);
+        }
     }
 
     protected void onDiscoveryFinished(BluetoothAdapter adapter) {

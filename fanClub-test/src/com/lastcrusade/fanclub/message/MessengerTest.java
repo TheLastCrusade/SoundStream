@@ -88,7 +88,7 @@ public class MessengerTest {
         String testMessage = "This is a test of the messaging system";
         message.setString(testMessage);
         messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger.getOutputBuffer());
+        InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
         
         Messenger rcvMessenger = new Messenger();
         //attempt to deserialize the second message
@@ -118,7 +118,7 @@ public class MessengerTest {
         message = new StringMessage();
         message.setString(testMessage2);
         messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger.getOutputBuffer());
+        InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
         
         Messenger rcvMessenger = new Messenger();
         //attempt to deserialize the second message
@@ -143,8 +143,8 @@ public class MessengerTest {
     }
 
     private InputStream simulateSendAndReceive(
-            ByteArrayOutputStream outputBuffer) {
-        return new ByteArrayInputStream(outputBuffer.toByteArray());
+            byte[] outputBytes) {
+        return new ByteArrayInputStream(outputBytes);
     }
 
     /**

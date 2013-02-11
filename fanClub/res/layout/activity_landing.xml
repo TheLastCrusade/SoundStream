@@ -13,22 +13,23 @@
         android:text="@string/welcome_text" />
 
     <Button
-        android:id="@+id/btn_host"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="80dp"
-        android:layout_toLeftOf="@+id/txt_greeting"
-        android:text="Host" />
-
-    <Button
         android:id="@+id/btn_fan"
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/btn_host"
-        android:layout_toRightOf="@+id/txt_greeting"
-        android:text="Fan" />
+        android:layout_below="@+id/txt_greeting"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="72dp"
+        android:text="@string/join_network" />
+
+    <Button
+        android:id="@+id/btn_host"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/txt_greeting"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="86dp"
+        android:text="@string/create_network" />
 
 </RelativeLayout>

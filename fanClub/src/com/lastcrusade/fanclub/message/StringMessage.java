@@ -13,13 +13,7 @@ import java.io.OutputStream;
  */
 public class StringMessage implements IMessage {
 
-    private static final int STRING_MESSAGE_VERSION = 1;
     private String string;
-
-    @Override
-    public int getMessageVersion() {
-        return STRING_MESSAGE_VERSION;
-    }
 
     @Override
     public void deserialize(InputStream input) throws IOException {
