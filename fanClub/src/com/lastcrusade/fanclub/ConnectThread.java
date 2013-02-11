@@ -6,7 +6,6 @@ import java.util.UUID;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 
 /**
@@ -17,10 +16,6 @@ import android.os.AsyncTask;
 public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocket> {
     private final BluetoothDevice mmDevice;
     private Context mmContext;
-
-    public static final String ACTION_CONNECTED    = "edu.gatech.thelastcrusade.bluetooth_test.action.CONNECTED";
-    public static final String ACTION_DISCONNECTED = "edu.gatech.thelastcrusade.bluetooth_test.action.DISCONNECTED";
-    public static final String EXTRA_SOCKET        = "edu.gatech.thelastcrusade.bluetooth_test.extra.SOCKET";
 
     public ConnectThread(Context context, BluetoothDevice device) throws IOException {
         mmContext = context;
@@ -60,7 +55,7 @@ public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocke
             onConnected(result);
         }
     }
-    
+
     protected abstract void onConnected(BluetoothSocket socket);
     
 //    /** Will cancel an in-progress connection, and close the socket */
