@@ -12,7 +12,7 @@ import java.io.OutputStream;
  *
  */
 public class StringMessage implements IMessage {
-
+    private final String TAG = "StringMessage";
     private String string;
 
     @Override

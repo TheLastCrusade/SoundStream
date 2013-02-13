@@ -8,6 +8,7 @@ import com.lastcrusade.fanclub.BluetoothNotEnabledException;
 
 public class BluetoothUtils {
     /* All methods should be static */
+    private final String TAG = "BluetoothUtils";
 
     public static void checkAndEnableBluetooth(Context context,
             BluetoothAdapter adapter) throws BluetoothNotEnabledException {
