@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class LandingActivity extends Activity {
+    private final String TAG = "LandingActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

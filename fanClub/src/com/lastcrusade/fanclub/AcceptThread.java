@@ -3,12 +3,16 @@ package com.lastcrusade.fanclub;
 import java.io.IOException;
 import java.util.UUID;
 
+import com.lastcrusade.fanclub.util.Toaster;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.util.Log;
 
 public class AcceptThread extends Thread {
+    private final String TAG = "AcceptThread";
     private final BluetoothServerSocket mmServerSocket;
     private String HOST_NAME = "Patty Placeholder's party";
     
@@ -38,8 +42,13 @@ public class AcceptThread extends Thread {
             // If a connection was accepted
             if (socket != null) {
                 // Do work to manage the connection (in a separate thread)
-                //TODO surround with try catch
-                mmServerSocket.close();
+                Log.i(TAG, "connection accepted");
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 break;
             }
         }

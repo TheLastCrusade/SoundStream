@@ -14,6 +14,7 @@ import android.os.AsyncTask;
  * @author Jesse Rosalia
  */
 public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocket> {
+    private final String TAG = "ConnectThread";
     private final BluetoothDevice mmDevice;
     private Context mmContext;
 
