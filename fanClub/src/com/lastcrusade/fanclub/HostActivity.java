@@ -39,15 +39,18 @@ public class HostActivity extends Activity {
         setContentView(R.layout.activity_host);
         Log.w(TAG, "Create Called");
 
+        // TODO consider moving this entire block into BluetoothUtils, because it's also used in FanActivity
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
         try {
-            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
-        } catch (BluetoothNotEnabledException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            BluetoothUtils.checkAndEnableBluetooth(adapter);
+        } catch (BluetoothNotEnabledException e) {
+            Toaster.iToast(this, "Unable to enable bluetooth adapter");
+            e.printStackTrace();
+            return;
+        } catch (BluetoothNotSupportedException e) {
+            Toaster.eToast(this, "Device may not support bluetooth");
+            e.printStackTrace();
         }
-
         registerReceivers(adapter);
 
         Button button = (Button) this.findViewById(R.id.button0);
@@ -144,6 +147,8 @@ public class HostActivity extends Activity {
             }
         }
         try {
+            //one thread per device found...if there are multiple devices,
+            // there are multiple threads
             this.connectThread = new ConnectThread(this, device) {
 
                 @Override

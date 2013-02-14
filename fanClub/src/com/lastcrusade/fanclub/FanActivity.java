@@ -25,7 +25,7 @@ public class FanActivity extends Activity {
     private final String TAG = "FanActivity";
     private BluetoothServerSocket mmServerSocket;
     private String HOST_NAME = "Patty Placeholder's party";
-    protected MessageThread connectedThread;
+    protected MessageThread messageThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +34,51 @@ public class FanActivity extends Activity {
 
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         try {
-            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
+            BluetoothUtils.checkAndEnableBluetooth(adapter);
         } catch (BluetoothNotEnabledException e) { // TODO This should be in
                                                    // BluetoothUtils?
             Toaster.iToast(this, "Unable to enable bluetooth adapter");
             e.printStackTrace();
             return;
+        } catch (BluetoothNotSupportedException e) {
+            Toaster.eToast(this, "Device may not support bluetooth");
+            e.printStackTrace();
         }
 
         BluetoothUtils.enableDiscovery(this);
 
+        try {
+            if (adapter == null) {
+                Toaster.eToast(this, "Unable to enable bluetooth adapter");
+            } else {
+//                mmServerSocket = adapter.listenUsingRfcommWithServiceRecord(
+//                        HOST_NAME,
+//                        UUID.fromString(this.getString(R.string.app_uuid)));
+//                if (mmServerSocket != null) {
+//                    Log.i(TAG, "Server Socket Made");
+//                } else {
+//                    Log.w(TAG, "Server Socket NOT made");
+//                }
+
+                AcceptThread thread = new AcceptThread(this, adapter) {
+
+                    @Override
+                    protected void onAccepted(BluetoothSocket socket) {
+                        onAcceptedHost(socket);
+                    }
+                    
+                };
+                thread.execute();
+            }
+        } catch (IOException e) {
+            Log.w(TAG, e.getStackTrace().toString());
+        }
+    }
+
+    protected void onAcceptedHost(BluetoothSocket socket) {
+        //disable discovery...we found our host.
+        BluetoothUtils.disableDiscovery(this);
+        //construct the message handler for host->fan messages
         final Handler handler = new Handler(new Handler.Callback() {
 
             @Override
@@ -56,43 +91,9 @@ public class FanActivity extends Activity {
             }
         });
 
-        try {
-            if (adapter == null) {
-                Toaster.eToast(this, "Unable to enable bluetooth adapter");
-            } else {
-                mmServerSocket = adapter.listenUsingRfcommWithServiceRecord(
-                        HOST_NAME,
-                        UUID.fromString(this.getString(R.string.app_uuid)));
-                if (mmServerSocket != null) {
-                    Log.i(TAG, "Server Socket Made");
-                } else {
-                    Log.w(TAG, "Server Socket NOT made");
-                }
-
-                new Thread() {
-                    public void run() {
-                        BluetoothSocket socket = null;
-                        try {
-                            while (true) {
-                                // If a connection was accepted
-                                socket = mmServerSocket.accept(); // blocking
-                                                                  // call
-                                if (socket != null) {
-                                    Log.i(TAG, "Connection accepted");
-                                    connectedThread = new MessageThread(socket,
-                                            handler);
-                                    connectedThread.start();
-                                }
-                            }
-                        } catch (IOException e) {
-                            Log.w(TAG, e.getStackTrace().toString());
-                        }
-                    };
-                }.start();
-            }
-        } catch (IOException e) {
-            Log.w(TAG, e.getStackTrace().toString());
-        }
+        //create the message thread for handling this connection
+        this.messageThread = new MessageThread(socket, handler);
+        this.messageThread.start();
     }
 
     protected void onReadMessage(String string, int arg1) {
