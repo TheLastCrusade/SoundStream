@@ -1,21 +1,25 @@
 package com.lastcrusade.fanclub;
 
 import java.io.IOException;
-import java.util.UUID;
 
-import com.lastcrusade.fanclub.util.BluetoothUtils;
-import com.lastcrusade.fanclub.util.Toaster;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+import com.lastcrusade.fanclub.message.FindNewFansMessage;
+import com.lastcrusade.fanclub.message.IMessage;
+import com.lastcrusade.fanclub.message.StringMessage;
+import com.lastcrusade.fanclub.util.BluetoothUtils;
+import com.lastcrusade.fanclub.util.Toaster;
 
 public class FanActivity extends Activity {
 
@@ -34,7 +38,7 @@ public class FanActivity extends Activity {
 
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         try {
-            BluetoothUtils.checkAndEnableBluetooth(adapter);
+            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
         } catch (BluetoothNotEnabledException e) { // TODO This should be in
                                                    // BluetoothUtils?
             Toaster.iToast(this, "Unable to enable bluetooth adapter");
@@ -51,15 +55,6 @@ public class FanActivity extends Activity {
             if (adapter == null) {
                 Toaster.eToast(this, "Unable to enable bluetooth adapter");
             } else {
-//                mmServerSocket = adapter.listenUsingRfcommWithServiceRecord(
-//                        HOST_NAME,
-//                        UUID.fromString(this.getString(R.string.app_uuid)));
-//                if (mmServerSocket != null) {
-//                    Log.i(TAG, "Server Socket Made");
-//                } else {
-//                    Log.w(TAG, "Server Socket NOT made");
-//                }
-
                 AcceptThread thread = new AcceptThread(this, adapter) {
 
                     @Override
@@ -73,8 +68,64 @@ public class FanActivity extends Activity {
         } catch (IOException e) {
             Log.w(TAG, e.getStackTrace().toString());
         }
+        
+        Button button = (Button) this.findViewById(R.id.btn_let_me_in);
+        button.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                onLetMeInButtonClicked();
+            }
+        });
+
+        button = (Button) this.findViewById(R.id.button1);
+        button.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                onHelloButtonClicked();
+            }
+        });
     }
 
+    protected void onLetMeInButtonClicked() {
+        //initial test message
+        Toaster.iToast(this, "Sending Find New Fans message");
+        FindNewFansMessage msg = new FindNewFansMessage();
+        //send the message to the host
+        sendMessage(msg);
+    }
+
+    protected void onHelloButtonClicked() {
+        //initial test message
+        Toaster.iToast(this, "Sending hello message");
+        String message = "Hello, Fans.  From: " + BluetoothAdapter.getDefaultAdapter().getName();
+        StringMessage sm = new StringMessage();
+        sm.setString(message);
+        //send the message to the host
+        sendMessage(sm);
+    }
+
+    /**
+     * Helper method to send a message to the host or raise an error
+     * to the user.
+     * 
+     * @param msg
+     */
+    private void sendMessage(IMessage msg) {
+        if(this.messageThread == null){
+            Toaster.eToast(this, "Not connected to host");
+        } else {
+            this.messageThread.write(msg);
+        }        
+    }
+
+    /**
+     * 
+     * NOTE: must be run on the UI thread.
+     * 
+     * @param socket
+     */
     protected void onAcceptedHost(BluetoothSocket socket) {
         //disable discovery...we found our host.
         BluetoothUtils.disableDiscovery(this);

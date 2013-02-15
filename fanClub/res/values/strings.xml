@@ -9,5 +9,7 @@
     <string name="title_activity_host">HostActivity</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
+    <string name="enable_bluetooth">Enabling Bluetooth...</string>
+    <string name="finding_new_fans">Finding new fans...</string>
 
 </resources>

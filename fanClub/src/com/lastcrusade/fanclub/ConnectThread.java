@@ -20,8 +20,8 @@ import android.util.Log;
 public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocket> {
     private final String TAG = "ConnectThread";
     private final BluetoothDevice mmDevice;
-    private final BluetoothSocket mmSocket;
     private final Context mmContext;
+    private BluetoothSocket mmSocket;
 
     public ConnectThread(Context context, BluetoothDevice device) throws UnableToCreateSocketException {
         mmContext = context;
@@ -66,6 +66,7 @@ public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocke
     public void cancel() {
         try {
             mmSocket.close();
+            mmSocket = null;
         } catch (IOException e) {
             //Nothing to do..fall thru gracefully
         }
