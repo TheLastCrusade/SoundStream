@@ -33,6 +33,9 @@ public class HostActivity extends Activity {
     private ConnectThread connectThread;
     private List<MessageThread> messageThreads = new ArrayList<MessageThread>();
 
+    private StringBuilder message = new StringBuilder();
+    private Object msgMutex = new Object();
+
     private final String TAG = "Bluetooth_Host";
 
     @Override
@@ -76,7 +79,7 @@ public class HostActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Toaster.iToast(HostActivity.this, "Testing stack");
+                onHelloButtonClicked();
             }
         });
     }
@@ -204,11 +207,19 @@ public class HostActivity extends Activity {
         }
     }
 
+    
     protected void onReadMessage(int messageNo, IMessage message) {
         Log.w(TAG, "Message received: " + messageNo);
         if (message instanceof StringMessage) {
             StringMessage sm = (StringMessage)message;
-            Toaster.iToast(this, sm.getString());
+            synchronized (msgMutex) {
+                if (this.message.length() > 0) {
+                    this.message.append("\n");
+                } else {
+                    startDelayedDisplayMessage();
+                }
+                this.message.append(sm.getString());
+            }
         }
 
         if (message instanceof FindNewFansMessage) {
@@ -219,6 +230,21 @@ public class HostActivity extends Activity {
             }
             adapter.startDiscovery();
         }
+    }
+
+    private void startDelayedDisplayMessage() {
+        int delayMillis = 2000; /* 2s */
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                synchronized (msgMutex) {
+                    Toaster.iToast(HostActivity.this, message.toString());
+                    message = new StringBuilder();
+                }
+            }
+
+        }, delayMillis);
     }
 
     protected void onDiscoveryFinished(BluetoothAdapter adapter) {

@@ -23,9 +23,6 @@ import com.lastcrusade.fanclub.util.Toaster;
 
 public class FanActivity extends Activity {
 
-    private StringBuilder message = new StringBuilder();
-    private Object msgMutex = new Object();
-
     private final String TAG = "FanActivity";
     private BluetoothServerSocket mmServerSocket;
     private String HOST_NAME = "Patty Placeholder's party";
@@ -99,7 +96,7 @@ public class FanActivity extends Activity {
     protected void onHelloButtonClicked() {
         //initial test message
         Toaster.iToast(this, "Sending hello message");
-        String message = "Hello, Fans.  From: " + BluetoothAdapter.getDefaultAdapter().getName();
+        String message = "You Rock! From: " + BluetoothAdapter.getDefaultAdapter().getName();
         StringMessage sm = new StringMessage();
         sm.setString(message);
         //send the message to the host
@@ -135,7 +132,7 @@ public class FanActivity extends Activity {
             @Override
             public boolean handleMessage(Message msg) {
                 if (msg.what == MessageThread.MESSAGE_READ) {
-                    onReadMessage(msg.obj.toString(), msg.arg1);
+                    onReadMessage(msg.arg1, (IMessage) msg.obj);
                     return true;
                 }
                 return false;
@@ -147,30 +144,12 @@ public class FanActivity extends Activity {
         this.messageThread.start();
     }
 
-    protected void onReadMessage(String string, int arg1) {
-        synchronized (msgMutex) {
-            if (message.length() > 0) {
-                message.append("\n");
-            } else {
-                startDelayedDisplayMessage();
-            }
-            message.append(string);
+    protected void onReadMessage(int messageNo, IMessage message) {
+        Log.w(TAG, "Message received: " + messageNo);
+        if (message instanceof StringMessage) {
+            StringMessage sm = (StringMessage)message;
+            Toaster.iToast(this, sm.getString());
         }
-    }
-
-    private void startDelayedDisplayMessage() {
-        int delayMillis = 2000; /* 2s */
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                synchronized (msgMutex) {
-                    Toaster.iToast(FanActivity.this, message.toString());
-                    message = new StringBuilder();
-                }
-            }
-
-        }, delayMillis);
     }
 
     @Override
