@@ -33,5 +33,3 @@ result.writeToFile('test_results/shot'+ str(num_files) +'.png','png')
 
 # Select and press create
 ##TODO make test to open create
-
-
