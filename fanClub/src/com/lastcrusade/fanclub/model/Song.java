@@ -10,6 +10,8 @@ public class Song {
 
     private String album;
 
+    private String filePath;
+
     private long size;
 
     private byte[] data;
@@ -46,6 +48,14 @@ public class Song {
 
     public void setArtist(String artist) {
         this.artist = artist;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public long getSize() {

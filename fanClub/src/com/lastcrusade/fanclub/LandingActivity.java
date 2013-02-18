@@ -34,6 +34,14 @@ public class LandingActivity extends Activity {
                     }
                 });
 
+        ((Button) findViewById(R.id.btn_test_playbar))
+        .setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                transitionTo(TestPlaybarActivity.class);
+            }
+        });
     }
 
     @Override

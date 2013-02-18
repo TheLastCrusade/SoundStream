@@ -4,9 +4,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 
-import com.lastcrusade.fanclub.BluetoothNotEnabledException;
-import com.lastcrusade.fanclub.BluetoothNotSupportedException;
 import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
+import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
 
 public class BluetoothUtils {
     /* All methods should be static */

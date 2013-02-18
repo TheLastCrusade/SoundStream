@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -11,6 +11,10 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
+
+import com.lastcrusade.fanclub.net.message.IMessage;
+import com.lastcrusade.fanclub.net.message.Messenger;
+import com.lastcrusade.fanclub.net.message.StringMessage;
 
 public class MessengerTest {
 

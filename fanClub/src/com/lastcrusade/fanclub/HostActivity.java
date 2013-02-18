@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -21,10 +22,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.lastcrusade.fanclub.message.FindNewFansMessage;
-import com.lastcrusade.fanclub.message.IMessage;
-import com.lastcrusade.fanclub.message.StringMessage;
 import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
+import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
+import com.lastcrusade.fanclub.net.ConnectThread;
+import com.lastcrusade.fanclub.net.MessageThread;
+import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
+import com.lastcrusade.fanclub.net.message.IMessage;
+import com.lastcrusade.fanclub.net.message.StringMessage;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.Toaster;
 
