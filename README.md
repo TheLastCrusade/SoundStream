@@ -47,3 +47,10 @@ If members want you to make changes to your pull request before accepting it, yo
 1. Make a commit with the necessary changes and push it to your own repo.
 2. On your fork's Github page, click the "Pull Request" button again. You will get a message stating that you already have a pull request, and that you can adjust the commit range for it.
 3. Include your new commit with the changes.
+
+## To sign apk
+
+1. Right click on the project and select export
+2. Then select Android application
+3. Use existing key, put the key from my email in the root directory
+
