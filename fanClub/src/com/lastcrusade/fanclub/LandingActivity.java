@@ -33,6 +33,17 @@ public class LandingActivity extends Activity {
                         transitionTo(FanActivity.class);
                     }
                 });
+        
+
+        ((Button) findViewById(R.id.btn_playlist))
+                .setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        transitionTo(PlaylistActivity.class);
+                    }
+                });
+
 
     }
 

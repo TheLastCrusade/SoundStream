@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding= "10dp">
+   
+    <com.lastcrusade.fanclub.util.VerticalTextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp">
+    </com.lastcrusade.fanclub.util.VerticalTextView>
+    
+    <LinearLayout>
+        <TextView
+	        android:id="@+id/title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="18sp"
+	        android:textColorHighlight="#656565">
+	    </TextView>
+	    
+        <RelativeLayout >
+             <TextView
+		        android:id="@+id/artist"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:textSize="14sp"
+		        android:textColorHighlight="#656565">
+		    </TextView>
+		    
+		    <TextView
+		        android:id="@+id/album"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_toRightOf="@+id/artist"
+		        android:textSize="14sp"
+		        android:textColorHighlight="#656565">
+		    </TextView>
+        </RelativeLayout>
+	   
+    </LinearLayout>
+    
+    
+</RelativeLayout>
+
+    

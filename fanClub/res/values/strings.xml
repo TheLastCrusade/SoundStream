@@ -7,7 +7,9 @@
     <string name="app_uuid">e271f460-d1ad-4ea8-b555-5e59b19c71ff</string>
     <string name="title_activity_fan">FanActivity</string>
     <string name="title_activity_host">HostActivity</string>
+    <string name="title_activity_playlist">PlaylistActivity</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
+    <string name="playlist">PlayList</string>
 
 </resources>

@@ -77,7 +77,7 @@ public class HostActivity extends Activity {
     }
 
     private String formatSong(Song song) {
-        return String.format("%s by %s on their hit album %s", song.getName(),
+        return String.format("%s by %s on their hit album %s", song.getTitle(),
                 song.getArtist(), song.getAlbum());
     }
 

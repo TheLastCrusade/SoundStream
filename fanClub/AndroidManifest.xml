@@ -33,6 +33,10 @@
             android:name="com.lastcrusade.fanclub.HostActivity"
             android:label="@string/title_activity_host" >
         </activity>
+        <activity
+            android:name="com.lastcrusade.fanclub.PlaylistActivity"
+            android:label="@string/title_activity_playlist" >
+        </activity>
     </application>
 
 </manifest>
