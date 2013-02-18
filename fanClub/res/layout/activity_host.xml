@@ -19,6 +19,6 @@
         android:layout_below="@+id/button0"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="26dp"
-        android:text="Hello, Reid!" />
+        android:text="Hello, Cleveland!" />
 
 </RelativeLayout>

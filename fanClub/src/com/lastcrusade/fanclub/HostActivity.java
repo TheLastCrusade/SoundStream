@@ -1,6 +1,8 @@
 package com.lastcrusade.fanclub;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -29,7 +31,10 @@ import com.lastcrusade.fanclub.util.Toaster;
 public class HostActivity extends Activity {
 
     private ConnectThread connectThread;
-    private MessageThread messageThread;
+    private List<MessageThread> messageThreads = new ArrayList<MessageThread>();
+
+    private StringBuilder message = new StringBuilder();
+    private Object msgMutex = new Object();
 
     private final String TAG = "Bluetooth_Host";
 
@@ -39,15 +44,18 @@ public class HostActivity extends Activity {
         setContentView(R.layout.activity_host);
         Log.w(TAG, "Create Called");
 
+        // TODO consider moving this entire block into BluetoothUtils, because it's also used in FanActivity
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
         try {
             BluetoothUtils.checkAndEnableBluetooth(this, adapter);
-        } catch (BluetoothNotEnabledException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } catch (BluetoothNotEnabledException e) {
+            Toaster.iToast(this, "Unable to enable bluetooth adapter");
+            e.printStackTrace();
+            return;
+        } catch (BluetoothNotSupportedException e) {
+            Toaster.eToast(this, "Device may not support bluetooth");
+            e.printStackTrace();
         }
-
         registerReceivers(adapter);
 
         Button button = (Button) this.findViewById(R.id.button0);
@@ -71,9 +79,21 @@ public class HostActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Toaster.iToast(HostActivity.this, "Testing stack");
+                onHelloButtonClicked();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disconnectAllSockets();
+    }
+
+    private void disconnectAllSockets() {
+        for (MessageThread thread : this.messageThreads) {
+            thread.cancel();
+        }
     }
 
     private String formatSong(Song song) {
@@ -104,6 +124,26 @@ public class HostActivity extends Activity {
         }, filter);
     }
 
+    protected void onHelloButtonClicked() {
+        //initial test message
+        Toaster.iToast(this, "Sending test message");
+        String message = "Hello, Fans.  From: " + BluetoothAdapter.getDefaultAdapter().getName();
+        if(this.messageThreads.isEmpty()){
+            Toaster.eToast(this, "No Fans connected");
+        } else {
+            StringMessage sm = new StringMessage();
+            sm.setString(message);
+            //send to all connected fans
+            broadcastMessage(sm);
+        }
+    }
+
+    private void broadcastMessage(StringMessage sm) {
+        for (MessageThread thread : this.messageThreads) {
+            thread.write(sm);
+        }
+    }
+
     /**
      * 
      * NOTE: must be run on the UI thread.
@@ -124,9 +164,11 @@ public class HostActivity extends Activity {
             }
         });
         
+        socket.getRemoteDevice();
         //create the message thread, which will be responsible for reading and writing messages
-        this.messageThread = new MessageThread(socket, handler);
-        this.messageThread.start();
+        MessageThread newMessageThread = new MessageThread(socket, handler);
+        newMessageThread.start();
+        this.messageThreads.add(newMessageThread);
     }
 
     protected void onDeviceFound(BluetoothAdapter adapter, Intent intent) {
@@ -135,7 +177,7 @@ public class HostActivity extends Activity {
         Log.w(TAG,
                 "Device found: " + device.getName() + "(" + device.getAddress()
                         + ")");
-        adapter.cancelDiscovery();
+//        adapter.cancelDiscovery();
 
         for (BluetoothDevice bonded : adapter.getBondedDevices()) {
             if (bonded.getAddress().equals(device.getAddress())) {
@@ -144,6 +186,11 @@ public class HostActivity extends Activity {
             }
         }
         try {
+            //one thread per device found...if there are multiple devices,
+            // there are multiple threads
+            //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
+            // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
+            // connection of the actual fan
             this.connectThread = new ConnectThread(this, device) {
 
                 @Override
@@ -160,17 +207,44 @@ public class HostActivity extends Activity {
         }
     }
 
+    
     protected void onReadMessage(int messageNo, IMessage message) {
         Log.w(TAG, "Message received: " + messageNo);
         if (message instanceof StringMessage) {
             StringMessage sm = (StringMessage)message;
-            Toaster.iToast(this, sm.getString());
+            synchronized (msgMutex) {
+                if (this.message.length() > 0) {
+                    this.message.append("\n");
+                } else {
+                    startDelayedDisplayMessage();
+                }
+                this.message.append(sm.getString());
+            }
         }
 
         if (message instanceof FindNewFansMessage) {
-            //TODO: this may need to be more robust, as discovery typically only lasts for 12 seconds
-            BluetoothUtils.enableDiscovery(this);
+            Toaster.iToast(this, R.string.finding_new_fans);
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+            if (adapter == null) {
+                Toaster.eToast(this, "Bluetooth adapter is null");
+            }
+            adapter.startDiscovery();
         }
+    }
+
+    private void startDelayedDisplayMessage() {
+        int delayMillis = 2000; /* 2s */
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                synchronized (msgMutex) {
+                    Toaster.iToast(HostActivity.this, message.toString());
+                    message = new StringBuilder();
+                }
+            }
+
+        }, delayMillis);
     }
 
     protected void onDiscoveryFinished(BluetoothAdapter adapter) {
