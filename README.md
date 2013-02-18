@@ -65,3 +65,10 @@ Test output will be placed in the test_results.
 2. All output should be written to not overwrite previous tests
 3. Tests should be added when new screens are added
 4. If you break the UI and the tests pass add a new test
+
+## To sign apk
+
+1. Right click on the project and select export
+2. Then select Android application
+3. Use existing key, put the key from my email in the root directory
+
