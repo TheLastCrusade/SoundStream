@@ -9,18 +9,20 @@ public class VerticalTextView extends TextView {
 
     public VerticalTextView(Context context, AttributeSet attrs) {
         super(context,attrs);
-        // TODO Auto-generated constructor stub
     }
     
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
+        super.onMeasure(heightMeasureSpec, widthMeasureSpec);
+        setMeasuredDimension(getMeasuredHeight(), getMeasuredWidth());
+     }
+    
     @Override
-    public void onDraw(Canvas canvas){
+    protected void onDraw(Canvas canvas){
         canvas.save();
-        
-        canvas.translate(getWidth(),0);
-        canvas.rotate(90);
-        canvas.translate(getCompoundPaddingLeft(), getExtendedPaddingTop());
-        
-        getLayout().draw(canvas);
+       
+        canvas.rotate(-90,getLeft(), getTop());
+        canvas.translate(-getHeight()/2.0f,0);
+        super.onDraw(canvas);
         canvas.restore();
     }
 
