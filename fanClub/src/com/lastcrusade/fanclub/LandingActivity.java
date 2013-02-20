@@ -35,6 +35,7 @@ public class LandingActivity extends Activity {
                 });
         
 
+        //temporary button for testing purposes
         ((Button) findViewById(R.id.btn_playlist))
                 .setOnClickListener(new OnClickListener() {
 

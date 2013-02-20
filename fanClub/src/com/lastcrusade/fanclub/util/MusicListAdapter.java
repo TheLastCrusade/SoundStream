@@ -18,6 +18,7 @@ public class MusicListAdapter extends BaseAdapter {
     private Context mContext;
     private Song[] songs;
     private Hashtable<String,String> users;
+    
     public MusicListAdapter(Context mContext, Song[] songs){
         this.mContext = mContext;
         this.songs = songs;
@@ -38,7 +39,7 @@ public class MusicListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return songs[position].getId();
+        return songs[position].getMetadata().getId();
     }
 
     @Override
@@ -57,11 +58,12 @@ public class MusicListAdapter extends BaseAdapter {
         TextView album = (TextView) element.findViewById(R.id.album);
         
 
-        userColor.setBackgroundColor(Color.parseColor(users.get(songs[position].getUsername())));
-        title.setText(songs[position].getTitle());
-        artist.setText(songs[position].getArtist());
-        album.setText(songs[position].getAlbum());
-        //((View)element.findViewById(R.id.userColor)).setMinimumHeight(element.getHeight());
+        userColor.setBackgroundColor(Color.parseColor(users.get(songs[position].getMetadata().getUsername())));
+        title.setText(songs[position].getMetadata().getTitle());
+        artist.setText(songs[position].getMetadata().getArtist());
+        album.setText(songs[position].getMetadata().getAlbum());
+
+        
         return element;
     }
 
