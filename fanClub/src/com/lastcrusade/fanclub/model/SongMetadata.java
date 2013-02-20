@@ -1,7 +1,7 @@
 package com.lastcrusade.fanclub.model;
 
 public class SongMetadata {
-	
+
     private long id;
 
     private String title;
@@ -9,8 +9,9 @@ public class SongMetadata {
     private String artist;
 
     private String album;
-    
-    private String username;	// Bluetooth id of person who added song to playlist
+
+    private String username; // Bluetooth id of person who added song to
+                             // playlist
 
     public long getId() {
         return id;

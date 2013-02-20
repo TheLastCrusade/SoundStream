@@ -1,7 +1,7 @@
 package com.lastcrusade.fanclub.model;
 
 public class Song {
-    
+
     private SongMetadata metadata;
 
     private long size;
@@ -36,10 +36,10 @@ public class Song {
     }
 
     public SongMetadata getMetadata() {
-	return metadata;
+        return metadata;
     }
-    
-    public void setSongMetadata(SongMetadata metadata){
+
+    public void setSongMetadata(SongMetadata metadata) {
         this.metadata = metadata;
     }
 }

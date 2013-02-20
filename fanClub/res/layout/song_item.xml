@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-   
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
     <View
         android:id="@+id/userColor"
         android:layout_width="10sp"
         android:layout_height="match_parent"
-        android:minHeight="50sp"
-        android:background="#ff000000"
+        android:layout_alignParentLeft="true"
         android:layout_marginRight="4sp"
-        android:layout_alignParentLeft="true">
-      </View>
+        android:background="#ff000000"
+        android:minHeight="50sp" >
+    </View>
 
     <TextView
-	     android:id="@+id/title"
-	     android:layout_width="wrap_content"
-	     android:layout_height="wrap_content"
-	     android:layout_toRightOf="@+id/userColor"
-	     android:paddingTop="2sp"
-	     android:textSize="18sp"
-	     android:textColorHighlight="#656565">
-     </TextView>
-     
-     <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/userColor"
+        android:paddingTop="2sp"
+        android:textColorHighlight="#656565"
+        android:textSize="18sp" >
+    </TextView>
+
+    <TextView
         android:id="@+id/artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,17 +34,15 @@
         android:textColorHighlight="#656565"
         android:textSize="14sp" >
     </TextView>
-    
+
     <TextView
         android:id="@+id/album"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/artist"
         android:layout_alignBaseline="@+id/artist"
+        android:layout_toRightOf="@+id/artist"
         android:textColorHighlight="#656565"
         android:textSize="14sp" >
     </TextView>
-   
-</RelativeLayout>
 
-    
+</RelativeLayout>
