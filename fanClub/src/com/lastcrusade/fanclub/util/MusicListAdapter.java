@@ -1,6 +1,9 @@
 package com.lastcrusade.fanclub.util;
 
+import java.util.Hashtable;
+
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,14 +12,16 @@ import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.UserList;
 
 public class MusicListAdapter extends BaseAdapter {
     private Context mContext;
     private Song[] songs;
-    
+    private Hashtable<String,String> users;
     public MusicListAdapter(Context mContext, Song[] songs){
         this.mContext = mContext;
         this.songs = songs;
+        users = UserList.getUsers();
     }
     
     
@@ -46,12 +51,13 @@ public class MusicListAdapter extends BaseAdapter {
             element = inflater.inflate(R.layout.song_item, null);
         }
         
-       // VerticalTextView username = (VerticalTextView) element.findViewById(R.id.userColor); 
+        View userColor = (View) element.findViewById(R.id.userColor); 
         TextView title = (TextView)element.findViewById(R.id.title);
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
         
-        //username.setText(songs[position].getUsername());
+
+        userColor.setBackgroundColor(Color.parseColor(users.get(songs[position].getUsername())));
         title.setText(songs[position].getTitle());
         artist.setText(songs[position].getArtist());
         album.setText(songs[position].getAlbum());

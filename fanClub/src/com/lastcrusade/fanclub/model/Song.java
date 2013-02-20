@@ -16,7 +16,7 @@ public class Song {
 
     private boolean fullRecord = false;
     
-    private String username = "username";
+    private String username = "Reid";
 
     public long getId() {
         return id;
