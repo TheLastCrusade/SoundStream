@@ -1,55 +1,56 @@
 package com.lastcrusade.fanclub.model;
 
 public class SongMetadata {
-	
-	private long id;
+
+    private long id;
 
     private String title;
 
     private String artist;
 
     private String album;
-    
-    private String username;	// Bluetooth id of person who added song to playlist
 
-	public long getId() {
-		return id;
-	}
+    private String username; // Bluetooth id of person who added song to
+                             // playlist
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getArtist() {
-		return artist;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setArtist(String artist) {
-		this.artist = artist;
-	}
+    public String getArtist() {
+        return artist;
+    }
 
-	public String getAlbum() {
-		return album;
-	}
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
 
-	public void setAlbum(String album) {
-		this.album = album;
-	}
+    public String getAlbum() {
+        return album;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setAlbum(String album) {
+        this.album = album;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 }
