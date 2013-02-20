@@ -10,6 +10,7 @@ import com.lastcrusade.fanclub.components.PlaybarFragment;
 import com.lastcrusade.fanclub.components.PlaybarFragment.PlayControlListener;
 import com.lastcrusade.fanclub.library.MediaStoreWrapper;
 import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 
 /**
  * Test activity for the playbar.  This will display the playbar in an activity, and respond to play button clicks
@@ -37,9 +38,10 @@ public class TestPlaybarActivity extends FragmentActivity {
 
             @Override
             public void onPlay() {
-                List<Song> songs = mediaStore.list();
-                Song song = songs.get(0);
-                song = mediaStore.loadSongData(song);
+                List<SongMetadata> songMetas = mediaStore.list();
+                SongMetadata meta = songMetas.get(0);
+                Song song = mediaStore.loadSongData(meta);
+//                TestPlaybarActivity.this.bindService(service, conn, flags)
                 player.setSongByPath(song.getFilePath());
                 player.play();
             }

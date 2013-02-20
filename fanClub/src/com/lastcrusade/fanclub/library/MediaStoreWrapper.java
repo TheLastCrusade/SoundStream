@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.provider.MediaStore;
 
 import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 
 public class MediaStoreWrapper {
 
@@ -19,7 +20,7 @@ public class MediaStoreWrapper {
         this.mActivity = mActivity;
     }
 
-    public List<Song> list() {
+    public List<SongMetadata> list() {
         String[] proj = { MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.ALBUM,
                 MediaStore.Audio.Media.ARTIST,
@@ -27,41 +28,42 @@ public class MediaStoreWrapper {
         Cursor cursor = this.mActivity.managedQuery(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, null, null,
                 null);
-        List<Song> newSongList = new ArrayList<Song>();
+        List<SongMetadata> newSongList = new ArrayList<SongMetadata>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Song song = new Song();
+            SongMetadata song = new SongMetadata();
             song.setId(cursor.getLong(0));
             song.setAlbum(cursor.getString(1));
             song.setArtist(cursor.getString(2));
-            song.setName(cursor.getString(3));
+            song.setTitle(cursor.getString(3));
             newSongList.add(song);
             cursor.moveToNext();
         }
 
-        Collections.sort(newSongList, new Comparator<Song>() {
+        Collections.sort(newSongList, new Comparator<SongMetadata>() {
 
             @Override
-            public int compare(Song lhs, Song rhs) {
-                return lhs.getName().compareTo(rhs.getName());
+            public int compare(SongMetadata lhs, SongMetadata rhs) {
+                return lhs.getTitle().compareTo(rhs.getTitle());
             }
 
         });
         return newSongList;
     }
 
-    public Song loadSongData(Song song) {
+    public Song loadSongData(SongMetadata metadata) {
         String[] proj = { MediaStore.Audio.Media._ID,
               MediaStore.Audio.Media.DATA, //NOTE: actually the path to the song, not the raw data
               MediaStore.Video.Media.SIZE 
               };
-        String selection = MediaStore.Audio.Media._ID + "=" + Long.toString(song.getId());
+        String selection = MediaStore.Audio.Media._ID + "=" + Long.toString(metadata.getId());
         Cursor cursor = this.mActivity.managedQuery(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, selection, null,
                 null);
         List<Song> newSongList = new ArrayList<Song>();
         cursor.moveToFirst();
         
+        Song song = new Song(metadata);
         song.setFilePath(cursor.getString(1));
         song.setSize(cursor.getLong(2));
         return song;
