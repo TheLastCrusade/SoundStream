@@ -1,7 +1,3 @@
-# fanClub
-
-**fanClub** is an open-source Android app that provides a platform to crowdsource music playlist creation among friends.
-
 ## git/Github Workflow
 
 In order to write good code for our project, we are going to fork the main project into our own private repositories and pull in changes to the main repo through pull requests, also known as the Fork & Pull Model.This adds a little complexity, but below there are some guides to clarify the how the process works.
