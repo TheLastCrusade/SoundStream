@@ -1,6 +1,7 @@
 # fanClub
 
 **fanClub** is an open-source Android app that provides a platform to crowdsource music playlist creation among friends.
+<<<<<<< HEAD
 
 ## git/Github Workflow
 
@@ -47,3 +48,5 @@ If members want you to make changes to your pull request before accepting it, yo
 1. Make a commit with the necessary changes and push it to your own repo.
 2. On your fork's Github page, click the "Pull Request" button again. You will get a message stating that you already have a pull request, and that you can adjust the commit range for it.
 3. Include your new commit with the changes.
+=======
+>>>>>>> 249cc7060fb7089ac4c69c666b007657e620c7ae

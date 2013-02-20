@@ -14,7 +14,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/fanclub_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -39,6 +39,10 @@
             android:label="@string/title_activity_host" >
         </activity>
         
+        <activity
+            android:name="com.lastcrusade.fanclub.PlaylistActivity"
+            android:label="@string/title_activity_playlist" >
+        </activity>
     </application>
 
 </manifest>

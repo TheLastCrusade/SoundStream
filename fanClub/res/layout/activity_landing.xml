@@ -32,6 +32,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="86dp"
         android:text="@string/create_network" />
+    <Button
+        android:id="@+id/btn_playlist"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_fan"
+        android:layout_centerHorizontal="true"
+        android:text="@string/playlist" />
+
     
     <Button
         android:id="@+id/btn_test_playbar"
@@ -42,6 +51,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="86dp"
         android:text="Test Playbar" />
-
     
 </LinearLayout>
