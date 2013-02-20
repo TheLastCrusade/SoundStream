@@ -1,8 +1,8 @@
 package com.lastcrusade.fanclub.model;
 
 public class Song {
-	
-	private SongMetadata metadata;
+
+    private SongMetadata metadata;
 
     private long size;
 
@@ -35,7 +35,11 @@ public class Song {
         this.fullRecord = fullRecord;
     }
 
-	public SongMetadata getMetadata() {
-		return metadata;
-	}
+    public SongMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setSongMetadata(SongMetadata metadata) {
+        this.metadata = metadata;
+    }
 }
