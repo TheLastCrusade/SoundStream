@@ -97,8 +97,8 @@ public class HostActivity extends Activity {
     }
 
     private String formatSong(Song song) {
-        return String.format("%s by %s on their hit album %s", song.getName(),
-                song.getArtist(), song.getAlbum());
+        return String.format("%s by %s on their hit album %s", song.getMetadata().getTitle(),
+                song.getMetadata().getArtist(), song.getMetadata().getAlbum());
     }
 
     private void registerReceivers(final BluetoothAdapter adapter) {
