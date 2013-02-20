@@ -11,5 +11,7 @@
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
     <string name="playlist">PlayList</string>
+    <string name="enable_bluetooth">Enabling Bluetooth...</string>
+    <string name="finding_new_fans">Finding new fans...</string>
 
 </resources>

@@ -2,13 +2,9 @@ package com.lastcrusade.fanclub.model;
 
 public class Song {
 
-    private long id;
+	
+	private SongMetadata metadata;
 
-    private String name = "title";
-
-    private String artist = "artist";
-
-    private String album = "album";
 
     private long size;
 
@@ -17,38 +13,6 @@ public class Song {
     private boolean fullRecord = false;
     
     private String username = "Reid";
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return name;
-    }
-
-    public void setTitle(String name) {
-        this.name = name;
-    }
-
-    public String getAlbum() {
-        return album;
-    }
-
-    public void setAlbum(String album) {
-        this.album = album;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
 
     public long getSize() {
         return size;
@@ -74,8 +38,8 @@ public class Song {
     public void setFullRecord(boolean fullRecord) {
         this.fullRecord = fullRecord;
     }
-    
-    public String getUsername(){
-        return username;
-    }
+
+	public SongMetadata getMetadata() {
+		return metadata;
+	}
 }
