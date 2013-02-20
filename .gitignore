@@ -1,5 +1,2 @@
 # Ignore file used to sign apk's
 keystore
-
-# Ignore location to put signed apk's
-signed_apks/*
