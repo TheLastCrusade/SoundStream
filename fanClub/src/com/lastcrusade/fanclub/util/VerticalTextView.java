@@ -14,14 +14,23 @@ public class VerticalTextView extends TextView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         super.onMeasure(heightMeasureSpec, widthMeasureSpec);
         setMeasuredDimension(getMeasuredHeight(), getMeasuredWidth());
+        int height = getHeight();
+        setHeight(getWidth());
+        setWidth(height);
      }
     
+    
+
     @Override
     protected void onDraw(Canvas canvas){
+        //int height = getHeight();
+        //setHeight(getWidth());
+        //setWidth((int)getTextSize());
         canvas.save();
-       
-        canvas.rotate(-90,getLeft(), getTop());
-        canvas.translate(-getHeight()/2.0f,0);
+        
+        canvas.rotate(-90);
+        canvas.translate(-getWidth(),0);
+        
         super.onDraw(canvas);
         canvas.restore();
     }

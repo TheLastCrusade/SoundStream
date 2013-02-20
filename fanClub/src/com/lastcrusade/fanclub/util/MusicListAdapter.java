@@ -46,16 +46,16 @@ public class MusicListAdapter extends BaseAdapter {
             element = inflater.inflate(R.layout.song_item, null);
         }
         
-        VerticalTextView username = (VerticalTextView) element.findViewById(R.id.username); 
+       // VerticalTextView username = (VerticalTextView) element.findViewById(R.id.userColor); 
         TextView title = (TextView)element.findViewById(R.id.title);
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
         
-        username.setText(songs[position].getUsername());
+        //username.setText(songs[position].getUsername());
         title.setText(songs[position].getTitle());
         artist.setText(songs[position].getArtist());
         album.setText(songs[position].getAlbum());
-        
+        //((View)element.findViewById(R.id.userColor)).setMinimumHeight(element.getHeight());
         return element;
     }
 
