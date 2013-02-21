@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -22,7 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
 import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
 import com.lastcrusade.fanclub.net.ConnectThread;
@@ -101,8 +100,8 @@ public class HostActivity extends Activity {
         }
     }
 
-    private String formatSong(Song song) {
-        return String.format("%s by %s on their hit album %s", song.getName(),
+    private String formatSong(SongMetadata song) {
+        return String.format("%s by %s on their hit album %s", song.getTitle(),
                 song.getArtist(), song.getAlbum());
     }
 

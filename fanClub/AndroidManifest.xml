@@ -43,6 +43,9 @@
             android:name="com.lastcrusade.fanclub.PlaylistActivity"
             android:label="@string/title_activity_playlist" >
         </activity>
+        <service android:name=".service.AudioPlayerService">
+            
+        </service>
     </application>
 
 </manifest>

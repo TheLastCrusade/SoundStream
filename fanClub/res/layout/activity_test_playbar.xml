@@ -12,6 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:text="SONGS"
+        android:layout_weight="1"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <fragment
