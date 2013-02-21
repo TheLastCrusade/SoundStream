@@ -1,8 +1,15 @@
 package com.lastcrusade.fanclub.util;
 
+import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.os.ParcelUuid;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
@@ -63,6 +70,36 @@ public class BluetoothUtils {
         discoverableIntent.putExtra(
                 BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         context.startActivity(discoverableIntent);
+    }
+
+    /**
+     * Get the UUIDs supported by this device.
+     * 
+     * NOTE: if calling this method on discovery, call this with the discovered
+     * device object, not the bonded device object.  The discovered device object
+     * will accurately show the services supported at that time.
+     * 
+     * @param device
+     * @return A list of UUIDs supported on the remote system.  Note that this may be empty (but should never be null).
+     */
+    public static List<UUID> getUuidsForDevice(BluetoothDevice device) {
+        try {
+            //NOTE: this uses an undocumented method call, because the documented call
+            // doesn't show up until API 15
+            Method method = device.getClass().getMethod("getUuids", null);
+            ParcelUuid[] puuids = (ParcelUuid[]) method.invoke(device, null);
+            //transform into a simple list
+            List<UUID> supportedUuids = new LinkedList<UUID>();
+            if (puuids != null) {
+                for (ParcelUuid puuid : puuids) {
+                    supportedUuids.add(puuid.getUuid());
+                }
+            }
+            return supportedUuids;
+        } catch (Exception e) {
+            //FIXME: 
+            throw new RuntimeException(e);
+        }
     }
 
 }

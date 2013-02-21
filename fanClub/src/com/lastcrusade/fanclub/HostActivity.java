@@ -3,6 +3,7 @@ package com.lastcrusade.fanclub;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -15,6 +16,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -181,37 +183,64 @@ public class HostActivity extends Activity {
         Log.w(TAG,
                 "Device found: " + device.getName() + "(" + device.getAddress()
                         + ")");
-//        adapter.cancelDiscovery();
 
-        for (BluetoothDevice bonded : adapter.getBondedDevices()) {
-            if (bonded.getAddress().equals(device.getAddress())) {
-                Log.w(TAG, "Already paired!  Using paired device");
-                device = adapter.getRemoteDevice(bonded.getAddress());
-            }
-        }
-        try {
-            //one thread per device found...if there are multiple devices,
-            // there are multiple threads
-            //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
-            // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
-            // connection of the actual fan
-            this.connectThread = new ConnectThread(this, device) {
-
-                @Override
-                protected void onConnected(BluetoothSocket socket) {
-                    onConnectedFan(socket);
+        //only connect to devices that can support our service
+        if (canSupportOurService(device)) {
+            for (BluetoothDevice bonded : adapter.getBondedDevices()) {
+                if (bonded.getAddress().equals(device.getAddress())) {
+                    Log.w(TAG, "Already paired!  Using paired device");
+                    device = adapter.getRemoteDevice(bonded.getAddress());
                 }
-                
-            };
-            this.connectThread.execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toaster.iToast(this,
-                    "Unable to create ConnectThread to connect to server");
+            }
+    
+            
+            try {
+                //one thread per device found...if there are multiple devices,
+                // there are multiple threads
+                //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
+                // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
+                // connection of the actual fan
+                this.connectThread = new ConnectThread(this, device) {
+    
+                    @Override
+                    protected void onConnected(BluetoothSocket socket) {
+                        onConnectedFan(socket);
+                    }
+                    
+                };
+                this.connectThread.execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toaster.iToast(this,
+                        "Unable to create ConnectThread to connect to server");
+            }
         }
     }
 
     
+    /**
+     * Helper method to determine if this device can support the UUID of our
+     * service.
+     * 
+     * @param device
+     * @return
+     */
+    private boolean canSupportOurService(BluetoothDevice device) {
+        boolean supported = false;
+        List<UUID> supportedUuids = BluetoothUtils.getUuidsForDevice(device);
+        UUID uuid = UUID.fromString(this.getString(R.string.app_uuid));
+        if (uuid == null) {
+            throw new RuntimeException("string.app_uuid is unset.");
+        }
+        for (UUID supportedUuid : supportedUuids) {
+            if (supportedUuid.compareTo(uuid) == 0) {
+                supported = true;
+                break;
+            }
+        }
+        return supported;
+    }
+
     protected void onReadMessage(int messageNo, IMessage message) {
         Log.w(TAG, "Message received: " + messageNo);
         if (message instanceof StringMessage) {
