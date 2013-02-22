@@ -37,6 +37,12 @@
             android:name="com.lastcrusade.fanclub.PlaylistActivity"
             android:label="@string/title_activity_playlist" >
         </activity>
+        <service
+            android:name=".MusicLibrary"
+            android:exported="false"
+            android:label="Music Library"
+            android:description="Service for syncing library across multiple devices"
+            />
     </application>
 
 </manifest>
