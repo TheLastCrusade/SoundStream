@@ -1,11 +1,13 @@
 package com.lastcrusade.fanclub;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListView;
 
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.service.MusicLibrary;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 
 public class PlaylistActivity extends Activity {
@@ -20,6 +22,10 @@ public class PlaylistActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        
+        //To test Music service
+        Intent intent = new Intent(this, MusicLibrary.class);
+        startService(intent);
         
         //for testing purposes
         for(Song s:songs){

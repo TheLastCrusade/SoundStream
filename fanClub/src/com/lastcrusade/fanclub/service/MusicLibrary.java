@@ -30,7 +30,6 @@ public class MusicLibrary extends IntentService {
     }
 
     @Override
-    @Override
     public void onDestroy() {
         Toast.makeText(this, "service stopping", Toast.LENGTH_SHORT).show();
         super.onDestroy();

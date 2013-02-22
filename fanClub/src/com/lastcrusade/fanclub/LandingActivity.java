@@ -1,5 +1,8 @@
 package com.lastcrusade.fanclub;
 
+import com.lastcrusade.fanclub.service.MusicLibrary;
+import com.lastcrusade.fanclub.util.Toaster;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -59,6 +62,17 @@ public class LandingActivity extends Activity {
         Intent intent = new Intent();
         intent.setClass(this, activityClass);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Make sure to destroy services when the application closes
+        Toaster.iToast(this, "Destroying MusicLibrary Service");
+        Intent intent = new Intent(this, MusicLibrary.class);
+        stopService(intent);
+
     }
 
 }
