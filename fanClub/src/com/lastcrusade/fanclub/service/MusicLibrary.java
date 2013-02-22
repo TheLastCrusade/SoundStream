@@ -1,37 +1,31 @@
 package com.lastcrusade.fanclub.service;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 import android.widget.Toast;
 
-public class MusicLibrary extends IntentService {
+public class MusicLibrary extends Service {
 
-    public MusicLibrary(){
-        super("MusicLibrary");
-    }
+    private final IBinder mBinder = new MusicLibraryBinder();
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        long endTime = System.currentTimeMillis() + 5*1000;
-        while (System.currentTimeMillis() < endTime) {
-            synchronized (this) {
-                try {
-                    wait(endTime - System.currentTimeMillis());
-                } catch (Exception e) {
-                }
-            }
+    public class MusicLibraryBinder extends Binder {
+        public MusicLibrary getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return MusicLibrary.this;
         }
     }
-    
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        return super.onStartCommand(intent,flags,startId);
-    }
 
     @Override
-    public void onDestroy() {
-        Toast.makeText(this, "service stopping", Toast.LENGTH_SHORT).show();
-        super.onDestroy();
+    public IBinder onBind(Intent intent) {
+        return mBinder;
     }
+    
+    /** Methods for clients */
+
+    public int getRandomNumber() {
+      return 101; //HAHA its not random
+    }
+
 }
