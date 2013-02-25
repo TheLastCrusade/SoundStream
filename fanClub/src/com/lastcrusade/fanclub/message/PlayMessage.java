@@ -14,8 +14,9 @@ public class PlayMessage implements IMessage {
 		byte[] bytes = new byte[1024];
 		int read = 0;
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		while((read = input.read(bytes)) > 0)
+		while((read = input.read(bytes)) > 0) {
 			out.write(bytes, 0, read);
+		}
 		this.setString(out.toString());
 	}
 

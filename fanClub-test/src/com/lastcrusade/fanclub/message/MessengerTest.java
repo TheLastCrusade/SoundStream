@@ -23,7 +23,7 @@ public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
 	
-	@Test
+    @Test
     public void testDeserializeMessage() throws IOException {
         
         //test the simple case (one message within the stream)
@@ -85,7 +85,7 @@ public class MessengerTest {
         //make sure all bytes are consumed
         assertEquals(0, bais.available());
     }
-
+    
     @Test
     public void testSerializeMessage() throws IOException {
         
