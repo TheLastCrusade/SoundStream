@@ -12,11 +12,13 @@ import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
+import com.lastcrusade.fanclub.LandingActivity;
+
 public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
-    
-    @Test
+
+	@Test
     public void testDeserializeMessage() throws IOException {
         
         //test the simple case (one message within the stream)
@@ -170,5 +172,29 @@ public class MessengerTest {
         
         baos.reset();
         baos.write(bytes);
+    }
+    
+    @Test
+    public void testSerializePlayMessage() throws IOException {
+		Messenger messenger = new Messenger();
+		
+		PlayMessage playMessage = new PlayMessage();
+		String testMessage = "Play";
+		playMessage.setString(testMessage);
+		messenger.serializeMessage(playMessage);
+		InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
+		
+		Messenger rcvMessenger = new Messenger();
+		// attempt to deserialize the second message
+		assertTrue(rcvMessenger.deserializeMessage(is));
+		
+		// and check the deserialized message
+		IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+		assertNotNull(rcvMessage);
+		assertTrue(rcvMessage instanceof PlayMessage);
+		assertEquals(testMessage, ((PlayMessage)rcvMessage).getPlayMessage());
+		
+		//make sure all bytes are consumed
+		assertEquals(0, is.available());
     }
 }
