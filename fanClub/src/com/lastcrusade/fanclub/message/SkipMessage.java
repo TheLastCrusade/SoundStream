@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class SkipMessage implements IMessage {
-	private final String SKIP_SERVICE = "Skip";
+	private String string;
+	private final String SKIP_MESSAGE= "Skip";
 
 	@Override
 	public void deserialize(InputStream input) throws IOException {
@@ -15,7 +16,19 @@ public class SkipMessage implements IMessage {
 
 	@Override
 	public void serialize(OutputStream output) throws IOException {
-		output.write(SKIP_SERVICE.getBytes());		
+		output.write(SKIP_MESSAGE.getBytes());		
+	}
+
+	public String getString() {
+		return string;
+	}
+
+	public void setString(String string) {
+		this.string = string;
+	}
+	
+	public String getSkipMessage() {
+		return SKIP_MESSAGE;
 	}
 
 }

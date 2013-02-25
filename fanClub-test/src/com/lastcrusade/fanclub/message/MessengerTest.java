@@ -221,4 +221,28 @@ public class MessengerTest {
     	// make sure all bytes are consumed
     	assertEquals(0, is.available());
     }
+    
+    @Test
+    public void testSerializeSkipMessage() throws IOException {
+    	Messenger messenger = new Messenger();
+    	
+    	SkipMessage skipMessage = new SkipMessage();
+    	String testMessage = "Skip";
+    	skipMessage.setString(testMessage);
+    	messenger.serializeMessage(skipMessage);
+    	InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
+    	
+    	Messenger rcvMessenger = new Messenger();
+		// attempt to deserialize the second message
+		assertTrue(rcvMessenger.deserializeMessage(is));
+		
+		// and check the deserialized message
+		IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+		assertNotNull(rcvMessage);
+		assertTrue(rcvMessage instanceof SkipMessage);
+		assertEquals(testMessage, ((SkipMessage)rcvMessage).getSkipMessage());
+		
+		// make sure all bytes are consumed
+		assertEquals(0, is.available());
+    }
 }
