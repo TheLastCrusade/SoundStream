@@ -9,7 +9,6 @@ public class PlayMessage implements IMessage {
 	private String string;
 	private final String PLAY_MESSAGE = "Play"; 
 
-	/* change this */
 	@Override
 	public void deserialize(InputStream input) throws IOException {
 		byte[] bytes = new byte[1024];
@@ -18,7 +17,7 @@ public class PlayMessage implements IMessage {
 		while((read = input.read(bytes)) > 0) {
 			out.write(bytes, 0, read);
 		}
-		//this.setString(out.toString());
+		this.setString(out.toString());
 	}
 
 	@Override
