@@ -7,6 +7,8 @@ public class Song {
     private byte[] data;
     private String filePath;
 
+    public Song() {}
+
     public Song(SongMetadata metadata) {
         this.metadata = metadata;
     }
