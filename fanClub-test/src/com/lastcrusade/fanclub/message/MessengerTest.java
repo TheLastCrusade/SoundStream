@@ -17,7 +17,7 @@ import com.lastcrusade.fanclub.LandingActivity;
 public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
-
+	
 	@Test
     public void testDeserializeMessage() throws IOException {
         
@@ -143,13 +143,13 @@ public class MessengerTest {
         //make sure all bytes are consumed
         assertEquals(0, is.available());
     }
-
+    
     private InputStream simulateSendAndReceive(
             byte[] outputBytes) {
         return new ByteArrayInputStream(outputBytes);
     }
-
-    /**
+	
+	/**
      * NOTE: keep this separate, so we have independent verification of the Messenger.  This lets
      * us use the independently verified side to test the other side of the messenger.
      * @param className
@@ -172,149 +172,5 @@ public class MessengerTest {
         
         baos.reset();
         baos.write(bytes);
-    }
-    
-    @Test
-    public void testSerializePlayMessage() throws IOException {
-		Messenger messenger = new Messenger();
-		
-		PlayMessage playMessage = new PlayMessage();
-		String testMessage = "Play";
-		playMessage.setString(testMessage);
-		messenger.serializeMessage(playMessage);
-		InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
-		
-		Messenger rcvMessenger = new Messenger();
-		// attempt to deserialize the second message
-		assertTrue(rcvMessenger.deserializeMessage(is));
-		
-		// and check the deserialized message
-		IMessage rcvMessage = rcvMessenger.getReceivedMessage();
-		assertNotNull(rcvMessage);
-		assertTrue(rcvMessage instanceof PlayMessage);
-		assertEquals(testMessage, ((PlayMessage)rcvMessage).getPlayMessage());
-		
-		// make sure all bytes are consumed
-		assertEquals(0, is.available());
-    }
-    
-    @Test
-    public void testSerializePauseMessage() throws IOException {
-    	Messenger messenger = new Messenger();
-    	
-    	PauseMessage pauseMessage = new PauseMessage();
-    	String testMessage = "Pause";
-    	pauseMessage.setString(testMessage);
-    	messenger.serializeMessage(pauseMessage);
-    	InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
-    	
-    	Messenger rcvMessenger = new Messenger();
-    	// attempt to deserialize the second message
-    	assertTrue(rcvMessenger.deserializeMessage(is));
-    	
-    	// and check the deserialized message
-    	IMessage rcvMessage = rcvMessenger.getReceivedMessage();
-    	assertNotNull(rcvMessage);
-    	assertTrue(rcvMessage instanceof PauseMessage);
-    	assertEquals(testMessage, ((PauseMessage)rcvMessage).getPauseMessage());
-    	
-    	// make sure all bytes are consumed
-    	assertEquals(0, is.available());
-    }
-    
-    @Test
-    public void testSerializeSkipMessage() throws IOException {
-    	Messenger messenger = new Messenger();
-    	
-    	SkipMessage skipMessage = new SkipMessage();
-    	String testMessage = "Skip";
-    	skipMessage.setString(testMessage);
-    	messenger.serializeMessage(skipMessage);
-    	InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
-    	
-    	Messenger rcvMessenger = new Messenger();
-		// attempt to deserialize the second message
-		assertTrue(rcvMessenger.deserializeMessage(is));
-		
-		// and check the deserialized message
-		IMessage rcvMessage = rcvMessenger.getReceivedMessage();
-		assertNotNull(rcvMessage);
-		assertTrue(rcvMessage instanceof SkipMessage);
-		assertEquals(testMessage, ((SkipMessage)rcvMessage).getSkipMessage());
-		
-		// make sure all bytes are consumed
-		assertEquals(0, is.available());
-    }
-    
-    @Test
-    public void testDeserializePlayMessage() throws IOException {
-    	// test the simple case (one message within the stream)
-    	Messenger messenger = new Messenger();
-    	
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	String className = PlayMessage.class.getCanonicalName();
-    	String testMessage = "Play";
-    	appendMessage(className, testMessage, baos);
-    	
-    	ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-    	
-    	// attempt deserialization
-    	assertTrue(messenger.deserializeMessage(bais));
-    	
-    	IMessage message = messenger.getReceivedMessage();
-    	assertNotNull(message);
-    	assertTrue(message instanceof PlayMessage);
-    	assertEquals(testMessage, ((PlayMessage)message).getPlayMessage());
-    	
-    	// make sure all bytes are consumed
-    	assertEquals(0, bais.available());
-    }
-    
-    @Test
-    public void testDeserializePauseMessage() throws IOException {
-    	// test the simple case (one message within the stream)
-    	Messenger messenger = new Messenger();
-    	
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	String className = PauseMessage.class.getCanonicalName();
-    	String testMessage = "Pause";
-    	appendMessage(className, testMessage, baos);
-    	
-    	ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-    	
-    	// attempt deserialization
-    	assertTrue(messenger.deserializeMessage(bais));
-    	
-    	IMessage message = messenger.getReceivedMessage();
-    	assertNotNull(message);
-    	assertTrue(message instanceof PauseMessage);
-    	assertEquals(testMessage, ((PauseMessage)message).getPauseMessage());
-    	
-    	// make sure all bytes are consumed
-    	assertEquals(0, bais.available());
-    }
-    
-    @Test
-    public void testDeserializeSkipMessage() throws IOException {
-    	// test the simple case (one message within the stream)
-    	Messenger messenger = new Messenger();
-    	
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	String className = SkipMessage.class.getCanonicalName();
-    	String testMessage = "Skip";
-    	appendMessage(className, testMessage, baos);
-    	
-    	ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-    	
-    	// attempt deserialization
-    	assertTrue(messenger.deserializeMessage(bais));
-    	
-    	IMessage message = messenger.getReceivedMessage();
-    	assertNotNull(message);
-    	assertTrue(message instanceof SkipMessage);
-    	assertEquals(testMessage, ((SkipMessage)message).getSkipMessage());
-    	
-    	// make sure all bytes are consumed
-    	assertEquals(0, bais.available());
     }
 }
