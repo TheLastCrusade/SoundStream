@@ -269,4 +269,28 @@ public class MessengerTest {
     	// make sure all bytes are consumed
     	assertEquals(0, bais.available());
     }
+    
+    @Test
+    public void testDeserializePauseMessage() throws IOException {
+    	// test the simple case (one message within the stream)
+    	Messenger messenger = new Messenger();
+    	
+    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    	String className = PauseMessage.class.getCanonicalName();
+    	String testMessage = "Pause";
+    	appendMessage(className, testMessage, baos);
+    	
+    	ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+    	
+    	// attempt deserialization
+    	assertTrue(messenger.deserializeMessage(bais));
+    	
+    	IMessage message = messenger.getReceivedMessage();
+    	assertNotNull(message);
+    	assertTrue(message instanceof PauseMessage);
+    	assertEquals(testMessage, ((PauseMessage)message).getPauseMessage());
+    	
+    	// make sure all bytes are consumed
+    	assertEquals(0, bais.available());
+    }
 }

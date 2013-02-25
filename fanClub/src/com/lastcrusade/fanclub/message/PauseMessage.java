@@ -1,5 +1,6 @@
 package com.lastcrusade.fanclub.message;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,8 +11,12 @@ public class PauseMessage implements IMessage {
 
 	@Override
 	public void deserialize(InputStream input) throws IOException {
-		// TODO Auto-generated method stub
-		
+		byte[] bytes = new byte[1024];
+		int read = 0;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		while((read = input.read(bytes)) > 0)
+			out.write(bytes, 0, read);
+		this.setString(out.toString());
 	}
 
 	@Override
