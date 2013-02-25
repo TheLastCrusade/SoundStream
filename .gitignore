@@ -1,2 +1,5 @@
 # Ignore file used to sign apk's
 keystore
+
+# Ignore sdcard image (for now)
+utilities/sdcard.img
