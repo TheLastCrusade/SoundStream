@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <View
+        android:id="@+id/userColor"
+        android:layout_width="12sp"
+        android:layout_height="12sp"
+        android:layout_margin="4sp">
+    </View>
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/userColor"
+        android:layout_alignBottom="@id/userColor"
+        android:textColorHighlight="#656565"
+        android:textSize="14sp" >
+    </TextView>
+
+
+</RelativeLayout>

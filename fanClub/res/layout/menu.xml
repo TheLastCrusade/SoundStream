@@ -8,15 +8,14 @@
         android:id="@+id/music"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:headerDividersEnabled="true"
-        android:entries="" >
+        android:headerDividersEnabled="true" >
         
     </ListView>
 
     <ListView
         android:id="@+id/statistics"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
     </ListView>
 
     <ListView
