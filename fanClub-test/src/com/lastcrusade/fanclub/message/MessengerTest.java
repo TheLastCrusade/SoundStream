@@ -194,7 +194,31 @@ public class MessengerTest {
 		assertTrue(rcvMessage instanceof PlayMessage);
 		assertEquals(testMessage, ((PlayMessage)rcvMessage).getPlayMessage());
 		
-		//make sure all bytes are consumed
+		// make sure all bytes are consumed
 		assertEquals(0, is.available());
+    }
+    
+    @Test
+    public void testSerializePauseMessage() throws IOException {
+    	Messenger messenger = new Messenger();
+    	
+    	PauseMessage pauseMessage = new PauseMessage();
+    	String testMessage = "Pause";
+    	pauseMessage.setString(testMessage);
+    	messenger.serializeMessage(pauseMessage);
+    	InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
+    	
+    	Messenger rcvMessenger = new Messenger();
+    	// attempt to deserialize the second message
+    	assertTrue(rcvMessenger.deserializeMessage(is));
+    	
+    	// and check the deserialized message
+    	IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+    	assertNotNull(rcvMessage);
+    	assertTrue(rcvMessage instanceof PauseMessage);
+    	assertEquals(testMessage, ((PauseMessage)rcvMessage).getPauseMessage());
+    	
+    	// make sure all bytes are consumed
+    	assertEquals(0, is.available());
     }
 }

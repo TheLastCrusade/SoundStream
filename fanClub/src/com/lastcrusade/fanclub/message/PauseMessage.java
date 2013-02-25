@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class PauseMessage implements IMessage {
+	private String string;
 	private final String PAUSE_MESSAGE = "Pause";
 
 	@Override
@@ -16,5 +17,17 @@ public class PauseMessage implements IMessage {
 	@Override
 	public void serialize(OutputStream output) throws IOException {
 		output.write(PAUSE_MESSAGE.getBytes());		
+	}
+
+	public String getString() {
+		return string;
+	}
+
+	public void setString(String string) {
+		this.string = string;
+	}
+	
+	public String getPauseMessage() {
+		return PAUSE_MESSAGE;
 	}
 }
