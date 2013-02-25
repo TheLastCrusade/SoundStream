@@ -33,12 +33,8 @@
             android:name="com.lastcrusade.fanclub.HostActivity"
             android:label="@string/title_activity_host" >
         </activity>
-        <activity
-            android:name="com.lastcrusade.fanclub.PlaylistFragmentActivity"
-            android:label="@string/title_activity_playlist" >
-        </activity>
          <activity
-            android:name="com.lastcrusade.fanclub.MainFragmentChanger"
+            android:name="com.lastcrusade.fanclub.CoreActivity"
             android:label="@string/title_activity_playlist" >
         </activity>
     </application>

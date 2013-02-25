@@ -14,7 +14,7 @@ public class MenuFragment extends SherlockListFragment {
     
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        String[] options = new String[] {"Playlist", "Choice B"};
+        String[] options = new String[] {"Playlist", "Music Library"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,android.R.id.text1, options);
         setListAdapter(adapter);
     }
@@ -27,13 +27,15 @@ public class MenuFragment extends SherlockListFragment {
         if(position == 0){
             switchFragment(new PlaylistFragment());
         }
+        else if(position == 1)
+            switchFragment(new MusicLibraryFragment());
     }
     
     private void switchFragment(Fragment fragment) {
         if (getActivity() == null)
             return;
         
-        ((MainFragmentChanger)getActivity()).switchContent(fragment);
+        ((CoreActivity)getActivity()).switchContent(fragment);
         
       
     }

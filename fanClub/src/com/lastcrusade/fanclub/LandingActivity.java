@@ -43,7 +43,7 @@ public class LandingActivity extends SherlockActivity {
 
                     @Override
                     public void onClick(View v) {
-                        transitionTo(MainFragmentChanger.class);
+                        transitionTo(CoreActivity.class);
                     }
                 });
 

@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 import com.actionbarsherlock.view.MenuItem;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class MainFragmentChanger extends SlidingFragmentActivity{
+public class CoreActivity extends SlidingFragmentActivity{
     private Fragment mainContent;
     
     public void onCreate(Bundle savedInstanceState){
@@ -38,6 +38,7 @@ public class MainFragmentChanger extends SlidingFragmentActivity{
         setSlidingActionBarEnabled(false);
         
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("Music");
     }
     
     public void switchContent(Fragment f){
@@ -50,7 +51,11 @@ public class MainFragmentChanger extends SlidingFragmentActivity{
         
         getSlidingMenu().showContent();
         
+        if(f instanceof MusicLibraryFragment)
+            setTitle("Music Library");
     }
+    
+    
     
     public boolean onOptionsItemSelected(MenuItem item) {
        if(item.getItemId()==android.R.id.home){
