@@ -14,6 +14,11 @@ import org.junit.Test;
 
 import com.lastcrusade.fanclub.LandingActivity;
 
+/**
+ * Doesn't inherit from SerializationTest and is separate from its generalized
+ * test structure. Meaning, the code repetition between this class and
+ * SerializationTest is necessary!
+ */
 public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
