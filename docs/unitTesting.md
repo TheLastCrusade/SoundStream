@@ -6,4 +6,3 @@ Because Eclipse can be weird, here is how **non-Android** unit tests in fanClub-
 * Run your unit tests as normal JUnit tests
 
 *I wrote this so that other people don't spend two days debugging only to find that you missed a single configurable.*
-***THIS IS MY STORY***
