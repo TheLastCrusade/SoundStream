@@ -34,8 +34,7 @@
             android:label="@string/title_activity_host" >
         </activity>
          <activity
-            android:name="com.lastcrusade.fanclub.CoreActivity"
-            android:label="@string/title_activity_playlist" >
+            android:name="com.lastcrusade.fanclub.CoreActivity" >
         </activity>
     </application>
 

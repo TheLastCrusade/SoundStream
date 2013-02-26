@@ -9,8 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.lastcrusade.fanclub.util.Titleable;
 
-public class MenuFragment extends SherlockListFragment {
+public class MenuFragment extends SherlockListFragment implements Titleable {
     
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -38,5 +39,10 @@ public class MenuFragment extends SherlockListFragment {
         ((CoreActivity)getActivity()).switchContent(fragment);
         
       
+    }
+    
+    @Override
+    public String getTitle() {
+        return getString(R.string.app_name);
     }
 }

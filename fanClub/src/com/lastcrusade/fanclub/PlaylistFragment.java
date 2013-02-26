@@ -10,8 +10,9 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
+import com.lastcrusade.fanclub.util.Titleable;
 
-public class PlaylistFragment extends SherlockListFragment{
+public class PlaylistFragment extends SherlockListFragment implements Titleable{
     //for testing purposes so we have songs to show
     static Song[] songs = new Song[]{
             new Song(),
@@ -49,6 +50,11 @@ public class PlaylistFragment extends SherlockListFragment{
     
     public void onListItemClick(ListView lv, View v, int position, long id){
         //code for expanding the particular song
+    }
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.playlist);
     }
     
     

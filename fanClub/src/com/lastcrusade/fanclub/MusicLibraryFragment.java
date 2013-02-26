@@ -6,12 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
+import com.lastcrusade.fanclub.util.Titleable;
 
-public class MusicLibraryFragment extends SherlockListFragment {
+public class MusicLibraryFragment extends SherlockListFragment implements Titleable {
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -49,6 +49,11 @@ public class MusicLibraryFragment extends SherlockListFragment {
             return v;
         }
         
+    }
+    
+    @Override
+    public String getTitle() {
+        return getString(R.string.music_library);
     }
     
     
