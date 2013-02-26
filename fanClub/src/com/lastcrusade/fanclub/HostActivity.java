@@ -16,13 +16,13 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
 import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
@@ -31,6 +31,7 @@ import com.lastcrusade.fanclub.net.MessageThread;
 import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
 import com.lastcrusade.fanclub.net.message.StringMessage;
+import com.lastcrusade.fanclub.util.BluetoothDiscoveryHandler;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.Toaster;
 
@@ -43,6 +44,8 @@ public class HostActivity extends Activity {
     private Object msgMutex = new Object();
 
     private final String TAG = "Bluetooth_Host";
+    private ArrayList<BluetoothDevice> discoveredDevices;
+    private BluetoothDiscoveryHandler bluetoothDiscoveryHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +111,16 @@ public class HostActivity extends Activity {
     }
 
     private void registerReceivers(final BluetoothAdapter adapter) {
+        this.bluetoothDiscoveryHandler = new BluetoothDiscoveryHandler(this, adapter);
+        this.bluetoothDiscoveryHandler.setOnDeviceSelectedListener(new IOnDialogItemClickListener<BluetoothDevice>() {
+
+            @Override
+            public void onItemClick(BluetoothDevice device) {
+                //the user selected a device...connect to it.
+                onDiscoveredFan(device);
+            }
+        });
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -118,13 +131,15 @@ public class HostActivity extends Activity {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(
                         BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
-                    onDiscoveryStarted(adapter);
+                    bluetoothDiscoveryHandler.onDiscoveryStarted();
                 } else if (intent.getAction().equals(
                         BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-                    onDiscoveryFinished(adapter);
+                    ((Button) findViewById(R.id.button0)).setEnabled(true);
+                    bluetoothDiscoveryHandler.onDiscoveryFinished();
                 } else if (intent.getAction().equals(
                         BluetoothDevice.ACTION_FOUND)) {
-                    onDeviceFound(adapter, intent);
+                    BluetoothDevice device = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    bluetoothDiscoveryHandler.onDiscoveryFound(device);
                 }
             }
         }, filter);
@@ -151,12 +166,39 @@ public class HostActivity extends Activity {
     }
 
     /**
+     * NOTE: must be run on the UI thread.
+     * @param device
+     */
+    private void onDiscoveredFan(BluetoothDevice device) {
+        try {
+            //one thread per device found...if there are multiple devices,
+            // there are multiple threads
+            //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
+            // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
+            // connection of the actual fan
+            this.connectThread = new ConnectThread(this, device) {
+
+                @Override
+                protected void onConnected(BluetoothSocket socket) {
+                    onConnectedFan(socket);
+                }
+                
+            };
+            this.connectThread.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toaster.iToast(this,
+                    "Unable to create ConnectThread to connect to server");
+        }
+    }
+
+    /**
      * 
      * NOTE: must be run on the UI thread.
      * 
      * @param socket
      */
-    protected void onConnectedFan(BluetoothSocket socket) {
+    private void onConnectedFan(BluetoothSocket socket) {
         Log.w(TAG, "Connected to server");
         Handler handler = new Handler(new Handler.Callback() {
 
@@ -175,70 +217,6 @@ public class HostActivity extends Activity {
         MessageThread newMessageThread = new MessageThread(socket, handler);
         newMessageThread.start();
         this.messageThreads.add(newMessageThread);
-    }
-
-    protected void onDeviceFound(BluetoothAdapter adapter, Intent intent) {
-        BluetoothDevice device = intent
-                .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        Log.w(TAG,
-                "Device found: " + device.getName() + "(" + device.getAddress()
-                        + ")");
-
-        //only connect to devices that can support our service
-        if (canSupportOurService(device)) {
-            for (BluetoothDevice bonded : adapter.getBondedDevices()) {
-                if (bonded.getAddress().equals(device.getAddress())) {
-                    Log.w(TAG, "Already paired!  Using paired device");
-                    device = adapter.getRemoteDevice(bonded.getAddress());
-                }
-            }
-    
-            
-            try {
-                //one thread per device found...if there are multiple devices,
-                // there are multiple threads
-                //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
-                // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
-                // connection of the actual fan
-                this.connectThread = new ConnectThread(this, device) {
-    
-                    @Override
-                    protected void onConnected(BluetoothSocket socket) {
-                        onConnectedFan(socket);
-                    }
-                    
-                };
-                this.connectThread.execute();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toaster.iToast(this,
-                        "Unable to create ConnectThread to connect to server");
-            }
-        }
-    }
-
-    
-    /**
-     * Helper method to determine if this device can support the UUID of our
-     * service.
-     * 
-     * @param device
-     * @return
-     */
-    private boolean canSupportOurService(BluetoothDevice device) {
-        boolean supported = false;
-        List<UUID> supportedUuids = BluetoothUtils.getUuidsForDevice(device);
-        UUID uuid = UUID.fromString(this.getString(R.string.app_uuid));
-        if (uuid == null) {
-            throw new RuntimeException("string.app_uuid is unset.");
-        }
-        for (UUID supportedUuid : supportedUuids) {
-            if (supportedUuid.compareTo(uuid) == 0) {
-                supported = true;
-                break;
-            }
-        }
-        return supported;
     }
 
     protected void onReadMessage(int messageNo, IMessage message) {
@@ -278,15 +256,6 @@ public class HostActivity extends Activity {
             }
 
         }, delayMillis);
-    }
-
-    protected void onDiscoveryFinished(BluetoothAdapter adapter) {
-        Log.w(TAG, "Discovery finished");
-        ((Button) findViewById(R.id.button0)).setEnabled(true);
-    }
-
-    protected void onDiscoveryStarted(BluetoothAdapter adapter) {
-        Log.w(TAG, "Discovery started");
     }
 
     @Override

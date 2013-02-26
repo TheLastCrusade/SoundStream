@@ -58,6 +58,7 @@ public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocke
 
     @Override
     protected void onPostExecute(BluetoothSocket result) {
+        //there was a successful connected socket...process the connection
         if (result != null) {
             onConnected(result);
         }
