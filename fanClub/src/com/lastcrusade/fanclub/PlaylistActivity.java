@@ -1,5 +1,7 @@
 package com.lastcrusade.fanclub;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -71,7 +73,7 @@ public class PlaylistActivity extends Activity {
         
         //Used to test Music Service
         ((Button) findViewById(R.id.btn_music_lib))
-        .setOnClickListener(new OnClickListener() {
+            .setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -79,8 +81,11 @@ public class PlaylistActivity extends Activity {
                     // Call a method from the MusicLibrary service.
                     // However, if this call were something that might hang, then this request should
                     // occur in a separate thread to avoid slowing down the activity performance.
-                    int num = mMusicLibraryService.getRandomNumber();
-                    Toast.makeText(PlaylistActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
+                    List<SongMetadata> lib = mMusicLibraryService.getLibrary();
+                    Toast.makeText(PlaylistActivity.this, lib.get(0).getArtist(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlaylistActivity.this, lib.get(0).getAlbum(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlaylistActivity.this, lib.get(0).getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlaylistActivity.this, lib.get(0).getUsername(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
