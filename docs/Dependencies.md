@@ -1,7 +1,7 @@
 #Sliding Menu + ActionBarScherlock
-<br/>
+
 In order to get the sliding drawer functionality we wanted, we are using the SlidingMenu library developed by Jeremy Feinstein. Since we are depending upon the action bar to interact with this menu, we are also using the ActionBarSherlock to create an action bar in older versions of Android.
-<br/>
+
 ##Getting the Libraries
 
 ###Downloads
