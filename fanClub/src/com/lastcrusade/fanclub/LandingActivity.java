@@ -6,12 +6,15 @@ import com.lastcrusade.fanclub.util.Toaster;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class LandingActivity extends Activity {
+import com.actionbarsherlock.app.SherlockActivity;
+
+public class LandingActivity extends SherlockActivity {
     private final String TAG = "LandingActivity";
 
     @Override
@@ -44,18 +47,11 @@ public class LandingActivity extends Activity {
 
                     @Override
                     public void onClick(View v) {
-                        transitionTo(PlaylistActivity.class);
+                        transitionTo(CoreActivity.class);
                     }
                 });
 
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_landing, menu);
-        return true;
     }
 
     protected void transitionTo(Class<? extends Activity> activityClass) {
