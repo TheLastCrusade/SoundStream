@@ -32,9 +32,15 @@ public class MusicLibraryService extends Service {
     /** Methods for clients */
 
     public List<SongMetadata> getLibrary(){
-        //TODO implement a background process to keep the metadataList up to date
-        MediaStoreWrapper msw = new MediaStoreWrapper(this);
-        return msw.list();
+        //TODO implement a way to get updates with library Message
+        return (new MediaStoreWrapper(this)).list();
+    }
+
+    //untested
+    private void updateLibrary(List<SongMetadata> additionalSongs){
+        for (SongMetadata song : additionalSongs) {
+            metadataList.add(song);
+        }
     }
 
 }
