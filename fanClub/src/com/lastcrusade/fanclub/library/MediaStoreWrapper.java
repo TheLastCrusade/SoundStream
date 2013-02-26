@@ -2,6 +2,7 @@ package com.lastcrusade.fanclub.library;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
@@ -16,8 +17,9 @@ public class MediaStoreWrapper {
                       ALBUM = MediaStore.Audio.Media.ALBUM,
                      ARTIST = MediaStore.Audio.Media.ARTIST,
                       TITLE = MediaStore.Audio.Media.TITLE,
-                       DATA = MediaStore.Audio.Media.DATA, //NOTE: actually the path to the song, not the raw data
+                       PATH = MediaStore.Audio.Media.DATA, //NOTE: actually the path to the song, not the raw data
                        SIZE = MediaStore.Video.Media.SIZE;
+    private final Uri EC_URI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
     public MediaStoreWrapper(Activity activity) {
         this.activity = activity;
@@ -29,9 +31,7 @@ public class MediaStoreWrapper {
      */
     public List<SongMetadata> list() {
         String[] proj = {ID, ALBUM, ARTIST, TITLE};
-        Cursor cursor = this.activity.getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                proj, null, null, null);
+        Cursor cursor = this.activity.getContentResolver().query(EC_URI, proj, null, null, null);
         List<SongMetadata> metadataList = new ArrayList<SongMetadata>();
         cursor.moveToFirst();
 
@@ -55,17 +55,16 @@ public class MediaStoreWrapper {
      * @return song object
      */
     public Song loadSongData(SongMetadata metadata) throws SongNotFoundException {
-        String[] proj = {ID, DATA, SIZE};
+        String[] proj = {ID, PATH, SIZE};
         String selection = ID + "=" + Long.toString(metadata.getId());
-        Cursor cursor = this.activity.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                proj, selection, null, null);
+        Cursor cursor = this.activity.getContentResolver().query(EC_URI, proj, selection, null, null);
 
         try {
             Song song = null;
 
             if (cursor.moveToFirst()) { //moves cursor to first element in result set. false if no first element
                 song = new Song(metadata);
-                song.setFilePath(cursor.getString(cursor.getColumnIndex(DATA)));
+                song.setFilePath(cursor.getString(cursor.getColumnIndex(PATH)));
                 song.setSize(cursor.getLong(cursor.getColumnIndex(SIZE)));
             }
 
