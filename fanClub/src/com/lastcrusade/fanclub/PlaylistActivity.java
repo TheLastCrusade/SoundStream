@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -82,10 +83,15 @@ public class PlaylistActivity extends Activity {
                     // However, if this call were something that might hang, then this request should
                     // occur in a separate thread to avoid slowing down the activity performance.
                     List<SongMetadata> lib = mMusicLibraryService.getLibrary();
-                    Toast.makeText(PlaylistActivity.this, lib.get(0).getArtist(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(PlaylistActivity.this, lib.get(0).getAlbum(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(PlaylistActivity.this, lib.get(0).getTitle(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(PlaylistActivity.this, lib.get(0).getUsername(), Toast.LENGTH_SHORT).show();
+                    Log.i("SongList", lib.size() + "");
+                    for (SongMetadata song : lib) {
+                        Log.i("SongList",
+                                "Artist: " + song.getArtist() +'\n'
+                                + "Album: " + song.getAlbum() + '\n'
+                                + "Title: " + song.getTitle() + '\n'
+                                + "Username: " + song.getUsername() + '\n'
+                             );
+                    }
                 }
             }
         });
