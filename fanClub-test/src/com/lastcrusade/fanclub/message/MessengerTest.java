@@ -22,7 +22,7 @@ import com.lastcrusade.fanclub.LandingActivity;
 public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
-	
+    
     @Test
     public void testDeserializeMessage() throws IOException {
         
@@ -153,8 +153,8 @@ public class MessengerTest {
             byte[] outputBytes) {
         return new ByteArrayInputStream(outputBytes);
     }
-	
-	/**
+    
+    /**
      * NOTE: keep this separate, so we have independent verification of the Messenger.  This lets
      * us use the independently verified side to test the other side of the messenger.
      * @param className

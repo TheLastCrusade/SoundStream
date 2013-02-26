@@ -13,11 +13,11 @@ import java.nio.ByteBuffer;
 import org.junit.Test;
 
 public class SerializationTest<T extends IMessage> {
-	
-	public T testSerializeMessage(T message) throws IOException {
-		Messenger messenger = new Messenger();
-		
-		messenger.serializeMessage(message);
+    
+    public T testSerializeMessage(T message) throws IOException {
+        Messenger messenger = new Messenger();
+        
+        messenger.serializeMessage(message);
         InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
         
         Messenger rcvMessenger = new Messenger();
@@ -32,15 +32,15 @@ public class SerializationTest<T extends IMessage> {
         //make sure all bytes are consumed
         assertEquals(0, is.available());
         return (T)rcvMessage;
-	}
-	
-	public T testDeserializeMessage(T message) throws IOException {
-		Messenger messenger = new Messenger();
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-		
-		//attempt to deserialize it
+    }
+    
+    public T testDeserializeMessage(T message) throws IOException {
+        Messenger messenger = new Messenger();
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        
+        //attempt to deserialize it
         assertTrue(messenger.deserializeMessage(bais));
         
         //and check the deserialized message
@@ -51,14 +51,14 @@ public class SerializationTest<T extends IMessage> {
         //make sure all bytes are consumed
         assertEquals(0, bais.available());
         return (T)rcvMessage;
-	}
-	
-	private InputStream simulateSendAndReceive(
+    }
+    
+    private InputStream simulateSendAndReceive(
             byte[] outputBytes) {
         return new ByteArrayInputStream(outputBytes);
     }
-	
-	/**
+    
+    /**
      * NOTE: keep this separate, so we have independent verification of the Messenger.  This lets
      * us use the independently verified side to test the other side of the messenger.
      * @param className
