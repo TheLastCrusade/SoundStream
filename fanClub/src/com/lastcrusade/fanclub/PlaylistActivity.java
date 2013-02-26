@@ -15,12 +15,12 @@ import android.widget.Toast;
 
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
-import com.lastcrusade.fanclub.service.MusicLibrary;
-import com.lastcrusade.fanclub.service.MusicLibrary.MusicLibraryBinder;
+import com.lastcrusade.fanclub.service.MusicLibraryService;
+import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 
 public class PlaylistActivity extends Activity {
-    MusicLibrary mMusicLibrary;
+    MusicLibraryService mMusicLibraryService;
     boolean boundToService; //Since you cannot instantly bind, set a boolean
                     // after its safe to call methods
 
@@ -38,8 +38,8 @@ public class PlaylistActivity extends Activity {
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MusicLibraryBinder binder = (MusicLibraryBinder) service;
-            mMusicLibrary = binder.getService();
+            MusicLibraryServiceBinder binder = (MusicLibraryServiceBinder) service;
+            mMusicLibraryService = binder.getService();
             boundToService = true;
         }
 
@@ -79,7 +79,7 @@ public class PlaylistActivity extends Activity {
                     // Call a method from the MusicLibrary service.
                     // However, if this call were something that might hang, then this request should
                     // occur in a separate thread to avoid slowing down the activity performance.
-                    int num = mMusicLibrary.getRandomNumber();
+                    int num = mMusicLibraryService.getRandomNumber();
                     Toast.makeText(PlaylistActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -91,7 +91,7 @@ public class PlaylistActivity extends Activity {
         super.onStart();
         
         //To test Music service
-        Intent intentML = new Intent(this, MusicLibrary.class);
+        Intent intentML = new Intent(this, MusicLibraryService.class);
         bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
     }
     

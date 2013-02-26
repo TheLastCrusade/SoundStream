@@ -6,14 +6,14 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
 
-public class MusicLibrary extends Service {
+public class MusicLibraryService extends Service {
 
-    private final IBinder mBinder = new MusicLibraryBinder();
+    private final IBinder mBinder = new MusicLibraryServiceBinder();
 
-    public class MusicLibraryBinder extends Binder {
-        public MusicLibrary getService() {
+    public class MusicLibraryServiceBinder extends Binder {
+        public MusicLibraryService getService() {
             // Return this instance of LocalService so clients can call public methods
-            return MusicLibrary.this;
+            return MusicLibraryService.this;
         }
     }
 
