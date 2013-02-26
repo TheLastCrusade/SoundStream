@@ -1,6 +1,8 @@
 package com.lastcrusade.fanclub.model;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 public class UserList {
     
@@ -19,6 +21,16 @@ public class UserList {
         users.put("Lizziemom", "#ff99cc00");
         
         return users;
+    }
+    
+    public static List<String> getUsernames(){
+        ArrayList<String> usernames = new ArrayList<String>();
+        usernames.add("Lizziemom");
+        usernames.add("Reid");
+        usernames.add("Greenie");
+        usernames.add("Sills");
+        usernames.add("Jesse");
+        return usernames;
     }
     
 }

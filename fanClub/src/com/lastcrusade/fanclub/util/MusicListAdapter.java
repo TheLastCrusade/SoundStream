@@ -33,7 +33,6 @@ public class MusicListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
         return songs[position];
     }
 
