@@ -14,10 +14,12 @@ public class CoreActivity extends SlidingFragmentActivity{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null)
+        if (savedInstanceState != null){
             mainContent = getSupportFragmentManager().getFragment(savedInstanceState, "mainContent");
-        if (mainContent == null)
-            mainContent = new PlaylistFragment();  
+        }
+        if (mainContent == null){
+            mainContent = new PlaylistFragment(); 
+        }
         
         setContentView(R.layout.content_frame);
         switchContent(mainContent);

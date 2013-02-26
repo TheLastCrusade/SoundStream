@@ -41,16 +41,17 @@ public class UserListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View element = convertView;
+        View userView = convertView;
         
-        if(element == null){
+        //
+        if(userView == null){
             LayoutInflater inflater = (LayoutInflater) this.mContext
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            element = inflater.inflate(R.layout.user_item, null);
+            userView = inflater.inflate(R.layout.user_item, null);
         }
         
-        View userColor = (View) element.findViewById(R.id.userColor); 
-        TextView username = (TextView)element.findViewById(R.id.username);
+        View userColor = (View) userView.findViewById(R.id.user_color); 
+        TextView username = (TextView)userView.findViewById(R.id.username);
 
         
 
@@ -59,7 +60,7 @@ public class UserListAdapter extends BaseAdapter {
 
 
         
-        return element;
+        return userView;
     }
 
 }

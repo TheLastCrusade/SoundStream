@@ -5,8 +5,8 @@ In order to get the sliding drawer functionality we wanted, we are using the Sli
 ##Getting the Libraries
 
 ###Downloads
-SlidingMenu: https://github.com/jfeinstein10/SlidingMenu
-ActionBarScherlock: http://actionbarsherlock.com/
+SlidingMenu: https://github.com/jfeinstein10/SlidingMenu (at pull request 191)
+ActionBarScherlock: http://actionbarsherlock.com/ (Version 4.2.0)
 
 Download the zip files and extract them to wherever you would like. Just remember where you put them because we need that for importing
 
@@ -20,7 +20,7 @@ We have to import both libraries, but start with SlidingMenu
 5. Rename the project that was just created to SlidingMenuLibrary
 6. Ignore the errors for now, we will fix them when we set up the dependencies
 
-Now on to ActionBarSherlock
+Now on to ActionBarSherlock (again, this applies to Eclipse only)
 
 1. Create a new Android Project from Existing Code
 2. Navigate to the unzipped ActionBarSherlock folder
@@ -30,7 +30,7 @@ Now on to ActionBarSherlock
 6. Clean the ABSLibrary Project
 
 
-###Set up SlidingMenu Dependencies
+###Set up SlidingMenu Dependencies in Eclipse
 Time to deal with the errors
 
 1. Select SlidingMenuLibrary

@@ -49,14 +49,7 @@ public class LandingActivity extends SherlockActivity {
 
 
     }
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.activity_landing, menu);
-        return true;
-    }
-*/
+
     protected void transitionTo(Class<? extends Activity> activityClass) {
         Intent intent = new Intent();
         intent.setClass(this, activityClass);
