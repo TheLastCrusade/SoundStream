@@ -8,26 +8,32 @@ In order to get the sliding drawer functionality we wanted, we are using the Sli
 SlidingMenu: https://github.com/jfeinstein10/SlidingMenu (at pull request 191)
 ActionBarScherlock: http://actionbarsherlock.com/ (Version 4.2.0)
 
-Download the zip files and extract them to wherever you would like. Just remember where you put them because we need that for importing
+Download the zip files and extract them. You only need the library folders for each of these. The following steps outline isolating the library folders and putting them in the right directory
+
+1. Open the unzipped SherlockActionBar folder
+2. Navigate to the directory named library
+3. Rename that directory to ABSLibrary
+4. Move the ABSLibrary directory into the third_party directory
+5. Open the unzipped SlidingMenu folder
+6. Navigate to the directory named library
+7. Rename that directory to SlidingMenuLibrary
+8. Move the SlidingMenuLibrary directoy into the third_party directory
 
 ###Import Libraries into Eclipse
-We have to import both libraries, but start with SlidingMenu
+We now have to import both libraries into Eclipse.
+
+Starting with ABSLibrary
 
 1. Create a new Android Project from Existing Code
-2. Navigate to your unzipped SlidingMenu folder
-3. Select the library folder (you can import all of them, but library is the one that we need)
-4. Make sure the library folder is checked, and Select Finish
-5. Rename the project that was just created to SlidingMenuLibrary
-6. Ignore the errors for now, we will fix them when we set up the dependencies
+2. Navigate to the ABSLibrary
+3. Make sure the folder is checked and Select Finish
 
-Now on to ActionBarSherlock (again, this applies to Eclipse only)
+Now on to SlidingMenuLibrary (again, this applies to Eclipse only)
 
 1. Create a new Android Project from Existing Code
-2. Navigate to the unzipped ActionBarSherlock folder
-3. Select the library folder
-4. Make sure the library folder is checked, and Select Finish
-5. Rename the project to ABSLibrary
-6. Clean the ABSLibrary Project
+2. Navigate to the SlidingMenuLibrary
+3. Make sure the folder is checked, and Select Finish
+4. There will be a few errors here - we will fix them in the next section
 
 
 ###Set up SlidingMenu Dependencies in Eclipse
@@ -43,14 +49,6 @@ Time to deal with the errors
 8. If you still have errors, clean the project.
 9. Go into the src folder and open up SlidingFragmentActivity
 10. change the extends FragmentActivity to extends SherlockFragmentActivity (Note: If we use more later, you will need to go change them to their Sherlock versions, but for now this is all we are using)
-
-
-###Set up Project Dependencies
-Finally we can set up the actual project dependencies.
-
-1. Select the LandingActivity project
-2. Right click-> Properties -> Android -> Add Library -> SlidingMenuLibrary
-3. Again, delete the support jar in the libs folder
 
 ###Finished!
 Everything should be set up just fine now :]

@@ -15,7 +15,7 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.util.Titleable;
 
 //This will probably change to a regular fragment instead of a list one
-//once I get into the layout more
+//once I (@ejohnson44) get into the layout more
 public class MenuFragment extends SherlockListFragment implements Titleable {
     private final String PLAYLIST = "Playlist";
     private final String MUSICLIBRARY = "MusicLibrary";

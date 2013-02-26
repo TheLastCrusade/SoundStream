@@ -37,20 +37,6 @@ public class CoreActivity extends SlidingFragmentActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
     
-    public void switchContent(Fragment f){
-        //switch out the content fragments
-        switchFragment(f, true);
-        
-        //close the sliding menu and show the full content fragment
-        getSlidingMenu().showContent();
-        
-        //update the activity title
-        if(f instanceof Titleable){
-            setTitle(((Titleable)f).getTitle());
-        }
-    }
-    
-    
     
     public boolean onOptionsItemSelected(MenuItem item) {
         //references the app icon
@@ -62,6 +48,20 @@ public class CoreActivity extends SlidingFragmentActivity{
        }
        
        return false;
+    }
+    
+    
+    public void switchContent(Fragment content){
+        //switch out the content fragments
+        switchFragment(content, true);
+        
+        //close the sliding menu and show the full content fragment
+        getSlidingMenu().showContent();
+        
+        //update the activity title
+        if(content instanceof Titleable){
+            setTitle(((Titleable)content).getTitle());
+        }
     }
     
     /*
