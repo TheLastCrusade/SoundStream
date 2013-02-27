@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub;
+package com.lastcrusade.fanclub.components;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -10,12 +10,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.lastcrusade.fanclub.CoreActivity;
+import com.lastcrusade.fanclub.CustomApp;
+import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.R.id;
+import com.lastcrusade.fanclub.R.layout;
+import com.lastcrusade.fanclub.R.string;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
-import com.lastcrusade.fanclub.util.Titleable;
+import com.lastcrusade.fanclub.util.ITitleable;
 
-public class MusicLibraryFragment extends SherlockListFragment implements Titleable {
+public class MusicLibraryFragment extends SherlockListFragment implements ITitleable {
     private final String TAG = MusicLibraryFragment.class.getName();
 
     @Override
@@ -33,16 +39,23 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
     
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        // construct the RelativeLayout
         
         View v = inflater.inflate(R.layout.list, container, false);
 
         return v;
     }
     
-    public void onResume(Bundle savedInstanceState){
-        getActivity().setTitle(R.string.music_library);
+    @Override
+    public String getTitle() {
+        return getString(R.string.music_library);
     }
+    
+    @Override
+    public void onResume(){
+        super.onResume();
+        getActivity().setTitle(getTitle());
+    }
+    
     
     private class MusicAdapter extends MusicListAdapter{
 
@@ -56,24 +69,9 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
         
         public View getView(int position, View convertView, ViewGroup parent){
             View v = super.getView(position, convertView, parent);
-            
             v.findViewById(R.id.add_to_playlist).setVisibility(View.VISIBLE);
-            
-            
             return v;
         }
         
     }
-    
-    @Override
-    public String getTitle() {
-        return getString(R.string.music_library);
-    }
-    
-    public void onStart(){
-        super.onStart();
-        getActivity().setTitle(getTitle());
-    }
-    
-    
 }

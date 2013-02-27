@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub;
+package com.lastcrusade.fanclub.components;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +12,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.lastcrusade.fanclub.util.Titleable;
+import com.lastcrusade.fanclub.CoreActivity;
+import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.R.layout;
+import com.lastcrusade.fanclub.R.string;
+import com.lastcrusade.fanclub.util.ITitleable;
 
 //This will probably change to a regular fragment instead of a list one
 //once I (@ejohnson44) get into the layout more
-public class MenuFragment extends SherlockListFragment implements Titleable {
+public class MenuFragment extends SherlockListFragment implements ITitleable {
     //These should map directly to R.string.playlist and R.string.music_library
     //but I(@ejohnson44) cannot figure out how to actually call those when the fragment
     //is not attached to something, so this this what it is going to be for now.
@@ -43,8 +47,6 @@ public class MenuFragment extends SherlockListFragment implements Titleable {
     
     public void onListItemClick(ListView lv, View v, int position, long id) {
         if(DRAWER.get(PLAYLIST) == position){
-            //might not always make a new fragment - need to learn more about the 
-            //fragment manager and how to get the saved instances of fragments
             switchContent(PLAYLIST);
         }
         else if(DRAWER.get(MUSICLIBRARY) == position){
@@ -52,9 +54,14 @@ public class MenuFragment extends SherlockListFragment implements Titleable {
         }
     }
     
+   /*
+    * tells the core activity to switch the active content to the fragment
+    * indicated by the name passed in
+    */
     private void switchContent(String fragmentName) {
-        /*getActivity() would be null if the fragment somehow 
-         *got unattached from its managing activity
+        /*
+         * getActivity() would be null if the fragment somehow 
+         * got unattached from its managing activity
          */
         if (getActivity() != null){
             ((CoreActivity)getActivity()).switchActiveContent(fragmentName);
@@ -64,10 +71,5 @@ public class MenuFragment extends SherlockListFragment implements Titleable {
     @Override
     public String getTitle() {
         return getString(R.string.app_name);
-    }
-    
-    public void onStart(){
-        super.onStart();
-        getActivity().setTitle(getTitle());
     }
 }

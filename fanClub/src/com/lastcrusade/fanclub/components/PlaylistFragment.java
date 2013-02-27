@@ -1,4 +1,8 @@
-package com.lastcrusade.fanclub;
+package com.lastcrusade.fanclub.components;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,26 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
+import com.lastcrusade.fanclub.CustomApp;
+import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.util.ITitleable;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
-import com.lastcrusade.fanclub.util.Titleable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-public class PlaylistFragment extends SherlockListFragment implements Titleable{
+public class PlaylistFragment extends SherlockListFragment implements ITitleable{
     //for testing purposes so we have songs to show
     static List<SongMetadata> metadataList = new ArrayList<SongMetadata>(
             Arrays.asList(new SongMetadata(), new SongMetadata(), new SongMetadata()));
-    
-
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        CustomApp curApp = (CustomApp) this.getActivity().getApplication();
-        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList, curApp.getUserList().getUsers()));
-    }
     
     public PlaylistFragment(){
         for(SongMetadata s : metadataList){
@@ -39,6 +33,14 @@ public class PlaylistFragment extends SherlockListFragment implements Titleable{
          metadataList.get(2).setUsername("Greenie");
         
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        CustomApp curApp = (CustomApp) this.getActivity().getApplication();
+        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList, curApp.getUserList().getUsers()));
+    }    
+
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,8 +49,9 @@ public class PlaylistFragment extends SherlockListFragment implements Titleable{
         return v;
     }
     
+    @Override
     public void onListItemClick(ListView lv, View v, int position, long id){
-        //code for expanding the particular song
+        //TODO: expanding the particular song
     }
 
     @Override
@@ -56,8 +59,9 @@ public class PlaylistFragment extends SherlockListFragment implements Titleable{
         return getString(R.string.playlist);
     }
     
-    public void onStart(){
-        super.onStart();
+    @Override
+    public void onResume(){
+        super.onResume();
         getActivity().setTitle(getTitle());
     }
     

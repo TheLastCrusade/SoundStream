@@ -9,10 +9,13 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.lastcrusade.fanclub.components.MenuFragment;
+import com.lastcrusade.fanclub.components.MusicLibraryFragment;
+import com.lastcrusade.fanclub.components.PlaylistFragment;
 import com.lastcrusade.fanclub.service.MusicLibraryService;
 import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
-import com.lastcrusade.fanclub.util.Titleable;
+import com.lastcrusade.fanclub.util.ITitleable;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
@@ -76,7 +79,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         if (item.getItemId() == android.R.id.home) {
             toggle(); // toggles the state of the sliding menu
             if(getSlidingMenu().isMenuShowing() && menu.isAdded())
-                setTitle(((Titleable)menu).getTitle());
+                setTitle(((ITitleable)menu).getTitle());
             return true;
         }
         return false;
