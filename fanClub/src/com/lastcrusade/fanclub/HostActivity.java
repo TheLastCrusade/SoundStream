@@ -38,6 +38,12 @@ import com.lastcrusade.fanclub.net.message.StringMessage;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.Toaster;
 
+/**
+ * 
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class HostActivity extends Activity {
 
     private ConnectThread connectThread;
@@ -237,8 +243,9 @@ public class HostActivity extends Activity {
 
         } else {
             if (devices.isEmpty()) {
-                Toaster.iToast(this, R.string.no_devices_discovered);
+                Toaster.iToast(this, R.string.no_fans_found);
             } else {
+                Toaster.iToast(this, R.string.found_fans);
                 new MultiSelectListDialog<BluetoothDevice>(this, R.string.select_fans, R.string.connect)
                     .setItems(devices)
                     .setOnClickListener(new IOnDialogItemClickListener<BluetoothDevice>() {

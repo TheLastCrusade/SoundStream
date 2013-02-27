@@ -157,8 +157,9 @@ public class FanActivity extends Activity {
 
     private void handleFoundFans(List<FoundFan> list) {
         if (list.isEmpty()) {
-            Toaster.iToast(this, R.string.no_devices_discovered);
+            Toaster.iToast(this, R.string.no_fans_found);
         } else {
+            Toaster.iToast(this, R.string.found_fans);
             new MultiSelectListDialog<FoundFan>(this, R.string.select_fans, R.string.connect)
                 .setItems(list)
                 .setOnClickListener(new IOnDialogItemClickListener<FoundFan>() {
