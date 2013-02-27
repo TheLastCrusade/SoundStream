@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public abstract class ADataMessage implements IMessage{
+/**
+ * An abstract message class for messages that send and receive data.  This class contains
+ * helper methods to read and write basic data types that may be sent.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
+public abstract class ADataMessage implements IMessage {
 
     protected String readString(InputStream input) throws IOException {
         int length = readInteger(input);
