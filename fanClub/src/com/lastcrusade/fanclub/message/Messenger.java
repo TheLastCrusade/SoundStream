@@ -26,7 +26,7 @@ public class Messenger {
 
     private static final char END_OF_CLASS_CHAR = '\n';
 
-    private static final String TAG = "Messenger";
+    private static final String TAG = Messenger.class.getName();
 
     private static final int SIZE_LEN = 4;
 
