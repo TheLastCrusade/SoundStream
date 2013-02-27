@@ -15,14 +15,12 @@ public class Playlist {
         list.add(meta);
     }
 
-    public List<SongMetadata> add(SongMetadata meta) {
+    public void add(SongMetadata meta) {
         list.add(meta);
-        return list;
     }
 
-    public List<SongMetadata> addToNext(SongMetadata meta) {
+    public void addToNext(SongMetadata meta) {
         list.add(1, meta);
-        return list;
     }
 
     public SongMetadata remove(SongMetadata meta) {

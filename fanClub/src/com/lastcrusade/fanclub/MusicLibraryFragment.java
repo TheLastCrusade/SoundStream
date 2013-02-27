@@ -20,7 +20,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
         super.onCreate(savedInstanceState);
         
         //whatever our song list is needs to be passed to the musiclistadapter
-        setListAdapter(new MusicAdapter( this.getActivity(), PlaylistFragment.songs ));
+        setListAdapter(new MusicAdapter( this.getActivity(), PlaylistFragment.metadataList ));
     }
     
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,8 +38,8 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
     
     private class MusicAdapter extends MusicListAdapter{
 
-        public MusicAdapter(Context mContext, List<SongMetadata> songs) {
-            super(mContext, songs);
+        public MusicAdapter(Context mContext, List<SongMetadata> metadataList) {
+            super(mContext, metadataList);
         }
         
         public View getView(int position, View convertView, ViewGroup parent){

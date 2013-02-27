@@ -17,25 +17,25 @@ import java.util.List;
 
 public class PlaylistFragment extends SherlockListFragment implements Titleable{
     //for testing purposes so we have songs to show
-    static List<SongMetadata> songs = new ArrayList<SongMetadata>(
+    static List<SongMetadata> metadataList = new ArrayList<SongMetadata>(
             Arrays.asList(new SongMetadata(), new SongMetadata(), new SongMetadata()));
     
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setListAdapter(new MusicListAdapter(this.getActivity(), songs));
+        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList));
     }
     
     public PlaylistFragment(){
-        for(SongMetadata s:songs){
+        for(SongMetadata s : metadataList){
             s.setTitle("Title");
             s.setAlbum("Album");
             s.setArtist("Artist");
          }
-         songs.get(0).setUsername("Reid");
-         songs.get(1).setUsername("Lizziemom");
-         songs.get(2).setUsername("Greenie");
+         metadataList.get(0).setUsername("Reid");
+         metadataList.get(1).setUsername("Lizziemom");
+         metadataList.get(2).setUsername("Greenie");
         
     }
     

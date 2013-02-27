@@ -17,29 +17,29 @@ import com.lastcrusade.fanclub.model.UserList;
 
 public class MusicListAdapter extends BaseAdapter {
     private Context mContext;
-    private List<SongMetadata> songs;
+    private List<SongMetadata> metadataList;
     private Hashtable<String,String> users;
     
-    public MusicListAdapter(Context mContext, List<SongMetadata> songs){
+    public MusicListAdapter(Context mContext, List<SongMetadata> metadataList){
         this.mContext = mContext;
-        this.songs = songs;
+        this.metadataList = metadataList;
         users = UserList.getUsers();
     }
     
     
     @Override
     public int getCount() {
-        return songs.size();
+        return metadataList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return songs.get(position);
+        return metadataList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return songs.get(position).getId();
+        return metadataList.get(position).getId();
     }
 
     @Override
@@ -58,10 +58,10 @@ public class MusicListAdapter extends BaseAdapter {
         TextView album = (TextView) element.findViewById(R.id.album);
         
 
-        userColor.setBackgroundColor(Color.parseColor(users.get(songs.get(position).getUsername())));
-        title.setText(songs.get(position).getTitle());
-        artist.setText(songs.get(position).getArtist());
-        album.setText(songs.get(position).getAlbum());
+        userColor.setBackgroundColor(Color.parseColor(users.get(metadataList.get(position).getUsername())));
+        title.setText(metadataList.get(position).getTitle());
+        artist.setText(metadataList.get(position).getArtist());
+        album.setText(metadataList.get(position).getAlbum());
 
         
         return element;
