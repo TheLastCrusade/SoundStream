@@ -63,7 +63,6 @@ public class LandingActivity extends SherlockActivity {
         super.onDestroy();
 
         //Make sure to destroy services when the application closes
-        Toaster.iToast(this, "Destroying MusicLibrary Service");
         Intent intent = new Intent(this, MusicLibraryService.class);
         stopService(intent);
 

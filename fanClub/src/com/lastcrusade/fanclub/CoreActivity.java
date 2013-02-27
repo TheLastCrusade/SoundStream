@@ -20,7 +20,7 @@ public class CoreActivity extends SlidingFragmentActivity{
 
     MusicLibraryService mMusicLibraryService;
     boolean boundToService; //Since you cannot instantly bind, set a boolean
-                    // after its safe to call methods
+                            // after its safe to call methods
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection musicLibraryConn = new ServiceConnection() {

@@ -51,10 +51,10 @@ public class UserList {
 
     public List<String> getUsernames(){
         ArrayList<String> usernames = new ArrayList<String>();
-        Iterator<Entry<String, String>> it = connectedUsers.entrySet().iterator();
+        Iterator<Entry<String, String>> userListIterator = connectedUsers.entrySet().iterator();
 
-        while (it.hasNext()) {
-            Entry<String, String> entry = it.next();
+        while (userListIterator.hasNext()) {
+            Entry<String, String> entry = userListIterator.next();
             usernames.add(entry.getKey());
         }
         //Uncomment line below if usernames need to come out in the same order
