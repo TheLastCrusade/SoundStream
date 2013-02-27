@@ -10,7 +10,7 @@ import com.lastcrusade.fanclub.R;
 
 public class BluetoothUtils {
     /* All methods should be static */
-    private static final String TAG = "BluetoothUtils";
+    private static final String TAG = BluetoothUtils.class.getName();
     
     /* The maximum number of seconds in which to wait for bluetooth to enable */
     private static final int ENABLE_CHECK_RETRY_SECONDS = 5;
