@@ -25,11 +25,11 @@ public class MenuFragment extends SherlockListFragment implements ITitleable {
     //but I(@ejohnson44) cannot figure out how to actually call those when the fragment
     //is not attached to something, so this this what it is going to be for now.
     private final String PLAYLIST = "Playlist";
-    private final String MUSICLIBRARY = "Music Library";
+    private final String MUSIC_LIBRARY = "Music Library";
     private final Map<String, Integer> DRAWER = new HashMap<String, Integer>(){
         {
             put(PLAYLIST, 0);
-            put(MUSICLIBRARY,1);
+            put(MUSIC_LIBRARY,1);
         }
     }; 
     
@@ -49,8 +49,8 @@ public class MenuFragment extends SherlockListFragment implements ITitleable {
         if(DRAWER.get(PLAYLIST) == position){
             switchContent(PLAYLIST);
         }
-        else if(DRAWER.get(MUSICLIBRARY) == position){
-            switchContent(MUSICLIBRARY);
+        else if(DRAWER.get(MUSIC_LIBRARY) == position){
+            switchContent(MUSIC_LIBRARY);
         }
     }
     
