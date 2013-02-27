@@ -80,13 +80,13 @@ public class PlaybarFragment extends Fragment {
         });
 
         ((ImageButton) view.findViewById(R.id.btn_skip))
-        .setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                PlaybarFragment.this.skip();
-            }
-        });
+            .setOnClickListener(new OnClickListener() {
+    
+                @Override
+                public void onClick(View v) {
+                    PlaybarFragment.this.skip();
+                }
+            });
 
         return view;
     }
