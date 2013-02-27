@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,7 +26,7 @@ public class Messenger {
 
     private static final char END_OF_CLASS_CHAR = '\n';
 
-    private static final String TAG = "Messenger";
+    private static final String TAG = Messenger.class.getName();
 
     private static final int SIZE_LEN = 4;
 

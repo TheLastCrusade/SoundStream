@@ -1,14 +1,15 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class PauseMessage implements IMessage {
-	private final String TAG = "PauseMessage";
+
+public class PlayMessage implements IMessage {
+	private final String TAG = "PlayMessage";
 	private String string;
-	private final String PAUSE_MESSAGE = "Pause";
+	private final String PLAY_MESSAGE = "Play"; 
 
 	@Override
 	public void deserialize(InputStream input) throws IOException {
@@ -23,9 +24,13 @@ public class PauseMessage implements IMessage {
 
 	@Override
 	public void serialize(OutputStream output) throws IOException {
-		output.write(PAUSE_MESSAGE.getBytes());		
+		output.write(PLAY_MESSAGE.getBytes()); // output message should be "Play"
 	}
 
+	public String getPlayMessage() {
+		return PLAY_MESSAGE;
+	}
+	
 	public String getString() {
 		return string;
 	}
@@ -33,8 +38,5 @@ public class PauseMessage implements IMessage {
 	public void setString(String string) {
 		this.string = string;
 	}
-	
-	public String getPauseMessage() {
-		return PAUSE_MESSAGE;
-	}
+
 }

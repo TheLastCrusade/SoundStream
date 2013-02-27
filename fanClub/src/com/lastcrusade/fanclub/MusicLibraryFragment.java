@@ -15,10 +15,8 @@ import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 import com.lastcrusade.fanclub.util.Titleable;
 
-import java.util.List;
-
 public class MusicLibraryFragment extends SherlockListFragment implements Titleable {
-    private final String TAG = "MusicLibraryFragment";
+    private final String TAG = MusicLibraryFragment.class.getName();
 
     @Override
     public void onCreate(Bundle savedInstanceState){

@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.io.OutputStream;
  *
  */
 public class StringMessage implements IMessage {
-    private final String TAG = "StringMessage";
+    private final String TAG = StringMessage.class.getName();
     private String string;
 
     @Override
