@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.ParcelUuid;
+import android.util.Log;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
@@ -74,11 +75,20 @@ public class BluetoothUtils {
     
     public static String getLocalBluetoothName(){
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        String name = mBluetoothAdapter.getName();
-        if(name == null){
-            name = mBluetoothAdapter.getAddress();
+        String name = null;
+        if(mBluetoothAdapter!=null){
+            name = mBluetoothAdapter.getName();
+            if(name == null){
+                name = mBluetoothAdapter.getAddress();
+            }
+           
+        }
+        else{
+            Log.wtf(TAG, "No Bluetooth Radio. Ok on emulator");
+            name = "No Bluetooth";
         }
         return name;
+       
     }
 
     /**
