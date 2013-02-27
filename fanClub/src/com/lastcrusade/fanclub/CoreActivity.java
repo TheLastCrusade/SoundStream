@@ -94,7 +94,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         //update the activity title
         /*if(content instanceof Titleable){
             setTitle(((Titleable)content).getTitle());
-        }*/
+        }*/ //TODO: Lizziemom, fix this!
     }
     
     /*
