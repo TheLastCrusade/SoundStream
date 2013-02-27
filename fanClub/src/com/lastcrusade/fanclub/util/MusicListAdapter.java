@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.model.UserList;
 
@@ -20,10 +21,14 @@ public class MusicListAdapter extends BaseAdapter {
     private List<SongMetadata> metadataList;
     private Hashtable<String,String> users;
     
-    public MusicListAdapter(Context mContext, List<SongMetadata> metadataList){
+    public MusicListAdapter(
+            Context mContext,
+            List<SongMetadata> metadataList,
+            Hashtable<String,String> users
+            ){
         this.mContext = mContext;
         this.metadataList = metadataList;
-        users = UserList.getUsers();
+        this.users = users;
     }
     
     

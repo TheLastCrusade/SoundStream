@@ -19,7 +19,7 @@ import com.lastcrusade.fanclub.util.Titleable;
 public class MenuFragment extends SherlockListFragment implements Titleable {
     private final String PLAYLIST = "Playlist";
     private final String MUSICLIBRARY = "MusicLibrary";
-    private final Map<String, Integer> DRAWER =new HashMap<String, Integer>(){
+    private final Map<String, Integer> DRAWER = new HashMap<String, Integer>(){
         {
             put(PLAYLIST, 0);
             put(MUSICLIBRARY,1);

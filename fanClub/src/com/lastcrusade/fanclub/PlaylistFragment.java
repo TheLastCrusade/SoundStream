@@ -24,7 +24,8 @@ public class PlaylistFragment extends SherlockListFragment implements Titleable{
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList));
+        CustomApp curApp = (CustomApp) this.getActivity().getApplication();
+        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList, curApp.getUserList().getUsers()));
     }
     
     public PlaylistFragment(){
