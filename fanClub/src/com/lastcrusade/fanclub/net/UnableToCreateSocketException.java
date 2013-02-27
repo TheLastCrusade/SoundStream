@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub;
+package com.lastcrusade.fanclub.net;
 
 import java.io.IOException;
 

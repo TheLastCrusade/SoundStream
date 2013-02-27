@@ -3,9 +3,10 @@ package com.lastcrusade.fanclub.model;
 public class Song {
 
     private SongMetadata metadata;
+
+    private String filePath;
     private long size;
     private byte[] data;
-    private String filePath;
 
     public Song() {}
 
@@ -13,6 +14,14 @@ public class Song {
         this.metadata = metadata;
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
+    
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+    
     public long getSize() {
         return size;
     }
@@ -35,13 +44,5 @@ public class Song {
 
     public void setSongMetadata(SongMetadata metadata) {
         this.metadata = metadata;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 }

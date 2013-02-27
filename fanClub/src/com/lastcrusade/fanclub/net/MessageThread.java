@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub;
+package com.lastcrusade.fanclub.net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,8 +7,8 @@ import java.io.OutputStream;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 
-import com.lastcrusade.fanclub.message.IMessage;
-import com.lastcrusade.fanclub.message.Messenger;
+import com.lastcrusade.fanclub.net.message.IMessage;
+import com.lastcrusade.fanclub.net.message.Messenger;
 
 /**
  * This thread is responsible for sending and receiving messages once the connection has been established.

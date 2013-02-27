@@ -49,6 +49,14 @@ public class LandingActivity extends SherlockActivity {
                 });
 
 
+        ((Button) findViewById(R.id.btn_test_playbar))
+                .setOnClickListener(new OnClickListener() {
+        
+                    @Override
+                    public void onClick(View v) {
+                        transitionTo(TestPlaybarActivity.class);
+                    }
+                });
     }
 
     protected void transitionTo(Class<? extends Activity> activityClass) {
