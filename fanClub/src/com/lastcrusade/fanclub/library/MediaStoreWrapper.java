@@ -1,6 +1,5 @@
 package com.lastcrusade.fanclub.library;
 
-import android.app.Activity;
 import android.app.Service;
 import android.database.Cursor;
 import android.net.Uri;
