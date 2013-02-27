@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

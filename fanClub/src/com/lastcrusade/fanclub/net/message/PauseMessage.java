@@ -1,9 +1,10 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 
 public class PauseMessage implements IMessage {
 	private String string;
