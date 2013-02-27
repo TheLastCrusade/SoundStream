@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class PauseMessage implements IMessage {
+	private final String TAG = "PauseMessage";
 	private String string;
 	private final String PAUSE_MESSAGE = "Pause";
 

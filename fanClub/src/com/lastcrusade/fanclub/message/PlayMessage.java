@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class PlayMessage implements IMessage {
+	private final String TAG = "PlayMessage";
 	private String string;
 	private final String PLAY_MESSAGE = "Play"; 
 
