@@ -1,9 +1,10 @@
 package com.lastcrusade.fanclub;
 
+import com.lastcrusade.fanclub.service.MusicLibraryService;
+
+import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -11,7 +12,7 @@ import android.widget.Button;
 import com.actionbarsherlock.app.SherlockActivity;
 
 public class LandingActivity extends SherlockActivity {
-    private final String TAG = "LandingActivity";
+    private final String TAG = LandingActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,16 @@ public class LandingActivity extends SherlockActivity {
         Intent intent = new Intent();
         intent.setClass(this, activityClass);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Make sure to destroy services when the application closes
+        Intent intent = new Intent(this, MusicLibraryService.class);
+        stopService(intent);
+
     }
 
 }

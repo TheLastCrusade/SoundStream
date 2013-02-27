@@ -22,7 +22,7 @@ public class MenuFragment extends SherlockListFragment implements Titleable {
     //is not attached to something, so this this what it is going to be for now.
     private final String PLAYLIST = "Playlist";
     private final String MUSICLIBRARY = "Music Library";
-    private final Map<String, Integer> DRAWER =new HashMap<String, Integer>(){
+    private final Map<String, Integer> DRAWER = new HashMap<String, Integer>(){
         {
             put(PLAYLIST, 0);
             put(MUSICLIBRARY,1);
