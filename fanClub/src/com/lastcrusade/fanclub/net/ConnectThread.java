@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.lastcrusade.fanclub.R;
-import com.lastcrusade.fanclub.R.string;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
