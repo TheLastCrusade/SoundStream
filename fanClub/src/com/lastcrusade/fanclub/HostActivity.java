@@ -2,7 +2,6 @@ package com.lastcrusade.fanclub;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.app.Activity;
@@ -22,6 +21,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
+import com.lastcrusade.fanclub.components.MultiSelectListDialog;
+import com.lastcrusade.fanclub.net.BluetoothDeviceDialogFormatter;
 import com.lastcrusade.fanclub.net.BluetoothDiscoveryHandler;
 import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
 import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
@@ -46,9 +47,10 @@ public class HostActivity extends Activity {
     private Object msgMutex = new Object();
 
     private final String TAG = "Bluetooth_Host";
-    private ArrayList<BluetoothDevice> discoveredDevices;
     private BluetoothDiscoveryHandler bluetoothDiscoveryHandler;
     private MessageThreadMessageDispatch messageDispatch;
+    private BroadcastReceiver broadcastReceiver;
+    private MessageThread discoveryInitiator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,15 +84,6 @@ public class HostActivity extends Activity {
                     Toaster.iToast(HostActivity.this,
                             "Device may not support bluetooth");
                 } else {
-                    HostActivity.this.bluetoothDiscoveryHandler.setOnDeviceSelectedListener(new IOnDialogItemClickListener<BluetoothDevice>() {
-
-                        @Override
-                        public void onItemClick(BluetoothDevice device) {
-                            //the user selected a device...connect to it.
-                            onDiscoveredFan(device);
-                        }
-                    });
-
                     adapter.startDiscovery();
                 }
             }
@@ -155,8 +148,13 @@ public class HostActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         disconnectAllSockets();
+        unregisterReceivers();
     }
 
+    /**
+     * Disconnect all connected sockets.
+     * 
+     */
     private void disconnectAllSockets() {
         for (MessageThread thread : this.messageThreads) {
             thread.cancel();
@@ -170,7 +168,8 @@ public class HostActivity extends Activity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothDevice.ACTION_FOUND);
-        this.registerReceiver(new BroadcastReceiver() {
+        filter.addAction(BluetoothDiscoveryHandler.ACTION_DISCOVERED_DEVICES);
+        this.broadcastReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -185,11 +184,19 @@ public class HostActivity extends Activity {
                         BluetoothDevice.ACTION_FOUND)) {
                     BluetoothDevice device = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     bluetoothDiscoveryHandler.onDiscoveryFound(device);
+                } else if (intent.getAction().equals(
+                        BluetoothDiscoveryHandler.ACTION_DISCOVERED_DEVICES)) {
+                    onDiscoveredDevices(intent);
                 }
             }
-        }, filter);
+        };
+        
+        registerReceiver(this.broadcastReceiver, filter);
     }
 
+    private void unregisterReceivers() {
+        this.unregisterReceiver(this.broadcastReceiver);
+    }
     protected void onHelloButtonClicked() {
         //initial test message
         Toaster.iToast(this, "Sending test message");
@@ -204,10 +211,50 @@ public class HostActivity extends Activity {
         }
     }
 
+    /**
+     * Send a message to all connected clients
+     * 
+     * @param sm
+     */
     private void broadcastMessage(StringMessage sm) {
         for (MessageThread thread : this.messageThreads) {
             thread.write(sm);
         }
+    }
+
+    private void onDiscoveredDevices(Intent intent) {
+        List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(BluetoothDiscoveryHandler.EXTRA_DEVICES);
+        //if the discovery was initiated by a remote cient, send the discovered devices back to the remote client
+        if (discoveryInitiator != null) {
+
+            List<FoundFan> foundFans = new ArrayList<FoundFan>();
+            for (BluetoothDevice device : devices) {
+                // send the found fans back to the client.
+                foundFans.add(new FoundFan(device.getName(), device.getAddress()));
+            }
+            FoundFansMessage msg = new FoundFansMessage(foundFans);
+            this.discoveryInitiator.write(msg);
+
+        } else {
+            if (devices.isEmpty()) {
+                Toaster.iToast(this, R.string.no_devices_discovered);
+            } else {
+                new MultiSelectListDialog<BluetoothDevice>(this, R.string.select_fans, R.string.connect)
+                    .setItems(devices)
+                    .setOnClickListener(new IOnDialogItemClickListener<BluetoothDevice>() {
+
+                        @Override
+                        public void onItemClick(BluetoothDevice device) {
+                            //the user selected a device...connect to it.
+                            onDiscoveredFan(device);
+                        }
+                    })
+                    .setFormatter(new BluetoothDeviceDialogFormatter())
+                    .show();
+            }
+        }
+        this.discoveryInitiator = null;
+        
     }
 
     /**
@@ -283,20 +330,8 @@ public class HostActivity extends Activity {
             return;
         }
 
-        final MessageThread msgThread = found;
-        this.bluetoothDiscoveryHandler
-                .setOnDeviceSelectedListener(new IOnDialogItemClickListener<BluetoothDevice>() {
-
-                    @Override
-                    public void onItemClick(BluetoothDevice item) {
-
-                        // send the found fans back to the client.
-                        List<FoundFan> foundFans = Arrays.asList(new FoundFan(
-                                item.getName(), item.getAddress()));
-                        FoundFansMessage msg = new FoundFansMessage(foundFans);
-                        msgThread.write(msg);
-                    }
-                });
+        this.discoveryInitiator = found;
+        adapter.startDiscovery();
     }
 
     private void startDelayedDisplayMessage() {

@@ -1,26 +1,34 @@
 package com.lastcrusade.fanclub;
 
 import java.io.IOException;
-
+import java.util.Arrays;
+import java.util.List;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
+import com.lastcrusade.fanclub.components.MultiSelectListDialog;
 import com.lastcrusade.fanclub.net.AcceptThread;
+import com.lastcrusade.fanclub.net.BluetoothDeviceDialogFormatter;
 import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
 import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
 import com.lastcrusade.fanclub.net.MessageThread;
+import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch;
+import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.lastcrusade.fanclub.net.message.ConnectFansMessage;
 import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
+import com.lastcrusade.fanclub.net.message.FoundFan;
+import com.lastcrusade.fanclub.net.message.FoundFansMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
 import com.lastcrusade.fanclub.net.message.StringMessage;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
@@ -32,6 +40,7 @@ public class FanActivity extends Activity {
     private BluetoothServerSocket mmServerSocket;
     private String HOST_NAME = "Patty Placeholder's party";
     protected MessageThread messageThread;
+    private MessageThreadMessageDispatch messageDispatch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +97,30 @@ public class FanActivity extends Activity {
                 onHelloButtonClicked();
             }
         });
+        
+        registerMessageHandlers();
+    }
+
+    private void registerMessageHandlers() {
+        this.messageDispatch = new MessageThreadMessageDispatch();
+        this.messageDispatch.registerHandler(StringMessage.class, new IMessageHandler<StringMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    StringMessage message, String fromAddr) {
+                StringMessage sm = (StringMessage)message;
+                Toaster.iToast(FanActivity.this, sm.getString());
+            }
+            
+        });
+        this.messageDispatch.registerHandler(FoundFansMessage.class, new IMessageHandler<FoundFansMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    FoundFansMessage message, String fromAddr) {
+                handleFoundFans(message.getFoundFans());
+            }
+        });
     }
 
     protected void onLetMeInButtonClicked() {
@@ -122,6 +155,24 @@ public class FanActivity extends Activity {
         }        
     }
 
+    private void handleFoundFans(List<FoundFan> list) {
+        if (list.isEmpty()) {
+            Toaster.iToast(this, R.string.no_devices_discovered);
+        } else {
+            new MultiSelectListDialog<FoundFan>(this, R.string.select_fans, R.string.connect)
+                .setItems(list)
+                .setOnClickListener(new IOnDialogItemClickListener<FoundFan>() {
+
+                    @Override
+                    public void onItemClick(FoundFan device) {
+                        ConnectFansMessage msg = new ConnectFansMessage(Arrays.asList(device.getAddress()));
+                        messageThread.write(msg);
+                    }
+                })
+                .show();
+        }
+    }
+
     /**
      * 
      * NOTE: must be run on the UI thread.
@@ -131,21 +182,9 @@ public class FanActivity extends Activity {
     protected void onAcceptedHost(BluetoothSocket socket) {
         //disable discovery...we found our host.
         BluetoothUtils.disableDiscovery(this);
-        //construct the message handler for host->fan messages
-        final Handler handler = new Handler(new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage(Message msg) {
-                if (msg.what == MessageThread.MESSAGE_READ) {
-                    onReadMessage(msg.arg1, (IMessage) msg.obj);
-                    return true;
-                }
-                return false;
-            }
-        });
 
         //create the message thread for handling this connection
-        this.messageThread = new MessageThread(socket, handler);
+        this.messageThread = new MessageThread(socket, this.messageDispatch);
         this.messageThread.start();
     }
 

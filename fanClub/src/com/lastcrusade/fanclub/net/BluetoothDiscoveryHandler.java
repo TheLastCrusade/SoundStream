@@ -3,16 +3,17 @@ package com.lastcrusade.fanclub.net;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.lastcrusade.fanclub.R;
-import com.lastcrusade.fanclub.R.string;
-import com.lastcrusade.fanclub.components.IDialogFormatter;
-import com.lastcrusade.fanclub.components.ListViewDialog;
 import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
+import com.lastcrusade.fanclub.components.MultiSelectListDialog;
+import com.lastcrusade.fanclub.util.Toaster;
 
 /**
  * A generic handler for discovering devices.  This handler will accumulate discovered devices and
@@ -23,36 +24,19 @@ import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
  */
 public class BluetoothDiscoveryHandler {
 
-    private class BluetoothDeviceDialogFormatter implements IDialogFormatter<BluetoothDevice> {
-
-        @Override
-        public String format(BluetoothDevice device) {
-            return device.getName() + " (" + device.getAddress() + ")";
-        }
-    }
-
     private static final String TAG = "BluetoothDiscoveryHandler";
     
-    private final Context context;
+    public static final String ACTION_DISCOVERED_DEVICES = "com.lastcrusade.fanclub.net.discoveredDevices";
+    public static final String EXTRA_DEVICES = "com.lastcrusade.fanclub.net.extra.devices";
+
+    private final Activity activity;
     private final BluetoothAdapter adapter;
 
-    private List<BluetoothDevice> discoveredDevices;
+    private ArrayList<BluetoothDevice> discoveredDevices;
 
-    private IOnDialogItemClickListener<BluetoothDevice> onDeviceSelectedListener;
-
-    public BluetoothDiscoveryHandler(Context context, BluetoothAdapter adapter) {
-        this.context = context;
-        this.adapter = adapter;
-    }
-
-    /**
-     * Set the listener that will get called with the selected device.  This may not get called if
-     * the user canceled the dialog.
-     * 
-     * @param onDeviceSelectedListener
-     */
-    public void setOnDeviceSelectedListener(IOnDialogItemClickListener<BluetoothDevice> onDeviceSelectedListener) {
-        this.onDeviceSelectedListener = onDeviceSelectedListener;
+    public BluetoothDiscoveryHandler(Activity activity, BluetoothAdapter adapter) {
+        this.activity = activity;
+        this.adapter  = adapter;
     }
 
     /**
@@ -71,11 +55,14 @@ public class BluetoothDiscoveryHandler {
     public void onDiscoveryFinished() {
         Log.w(TAG, "Discovery finished");
         
-        new ListViewDialog<BluetoothDevice>(this.context, R.string.select_device)
-            .setItems(this.discoveredDevices)
-            .setOnClickListener(this.onDeviceSelectedListener)
-            .setFormatter(new BluetoothDeviceDialogFormatter())
-            .show();
+        sendDiscoveredDevices();
+    }
+
+    private void sendDiscoveredDevices() {
+        Intent intent = new Intent();
+        intent.setAction(ACTION_DISCOVERED_DEVICES);
+        intent.putParcelableArrayListExtra(EXTRA_DEVICES, this.discoveredDevices);
+        this.activity.sendBroadcast(intent);
     }
 
     /**
