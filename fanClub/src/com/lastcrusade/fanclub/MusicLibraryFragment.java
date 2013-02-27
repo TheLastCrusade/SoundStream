@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 import com.lastcrusade.fanclub.util.Titleable;
+
+import java.util.List;
 
 public class MusicLibraryFragment extends SherlockListFragment implements Titleable {
 
@@ -18,7 +20,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
         super.onCreate(savedInstanceState);
         
         //whatever our song list is needs to be passed to the musiclistadapter
-        setListAdapter(new MusicAdapter( this.getActivity(), PlaylistFragment.songs ));
+        setListAdapter(new MusicAdapter( this.getActivity(), PlaylistFragment.metadataList ));
     }
     
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,8 +38,8 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
     
     private class MusicAdapter extends MusicListAdapter{
 
-        public MusicAdapter(Context mContext, Song[] songs) {
-            super(mContext, songs);
+        public MusicAdapter(Context mContext, List<SongMetadata> metadataList) {
+            super(mContext, metadataList);
         }
         
         public View getView(int position, View convertView, ViewGroup parent){
