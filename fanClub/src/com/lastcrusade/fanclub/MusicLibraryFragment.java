@@ -1,24 +1,36 @@
 package com.lastcrusade.fanclub;
 
+import java.util.List;
+
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.service.MusicLibraryService;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 import com.lastcrusade.fanclub.util.Titleable;
 
 public class MusicLibraryFragment extends SherlockListFragment implements Titleable {
+    private final String TAG = "MusicLibraryFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         
         //whatever our song list is needs to be passed to the musiclistadapter
-        setListAdapter(new MusicAdapter( this.getActivity(), PlaylistFragment.songs ));
+        List<SongMetadata> musicLibrary = (((CoreActivity) this.getActivity()).getMusicLibraryService()).getLibrary();
+        Song[] songs = new Song[musicLibrary.size()];
+        for(int i=0; i<musicLibrary.size(); i++){
+            songs[i] = new Song(musicLibrary.get(i));
+            songs[i].getMetadata().setUsername("Reid");
+        }
+        setListAdapter(new MusicAdapter( this.getActivity(), songs));
     }
     
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
