@@ -1,9 +1,11 @@
 package com.lastcrusade.fanclub;
 
+import com.lastcrusade.fanclub.service.MusicLibraryService;
+import com.lastcrusade.fanclub.util.Toaster;
+
+import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -54,6 +56,16 @@ public class LandingActivity extends SherlockActivity {
         Intent intent = new Intent();
         intent.setClass(this, activityClass);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        //Make sure to destroy services when the application closes
+        Intent intent = new Intent(this, MusicLibraryService.class);
+        stopService(intent);
+
     }
 
 }
