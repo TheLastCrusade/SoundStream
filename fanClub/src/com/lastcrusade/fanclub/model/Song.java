@@ -5,12 +5,10 @@ public class Song {
     private SongMetadata metadata;
 
     private String filePath;
-
     private long size;
-
     private byte[] data;
 
-    private boolean fullRecord = false;
+    public Song() {}
 
     public Song(SongMetadata metadata) {
         this.metadata = metadata;
@@ -38,15 +36,6 @@ public class Song {
 
     public void setData(byte[] data) {
         this.data = data;
-        this.fullRecord = true;
-    }
-
-    public boolean isFullRecord() {
-        return fullRecord;
-    }
-
-    public void setFullRecord(boolean fullRecord) {
-        this.fullRecord = fullRecord;
     }
 
     public SongMetadata getMetadata() {

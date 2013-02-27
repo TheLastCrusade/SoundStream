@@ -13,6 +13,7 @@ import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
 import com.lastcrusade.fanclub.components.PlaybarFragment;
 import com.lastcrusade.fanclub.components.PlaybarFragment.PlayControlListener;
 import com.lastcrusade.fanclub.library.MediaStoreWrapper;
+import com.lastcrusade.fanclub.library.SongNotFoundException;
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.service.AudioPlayerService;
@@ -72,14 +73,17 @@ public class TestPlaybarActivity extends FragmentActivity {
             public void onPlay() {
                 List<SongMetadata> songMetas = mediaStore.list();
                 SongMetadata meta = songMetas.get(0);
-                Song song = mediaStore.loadSongData(meta);
                 try {
+                    Song song = mediaStore.loadSongData(meta);
                     //play thru the audio player service.
                     serviceLocator.getService().setSongByPath(song.getFilePath());
                     serviceLocator.getService().play();
                 } catch (ServiceNotBoundException e) {
                     Log.wtf(TAG, e);
                     Toaster.eToast(TestPlaybarActivity.this, "Audio Player Service is not bound.");
+                } catch (SongNotFoundException e) {
+                    Log.wtf(TAG, e);
+                    Toaster.eToast(TestPlaybarActivity.this, "Song not found.");
                 }
             }
 

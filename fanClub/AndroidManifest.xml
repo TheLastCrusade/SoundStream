@@ -38,10 +38,8 @@
             android:name=".TestPlaybarActivity"
             android:label="@string/title_activity_host" >
         </activity>
-        
-        <activity
-            android:name="com.lastcrusade.fanclub.PlaylistActivity"
-            android:label="@string/title_activity_playlist" >
+         <activity
+            android:name=".CoreActivity" >
         </activity>
         <service android:name=".service.AudioPlayerService">
             
