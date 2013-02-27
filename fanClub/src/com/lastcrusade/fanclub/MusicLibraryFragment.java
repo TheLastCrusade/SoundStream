@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 import com.lastcrusade.fanclub.util.Titleable;
 
@@ -26,7 +27,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
         //whatever our song list is needs to be passed to the musiclistadapter
         List<SongMetadata> musicLibrary = (((CoreActivity) this.getActivity()).getMusicLibraryService()).getLibrary();
         for(int i=0; i<musicLibrary.size(); i++){
-            musicLibrary.get(i).setUsername("Reid");
+            musicLibrary.get(i).setUsername(BluetoothUtils.getLocalBluetoothName());
         }
         CustomApp curApp = (CustomApp) this.getActivity().getApplication();
         setListAdapter(new MusicAdapter( this.getActivity(), musicLibrary, curApp.getUserList().getUsers()));
