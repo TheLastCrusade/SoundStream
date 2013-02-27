@@ -1,13 +1,14 @@
-package com.lastcrusade.fanclub.message;
+package com.lastcrusade.fanclub.net.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class PlayMessage implements IMessage {
+
+public class SkipMessage implements IMessage {
 	private String string;
-	private final String PLAY_MESSAGE = "Play"; 
+	private final String SKIP_MESSAGE= "Skip";
 
 	@Override
 	public void deserialize(InputStream input) throws IOException {
@@ -22,19 +23,19 @@ public class PlayMessage implements IMessage {
 
 	@Override
 	public void serialize(OutputStream output) throws IOException {
-		output.write(PLAY_MESSAGE.getBytes()); // output message should be "Play"
+		output.write(SKIP_MESSAGE.getBytes());		
 	}
 
-	public String getPlayMessage() {
-		return PLAY_MESSAGE;
-	}
-	
 	public String getString() {
 		return string;
 	}
 
 	public void setString(String string) {
 		this.string = string;
+	}
+	
+	public String getSkipMessage() {
+		return SKIP_MESSAGE;
 	}
 
 }
