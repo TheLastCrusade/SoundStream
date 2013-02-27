@@ -1,7 +1,6 @@
 package com.lastcrusade.fanclub;
 
 import com.lastcrusade.fanclub.service.MusicLibraryService;
-import com.lastcrusade.fanclub.util.Toaster;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -13,7 +12,7 @@ import android.widget.Button;
 import com.actionbarsherlock.app.SherlockActivity;
 
 public class LandingActivity extends SherlockActivity {
-    private final String TAG = "LandingActivity";
+    private final String TAG = LandingActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

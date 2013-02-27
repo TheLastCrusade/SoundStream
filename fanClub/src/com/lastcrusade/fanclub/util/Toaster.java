@@ -6,7 +6,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 public class Toaster {
-    private final String TAG = "Toaster";
+    private final String TAG = Toaster.class.getName();
     private static int duration = Toast.LENGTH_SHORT;
     private static int methodDepth = 3;
 
