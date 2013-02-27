@@ -1,6 +1,6 @@
 package com.lastcrusade.fanclub.library;
 
-import android.app.Activity;
+import android.app.Service;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MediaStoreWrapper {
 
-    private Activity activity;
+    private Service service;
     private final String ID = MediaStore.Audio.Media._ID,
                       ALBUM = MediaStore.Audio.Media.ALBUM,
                      ARTIST = MediaStore.Audio.Media.ARTIST,
@@ -21,8 +21,8 @@ public class MediaStoreWrapper {
                        SIZE = MediaStore.Video.Media.SIZE;
     private final Uri EC_URI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-    public MediaStoreWrapper(Activity activity) {
-        this.activity = activity;
+    public MediaStoreWrapper(Service ser) {
+        service = ser;
     }
 
     /**
@@ -31,7 +31,7 @@ public class MediaStoreWrapper {
      */
     public List<SongMetadata> list() {
         String[] proj = {ID, ALBUM, ARTIST, TITLE};
-        Cursor cursor = this.activity.getContentResolver().query(EC_URI, proj, null, null, null);
+        Cursor cursor = service.getContentResolver().query(EC_URI, proj, null, null, null);
         List<SongMetadata> metadataList = new ArrayList<SongMetadata>();
         cursor.moveToFirst();
 
@@ -57,7 +57,7 @@ public class MediaStoreWrapper {
     public Song loadSongData(SongMetadata metadata) throws SongNotFoundException {
         String[] proj = {ID, PATH, SIZE};
         String selection = ID + "=" + Long.toString(metadata.getId());
-        Cursor cursor = this.activity.getContentResolver().query(EC_URI, proj, selection, null, null);
+        Cursor cursor = service.getContentResolver().query(EC_URI, proj, selection, null, null);
 
         try {
             Song song = null;

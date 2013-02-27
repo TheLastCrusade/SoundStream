@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 import android.util.Log;
@@ -27,7 +26,7 @@ public class Messenger {
 
     private static final char END_OF_CLASS_CHAR = '\n';
 
-    private static final String TAG = "Messenger";
+    private static final String TAG = Messenger.class.getName();
 
     private static final int SIZE_LEN = 4;
 

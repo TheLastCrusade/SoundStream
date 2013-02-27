@@ -3,7 +3,6 @@ package com.lastcrusade.fanclub.net.message;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 
 public interface IMessage {
 
