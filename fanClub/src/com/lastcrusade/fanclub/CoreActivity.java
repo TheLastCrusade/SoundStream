@@ -22,6 +22,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class CoreActivity extends SlidingFragmentActivity{
     private Fragment activeContent;
     private Fragment menu;
+    
 
     MusicLibraryService mMusicLibraryService;
     boolean boundToService; //Since you cannot instantly bind, set a boolean
@@ -61,7 +62,7 @@ public class CoreActivity extends SlidingFragmentActivity{
 
        
         // setup the sliding bar
-        getSlidingMenu().setBehindOffset(60);
+        getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
 
         // enables the icon to act as the up
@@ -78,8 +79,9 @@ public class CoreActivity extends SlidingFragmentActivity{
         // home references the app icon
         if (item.getItemId() == android.R.id.home) {
             toggle(); // toggles the state of the sliding menu
-            if(getSlidingMenu().isMenuShowing() && menu.isAdded())
+            if(getSlidingMenu().isMenuShowing() && menu.isAdded()){
                 setTitle(((ITitleable)menu).getTitle());
+            }
             return true;
         }
         return false;
@@ -122,17 +124,17 @@ public class CoreActivity extends SlidingFragmentActivity{
      * every time
      */
     private Fragment getFragment(String fragmentName) {
-        
+        Fragment newFragment = null;
         if(fragmentName.equals(getString(R.string.playlist)))
-            return new PlaylistFragment();
+            newFragment = new PlaylistFragment();
         
         if(fragmentName.equals(getString(R.string.music_library)))
-            return new MusicLibraryFragment();
+            newFragment = new MusicLibraryFragment();
         
         if(fragmentName.equals(getString(R.string.menu)))
-            return new MenuFragment();
+            newFragment =  new MenuFragment();
         
-        return null;
+        return newFragment;
     }
 
     public MusicLibraryService getMusicLibraryService(){
