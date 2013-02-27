@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.fanclub.service.MusicLibraryService;
 import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
+import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.Titleable;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -64,6 +65,10 @@ public class CoreActivity extends SlidingFragmentActivity{
         
         //enables the icon to act as the up 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Add user to user list
+        CustomApp curApp = ((CustomApp)getApplication());
+        curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName());
     }
     
     

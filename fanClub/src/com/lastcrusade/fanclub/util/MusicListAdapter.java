@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.UserList;
@@ -19,10 +20,11 @@ public class MusicListAdapter extends BaseAdapter {
     private Song[] songs;
     private Hashtable<String,String> users;
     
-    public MusicListAdapter(Context mContext, Song[] songs){
+    public MusicListAdapter(Context mContext, Song[] songs, Hashtable<String,String> users){
         this.mContext = mContext;
         this.songs = songs;
-        users = UserList.getUsers();
+        //Add user to user list
+        this.users = users;
     }
     
     

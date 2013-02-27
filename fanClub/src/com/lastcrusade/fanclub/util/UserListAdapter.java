@@ -19,9 +19,9 @@ public class UserListAdapter extends BaseAdapter {
     private String[] usernames;
     private Hashtable<String, String> users;
     
-    public UserListAdapter(Context mContext, String[] usernames){
+    public UserListAdapter(Context mContext, String[] usernames, Hashtable<String,String> users){
         this.usernames = usernames;
-        users = UserList.getUsers();
+        this.users = users;
         this.mContext = mContext;
     }
     @Override

@@ -1,5 +1,6 @@
 package com.lastcrusade.fanclub;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import android.content.Context;
@@ -30,7 +31,8 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
             songs[i] = new Song(musicLibrary.get(i));
             songs[i].getMetadata().setUsername("Reid");
         }
-        setListAdapter(new MusicAdapter( this.getActivity(), songs));
+        CustomApp curApp = (CustomApp) this.getActivity().getApplication();
+        setListAdapter(new MusicAdapter( this.getActivity(), songs, curApp.getUserList().getUsers()));
     }
     
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,8 +50,8 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
     
     private class MusicAdapter extends MusicListAdapter{
 
-        public MusicAdapter(Context mContext, Song[] songs) {
-            super(mContext, songs);
+        public MusicAdapter(Context mContext, Song[] songs, Hashtable<String, String> users) {
+            super(mContext, songs, users);
         }
         
         public View getView(int position, View convertView, ViewGroup parent){
