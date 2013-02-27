@@ -64,5 +64,14 @@ public class BluetoothUtils {
                 BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         context.startActivity(discoverableIntent);
     }
+    
+    public static String getLocalBluetoothName(){
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        String name = mBluetoothAdapter.getName();
+        if(name == null){
+            name = mBluetoothAdapter.getAddress();
+        }
+        return name;
+    }
 
 }
