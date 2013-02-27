@@ -18,8 +18,10 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     private static final String TAG = SingleFileAudioPlayer.class.getName();
     private String filePath;
+    private MediaPlayer player;
 
     public SingleFileAudioPlayer() {
+        this.player = new MediaPlayer();
     }
     
     public void setSongByPath(String filePath) {
@@ -29,7 +31,6 @@ public class SingleFileAudioPlayer implements IPlayer {
     public void play() {
         try {
             new File((new File(this.filePath).getParentFile().list())[0]).exists();
-            MediaPlayer player = new MediaPlayer();
             if (player.isPlaying()) {
                 player.stop();
             }
@@ -44,12 +45,16 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     @Override
     public void pause() {
-        this.pause();
+        if (player.isPlaying()) {
+            player.pause();
+        }
     }
 
     @Override
     public void skip() {
-        // TODO Auto-generated method stub
-        
+        //since this is a single file player, skip == stop
+        if (player.isPlaying()) {
+            player.stop();
+        }
     }
 }

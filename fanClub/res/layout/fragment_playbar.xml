@@ -15,7 +15,7 @@
 
      <ImageButton
         android:id="@+id/btn_play_pause"
-        android:src="@drawable/glyphicons_173_play"
+        android:src="@drawable/av_play"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -29,6 +29,6 @@
         android:layout_weight="1"
          android:layout_margin="5dp"
          android:background="@null"
-         android:src="@drawable/glyphicons_176_forward" />
+         android:src="@drawable/av_next" />
      
 </LinearLayout>

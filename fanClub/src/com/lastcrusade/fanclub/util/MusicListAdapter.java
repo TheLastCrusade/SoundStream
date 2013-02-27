@@ -1,6 +1,7 @@
 package com.lastcrusade.fanclub.util;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -11,34 +12,37 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
-import com.lastcrusade.fanclub.model.Song;
-import com.lastcrusade.fanclub.model.UserList;
+import com.lastcrusade.fanclub.model.SongMetadata;
 
 public class MusicListAdapter extends BaseAdapter {
     private Context mContext;
-    private Song[] songs;
+    private List<SongMetadata> metadataList;
     private Hashtable<String,String> users;
     
-    public MusicListAdapter(Context mContext, Song[] songs){
+    public MusicListAdapter(
+            Context mContext,
+            List<SongMetadata> metadataList,
+            Hashtable<String,String> users
+            ){
         this.mContext = mContext;
-        this.songs = songs;
-        users = UserList.getUsers();
+        this.metadataList = metadataList;
+        this.users = users;
     }
     
     
     @Override
     public int getCount() {
-        return songs.length;
+        return metadataList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return songs[position];
+        return metadataList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return songs[position].getMetadata().getId();
+        return metadataList.get(position).getId();
     }
 
     @Override
@@ -57,10 +61,10 @@ public class MusicListAdapter extends BaseAdapter {
         TextView album = (TextView) element.findViewById(R.id.album);
         
 
-        userColor.setBackgroundColor(Color.parseColor(users.get(songs[position].getMetadata().getUsername())));
-        title.setText(songs[position].getMetadata().getTitle());
-        artist.setText(songs[position].getMetadata().getArtist());
-        album.setText(songs[position].getMetadata().getAlbum());
+        userColor.setBackgroundColor(Color.parseColor(users.get(metadataList.get(position).getUsername())));
+        title.setText(metadataList.get(position).getTitle());
+        artist.setText(metadataList.get(position).getArtist());
+        album.setText(metadataList.get(position).getAlbum());
 
         
         return element;

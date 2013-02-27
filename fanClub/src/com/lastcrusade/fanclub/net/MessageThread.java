@@ -21,7 +21,7 @@ import com.lastcrusade.fanclub.net.message.Messenger;
  *
  */
 public class MessageThread extends Thread {
-    private final String TAG = "MessageThread";
+    private final String TAG = MessageThread.class.getName();
     public static final int MESSAGE_READ = 1;
     public static final String EXTRA_ADDRESS = "com.lastcrusade.fanclub.net.extraAddress";
 

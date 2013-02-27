@@ -17,7 +17,7 @@ import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
 
 public class BluetoothUtils {
     /* All methods should be static */
-    private static final String TAG = "BluetoothUtils";
+    private static final String TAG = BluetoothUtils.class.getName();
     
     /* The maximum number of seconds in which to wait for bluetooth to enable */
     private static final int ENABLE_CHECK_RETRY_SECONDS = 5;
@@ -70,5 +70,14 @@ public class BluetoothUtils {
         discoverableIntent.putExtra(
                 BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         context.startActivity(discoverableIntent);
+    }
+    
+    public static String getLocalBluetoothName() {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        String name = mBluetoothAdapter.getName();
+        if(name == null) {
+            name = mBluetoothAdapter.getAddress();
+        }
+        return name;
     }
 }

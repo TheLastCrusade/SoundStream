@@ -64,40 +64,44 @@ public class TestPlaybarActivity extends FragmentActivity {
                 new ServiceLocator(TestPlaybarActivity.this, AudioPlayerService.class, AudioPlayerServiceBinder.class);
 
         this.player = new SingleFileAudioPlayer();
-        this.mediaStore = new MediaStoreWrapper(this);
-        PlaybarFragment pb = (PlaybarFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_playbar);
-        
-        pb.setPlayControlListener(new PlayControlListener() {
+        //JR, 02/27/13, NOTE: this code no longer works as written, because MediaStoreWrapper is written to use a Service
+        // however it is still a great example of how to use the PlaybarFragment as it is currently written, and also
+        // how to use the service locator
 
-            @Override
-            public void onPlay() {
-                List<SongMetadata> songMetas = mediaStore.list();
-                SongMetadata meta = songMetas.get(0);
-                try {
-                    Song song = mediaStore.loadSongData(meta);
-                    //play thru the audio player service.
-                    serviceLocator.getService().setSongByPath(song.getFilePath());
-                    serviceLocator.getService().play();
-                } catch (ServiceNotBoundException e) {
-                    Log.wtf(TAG, e);
-                    Toaster.eToast(TestPlaybarActivity.this, "Audio Player Service is not bound.");
-                } catch (SongNotFoundException e) {
-                    Log.wtf(TAG, e);
-                    Toaster.eToast(TestPlaybarActivity.this, "Song not found.");
-                }
-            }
-
-            @Override
-            public void onPause() {
-                player.pause();                
-            }
-
-            @Override
-            public void onSkip() {
-                // TODO Auto-generated method stub
-                
-            }
-            
-        });
+        //        this.mediaStore = new MediaStoreWrapper(this);
+//        PlaybarFragment pb = (PlaybarFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_playbar);
+//        
+//        pb.setPlayControlListener(new PlayControlListener() {
+//
+//            @Override
+//            public void onPlay() {
+//                List<SongMetadata> songMetas = mediaStore.list();
+//                SongMetadata meta = songMetas.get(0);
+//                try {
+//                    Song song = mediaStore.loadSongData(meta);
+//                    //play thru the audio player service.
+//                    serviceLocator.getService().setSongByPath(song.getFilePath());
+//                    serviceLocator.getService().play();
+//                } catch (ServiceNotBoundException e) {
+//                    Log.wtf(TAG, e);
+//                    Toaster.eToast(TestPlaybarActivity.this, "Audio Player Service is not bound.");
+//                } catch (SongNotFoundException e) {
+//                    Log.wtf(TAG, e);
+//                    Toaster.eToast(TestPlaybarActivity.this, "Song not found.");
+//                }
+//            }
+//
+//            @Override
+//            public void onPause() {
+//                player.pause();                
+//            }
+//
+//            @Override
+//            public void onSkip() {
+//                // TODO Auto-generated method stub
+//                
+//            }
+//            
+//        });
     }
 }
