@@ -25,10 +25,9 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	@Test
 	public void testSerializeLibraryMessage() throws IOException {
 		LibraryMessage oldMessage = new LibraryMessage();
-		oldMessage.setLibraryString(metadataList.toString());
+		oldMessage.setLibrary(metadataList);
 		LibraryMessage newMessage = super.testSerializeMessage(oldMessage);
 				
-		assertEquals(metadataList.toString() , newMessage.getLibraryString());
+		assertEquals(metadataList , newMessage.getLibrary());
 	}
-
 }

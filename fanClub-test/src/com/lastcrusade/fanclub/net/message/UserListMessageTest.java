@@ -14,14 +14,14 @@ import com.lastcrusade.fanclub.net.message.UserListMessage;
 
 public class UserListMessageTest extends SerializationTest<UserListMessage> {
 	
-	private Hashtable<String,String> connectedUsers = new Hashtable<String,String>();
+	private UserList userList = new UserList();
 	
 	@Test
 	public void testSerializeUserListMessage() throws IOException {
 		UserListMessage oldMessage = new UserListMessage();
-		oldMessage.setUserListString(connectedUsers.toString());
+		oldMessage.setUserList(userList);
 		UserListMessage newMessage = super.testSerializeMessage(oldMessage);
 		
-		assertEquals(connectedUsers.toString(), newMessage.getUserListString());
+		assertEquals(userList, newMessage.getUserList());
 	}
 }

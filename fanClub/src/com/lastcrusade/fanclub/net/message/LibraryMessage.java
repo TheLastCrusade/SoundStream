@@ -4,13 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import com.lastcrusade.fanclub.PlaylistFragment;
 //import com.lastcrusade.fanclub.service.MusicLibraryService;
+import com.lastcrusade.fanclub.model.SongMetadata;
 
 public class LibraryMessage implements IMessage {
 	private final String TAG = LibraryMessage.class.getName();
-	private String libraryString;
+	private List<SongMetadata> library;
 
 	@Override
 	public void deserialize(InputStream input) throws IOException {
@@ -20,19 +22,19 @@ public class LibraryMessage implements IMessage {
 		while((read = input.read(bytes)) > 0) {
 			out.write(bytes, 0, read);
 		}
-		this.setLibraryString(out.toString());
+		//this.setLibrary(out); // wait for Jesse's changes to be made 
 	}
 
 	@Override
 	public void serialize(OutputStream output) throws IOException {
-		output.write(this.getLibraryString().getBytes());
+		output.write(this.getLibrary().toString().getBytes());
 	}
 
-	public String getLibraryString() {
-		return libraryString;
+	public List<SongMetadata> getLibrary() {
+		return library;
 	}
 
-	public void setLibraryString(String string) {
-		this.libraryString = string;
+	public void setLibrary(List<SongMetadata> library) {
+		this.library = library;
 	}
 }
