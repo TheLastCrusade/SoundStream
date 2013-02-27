@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class UserListMessage implements IMessage {
-	private final String TAG = "UserListMessage";
+	private final String TAG = UserListMessage.class.getName();
 	private String userListString;
 	
 	@Override

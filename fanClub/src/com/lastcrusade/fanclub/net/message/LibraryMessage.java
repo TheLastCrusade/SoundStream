@@ -9,7 +9,7 @@ import com.lastcrusade.fanclub.PlaylistFragment;
 //import com.lastcrusade.fanclub.service.MusicLibraryService;
 
 public class LibraryMessage implements IMessage {
-	private final String TAG = "LibraryMessage";
+	private final String TAG = LibraryMessage.class.getName();
 	private String libraryString;
 
 	@Override
