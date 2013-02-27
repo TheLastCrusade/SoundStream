@@ -12,10 +12,11 @@ import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
-import com.lastcrusade.fanclub.net.message.IMessage;
-import com.lastcrusade.fanclub.net.message.Messenger;
-import com.lastcrusade.fanclub.net.message.StringMessage;
-
+/**
+ * Doesn't inherit from SerializationTest and is separate from its generalized
+ * test structure. Meaning, the code repetition between this class and
+ * SerializationTest is necessary!
+ */
 public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
@@ -82,7 +83,7 @@ public class MessengerTest {
         //make sure all bytes are consumed
         assertEquals(0, bais.available());
     }
-
+    
     @Test
     public void testSerializeMessage() throws IOException {
         
@@ -145,12 +146,12 @@ public class MessengerTest {
         //make sure all bytes are consumed
         assertEquals(0, is.available());
     }
-
+    
     private InputStream simulateSendAndReceive(
             byte[] outputBytes) {
         return new ByteArrayInputStream(outputBytes);
     }
-
+    
     /**
      * NOTE: keep this separate, so we have independent verification of the Messenger.  This lets
      * us use the independently verified side to test the other side of the messenger.

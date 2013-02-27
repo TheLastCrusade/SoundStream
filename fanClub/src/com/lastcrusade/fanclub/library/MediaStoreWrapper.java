@@ -1,71 +1,82 @@
 package com.lastcrusade.fanclub.library;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import android.app.Activity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.MediaStore;
-
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MediaStoreWrapper {
 
-    private Activity mActivity;
+    private Activity activity;
+    private final String ID = MediaStore.Audio.Media._ID,
+                      ALBUM = MediaStore.Audio.Media.ALBUM,
+                     ARTIST = MediaStore.Audio.Media.ARTIST,
+                      TITLE = MediaStore.Audio.Media.TITLE,
+                       PATH = MediaStore.Audio.Media.DATA, //NOTE: actually the path to the song, not the raw data
+                       SIZE = MediaStore.Video.Media.SIZE;
+    private final Uri EC_URI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-    public MediaStoreWrapper(Activity mActivity) {
-        this.mActivity = mActivity;
+    public MediaStoreWrapper(Activity activity) {
+        this.activity = activity;
     }
 
+    /**
+     * Lists all media files on the device
+     * @return A list of metadata for all the songs on the device
+     */
     public List<SongMetadata> list() {
-        String[] proj = { MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.TITLE};
-        Cursor cursor = this.mActivity.managedQuery(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, null, null,
-                null);
-        List<SongMetadata> newSongList = new ArrayList<SongMetadata>();
+        String[] proj = {ID, ALBUM, ARTIST, TITLE};
+        Cursor cursor = this.activity.getContentResolver().query(EC_URI, proj, null, null, null);
+        List<SongMetadata> metadataList = new ArrayList<SongMetadata>();
         cursor.moveToFirst();
+
         while (!cursor.isAfterLast()) {
-            SongMetadata song = new SongMetadata();
-            song.setId(cursor.getLong(0));
-            song.setAlbum(cursor.getString(1));
-            song.setArtist(cursor.getString(2));
-            song.setTitle(cursor.getString(3));
-            newSongList.add(song);
+            SongMetadata metadata = new SongMetadata();
+            metadata.setId(cursor.getLong(cursor.getColumnIndex(ID)));
+            metadata.setAlbum(cursor.getString(cursor.getColumnIndex(ALBUM)));
+            metadata.setArtist(cursor.getString(cursor.getColumnIndex(ARTIST)));
+            metadata.setTitle(cursor.getString(cursor.getColumnIndex(TITLE)));
+            metadataList.add(metadata);
             cursor.moveToNext();
         }
 
-        Collections.sort(newSongList, new Comparator<SongMetadata>() {
-
-            @Override
-            public int compare(SongMetadata lhs, SongMetadata rhs) {
-                return lhs.getTitle().compareTo(rhs.getTitle());
-            }
-
-        });
-        return newSongList;
+        cursor.close();
+        return metadataList;
     }
 
-    public Song loadSongData(SongMetadata metadata) {
-        String[] proj = { MediaStore.Audio.Media._ID,
-              MediaStore.Audio.Media.DATA, //NOTE: actually the path to the song, not the raw data
-              MediaStore.Video.Media.SIZE 
-              };
-        String selection = MediaStore.Audio.Media._ID + "=" + Long.toString(metadata.getId());
-        Cursor cursor = this.mActivity.managedQuery(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj, selection, null,
-                null);
-        List<Song> newSongList = new ArrayList<Song>();
-        cursor.moveToFirst();
-        
-        Song song = new Song(metadata);
-        song.setFilePath(cursor.getString(1));
-        song.setSize(cursor.getLong(2));
-        return song;
+    /**
+     * Gets a song from the MediaStore, else errors with SongNotFoundException
+     * @param metadata metadata for the requested song
+     * @return song object
+     */
+    public Song loadSongData(SongMetadata metadata) throws SongNotFoundException {
+        String[] proj = {ID, PATH, SIZE};
+        String selection = ID + "=" + Long.toString(metadata.getId());
+        Cursor cursor = this.activity.getContentResolver().query(EC_URI, proj, selection, null, null);
+
+        try {
+            Song song = null;
+
+            if (cursor.moveToFirst()) { //moves cursor to first element in result set. false if no first element
+                song = new Song(metadata);
+                song.setFilePath(cursor.getString(cursor.getColumnIndex(PATH)));
+                song.setSize(cursor.getLong(cursor.getColumnIndex(SIZE)));
+            }
+
+            if (song == null) {
+                throw new SongNotFoundException("Song not found: "
+                        + metadata.getArtist() + " - " + metadata.getTitle());
+            }
+            return song;
+        } finally { //prevents memory leaks
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }
