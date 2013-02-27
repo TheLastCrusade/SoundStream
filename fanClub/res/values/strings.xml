@@ -13,5 +13,6 @@
     <string name="enable_bluetooth">Enabling Bluetooth...</string>
     <string name="finding_new_fans">Finding new fans...</string>
     <string name="music_library">Music Library</string>
+    <string name="menu">Menu</string>
 
 </resources>

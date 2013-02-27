@@ -56,5 +56,10 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
         return getString(R.string.music_library);
     }
     
+    public void onStart(){
+        super.onStart();
+        getActivity().setTitle(getTitle());
+    }
+    
     
 }

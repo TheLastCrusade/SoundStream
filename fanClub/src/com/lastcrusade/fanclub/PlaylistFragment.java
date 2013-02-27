@@ -57,5 +57,10 @@ public class PlaylistFragment extends SherlockListFragment implements Titleable{
         return getString(R.string.playlist);
     }
     
+    public void onStart(){
+        super.onStart();
+        getActivity().setTitle(getTitle());
+    }
+    
     
 }
