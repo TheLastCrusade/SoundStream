@@ -38,7 +38,7 @@
             android:name="com.lastcrusade.fanclub.CoreActivity" >
         </activity>
         <service
-            android:name=".MusicLibraryService"
+            android:name=".service.MusicLibraryService"
             android:exported="false"
             android:label="@string/music_library"
             />
