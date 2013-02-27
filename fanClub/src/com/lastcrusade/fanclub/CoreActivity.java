@@ -125,14 +125,16 @@ public class CoreActivity extends SlidingFragmentActivity{
      */
     private Fragment getFragment(String fragmentName) {
         Fragment newFragment = null;
-        if(fragmentName.equals(getString(R.string.playlist)))
+        
+        if(fragmentName.equals(getString(R.string.playlist))){
             newFragment = new PlaylistFragment();
-        
-        if(fragmentName.equals(getString(R.string.music_library)))
+        }
+        else if(fragmentName.equals(getString(R.string.music_library))){
             newFragment = new MusicLibraryFragment();
-        
-        if(fragmentName.equals(getString(R.string.menu)))
+        }
+        else if(fragmentName.equals(getString(R.string.menu))){
             newFragment =  new MenuFragment();
+        }
         
         return newFragment;
     }
