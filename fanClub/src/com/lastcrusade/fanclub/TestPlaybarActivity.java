@@ -17,7 +17,7 @@ import com.lastcrusade.fanclub.library.SongNotFoundException;
 import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.service.AudioPlayerService;
-import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerBinder;
+import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 import com.lastcrusade.fanclub.util.Toaster;
@@ -61,7 +61,7 @@ public class TestPlaybarActivity extends FragmentActivity {
         
         //create the service locator for the AudioPlayerService (which will bind to the service, launching if needed).
         this.serviceLocator =
-                new ServiceLocator(TestPlaybarActivity.this, AudioPlayerService.class, AudioPlayerBinder.class);
+                new ServiceLocator(TestPlaybarActivity.this, AudioPlayerService.class, AudioPlayerServiceBinder.class);
 
         this.player = new SingleFileAudioPlayer();
         this.mediaStore = new MediaStoreWrapper(this);

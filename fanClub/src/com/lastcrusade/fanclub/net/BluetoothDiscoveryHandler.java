@@ -1,4 +1,4 @@
-package com.lastcrusade.fanclub.util;
+package com.lastcrusade.fanclub.net;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +70,7 @@ public class BluetoothDiscoveryHandler {
      */
     public void onDiscoveryFinished() {
         Log.w(TAG, "Discovery finished");
+        
         new ListViewDialog<BluetoothDevice>(this.context, R.string.select_device)
             .setItems(this.discoveredDevices)
             .setOnClickListener(this.onDeviceSelectedListener)
