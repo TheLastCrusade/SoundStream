@@ -1,6 +1,7 @@
 package com.lastcrusade.fanclub.util;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -11,15 +12,15 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
-import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.model.UserList;
 
 public class MusicListAdapter extends BaseAdapter {
     private Context mContext;
-    private Song[] songs;
+    private List<SongMetadata> songs;
     private Hashtable<String,String> users;
     
-    public MusicListAdapter(Context mContext, Song[] songs){
+    public MusicListAdapter(Context mContext, List<SongMetadata> songs){
         this.mContext = mContext;
         this.songs = songs;
         users = UserList.getUsers();
@@ -28,17 +29,17 @@ public class MusicListAdapter extends BaseAdapter {
     
     @Override
     public int getCount() {
-        return songs.length;
+        return songs.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return songs[position];
+        return songs.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return songs[position].getMetadata().getId();
+        return songs.get(position).getId();
     }
 
     @Override
@@ -57,10 +58,10 @@ public class MusicListAdapter extends BaseAdapter {
         TextView album = (TextView) element.findViewById(R.id.album);
         
 
-        userColor.setBackgroundColor(Color.parseColor(users.get(songs[position].getMetadata().getUsername())));
-        title.setText(songs[position].getMetadata().getTitle());
-        artist.setText(songs[position].getMetadata().getArtist());
-        album.setText(songs[position].getMetadata().getAlbum());
+        userColor.setBackgroundColor(Color.parseColor(users.get(songs.get(position).getUsername())));
+        title.setText(songs.get(position).getTitle());
+        artist.setText(songs.get(position).getArtist());
+        album.setText(songs.get(position).getAlbum());
 
         
         return element;

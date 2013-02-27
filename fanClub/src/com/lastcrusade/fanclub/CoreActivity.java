@@ -59,9 +59,9 @@ public class CoreActivity extends SlidingFragmentActivity{
         getSlidingMenu().showContent();
         
         //update the activity title
-        if(content instanceof Titleable){
-            setTitle(((Titleable)content).getTitle());
-        }
+//        if(content instanceof Titleable){
+//            setTitle(((Titleable)content).getTitle());
+//        }
     }
     
     /*

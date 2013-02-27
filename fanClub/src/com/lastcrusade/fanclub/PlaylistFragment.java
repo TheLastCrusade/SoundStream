@@ -7,37 +7,35 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 import com.lastcrusade.fanclub.util.Titleable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class PlaylistFragment extends SherlockListFragment implements Titleable{
     //for testing purposes so we have songs to show
-    static Song[] songs = new Song[]{
-            new Song(),
-            new Song(),
-            new Song()
-    };
+    static List<SongMetadata> songs = new ArrayList<SongMetadata>(
+            Arrays.asList(new SongMetadata(), new SongMetadata(), new SongMetadata()));
     
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setListAdapter(new MusicListAdapter(this.getActivity(),songs));
+        setListAdapter(new MusicListAdapter(this.getActivity(), songs));
     }
     
     public PlaylistFragment(){
-        for(Song s:songs){
-            SongMetadata sm = new SongMetadata();
-            sm.setTitle("Title");
-            sm.setAlbum("Album");
-            sm.setArtist("Artist");
-            s.setSongMetadata(sm);
+        for(SongMetadata s:songs){
+            s.setTitle("Title");
+            s.setAlbum("Album");
+            s.setArtist("Artist");
          }
-         songs[0].getMetadata().setUsername("Reid");
-         songs[1].getMetadata().setUsername("Lizziemom");
-         songs[2].getMetadata().setUsername("Greenie");
+         songs.get(0).setUsername("Reid");
+         songs.get(1).setUsername("Lizziemom");
+         songs.get(2).setUsername("Greenie");
         
     }
     

@@ -7,9 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 import com.lastcrusade.fanclub.util.Titleable;
+
+import java.util.List;
 
 public class MusicLibraryFragment extends SherlockListFragment implements Titleable {
 
@@ -36,7 +38,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements Titlea
     
     private class MusicAdapter extends MusicListAdapter{
 
-        public MusicAdapter(Context mContext, Song[] songs) {
+        public MusicAdapter(Context mContext, List<SongMetadata> songs) {
             super(mContext, songs);
         }
         
