@@ -213,16 +213,16 @@ public class HostActivity extends Activity {
             StringMessage sm = new StringMessage();
             sm.setString(message);
             //send to all connected fans
-            broadcastMessage(sm);
+            broadcastStringMessage(sm);
         }
     }
 
     /**
-     * Send a message to all connected clients
+     * Send a string message to all connected clients
      * 
-     * @param sm
+     * @param sm The string message to send
      */
-    private void broadcastMessage(StringMessage sm) {
+    private void broadcastStringMessage(StringMessage sm) {
         for (MessageThread thread : this.messageThreads) {
             thread.write(sm);
         }
