@@ -315,11 +315,10 @@ public class HostActivity extends Activity {
     private void handleFindNewFansMessage(final String remoteAddr) {
         Toaster.iToast(this, R.string.finding_new_fans);
 
+        //NOTE: we assume that the adapter is nonnull, because the activity will not
+        // get past onCreate on a device w/o Bluetooth...and also, because this method is
+        // called in response to a network message over Bluetooth
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter == null) {
-            Toaster.eToast(this, "Bluetooth adapter is null");
-            return;
-        }
 
         // look up the message thread that manages the connection to the remote
         // device
@@ -333,7 +332,7 @@ public class HostActivity extends Activity {
         }
 
         if (found == null) {
-            Toaster.eToast(this, "Unknown remote device.");
+            Log.wtf(TAG, "Unknown remote device: " + remoteAddr);
             return;
         }
 
