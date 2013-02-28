@@ -73,52 +73,20 @@ public class BluetoothUtils {
         context.startActivity(discoverableIntent);
     }
     
-    public static String getLocalBluetoothName(){
+    public static String getLocalBluetoothName() {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         String name = null;
-        if(mBluetoothAdapter!=null){
+        if(mBluetoothAdapter!=null) {
             name = mBluetoothAdapter.getName();
             if(name == null){
                 name = mBluetoothAdapter.getAddress();
             }
-           
         }
         else{
             Log.wtf(TAG, "No Bluetooth Radio. Ok on emulator");
             name = "No Bluetooth";
         }
-        return name;
-       
+        return name;       
     }
-
-    /**
-     * Get the UUIDs supported by this device.
-     * 
-     * NOTE: if calling this method on discovery, call this with the discovered
-     * device object, not the bonded device object.  The discovered device object
-     * will accurately show the services supported at that time.
-     * 
-     * @param device
-     * @return A list of UUIDs supported on the remote system.  Note that this may be empty (but should never be null).
-     */
-    public static List<UUID> getUuidsForDevice(BluetoothDevice device) {
-        try {
-            //NOTE: this uses an undocumented method call, because the documented call
-            // doesn't show up until API 15
-            Method method = device.getClass().getMethod("getUuids", null);
-            ParcelUuid[] puuids = (ParcelUuid[]) method.invoke(device, null);
-            //transform into a simple list
-            List<UUID> supportedUuids = new LinkedList<UUID>();
-            if (puuids != null) {
-                for (ParcelUuid puuid : puuids) {
-                    supportedUuids.add(puuid.getUuid());
-                }
-            }
-            return supportedUuids;
-        } catch (Exception e) {
-            //FIXME: 
-            throw new RuntimeException(e);
-        }
-    }
-
 }
