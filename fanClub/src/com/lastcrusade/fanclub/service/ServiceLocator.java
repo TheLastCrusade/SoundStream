@@ -1,6 +1,6 @@
 package com.lastcrusade.fanclub.service;
 
-import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerBinder;
+import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerServiceBinder;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -12,7 +12,7 @@ import android.os.IBinder;
 /**
  * A generic class for launching/locating services.  As a general pattern, create locators
  * in onCreate or onResume for any services you may need in that activity.  The binding/launching process
- * happens in the message loop, so you must return from the on* method for the service to actually launch.
+ * happens in the message loop, so you MUST return from the on* method for the service to actually launch.
  * After the service is bound, use getService to get the service object.
  * 
  * @author Jesse Rosalia

@@ -73,9 +73,7 @@ public class PlaybarFragment extends Fragment {
                     PlaybarFragment.this.pause();
                 } else {
                     PlaybarFragment.this.play();
-                }
-                
-//                transitionTo(HostActivity.class);
+                }                
             }
         });
 

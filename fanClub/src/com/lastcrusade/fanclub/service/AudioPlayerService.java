@@ -24,7 +24,7 @@ public class AudioPlayerService extends Service implements IPlayer {
      * runs in the same process as its clients, we don't need to deal with
      * IPC.
      */
-    public class AudioPlayerBinder extends Binder implements ILocalBinder<AudioPlayerService> {
+    public class AudioPlayerServiceBinder extends Binder implements ILocalBinder<AudioPlayerService> {
         public AudioPlayerService getService() {
             return AudioPlayerService.this;
         }
@@ -33,7 +33,7 @@ public class AudioPlayerService extends Service implements IPlayer {
     @Override
     public IBinder onBind(Intent intent) {
         this.audioPlayer = new SingleFileAudioPlayer();
-        return new AudioPlayerBinder();
+        return new AudioPlayerServiceBinder();
     }
 
     @Override
