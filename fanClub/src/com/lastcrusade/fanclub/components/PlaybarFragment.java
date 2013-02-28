@@ -10,50 +10,29 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.service.AudioPlayerService;
+import com.lastcrusade.fanclub.util.BroadcastIntent;
 
 public class PlaybarFragment extends Fragment {
 
     /**
-     * Implement this interface to receive events when the user presses the play/pause button
+     * Broadcast action sent when the Audio Player service is paused.
      * 
-     * @author thejenix
-     *
      */
-    public static interface PlayControlListener {
-        /**
-         * Called when the user presses the play button.  Note that this should never get called if music is already playing.
-         * 
-         */
-        public void onPlay();
-        
-        /**
-         * Called when the user presses the pause button.  Note that this should never get called if music is already paused.
-         * 
-         */
-        public void onPause();
-        
-        /**
-         * Called when the user presses the skip button.
-         * 
-         */
-        public void onSkip();
-        
-    }
-   
-    private static final PlayControlListener NO_OP_PLAY_CONTROL_LISTENER = new PlayControlListener() {
-        
-        @Override
-        public void onSkip() {}
-        
-        @Override
-        public void onPlay() {}
-        
-        @Override
-        public void onPause() {}
-    };
+    public static final String ACTION_PAUSE = AudioPlayerService.class.getName() + ".action.Paused";
     
-    private PlayControlListener playControlListener = NO_OP_PLAY_CONTROL_LISTENER;
+    /**
+     * Broadcast action sent when the Audio Player service starts playing.
+     * 
+     */
+    public static final String ACTION_PLAY  = AudioPlayerService.class.getName() + ".action.Playing";
 
+    /**
+     * Broadcast action sent when the Audio Player service is asked to skip a song.
+     * 
+     */
+    public static final String ACTION_SKIP  = AudioPlayerService.class.getName() + ".action.Skipping";
+    
     private boolean playing;
     
     public PlaybarFragment() {
@@ -65,17 +44,17 @@ public class PlaybarFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_playbar, container, false);
     
         ((ImageButton) view.findViewById(R.id.btn_play_pause))
-        .setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (PlaybarFragment.this.isPlaying()) {
-                    PlaybarFragment.this.pause();
-                } else {
-                    PlaybarFragment.this.play();
-                }                
-            }
-        });
+            .setOnClickListener(new OnClickListener() {
+    
+                @Override
+                public void onClick(View v) {
+                    if (PlaybarFragment.this.isPlaying()) {
+                        PlaybarFragment.this.pause();
+                    } else {
+                        PlaybarFragment.this.play();
+                    }                
+                }
+            });
 
         ((ImageButton) view.findViewById(R.id.btn_skip))
             .setOnClickListener(new OnClickListener() {
@@ -95,19 +74,15 @@ public class PlaybarFragment extends Fragment {
 
     public void play() {
         this.playing = true;
-        this.playControlListener.onPlay();
+        new BroadcastIntent(ACTION_PLAY).send(this.getActivity());
     }
 
     public void pause() {
         this.playing = false;
-        this.playControlListener.onPause();
+        new BroadcastIntent(ACTION_PAUSE).send(this.getActivity());
     }
     
     public void skip() {
-        this.playControlListener.onSkip();        
-    }
-
-    public void setPlayControlListener(PlayControlListener listener) {
-        this.playControlListener = listener;
+        new BroadcastIntent(ACTION_SKIP).send(this.getActivity());
     }
 }

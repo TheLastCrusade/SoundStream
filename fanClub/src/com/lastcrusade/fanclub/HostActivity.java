@@ -11,7 +11,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -36,6 +35,8 @@ import com.lastcrusade.fanclub.net.message.FoundFan;
 import com.lastcrusade.fanclub.net.message.FoundFansMessage;
 import com.lastcrusade.fanclub.net.message.StringMessage;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
+import com.lastcrusade.fanclub.util.BroadcastRegistrar;
+import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 import com.lastcrusade.fanclub.util.Toaster;
 
 /**
@@ -55,8 +56,8 @@ public class HostActivity extends Activity {
     private final String TAG = "Bluetooth_Host";
     private BluetoothDiscoveryHandler bluetoothDiscoveryHandler;
     private MessageThreadMessageDispatch messageDispatch;
-    private BroadcastReceiver broadcastReceiver;
     private MessageThread discoveryInitiator;
+    private BroadcastRegistrar broadcastRegistrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,39 +171,43 @@ public class HostActivity extends Activity {
     private void registerReceivers(final BluetoothAdapter adapter) {
         this.bluetoothDiscoveryHandler = new BluetoothDiscoveryHandler(this, adapter);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothDiscoveryHandler.ACTION_DISCOVERED_DEVICES);
-        this.broadcastReceiver = new BroadcastReceiver() {
+        this.broadcastRegistrar = new BroadcastRegistrar();
+        this.broadcastRegistrar
+            .addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED, new IBroadcastActionHandler() {
+                    @Override
+                    public void onReceiveAction(Context context, Intent intent) {
+                        bluetoothDiscoveryHandler.onDiscoveryStarted();
+                    }
+                })
+            .addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
+                    @Override
+                    public void onReceiveAction(Context context, Intent intent) {
+                        ((Button) findViewById(R.id.button0)).setEnabled(true);
+                        bluetoothDiscoveryHandler.onDiscoveryFinished();
+                    }
+                })
+            .addAction(BluetoothDevice.ACTION_FOUND, new IBroadcastActionHandler() {
+    
+                    @Override
+                    public void onReceiveAction(Context context, Intent intent) {
+                        BluetoothDevice device = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                        bluetoothDiscoveryHandler.onDiscoveryFound(device);
+                    }
+                })
+            .addAction(BluetoothDiscoveryHandler.ACTION_DISCOVERED_DEVICES, new IBroadcastActionHandler() {
 
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(
-                        BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
-                    bluetoothDiscoveryHandler.onDiscoveryStarted();
-                } else if (intent.getAction().equals(
-                        BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-                    ((Button) findViewById(R.id.button0)).setEnabled(true);
-                    bluetoothDiscoveryHandler.onDiscoveryFinished();
-                } else if (intent.getAction().equals(
-                        BluetoothDevice.ACTION_FOUND)) {
-                    BluetoothDevice device = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    bluetoothDiscoveryHandler.onDiscoveryFound(device);
-                } else if (intent.getAction().equals(
-                        BluetoothDiscoveryHandler.ACTION_DISCOVERED_DEVICES)) {
-                    onDiscoveredDevices(intent);
-                }
-            }
-        };
-        
-        registerReceiver(this.broadcastReceiver, filter);
+                    @Override
+                    public void onReceiveAction(Context context, Intent intent) {
+                        onDiscoveredDevices(intent);
+                    }
+                })
+            .register(this);
     }
 
     private void unregisterReceivers() {
-        this.unregisterReceiver(this.broadcastReceiver);
+        this.broadcastRegistrar.unregister();
     }
+
     protected void onHelloButtonClicked() {
         //initial test message
         Toaster.iToast(this, "Sending test message");

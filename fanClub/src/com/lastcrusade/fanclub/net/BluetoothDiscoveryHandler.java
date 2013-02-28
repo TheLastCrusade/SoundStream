@@ -1,19 +1,13 @@
 package com.lastcrusade.fanclub.net;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
-import com.lastcrusade.fanclub.R;
-import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
-import com.lastcrusade.fanclub.components.MultiSelectListDialog;
-import com.lastcrusade.fanclub.util.Toaster;
+import com.lastcrusade.fanclub.util.BroadcastIntent;
 
 /**
  * A generic handler for discovering devices.  This handler will accumulate discovered devices and
@@ -59,10 +53,9 @@ public class BluetoothDiscoveryHandler {
     }
 
     private void sendDiscoveredDevices() {
-        Intent intent = new Intent();
-        intent.setAction(ACTION_DISCOVERED_DEVICES);
-        intent.putParcelableArrayListExtra(EXTRA_DEVICES, this.discoveredDevices);
-        this.activity.sendBroadcast(intent);
+        new BroadcastIntent(ACTION_DISCOVERED_DEVICES)
+            .putParcelableArrayListExtra(EXTRA_DEVICES, this.discoveredDevices)
+            .send(this.activity);
     }
 
     /**

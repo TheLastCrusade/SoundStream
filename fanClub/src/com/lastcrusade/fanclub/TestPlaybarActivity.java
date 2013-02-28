@@ -1,26 +1,18 @@
 package com.lastcrusade.fanclub;
 
-import java.util.List;
-
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
 import com.lastcrusade.fanclub.components.PlaybarFragment;
-import com.lastcrusade.fanclub.components.PlaybarFragment.PlayControlListener;
 import com.lastcrusade.fanclub.library.MediaStoreWrapper;
-import com.lastcrusade.fanclub.library.SongNotFoundException;
-import com.lastcrusade.fanclub.model.Song;
-import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.service.AudioPlayerService;
 import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
-import com.lastcrusade.fanclub.service.ServiceNotBoundException;
-import com.lastcrusade.fanclub.util.Toaster;
+import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 
 /**
  * Test activity for the playbar.  This will display the playbar in an activity, and respond to play button clicks
@@ -53,6 +45,8 @@ public class TestPlaybarActivity extends FragmentActivity {
     };
     private ServiceLocator<AudioPlayerService> serviceLocator;
 
+    private BroadcastRegistrar registrar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -63,7 +57,9 @@ public class TestPlaybarActivity extends FragmentActivity {
         this.serviceLocator =
                 new ServiceLocator(TestPlaybarActivity.this, AudioPlayerService.class, AudioPlayerServiceBinder.class);
 
-        this.player = new SingleFileAudioPlayer();
+        this.registrar = new BroadcastRegistrar();
+//        this.registrar.addAction(PlaybarFragment.ACTION_PAUSE, handler)
+//        this.player = new SingleFileAudioPlayer();
         //JR, 02/27/13, NOTE: this code no longer works as written, because MediaStoreWrapper is written to use a Service
         // however it is still a great example of how to use the PlaybarFragment as it is currently written, and also
         // how to use the service locator
