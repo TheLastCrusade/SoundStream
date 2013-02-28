@@ -18,7 +18,15 @@ import com.lastcrusade.fanclub.net.message.IMessage;
  */
 public class MessageThreadMessageDispatch extends Handler {
 
-    public interface IMessageHandler<T> {
+    public interface IMessageHandler<T extends IMessage> {
+        /**
+         * Handle an incoming message from a remote connection.
+         * 
+         * @param messageNo A monotonically increasing message counter
+         * @param message A message object.  The type of this object is specified through generic type parameters 
+         * @param fromAddr The MAC address of the remote device (e.g. the Bluetooth address).  It will be in the form
+         * xx:yy:zz:aa:bb:cc, made up of hexadecimal digits.
+         */
         public void handleMessage(int messageNo, T message, String fromAddr);
     }
 
