@@ -17,6 +17,7 @@
     <string name="music_library">Music Library</string>
     <string name="select_fans">Select fans...</string>
     <string name="connect">Connect</string>
-    <string name="no_fans_found">No fans found</string>
-    
+    <string name="no_fans_found">No fans found</string>    
+    <string name="menu">Menu</string>
+
 </resources>
