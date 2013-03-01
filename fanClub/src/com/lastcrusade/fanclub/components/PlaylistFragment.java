@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.CustomApp;
@@ -24,7 +25,7 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     
     public PlaylistFragment(){
         for(SongMetadata s : metadataList){
-            s.setTitle("Title");
+            s.setTitle("This is a really really really looooooooooooooooooooooooooooooooooooooooooooooong Title");
             s.setAlbum("Album");
             s.setArtist("Artist");
          }
@@ -51,7 +52,17 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     
     @Override
     public void onListItemClick(ListView lv, View v, int position, long id){
-        //TODO: expanding the particular song
+        toggleViewSize(v);
+    }
+    
+    private void toggleViewSize(View v){
+        TextView title = (TextView)v.findViewById(R.id.title); 
+        if(v.getHeight()>getResources().getDimension(R.dimen.song_height)){
+            title.setMaxLines(1);
+        }
+        else{
+            title.setMaxLines(10);
+        }
     }
 
     @Override

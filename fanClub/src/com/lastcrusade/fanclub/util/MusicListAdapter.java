@@ -66,7 +66,6 @@ public class MusicListAdapter extends BaseAdapter {
         artist.setText(metadataList.get(position).getArtist());
         album.setText(metadataList.get(position).getAlbum());
 
-        
         return element;
     }
 
