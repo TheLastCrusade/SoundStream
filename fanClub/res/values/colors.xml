@@ -3,4 +3,5 @@
     <color name="red">#FF0000</color>
     <color name="blue">#0000FF</color>
     <color name="cornflower_blue">#6495ed</color>
+    <color name="gray">#ffcccccc</color>
 </resources>
