@@ -20,8 +20,8 @@ public class PlaybarFragment extends Fragment {
     private static final String TAG = PlaybarFragment.class.getName();
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
-    //TODO While investigating MusicLibraryService PlaybarFragment floods logcat
-    // with errors if the screen is rotated
+    //TODO PlaybarFragment floods logcat with errors if the screen is rotated
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

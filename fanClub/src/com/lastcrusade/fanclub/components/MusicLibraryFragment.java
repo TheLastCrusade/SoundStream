@@ -70,7 +70,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         }
         users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
 
-        //registerReceivers();
+        registerReceivers();
     }
     
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -92,10 +92,12 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         if (boundToService) {
             this.getActivity().unbindService(musicLibraryConn);
             boundToService = false;
-            Log.i(TAG, "Service un bound");
         }
+        unregisterReceivers();
     }
+
     private List<SongMetadata> getMusicLibrary() {
+        //If we can refresh our music library do otherwise return the old one
         if(mMusicLibraryService != null && boundToService){
             musicLibrary = mMusicLibraryService.getLibrary();
         }

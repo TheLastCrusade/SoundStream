@@ -1,8 +1,5 @@
 package com.lastcrusade.fanclub;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -30,13 +27,14 @@ public class CoreActivity extends SlidingFragmentActivity{
         setBehindContentView(R.layout.menu_frame);
         switchFragment(getString(R.string.menu), false);
         
+        //We want to start off at the playlist if this is the first time
+        // the activity is created
         if(savedInstanceState == null){
             //add the initial content fragment and set the title on the action bar
             switchActiveContent(getString(R.string.playlist));
             setTitle(getString(R.string.playlist));
         }
 
-       
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
@@ -121,13 +119,4 @@ public class CoreActivity extends SlidingFragmentActivity{
         return newFragment;
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 }
