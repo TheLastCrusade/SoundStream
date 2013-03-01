@@ -24,7 +24,8 @@ public class PlaybarFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.playlistServiceLocator = new ServiceLocator<PlaylistService>(this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
+        this.playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
     }
 
     @Override
