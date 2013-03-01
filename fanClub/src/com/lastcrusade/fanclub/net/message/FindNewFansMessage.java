@@ -8,9 +8,11 @@ public class FindNewFansMessage implements IMessage {
 
     @Override
     public void deserialize(InputStream input) throws IOException {
+        //nothing to do
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
+        //nothing to do
     }
 }
