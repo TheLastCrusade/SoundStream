@@ -2,61 +2,30 @@ package com.lastcrusade.fanclub.components;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.service.PlaylistService;
+import com.lastcrusade.fanclub.service.PlaylistService.PlaylistServiceBinder;
+import com.lastcrusade.fanclub.service.ServiceLocator;
+import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 
 public class PlaybarFragment extends Fragment {
 
-    /**
-     * Implement this interface to receive events when the user presses the play/pause button
-     * 
-     * @author thejenix
-     *
-     */
-    public static interface PlayControlListener {
-        /**
-         * Called when the user presses the play button.  Note that this should never get called if music is already playing.
-         * 
-         */
-        public void onPlay();
-        
-        /**
-         * Called when the user presses the pause button.  Note that this should never get called if music is already paused.
-         * 
-         */
-        public void onPause();
-        
-        /**
-         * Called when the user presses the skip button.
-         * 
-         */
-        public void onSkip();
-        
-    }
-   
-    private static final PlayControlListener NO_OP_PLAY_CONTROL_LISTENER = new PlayControlListener() {
-        
-        @Override
-        public void onSkip() {}
-        
-        @Override
-        public void onPlay() {}
-        
-        @Override
-        public void onPause() {}
-    };
+    private static final String TAG = PlaybarFragment.class.getName();
     
-    private PlayControlListener playControlListener = NO_OP_PLAY_CONTROL_LISTENER;
-
-    private boolean playing;
+    private ServiceLocator<PlaylistService> playlistServiceLocator;
     
-    public PlaybarFragment() {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
     }
 
     @Override
@@ -65,51 +34,37 @@ public class PlaybarFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_playbar, container, false);
     
         ((ImageButton) view.findViewById(R.id.btn_play_pause))
-        .setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (PlaybarFragment.this.isPlaying()) {
-                    PlaybarFragment.this.pause();
-                } else {
-                    PlaybarFragment.this.play();
+            .setOnClickListener(new OnClickListener() {
+    
+                @Override
+                public void onClick(View v) {
+                    try {
+                        PlaylistService service = playlistServiceLocator.getService();
+                        if (service.isPlaying()) {
+                            service.pause();
+                        } else {
+                            service.play();
+                        }
+                    } catch (ServiceNotBoundException e) {
+                        Log.wtf(TAG, e);
+                    }
                 }
-                
-//                transitionTo(HostActivity.class);
-            }
-        });
+            });
 
         ((ImageButton) view.findViewById(R.id.btn_skip))
             .setOnClickListener(new OnClickListener() {
     
                 @Override
                 public void onClick(View v) {
-                    PlaybarFragment.this.skip();
+                    try {
+                        PlaylistService service = playlistServiceLocator.getService();
+                        service.skip();
+                    } catch (ServiceNotBoundException e) {
+                        Log.wtf(TAG, e);
+                    }
                 }
             });
 
         return view;
-    }
-
-    private boolean isPlaying() {
-        return playing;
-    }
-
-    public void play() {
-        this.playing = true;
-        this.playControlListener.onPlay();
-    }
-
-    public void pause() {
-        this.playing = false;
-        this.playControlListener.onPause();
-    }
-    
-    public void skip() {
-        this.playControlListener.onSkip();        
-    }
-
-    public void setPlayControlListener(PlayControlListener listener) {
-        this.playControlListener = listener;
     }
 }

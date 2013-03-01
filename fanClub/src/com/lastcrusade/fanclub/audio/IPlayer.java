@@ -9,6 +9,8 @@ package com.lastcrusade.fanclub.audio;
  */
 public interface IPlayer {
 
+    public boolean isPlaying();
+    
     public void play();
 
     public void pause();

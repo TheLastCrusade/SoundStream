@@ -12,7 +12,12 @@
     <string name="playlist">Playlist</string>
     <string name="enable_bluetooth">Enabling Bluetooth...</string>
     <string name="finding_new_fans">Finding new fans...</string>
+    <string name="found_fans">Found fans</string>
     <string name="now_playing">Now Playing</string>
     <string name="music_library">Music Library</string>
+    <string name="select_fans">Select fans...</string>
+    <string name="connect">Connect</string>
+    <string name="no_fans_found">No fans found</string>    
+    <string name="menu">Menu</string>
 
 </resources>
