@@ -65,7 +65,8 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
         }
         else{
             title.setMaxLines(10);
-            v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
+            int viewHeight = (int) getResources().getDimension(R.dimen.song_height)+(title.getLineCount()-1)*title.getLineHeight();
+            v.findViewById(R.id.user_color).setMinimumHeight(viewHeight);
         }
         
         
