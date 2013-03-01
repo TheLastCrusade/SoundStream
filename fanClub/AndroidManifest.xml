@@ -43,7 +43,7 @@
             android:name=".CoreActivity" >
         </activity>
         <service
-            android:name=".service.AudioPlayerService"
+            android:name=".service.PlaylistService"
             android:exported="false"
             />
             

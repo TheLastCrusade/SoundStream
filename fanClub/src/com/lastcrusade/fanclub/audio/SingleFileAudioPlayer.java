@@ -28,6 +28,11 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.filePath = filePath;
     }
 
+    @Override
+    public boolean isPlaying() {
+        return player.isPlaying();
+    }
+    
     public void play() {
         try {
             new File((new File(this.filePath).getParentFile().list())[0]).exists();
