@@ -66,6 +66,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
         
+        //add the playbar fragment onto the active content view
         getSupportFragmentManager()
             .beginTransaction()
             .replace(R.id.playbar, new PlaybarFragment())
