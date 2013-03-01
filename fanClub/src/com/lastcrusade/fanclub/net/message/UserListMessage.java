@@ -4,27 +4,44 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Hashtable;
+import java.util.List;
 
 import com.lastcrusade.fanclub.model.UserList;
 
-public class UserListMessage implements IMessage {
+public class UserListMessage extends ADataMessage {
 	private final String TAG = UserListMessage.class.getName();
-	private UserList userList;
+	
+	// NOTE: this relies on the default UserList constructor which currently
+	// populates with hardcoded user data
+	private UserList userList = new UserList(); 
+	
+	public UserListMessage() {}
+	
+	public UserListMessage(UserList userList) {
+		
+	}
 	
 	@Override
 	public void deserialize(InputStream input) throws IOException {
-		byte[] bytes = new byte[1024];
-		int read = 0;
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		while((read = input.read(bytes)) > 0) {
-			out.write(bytes, 0, read);
+		int userListSize = readInteger(input);
+		for(int i = 0; i < userListSize; i++) {
+			String username = readString(input);
+			String color = readString(input);
+			
+			userList.addUser(username, color);
 		}
-		//this.setUserList(out.); //wait for Jesse's changes to be made
 	}
 	
 	@Override
 	public void serialize(OutputStream output) throws IOException {
-		output.write(this.getUserList().toString().getBytes());		
+		List<String> usernames = userList.getUsernames();
+		
+		writeInteger(userList.getUsers().size(), output);
+		for(int i = 0; i < usernames.size(); i++) {
+			writeString(usernames.get(i), output);
+			writeString(userList.getUsers().get(usernames.get(i)), output);
+		}
 	}
 
 	public UserList getUserList() {
