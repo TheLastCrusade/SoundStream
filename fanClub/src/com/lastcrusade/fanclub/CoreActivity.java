@@ -1,11 +1,6 @@
 package com.lastcrusade.fanclub;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
@@ -13,8 +8,6 @@ import com.lastcrusade.fanclub.components.MenuFragment;
 import com.lastcrusade.fanclub.components.MusicLibraryFragment;
 import com.lastcrusade.fanclub.components.PlaybarFragment;
 import com.lastcrusade.fanclub.components.PlaylistFragment;
-import com.lastcrusade.fanclub.service.MusicLibraryService;
-import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
 import com.lastcrusade.fanclub.util.ITitleable;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
@@ -23,30 +16,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class CoreActivity extends SlidingFragmentActivity{
     private Fragment activeContent;
     private Fragment menu;
-    
-
-    MusicLibraryService mMusicLibraryService;
-    boolean boundToService; //Since you cannot instantly bind, set a boolean
-                            // after its safe to call methods
-
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection musicLibraryConn = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MusicLibraryServiceBinder binder = (MusicLibraryServiceBinder) service;
-            mMusicLibraryService = binder.getService();
-            boundToService = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            boundToService = false;
-        }
-    };
-    
+        
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
@@ -57,11 +27,14 @@ public class CoreActivity extends SlidingFragmentActivity{
         setBehindContentView(R.layout.menu_frame);
         switchFragment(getString(R.string.menu), false);
         
-        //add the initial content fragment and set the title on the action bar
-        switchActiveContent(getString(R.string.playlist));
-        setTitle(getString(R.string.playlist));
+        //We want to start off at the playlist if this is the first time
+        // the activity is created
+        if(savedInstanceState == null){
+            //add the initial content fragment and set the title on the action bar
+            switchActiveContent(getString(R.string.playlist));
+            setTitle(getString(R.string.playlist));
+        }
 
-       
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
@@ -71,7 +44,7 @@ public class CoreActivity extends SlidingFragmentActivity{
             .beginTransaction()
             .replace(R.id.playbar, new PlaybarFragment())
             .commit();
-
+        
         // enables the icon to act as the up
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
@@ -146,26 +119,4 @@ public class CoreActivity extends SlidingFragmentActivity{
         return newFragment;
     }
 
-    public MusicLibraryService getMusicLibraryService(){
-        return mMusicLibraryService;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        //To test Music service
-        Intent intentML = new Intent(this, MusicLibraryService.class);
-        bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the MusicLibrary service
-        if (boundToService) {
-            unbindService(musicLibraryConn);
-            boundToService = false;
-        }
-    }
 }
