@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.fanclub.components.MenuFragment;
 import com.lastcrusade.fanclub.components.MusicLibraryFragment;
+import com.lastcrusade.fanclub.components.PlaybarFragment;
 import com.lastcrusade.fanclub.components.PlaylistFragment;
 import com.lastcrusade.fanclub.service.MusicLibraryService;
 import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
@@ -64,6 +65,12 @@ public class CoreActivity extends SlidingFragmentActivity{
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
+        
+        //add the playbar fragment onto the active content view
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.playbar, new PlaybarFragment())
+            .commit();
 
         // enables the icon to act as the up
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
