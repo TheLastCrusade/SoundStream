@@ -36,13 +36,26 @@
         android:textColorHighlight="#656565"
         android:textSize="12sp">
     </TextView>
+    
+     <TextView
+        android:id="@+id/division"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/artist"
+        android:layout_toRightOf="@+id/artist"
+        android:paddingRight="2sp"
+        android:maxLines="1"
+        android:textColorHighlight="#656565"
+        android:textSize="12sp"
+        android:text="-">
+    </TextView>
 
     <TextView
         android:id="@+id/album"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/artist"
-        android:layout_toRightOf="@+id/artist"
+        android:layout_toRightOf="@+id/division"
         android:maxLines="1"
         android:textColorHighlight="#656565"
         android:textSize="12sp" >

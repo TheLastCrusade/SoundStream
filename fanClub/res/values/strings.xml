@@ -15,5 +15,6 @@
     <string name="now_playing">Now Playing</string>
     <string name="music_library">Music Library</string>
     <string name="menu">Menu</string>
+    <string name="divider">-</string>
 
 </resources>
