@@ -1,7 +1,5 @@
 package com.lastcrusade.fanclub.service;
 
-import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerServiceBinder;
-
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -51,5 +49,4 @@ public class ServiceLocator<T extends Service> implements ServiceConnection {
         }
         return this.service;
     }
-
 }

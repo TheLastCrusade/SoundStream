@@ -14,59 +14,65 @@ import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 
 /**
- * An implementation of Service to provide background music playing functionality.  This uses ILocalBinder
- * to implement a local binder that enables binding activities to get access to the service.
+ * This service is responsible for holding the play queue, and feeding songs to
+ * the Audio player service.
  * 
  * @author Jesse Rosalia
- *
+ * 
  */
-public class AudioPlayerService extends Service implements IPlayer {
+public class PlaylistService extends Service implements IPlayer {
 
     /**
      * Broadcast action sent when the Audio Player service is paused.
      * 
      */
-    public static final String ACTION_PAUSED   = AudioPlayerService.class.getName() + ".action.Paused";
-    
+    public static final String ACTION_PAUSED_AUDIO = PlaylistService.class
+            .getName() + ".action.PausedAudio";
+
     /**
      * Broadcast action sent when the Audio Player service starts playing.
      * 
      */
-    public static final String ACTION_PLAYING  = AudioPlayerService.class.getName() + ".action.Playing";
+    public static final String ACTION_PLAYING_AUDIO = PlaylistService.class
+            .getName() + ".action.PlayingAudio";
 
     /**
-     * Broadcast action sent when the Audio Player service is asked to skip a song.
+     * Broadcast action sent when the Audio Player service is asked to skip a
+     * song.
      * 
      */
-    public static final String ACTION_SKIPPING = AudioPlayerService.class.getName() + ".action.Skipping";
+    public static final String ACTION_SKIPPING_AUDIO = PlaylistService.class
+            .getName() + ".action.SkippingAudio";
 
-    private SingleFileAudioPlayer audioPlayer;
-    private BroadcastRegistrar registrar;
+    private static final String TAG = PlaylistService.class.getName();
 
     /**
-     * Class for clients to access.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with
-     * IPC.
+     * Class for clients to access. Because we know this service always runs in
+     * the same process as its clients, we don't need to deal with IPC.
      */
-    public class AudioPlayerServiceBinder extends Binder implements ILocalBinder<AudioPlayerService> {
-        public AudioPlayerService getService() {
-            return AudioPlayerService.this;
+    public class PlaylistServiceBinder extends Binder implements
+            ILocalBinder<PlaylistService> {
+        public PlaylistService getService() {
+            return PlaylistService.this;
         }
     }
+
+    private BroadcastRegistrar    registrar;
+    private SingleFileAudioPlayer audioPlayer;
 
     @Override
     public IBinder onBind(Intent intent) {
         this.audioPlayer = new SingleFileAudioPlayer();
-        registerReceivers();
-        return new AudioPlayerServiceBinder();
+        // TODO: kick off a thread to feed the monster that is the audio service
+        return new PlaylistServiceBinder();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        unregisterReceivers();
+        // TODO Auto-generated method stub
         return super.onUnbind(intent);
     }
-    
+
     /**
      * Register intent receivers to control this service
      * 
@@ -89,27 +95,31 @@ public class AudioPlayerService extends Service implements IPlayer {
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
-    
+  
+    @Override
+    public boolean isPlaying() {
+        return this.audioPlayer.isPlaying();
+    }
+
     @Override
     public void play() {
         this.audioPlayer.play();
-        new BroadcastIntent(ACTION_PLAYING).send(this);
+        new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
     }
 
     @Override
     public void pause() {
         this.audioPlayer.pause();
-        new BroadcastIntent(ACTION_PAUSED).send(this);
+        new BroadcastIntent(ACTION_PAUSED_AUDIO).send(this);
     }
 
     @Override
     public void skip() {
         this.audioPlayer.skip();
-        new BroadcastIntent(ACTION_SKIPPING).send(this);
+        new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
     }
 
     public void setSongByPath(String filePath) {
         this.audioPlayer.setSongByPath(filePath);
     }
-
 }

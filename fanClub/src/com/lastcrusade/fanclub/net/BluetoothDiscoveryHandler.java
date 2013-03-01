@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.util.Log;
 
 import com.lastcrusade.fanclub.util.BroadcastIntent;
@@ -23,14 +24,14 @@ public class BluetoothDiscoveryHandler {
     public static final String ACTION_DISCOVERED_DEVICES = "com.lastcrusade.fanclub.net.discoveredDevices";
     public static final String EXTRA_DEVICES = "com.lastcrusade.fanclub.net.extra.devices";
 
-    private final Activity activity;
+    private final Context context;
     private final BluetoothAdapter adapter;
 
     private ArrayList<BluetoothDevice> discoveredDevices;
 
-    public BluetoothDiscoveryHandler(Activity activity, BluetoothAdapter adapter) {
-        this.activity = activity;
-        this.adapter  = adapter;
+    public BluetoothDiscoveryHandler(Context context, BluetoothAdapter adapter) {
+        this.context = context;
+        this.adapter = adapter;
     }
 
     /**
@@ -55,7 +56,7 @@ public class BluetoothDiscoveryHandler {
     private void sendDiscoveredDevices() {
         new BroadcastIntent(ACTION_DISCOVERED_DEVICES)
             .putParcelableArrayListExtra(EXTRA_DEVICES, this.discoveredDevices)
-            .send(this.activity);
+            .send(this.context);
     }
 
     /**

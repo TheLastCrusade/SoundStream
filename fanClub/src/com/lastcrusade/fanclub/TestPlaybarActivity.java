@@ -7,10 +7,9 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 
 import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
-import com.lastcrusade.fanclub.components.PlaybarFragment;
 import com.lastcrusade.fanclub.library.MediaStoreWrapper;
-import com.lastcrusade.fanclub.service.AudioPlayerService;
-import com.lastcrusade.fanclub.service.AudioPlayerService.AudioPlayerServiceBinder;
+import com.lastcrusade.fanclub.service.PlaylistService;
+import com.lastcrusade.fanclub.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 
@@ -27,23 +26,9 @@ public class TestPlaybarActivity extends FragmentActivity {
     
     private SingleFileAudioPlayer player;
     private MediaStoreWrapper mediaStore;
-    private AudioPlayerService mService;
     protected boolean mBound;
 
-    private ServiceConnection connection = new ServiceConnection() {
-
-        public void onServiceConnected(ComponentName className, IBinder iservice) {
-            mService = AudioPlayerService.class.cast(iservice);
-            mBound = true;
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            mService = null;
-            mBound = false;
-        }
-
-    };
-    private ServiceLocator<AudioPlayerService> serviceLocator;
+    private ServiceLocator<PlaylistService> serviceLocator;
 
     private BroadcastRegistrar registrar;
 
@@ -55,7 +40,7 @@ public class TestPlaybarActivity extends FragmentActivity {
         
         //create the service locator for the AudioPlayerService (which will bind to the service, launching if needed).
         this.serviceLocator =
-                new ServiceLocator(TestPlaybarActivity.this, AudioPlayerService.class, AudioPlayerServiceBinder.class);
+                new ServiceLocator(TestPlaybarActivity.this, PlaylistService.class, PlaylistServiceBinder.class);
 
         this.registrar = new BroadcastRegistrar();
 //        this.registrar.addAction(PlaybarFragment.ACTION_PAUSE, handler)

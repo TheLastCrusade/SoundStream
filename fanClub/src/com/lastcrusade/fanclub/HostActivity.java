@@ -65,6 +65,7 @@ public class HostActivity extends Activity {
         setContentView(R.layout.activity_host);
         Log.w(TAG, "Create Called");
 
+        
         // TODO consider moving this entire block into BluetoothUtils, because it's also used in FanActivity
         final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         try {
