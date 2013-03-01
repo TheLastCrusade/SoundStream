@@ -26,8 +26,8 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     public PlaylistFragment(){
         for(SongMetadata s : metadataList){
             s.setTitle("This is a really really really looooooooooooooooooooooooooooooooooooooooooooooong Title");
-            s.setAlbum("Album");
-            s.setArtist("Artist");
+            s.setAlbum("Album is super freaking long too");
+            s.setArtist("Artist is too, but not as much");
          }
          metadataList.get(0).setUsername("Reid");
          metadataList.get(1).setUsername("Lizziemom");
@@ -57,20 +57,26 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     
     private void toggleViewSize(View v){
         TextView title = (TextView)v.findViewById(R.id.title); 
+        TextView album = (TextView)v.findViewById(R.id.album);
+        TextView artist = (TextView)v.findViewById(R.id.artist);
         
         if(v.getHeight()>getResources().getDimension(R.dimen.song_height)){
             title.setMaxLines(1);
+            album.setMaxLines(1);
+            artist.setMaxLines(1);
             v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
-            
         }
         else{
             title.setMaxLines(10);
-            int viewHeight = (int) getResources().getDimension(R.dimen.song_height)+(title.getLineCount()-1)*title.getLineHeight();
+            album.setMaxLines(10);
+            artist.setMaxLines(10);
+            
+            int viewHeight = (int) getResources().getDimension(R.dimen.song_height)
+                    + (title.getLineCount()-1)*title.getLineHeight()
+                    + (artist.getLineCount()-1)*artist.getLineHeight()
+                    + (album.getLineCount()-1)*album.getLineHeight();
             v.findViewById(R.id.user_color).setMinimumHeight(viewHeight);
-        }
-        
-        
-        
+        }  
     }
 
     @Override

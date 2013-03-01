@@ -63,8 +63,13 @@ public class MusicListAdapter extends BaseAdapter {
 
         userColor.setBackgroundColor(Color.parseColor(users.get(metadataList.get(position).getUsername())));
         title.setText(metadataList.get(position).getTitle());
-        artist.setText(metadataList.get(position).getArtist());
+        artist.setText(metadataList.get(position).getArtist() +" - ");
         album.setText(metadataList.get(position).getAlbum());
+        
+        //artist.setWidth(element.getWidth()/2);
+        //album.setWidth(element.getWidth()/2);
+        
+        
 
         return element;
     }

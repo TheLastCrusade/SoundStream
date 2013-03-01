@@ -32,8 +32,9 @@
         android:layout_below="@+id/title"
         android:layout_toRightOf="@+id/user_color"
         android:paddingRight="2sp"
+        android:maxLines="1"
         android:textColorHighlight="#656565"
-        android:textSize="12sp" >
+        android:textSize="12sp">
     </TextView>
 
     <TextView
@@ -42,6 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/artist"
         android:layout_toRightOf="@+id/artist"
+        android:maxLines="1"
         android:textColorHighlight="#656565"
         android:textSize="12sp" >
     </TextView>
