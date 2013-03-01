@@ -57,12 +57,19 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     
     private void toggleViewSize(View v){
         TextView title = (TextView)v.findViewById(R.id.title); 
+        
         if(v.getHeight()>getResources().getDimension(R.dimen.song_height)){
             title.setMaxLines(1);
+            v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
+            
         }
         else{
             title.setMaxLines(10);
+            v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
         }
+        
+        
+        
     }
 
     @Override
