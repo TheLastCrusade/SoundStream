@@ -64,12 +64,14 @@ public class PlaylistService extends Service implements IPlayer {
     public IBinder onBind(Intent intent) {
         this.audioPlayer = new SingleFileAudioPlayer();
         // TODO: kick off a thread to feed the monster that is the audio service
+        // TODO: registerReceivers, if this is where we want it
         return new PlaylistServiceBinder();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        // TODO Auto-generated method stub
+        
+        // TODO: unregisterReceivers, if this is where we want it
         return super.onUnbind(intent);
     }
 
