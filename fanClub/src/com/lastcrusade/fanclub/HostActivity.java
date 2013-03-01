@@ -1,14 +1,10 @@
 package com.lastcrusade.fanclub;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,19 +18,13 @@ import android.widget.Button;
 import com.lastcrusade.fanclub.components.IOnDialogItemClickListener;
 import com.lastcrusade.fanclub.components.MultiSelectListDialog;
 import com.lastcrusade.fanclub.net.BluetoothDeviceDialogFormatter;
-import com.lastcrusade.fanclub.net.BluetoothDiscoveryHandler;
-import com.lastcrusade.fanclub.net.BluetoothNotEnabledException;
-import com.lastcrusade.fanclub.net.BluetoothNotSupportedException;
-import com.lastcrusade.fanclub.net.ConnectThread;
-import com.lastcrusade.fanclub.net.MessageThread;
-import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch;
-import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.fanclub.net.message.ConnectFansMessage;
-import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
-import com.lastcrusade.fanclub.net.message.FoundFan;
-import com.lastcrusade.fanclub.net.message.FoundFansMessage;
-import com.lastcrusade.fanclub.net.message.StringMessage;
-import com.lastcrusade.fanclub.util.BluetoothUtils;
+import com.lastcrusade.fanclub.service.ConnectionService;
+import com.lastcrusade.fanclub.service.ConnectionService.ConnectionServiceBinder;
+import com.lastcrusade.fanclub.service.IMessagingService;
+import com.lastcrusade.fanclub.service.MessagingService;
+import com.lastcrusade.fanclub.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.fanclub.service.ServiceLocator;
+import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 import com.lastcrusade.fanclub.util.Toaster;
@@ -47,39 +37,26 @@ import com.lastcrusade.fanclub.util.Toaster;
  */
 public class HostActivity extends Activity {
 
-    private ConnectThread connectThread;
-    private List<MessageThread> messageThreads = new ArrayList<MessageThread>();
-
     private StringBuilder textBuffer = new StringBuilder();
     private Object msgMutex = new Object();
 
-    private final String TAG = "Bluetooth_Host";
-    private BluetoothDiscoveryHandler bluetoothDiscoveryHandler;
-    private MessageThreadMessageDispatch messageDispatch;
-    private MessageThread discoveryInitiator;
+    private final String TAG = HostActivity.class.getName();
     private BroadcastRegistrar broadcastRegistrar;
 
+    private ServiceLocator<ConnectionService> connectionServiceLocator;
+    private ServiceLocator<MessagingService>  messagingServiceLocator;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host);
         Log.w(TAG, "Create Called");
 
+        connectionServiceLocator = new ServiceLocator<ConnectionService>(
+                this, ConnectionService.class, ConnectionServiceBinder.class);
         
-        // TODO consider moving this entire block into BluetoothUtils, because it's also used in FanActivity
-        final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        try {
-            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
-        } catch (BluetoothNotEnabledException e) {
-            Toaster.iToast(this, "Unable to enable bluetooth adapter");
-            e.printStackTrace();
-            return;
-        } catch (BluetoothNotSupportedException e) {
-            Toaster.eToast(this, "Device may not support bluetooth");
-            e.printStackTrace();
-        }
-        registerReceivers(adapter);
-        registerMessageHandlers();
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingServiceBinder.class);
 
         Button button = (Button) this.findViewById(R.id.button0);
         button.setOnClickListener(new OnClickListener() {
@@ -87,13 +64,8 @@ public class HostActivity extends Activity {
             @Override
             public void onClick(View v) {
                 ((Button) findViewById(R.id.button0)).setEnabled(false);
-                Log.w(TAG, "Starting Discovery");
-                if (adapter == null) {
-                    Toaster.iToast(HostActivity.this,
-                            "Device may not support bluetooth");
-                } else {
-                    adapter.startDiscovery();
-                }
+                //this service will be populated in onResume
+                getConnectionService().findNewFans();
             }
         });
 
@@ -105,101 +77,72 @@ public class HostActivity extends Activity {
                 onHelloButtonClicked();
             }
         });
-                
+        
+        registerReceivers();
+    }
+    
+    protected ConnectionService getConnectionService() {
+        ConnectionService connectionService = null;
+        try {
+            connectionService = this.connectionServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return connectionService;
     }
 
-    private void registerMessageHandlers() {
-        this.messageDispatch = new MessageThreadMessageDispatch();
-        this.messageDispatch.registerHandler(StringMessage.class, new IMessageHandler<StringMessage>() {
+    protected IMessagingService getMessagingService() {
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
+    }
 
-            @Override
-            public void handleMessage(int messageNo,
-                    StringMessage message, String fromAddr) {
-                StringMessage sm = (StringMessage) message;
-                synchronized (msgMutex) {
-                    if (textBuffer.length() > 0) {
-                        textBuffer.append("\n");
-                    } else {
-                        startDelayedDisplayMessage();
-                    }
-                    textBuffer.append(sm.getString());
-                }
-            }
-            
-        });
-        this.messageDispatch.registerHandler(FindNewFansMessage.class, new IMessageHandler<FindNewFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    FindNewFansMessage message, String fromAddr) {
-                handleFindNewFansMessage(fromAddr);
-            }
-            
-        });
-        this.messageDispatch.registerHandler(ConnectFansMessage.class, new IMessageHandler<ConnectFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    ConnectFansMessage message, String fromAddr) {
-                for (String address : ((ConnectFansMessage) message).getAddresses()) {
-                    BluetoothDevice device = BluetoothAdapter.getDefaultAdapter()
-                            .getRemoteDevice(address);
-                    // call the same method as if it were discovered and picked from
-                    // the host device
-                    onDiscoveredFan(device);
-                }
-            }
-        });
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disconnectAllSockets();
+        getConnectionService().disconnectAllFans();
+        unbindAllServices();
         unregisterReceivers();
     }
 
-    /**
-     * Disconnect all connected sockets.
-     * 
-     */
-    private void disconnectAllSockets() {
-        for (MessageThread thread : this.messageThreads) {
-            thread.cancel();
-        }
+    private void unbindAllServices() {
+        this.connectionServiceLocator.unbind();
+        this.messagingServiceLocator.unbind();
     }
 
-    private void registerReceivers(final BluetoothAdapter adapter) {
-        this.bluetoothDiscoveryHandler = new BluetoothDiscoveryHandler(this, adapter);
-
+    private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED, new IBroadcastActionHandler() {
-                    @Override
-                    public void onReceiveAction(Context context, Intent intent) {
-                        bluetoothDiscoveryHandler.onDiscoveryStarted();
+            .addAction(MessagingService.ACTION_STRING_MESSAGE, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String string = intent.getStringExtra(MessagingService.EXTRA_STRING);
+                    synchronized (msgMutex) {
+                        if (textBuffer.length() > 0) {
+                            textBuffer.append("\n");
+                        } else {
+                            startDelayedDisplayMessage();
+                        }
+                        textBuffer.append(string);
                     }
-                })
-            .addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
-                    @Override
-                    public void onReceiveAction(Context context, Intent intent) {
-                        ((Button) findViewById(R.id.button0)).setEnabled(true);
-                        bluetoothDiscoveryHandler.onDiscoveryFinished();
-                    }
-                })
-            .addAction(BluetoothDevice.ACTION_FOUND, new IBroadcastActionHandler() {
-    
-                    @Override
-                    public void onReceiveAction(Context context, Intent intent) {
-                        BluetoothDevice device = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                        bluetoothDiscoveryHandler.onDiscoveryFound(device);
-                    }
-                })
-            .addAction(BluetoothDiscoveryHandler.ACTION_DISCOVERED_DEVICES, new IBroadcastActionHandler() {
+                }
+            })
+            .addAction(ConnectionService.ACTION_FIND_FINISHED, new IBroadcastActionHandler() {
 
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {
                         onDiscoveredDevices(intent);
+                        ((Button) findViewById(R.id.button0)).setEnabled(true);
                     }
                 })
             .register(this);
@@ -213,137 +156,30 @@ public class HostActivity extends Activity {
         //initial test message
         Toaster.iToast(this, "Sending test message");
         String message = "Hello, Fans.  From: " + BluetoothAdapter.getDefaultAdapter().getName();
-        if(this.messageThreads.isEmpty()){
-            Toaster.eToast(this, "No Fans connected");
-        } else {
-            StringMessage sm = new StringMessage();
-            sm.setString(message);
-            //send to all connected fans
-            broadcastStringMessage(sm);
-        }
-    }
-
-    /**
-     * Send a string message to all connected clients
-     * 
-     * @param sm The string message to send
-     */
-    private void broadcastStringMessage(StringMessage sm) {
-        for (MessageThread thread : this.messageThreads) {
-            thread.write(sm);
-        }
+        getMessagingService().sendStringMessage(message);
     }
 
     private void onDiscoveredDevices(Intent intent) {
-        List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(BluetoothDiscoveryHandler.EXTRA_DEVICES);
-        //if the discovery was initiated by a remote cient, send the discovered devices back to the remote client
-        if (discoveryInitiator != null) {
-
-            List<FoundFan> foundFans = new ArrayList<FoundFan>();
-            for (BluetoothDevice device : devices) {
-                // send the found fans back to the client.
-                foundFans.add(new FoundFan(device.getName(), device.getAddress()));
-            }
-            FoundFansMessage msg = new FoundFansMessage(foundFans);
-            this.discoveryInitiator.write(msg);
-
-        } else {
-            if (devices.isEmpty()) {
-                Toaster.iToast(this, R.string.no_fans_found);
-            } else {
-                Toaster.iToast(this, R.string.found_fans);
-                new MultiSelectListDialog<BluetoothDevice>(this, R.string.select_fans, R.string.connect)
-                    .setItems(devices)
-                    .setOnClickListener(new IOnDialogItemClickListener<BluetoothDevice>() {
-
-                        @Override
-                        public void onItemClick(BluetoothDevice device) {
-                            //the user selected a device...connect to it.
-                            onDiscoveredFan(device);
-                        }
-                    })
-                    .setFormatter(new BluetoothDeviceDialogFormatter())
-                    .show();
-            }
-        }
-        this.discoveryInitiator = null;
         
-    }
+        //locally initiated device discovery...pop up a dialog for the user
+        //TODO: this should probably use FoundFan, to decouple this code from the bluetooth code
+        List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES);
+        
+//            Toaster.iToast(this, R.string.found_fans);
+        new MultiSelectListDialog<BluetoothDevice>(this,
+                R.string.select_fans, R.string.connect)
+                .setItems(devices)
+                .setOnClickListener(
+                        new IOnDialogItemClickListener<BluetoothDevice>() {
 
-    /**
-     * NOTE: must be run on the UI thread.
-     * @param device
-     */
-    protected void onDiscoveredFan(BluetoothDevice device) {
-        try {
-            //one thread per device found...if there are multiple devices,
-            // there are multiple threads
-            //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
-            // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
-            // connection of the actual fan
-            this.connectThread = new ConnectThread(this, device) {
-
-                @Override
-                protected void onConnected(BluetoothSocket socket) {
-                    onConnectedFan(socket);
-                }
-                
-            };
-            this.connectThread.execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toaster.iToast(this,
-                    "Unable to create ConnectThread to connect to server");
-        }
-    }
-
-    /**
-     * 
-     * NOTE: must be run on the UI thread.
-     * 
-     * @param socket
-     */
-    protected void onConnectedFan(BluetoothSocket socket) {
-        Log.w(TAG, "Connected to server");
-
-        //create the message thread, which will be responsible for reading and writing messages
-        MessageThread newMessageThread = new MessageThread(socket, this.messageDispatch);
-        newMessageThread.start();
-        this.messageThreads.add(newMessageThread);
-    }
-
-    /**
-     * Handle the FindNewFansMessage, which enables discovery on this device and
-     * reports the results back to the requestor.
-     * 
-     * @param remoteAddr
-     */
-    private void handleFindNewFansMessage(final String remoteAddr) {
-        Toaster.iToast(this, R.string.finding_new_fans);
-
-        //NOTE: we assume that the adapter is nonnull, because the activity will not
-        // get past onCreate on a device w/o Bluetooth...and also, because this method is
-        // called in response to a network message over Bluetooth
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
-        // look up the message thread that manages the connection to the remote
-        // device
-        BluetoothDevice remoteDevice = adapter.getRemoteDevice(remoteAddr);
-        MessageThread found = null;
-        for (MessageThread thread : this.messageThreads) {
-            if (thread.isRemoteDevice(remoteDevice)) {
-                found = thread;
-                break;
-            }
-        }
-
-        if (found == null) {
-            Log.wtf(TAG, "Unknown remote device: " + remoteAddr);
-            return;
-        }
-
-        this.discoveryInitiator = found;
-        adapter.startDiscovery();
+                            @Override
+                            public void onItemClick(
+                                    BluetoothDevice device) {
+                                getConnectionService().connectToFan(device);
+                            }
+                        })
+                .setFormatter(new BluetoothDeviceDialogFormatter())
+                .show();
     }
 
     private void startDelayedDisplayMessage() {
