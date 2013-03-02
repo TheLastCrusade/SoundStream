@@ -48,6 +48,16 @@
             />
             
         <service
+            android:name=".service.ConnectionService"
+            android:exported="false"
+            />
+            
+        <service
+            android:name=".service.MessagingService"
+            android:exported="false"
+            />
+            
+        <service
             android:name=".service.MusicLibraryService"
             android:exported="false"
             android:label="@string/music_library"

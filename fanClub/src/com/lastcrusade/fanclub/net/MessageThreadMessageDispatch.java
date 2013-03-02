@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.fanclub.net.message.IMessage;
 
 /**
@@ -41,6 +42,8 @@ public class MessageThreadMessageDispatch extends Handler {
     private Map<Class<? extends IMessage>, IMessageHandler<? extends IMessage>> dispatchMap =
             new HashMap<Class<? extends IMessage>, IMessageHandler<? extends IMessage>>();
 
+    private IMessageHandler<IMessage> defaultHandler = null;
+
     /**
      * Register a message handler with the dispatch.  This handler will get called
      * when a message is received.
@@ -54,9 +57,12 @@ public class MessageThreadMessageDispatch extends Handler {
         dispatchMap.put(messageClass, handler);
     }
     
+    public void setDefaultHandler(IMessageHandler<IMessage> defaultHandler) {
+        this.defaultHandler = defaultHandler;
+    }
+
     @Override
     public void handleMessage(Message msg) {
-        IMessageHandler handler   = null;
         IMessage        message   = null;
         int             messageNo = 0;
         String          fromAddr  = null;
@@ -64,17 +70,24 @@ public class MessageThreadMessageDispatch extends Handler {
         if (msg.what == MessageThread.MESSAGE_READ) {
             messageNo = msg.arg1;
             message   = (IMessage)msg.obj;
-            handler   = dispatchMap.get(message.getClass());
             fromAddr  = msg.getData().getString(MessageThread.EXTRA_ADDRESS);
-        }
-        
-        if (message != null && handler != null) {
-            Log.w(TAG, "Message received: " + messageNo);
-            handler.handleMessage(messageNo, message, fromAddr);
+            handleMessage(messageNo, message, fromAddr);
         } else {
             // default...call the base class
             super.handleMessage(msg);
         }
     }
-    
+
+    public void handleMessage(int messageNo, IMessage message, String fromAddr) {
+        IMessageHandler handler   = dispatchMap.get(message.getClass());
+        
+        if (handler != null) {
+            Log.w(TAG, "Message received: " + messageNo);
+            handler.handleMessage(messageNo, message, fromAddr);
+        } else if (defaultHandler != null) {
+            this.defaultHandler.handleMessage(messageNo, message, fromAddr);
+        } else {
+            Log.wtf(TAG, "Handler not registered for '" + message.getClass() + "'");            
+        }
+    }
 }

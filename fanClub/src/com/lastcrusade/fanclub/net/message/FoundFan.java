@@ -1,12 +1,20 @@
 package com.lastcrusade.fanclub.net.message;
 
-public class FoundFan {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class FoundFan implements Parcelable {
     private String name;
     private String address;
 
     public FoundFan(String name, String address) {
         this.name = name;
         this.address = address;
+    }
+    
+    public FoundFan(Parcel in) {
+        this.name    = in.readString();
+        this.address = in.readString();
     }
 
     public String getAddress() {
@@ -62,5 +70,15 @@ public class FoundFan {
             return false;
         return true;
     }
-    
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getName());
+        dest.writeString(getAddress());
+    }
 }
