@@ -69,5 +69,15 @@ public class MusicListAdapter extends BaseAdapter {
         
         return element;
     }
+    
+    public void updateMusic(List<SongMetadata> metadataList){
+        this.metadataList = metadataList;
+        notifyDataSetChanged();
+    }
+    
+    public void updateUsers(Hashtable<String,String> users){
+        this.users = users;
+        notifyDataSetChanged();
+    }
 
 }
