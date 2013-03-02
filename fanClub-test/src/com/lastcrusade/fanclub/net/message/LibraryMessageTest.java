@@ -26,15 +26,18 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	            new SongMetadata(23, "Toronto Customs Lady", 
 	            		"Aziz Ansari", "Dangerously Delicious", "David")));		
 		
-		LibraryMessage oldMessage = new LibraryMessage(library);
-		LibraryMessage newMessage = super.testSerializeMessage(oldMessage);
+		LibraryMessage preSerializationLibraryMessage = new LibraryMessage(library);
+		LibraryMessage postSerializationLibraryMessage = super.testSerializeMessage(preSerializationLibraryMessage);
 		
 		for(int i = 0; i < library.size(); i++) {
-			assertEquals(library.get(i).getId() , newMessage.getLibrary().get(i).getId());
-			assertEquals(library.get(i).getTitle() , newMessage.getLibrary().get(i).getTitle());
-			assertEquals(library.get(i).getArtist() , newMessage.getLibrary().get(i).getArtist());
-			assertEquals(library.get(i).getAlbum() , newMessage.getLibrary().get(i).getAlbum());
-			assertEquals(library.get(i).getUsername() , newMessage.getLibrary().get(i).getUsername());
+			SongMetadata preSerializationSongMetadata = library.get(i);
+			SongMetadata postSerializationSongMetadata = postSerializationLibraryMessage.getLibrary().get(i);
+			
+			assertEquals(preSerializationSongMetadata.getId() , postSerializationSongMetadata.getId());
+			assertEquals(preSerializationSongMetadata.getTitle() , postSerializationSongMetadata.getTitle());
+			assertEquals(preSerializationSongMetadata.getArtist() , postSerializationSongMetadata.getArtist());
+			assertEquals(preSerializationSongMetadata.getAlbum() , postSerializationSongMetadata.getAlbum());
+			assertEquals(preSerializationSongMetadata.getUsername() , postSerializationSongMetadata.getUsername());
 		}
 	}
 }

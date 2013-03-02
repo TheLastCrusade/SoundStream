@@ -50,8 +50,4 @@ public class LibraryMessage extends ADataMessage {
 	public List<SongMetadata> getLibrary() {
 		return library;
 	}
-
-	public void setLibrary(List<SongMetadata> library) {
-		this.library = library;
-	}
 }
