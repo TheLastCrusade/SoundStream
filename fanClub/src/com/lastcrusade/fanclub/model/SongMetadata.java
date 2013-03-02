@@ -13,6 +13,15 @@ public class SongMetadata {
     private String username; // Bluetooth id of person who added song to
                              // playlist
 
+    public SongMetadata() {}
+
+    public SongMetadata(String title, String artist, String album, String username) {
+        this.title = title;
+        this.artist = artist;
+        this.album = album;
+        this.username = username;
+    }
+
     public long getId() {
         return id;
     }

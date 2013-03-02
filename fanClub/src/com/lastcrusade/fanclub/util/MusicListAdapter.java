@@ -9,12 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
 
-public class MusicListAdapter extends BaseAdapter {
+public class MusicListAdapter extends BaseAdapter implements View.OnClickListener {
     private Context mContext;
     private List<SongMetadata> metadataList;
     private Hashtable<String,String> users;
@@ -59,7 +60,10 @@ public class MusicListAdapter extends BaseAdapter {
         TextView title = (TextView)element.findViewById(R.id.title);
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
-        
+        ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
+
+        addButton.setOnClickListener(this);
+        addButton.setTag(position);
 
         userColor.setBackgroundColor(Color.parseColor(users.get(metadataList.get(position).getUsername())));
         title.setText(metadataList.get(position).getTitle());
@@ -70,4 +74,9 @@ public class MusicListAdapter extends BaseAdapter {
         return element;
     }
 
+    @Override
+    public void onClick(View v) {
+        Toaster.iToast(mContext, "Test " + metadataList.get((Integer)v.getTag()).getTitle());
+
+    }
 }
