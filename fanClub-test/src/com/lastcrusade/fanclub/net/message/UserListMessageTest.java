@@ -11,13 +11,12 @@ import com.lastcrusade.fanclub.model.*;
 import com.lastcrusade.fanclub.net.message.UserListMessage;
 
 public class UserListMessageTest extends SerializationTest<UserListMessage> {
-	
-	// NOTE: this relies on the default UserList constructor which currently
-	// populates with hardcoded user data
-	private UserList userList = new UserList();
-	
+		
 	@Test
 	public void testSerializeUserListMessage() throws IOException {
+		UserList userList = new UserList();
+		populateTestUserList(userList);
+		
 		List<String> usernames = userList.getUsernames();
 		
 		UserListMessage preSerializationUserListMessage = new UserListMessage();
@@ -28,5 +27,18 @@ public class UserListMessageTest extends SerializationTest<UserListMessage> {
 		for(int i = 0; i < usernames.size(); i++) {
 			assertEquals(usernames.get(i), postSerializationUserListMessage.getUserList().getUsernames().get(i));
 		}
+	}
+	
+	/**
+	 * @return A UserList populated with data used to test UserList serialization
+	 */
+	public UserList populateTestUserList(UserList userList) {
+		userList.addUser("David");
+		userList.addUser("Jesse");
+		userList.addUser("Lizziemom");
+		userList.addUser("Sills");
+		userList.addUser("Reid");
+		
+		return userList;
 	}
 }
