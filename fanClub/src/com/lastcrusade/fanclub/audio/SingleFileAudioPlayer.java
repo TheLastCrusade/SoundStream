@@ -7,7 +7,7 @@ import android.util.Log;
 
 
 /**
- * A simple audio player that expects an audio file to be located in an accessable folder.
+ * A simple audio player that expects an audio file to be located in an accessible folder.
  * 
  * This player takes in the path to the file to play, and can play
  * 

@@ -28,6 +28,12 @@ public class PlaybarFragment extends Fragment {
         this.playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
     }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        playlistServiceLocator.unbind();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,6 +47,7 @@ public class PlaybarFragment extends Fragment {
                 public void onClick(View v) {
                     try {
                         PlaylistService service = playlistServiceLocator.getService();
+                        Log.w(TAG, "onclick called");
                         if (service.isPlaying()) {
                             service.pause();
                         } else {

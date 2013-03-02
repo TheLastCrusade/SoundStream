@@ -47,4 +47,12 @@ public class Playlist {
     public void setList(List<SongMetadata> list) {
         this.list = list;
     }
+    
+    public int size(){
+        return list.size();
+    }
+    
+    public SongMetadata getNext(){
+        return list.get(0);
+    }
 }

@@ -5,33 +5,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
 
 import com.lastcrusade.fanclub.audio.IPlayer;
 import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
+import com.lastcrusade.fanclub.library.MediaStoreWrapper;
+import com.lastcrusade.fanclub.library.SongNotFoundException;
+import com.lastcrusade.fanclub.model.Playlist;
+import com.lastcrusade.fanclub.model.Song;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 
 /**
- * This service is responsible for holding the play queue, and feeding songs to
- * the Audio player service.
- * 
- * @author Jesse Rosalia
- * 
+ * This service is responsible for holding the play queue
  */
 public class PlaylistService extends Service implements IPlayer {
 
     /**
      * Broadcast action sent when the Audio Player service is paused.
-     * 
      */
     public static final String ACTION_PAUSED_AUDIO = PlaylistService.class
             .getName() + ".action.PausedAudio";
 
     /**
      * Broadcast action sent when the Audio Player service starts playing.
-     * 
      */
     public static final String ACTION_PLAYING_AUDIO = PlaylistService.class
             .getName() + ".action.PlayingAudio";
@@ -39,7 +39,6 @@ public class PlaylistService extends Service implements IPlayer {
     /**
      * Broadcast action sent when the Audio Player service is asked to skip a
      * song.
-     * 
      */
     public static final String ACTION_SKIPPING_AUDIO = PlaylistService.class
             .getName() + ".action.SkippingAudio";
@@ -59,10 +58,13 @@ public class PlaylistService extends Service implements IPlayer {
 
     private BroadcastRegistrar    registrar;
     private SingleFileAudioPlayer audioPlayer;
+    private Playlist queue;
 
     @Override
     public IBinder onBind(Intent intent) {
         this.audioPlayer = new SingleFileAudioPlayer();
+        this.queue = new Playlist();
+        queue.add((new MediaStoreWrapper(this)).list().get(0));
         // TODO: kick off a thread to feed the monster that is the audio service
         // TODO: registerReceivers, if this is where we want it
         return new PlaylistServiceBinder();
@@ -105,8 +107,11 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public void play() {
-        this.audioPlayer.play();
-        new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
+        if(queue.size() > 1){
+            setSong(queue.getNext());
+            this.audioPlayer.play();
+            new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
+        }
     }
 
     @Override
@@ -121,7 +126,18 @@ public class PlaylistService extends Service implements IPlayer {
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
     }
 
-    public void setSongByPath(String filePath) {
-        this.audioPlayer.setSongByPath(filePath);
+    public void addSong(SongMetadata newSong){
+        queue.add(newSong);
     }
+    
+    private void setSong(SongMetadata songData) {
+        MediaStoreWrapper msw = new  MediaStoreWrapper(this);
+        try {
+            Song s = msw.loadSongData(songData);
+            this.audioPlayer.setSongByPath(s.getFilePath());
+        } catch (SongNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }
