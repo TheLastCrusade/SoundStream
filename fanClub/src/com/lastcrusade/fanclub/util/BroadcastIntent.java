@@ -21,6 +21,24 @@ public class BroadcastIntent extends Intent {
     public BroadcastIntent(String action) {
         super.setAction(action);
     }    
+    
+    //Overridden to return BroadcastIntent, so we can chain method calls
+    @Override
+    public BroadcastIntent putExtra(String name, boolean value) {
+        return (BroadcastIntent) super.putExtra(name, value);
+    }
+
+    //Overridden to return BroadcastIntent, so we can chain method calls
+    @Override
+    public BroadcastIntent putExtra(String name, int value) {
+        return (BroadcastIntent) super.putExtra(name, value);
+    }
+
+    //Overridden to return BroadcastIntent, so we can chain method calls
+    @Override
+    public BroadcastIntent putExtra(String name, String value) {
+        return (BroadcastIntent) super.putExtra(name, value);
+    }
 
     //Overridden to return BroadcastIntent, so we can chain method calls
     @Override
@@ -29,6 +47,12 @@ public class BroadcastIntent extends Intent {
         return (BroadcastIntent) super.putParcelableArrayListExtra(name, value);
     }
 
+    //Overridden to return BroadcastIntent, so we can chain method calls
+    @Override
+    public BroadcastIntent putStringArrayListExtra(String name, ArrayList<String> value) {
+        return (BroadcastIntent) super.putStringArrayListExtra(name, value);
+    }
+    
     public void send(Context context) {
         context.sendBroadcast(this);
     }
