@@ -40,22 +40,6 @@ public class UserList {
         connectedUsers.put(user, colors[nextColor]);
         nextColor = (nextColor + 1) % colors.length;
     }
-    
-    public void addUser(String user, String color) {
-    	// probably a wonky way of doing this
-    	boolean colorUsed = false;
-    	for(int i = 0; i < colors.length; i++) {
-    		if(colors[i] == color) {
-    			colorUsed = true;
-    			break;
-    		}
-    	}
-    	
-    	if(!colorUsed) {
-    		connectedUsers.put(user, color);
-    		colors[colors.length - 1] = color;
-    	}
-    }
 
     public void removeUser(String user){
         connectedUsers.remove(user);

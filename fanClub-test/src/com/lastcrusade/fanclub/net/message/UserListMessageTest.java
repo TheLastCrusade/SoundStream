@@ -3,7 +3,6 @@ package com.lastcrusade.fanclub.net.message;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,19 +19,14 @@ public class UserListMessageTest extends SerializationTest<UserListMessage> {
 	@Test
 	public void testSerializeUserListMessage() throws IOException {
 		List<String> usernames = userList.getUsernames();
-		Hashtable<String, String> users = userList.getUsers();
 		
-		UserListMessage oldMessage = new UserListMessage();
-		oldMessage.setUserList(userList);
-		UserListMessage newMessage = super.testSerializeMessage(oldMessage);
+		UserListMessage preSerializationUserListMessage = new UserListMessage();
+		preSerializationUserListMessage.setUserList(userList);
+		UserListMessage postSerializationUserListMessage = 
+				super.testSerializeMessage(preSerializationUserListMessage);
 		
-		for(int i = 0; i < userList.getUsers().size(); i++) {
-			System.out.println(i);
-			assertEquals(usernames.get(i), newMessage.getUserList().getUsernames().get(i));
-			// charlie foxtrot
-			assertEquals(users.get(usernames.get(i)), 
-					newMessage.getUserList().getUsers().get(newMessage.getUserList().getUsernames().get(i)));
-			
+		for(int i = 0; i < usernames.size(); i++) {
+			assertEquals(usernames.get(i), postSerializationUserListMessage.getUserList().getUsernames().get(i));
 		}
 	}
 }
