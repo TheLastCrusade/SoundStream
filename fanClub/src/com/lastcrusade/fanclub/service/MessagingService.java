@@ -214,7 +214,20 @@ public class MessagingService extends Service implements IMessagingService {
     public void sendStringMessage(String message) {
         StringMessage sm = new StringMessage();
         sm.setString(message);
-        //send the message to the host
-        sendMessageToHost(sm);
+        //JR, 03/02/12, TODO: the connection service should be changed to only deal with "connections".  The mode of connection will
+        // be determined by which method is called initially (braodcastFan vs findNewFans), but after that point, it should just
+        // work with connections
+        try {
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(sm);
+            }
+            
+            if (this.connectServiceLocator.getService().isFanConnected()) {
+                broadcastMessageToFans(sm);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 }
