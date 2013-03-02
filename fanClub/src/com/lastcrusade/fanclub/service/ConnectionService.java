@@ -261,7 +261,7 @@ public class ConnectionService extends Service {
         }
     }
 
-    private boolean isHostConnected() {
+    public boolean isHostConnected() {
         return this.host != null;
     }
 
