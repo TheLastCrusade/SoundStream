@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +33,6 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
     private MusicLibraryService mMusicLibraryService;
     private boolean boundToService = false; //Since you cannot instantly bind, set a boolean
                                     // after its safe to call methods
-    //private List<SongMetadata> musicLibrary; //I dont like having this instance var
-    //private Hashtable<String, String> users; //I dont like having this instance var
     
     private MusicListAdapter musicListAdapter;
 
@@ -44,9 +43,11 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
             MusicLibraryServiceBinder binder = (MusicLibraryServiceBinder) service;
+            
             mMusicLibraryService = binder.getService();
             boundToService = true;
-            //update music library
+            
+            //update displayed music
             musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
         }
 
@@ -66,11 +67,12 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
             this.getActivity().bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
         }
         
+        
         Hashtable<String,String> users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
-
-        //make a new music list adapter and give it an empty list of songs to use until the 
-        //service is correctly connected
+        //make a new music list adapter and give it an empty list of songs to use until the service is connected
         musicListAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
+        setListAdapter(musicListAdapter);
+        
         registerReceivers();
     }
     
@@ -96,15 +98,6 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         }
         unregisterReceivers();
     }
-
-    /*
-    private List<SongMetadata> getMusicLibrary() {
-        //If we can refresh our music library do otherwise return the old one
-        if(mMusicLibraryService != null && boundToService){
-            musicLibrary = mMusicLibraryService.getLibrary();
-        }
-        return musicLibrary;
-    }*/
 
     @Override
     public String getTitle() {
