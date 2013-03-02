@@ -28,7 +28,8 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     
     public PlaylistFragment(){
         for(SongMetadata s : metadataList){
-            s.setTitle("This is a really really really looooooooooooooooooooooooooooooooooooooooooooooong Title");
+            s.setTitle("This is a really really really loooooooooooooooooooooo" +
+            		"ooooooooooooooooooooooooong Title");
             s.setAlbum("Album is super freaking long too");
             s.setArtist("Artist is too, but not as much");
          }

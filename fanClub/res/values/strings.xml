@@ -19,6 +19,6 @@
     <string name="connect">Connect</string>
     <string name="no_fans_found">No fans found</string>    
     <string name="menu">Menu</string>
-    <string name="divider">-</string>
+    <string name="song_item_division">-</string>
 
 </resources>
