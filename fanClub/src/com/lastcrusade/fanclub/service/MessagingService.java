@@ -9,18 +9,19 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.fanclub.net.MessageThread;
 import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch;
 import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.fanclub.net.message.ConnectFansMessage;
 import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
 import com.lastcrusade.fanclub.net.message.FoundFansMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
+import com.lastcrusade.fanclub.net.message.PauseMessage;
+import com.lastcrusade.fanclub.net.message.PlayMessage;
+import com.lastcrusade.fanclub.net.message.SkipMessage;
 import com.lastcrusade.fanclub.net.message.StringMessage;
 import com.lastcrusade.fanclub.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
-import com.lastcrusade.fanclub.util.Toaster;
 
 public class MessagingService extends Service implements IMessagingService {
 
@@ -38,6 +39,31 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_FIND_FANS_MESSAGE = MessagingService.class.getName() + ".action.FindFansMessage";
     public static final String EXTRA_REQUEST_ADDRESS    = MessagingService.class.getName() + ".extra.RequestAddress";
     
+    public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
+    public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
+    public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
+
+    /**
+     * A default handler for command messages (messages that do not have any data).  These messages
+     * just map to an action.
+     * 
+     * @author Jesse Rosalia
+     *
+     * @param <T>
+     */
+    private class CommandHandler<T extends IMessage> implements IMessageHandler<T> {
+
+        private String action;
+        public CommandHandler(String action) {
+            this.action = action;
+        }
+
+        @Override
+        public void handleMessage(int messageNo, T message, String fromAddr) {
+            new BroadcastIntent(this.action).send(MessagingService.this);
+        }
+    }
+
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -74,6 +100,12 @@ public class MessagingService extends Service implements IMessagingService {
         return super.onUnbind(intent);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.connectServiceLocator.unbind();
+    }
+
     public void receiveMessage(int messageNo, IMessage message, String fromAddr) {
         this.messageDispatch.handleMessage(messageNo, message, fromAddr);
     }
@@ -84,6 +116,9 @@ public class MessagingService extends Service implements IMessagingService {
         registerFindNewFansMessageHandler();
         registerConnectFansMessageHandler();
         registerFoundFansHandler();
+        registerPauseMessageHandler();
+        registerPlayMessageHandler();
+        registerSkipMessageHandler();
     }
 
     private void registerFoundFansHandler() {
@@ -137,6 +172,21 @@ public class MessagingService extends Service implements IMessagingService {
                     .send(MessagingService.this);
             }            
         });
+    }
+
+    private void registerPauseMessageHandler() {
+        this.messageDispatch.registerHandler(PauseMessage.class,
+                new CommandHandler<PauseMessage>(ACTION_PAUSE_MESSAGE));
+    }
+    
+    private void registerPlayMessageHandler() {
+        this.messageDispatch.registerHandler(PlayMessage.class,
+                new CommandHandler<PlayMessage>(ACTION_PLAY_MESSAGE));
+    }
+    
+    private void registerSkipMessageHandler() {
+        this.messageDispatch.registerHandler(SkipMessage.class,
+                new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
     }
 
     private void broadcastMessageToFans(IMessage msg) {
