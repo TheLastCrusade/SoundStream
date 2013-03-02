@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 
 import com.lastcrusade.fanclub.net.message.IMessage;
 import com.lastcrusade.fanclub.net.message.Messenger;
@@ -20,6 +23,7 @@ import com.lastcrusade.fanclub.net.message.Messenger;
 public class MessageThread extends Thread {
     private final String TAG = MessageThread.class.getName();
     public static final int MESSAGE_READ = 1;
+    public static final String EXTRA_ADDRESS = "com.lastcrusade.fanclub.net.extraAddress";
 
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
@@ -50,6 +54,10 @@ public class MessageThread extends Thread {
         mmMessenger = new Messenger();
     }
  
+    public boolean isRemoteDevice(BluetoothDevice device) {
+        return mmSocket.getRemoteDevice().equals(device);
+    }
+
     private static String safeSocketName(BluetoothSocket socket) {
         return socket != null && socket.getRemoteDevice() != null ? socket.getRemoteDevice().getName() : "UnknownSocket";
     }
@@ -62,8 +70,11 @@ public class MessageThread extends Thread {
                 boolean messageRecvd = mmMessenger.deserializeMessage(mmInStream);
                 if (messageRecvd) {
                     //dispatch the message to the 
-                    mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, mmMessenger.getReceivedMessage())
-                            .sendToTarget();
+                    Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, mmMessenger.getReceivedMessage());
+                    Bundle bundle = new Bundle();
+                    bundle.putString(EXTRA_ADDRESS, mmSocket.getRemoteDevice().getAddress());
+                    androidMsg.setData(bundle);
+                    androidMsg.sendToTarget();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

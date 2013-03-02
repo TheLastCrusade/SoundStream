@@ -49,6 +49,7 @@ public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocke
         } catch (IOException e) {
             // Unable to connect; close the socket and get out
             Log.e(TAG, "Unable to connect socket", e);
+            //TODO: should probably pop something up to the user
             cancel();
         }
 
@@ -57,6 +58,7 @@ public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocke
 
     @Override
     protected void onPostExecute(BluetoothSocket result) {
+        //there was a successful connected socket...process the connection
         if (result != null) {
             onConnected(result);
         }
