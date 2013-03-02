@@ -19,6 +19,7 @@ import com.lastcrusade.fanclub.service.IMessagingService;
 import com.lastcrusade.fanclub.service.MessagingService;
 import com.lastcrusade.fanclub.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
+import com.lastcrusade.fanclub.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
@@ -26,7 +27,6 @@ import com.lastcrusade.fanclub.util.Toaster;
 
 public class FanActivity extends Activity {
 
-    private String HOST_NAME = "Patty Placeholder's party";
     private final String TAG = FanActivity.class.getName();
 
     private BroadcastRegistrar broadcastRegistrar;
@@ -46,10 +46,10 @@ public class FanActivity extends Activity {
                 this, MessagingService.class, MessagingServiceBinder.class);
 
 
-        connectionServiceLocator.setOnBindListener(new Runnable() {
+        connectionServiceLocator.setOnBindListener(new IOnBindListener() {
 
             @Override
-            public void run() {
+            public void onServiceBound() {
                 getConnectionService().broadcastFan(FanActivity.this);
             }
         });
