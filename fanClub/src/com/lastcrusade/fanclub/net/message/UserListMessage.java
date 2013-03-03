@@ -10,15 +10,11 @@ import com.lastcrusade.fanclub.model.UserList;
 public class UserListMessage extends ADataMessage {
 	private final String TAG = UserListMessage.class.getName();
 	
-	// NOTE: this relies on the default UserList constructor which currently
-	// populates with hardcoded user data
 	private UserList userList = new UserList(); 
 	
 	public UserListMessage() {}
 	
-	public UserListMessage(UserList userList) {
-		
-	}
+	public UserListMessage(UserList userList) {}
 	
 	@Override
 	public void deserialize(InputStream input) throws IOException {

@@ -16,8 +16,8 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	
 	@Test
 	public void testSerializeLibraryMessage() throws IOException {
-		// library populated with some metadata of the last few songs I was
-		// listening to at that time
+		// library populated with some metadata of the last few songs 
+		// @dgreenhalgh was listening to at that time
 		List<SongMetadata> library = new ArrayList<SongMetadata>(Arrays.asList(
 				new SongMetadata(69, "Driver that Had a Dick on His Shoulder", 
 						"Aziz Ansari", "Dangerously Delicious", "David"),
@@ -35,11 +35,11 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 			SongMetadata preSerializationSongMetadata = library.get(i);
 			SongMetadata postSerializationSongMetadata = postSerializationLibraryMessage.getLibrary().get(i);
 			
-			assertEquals(preSerializationSongMetadata.getId() , postSerializationSongMetadata.getId());
-			assertEquals(preSerializationSongMetadata.getTitle() , postSerializationSongMetadata.getTitle());
-			assertEquals(preSerializationSongMetadata.getArtist() , postSerializationSongMetadata.getArtist());
-			assertEquals(preSerializationSongMetadata.getAlbum() , postSerializationSongMetadata.getAlbum());
-			assertEquals(preSerializationSongMetadata.getUsername() , postSerializationSongMetadata.getUsername());
+			assertEquals(preSerializationSongMetadata.getId(), postSerializationSongMetadata.getId());
+			assertEquals(preSerializationSongMetadata.getTitle(), postSerializationSongMetadata.getTitle());
+			assertEquals(preSerializationSongMetadata.getArtist(), postSerializationSongMetadata.getArtist());
+			assertEquals(preSerializationSongMetadata.getAlbum(), postSerializationSongMetadata.getAlbum());
+			assertEquals(preSerializationSongMetadata.getUsername(), postSerializationSongMetadata.getUsername());
 		}
 	}
 }
