@@ -55,7 +55,7 @@ public class MusicListAdapter extends BaseAdapter {
             element = inflater.inflate(R.layout.song_item, null);
         }
         
-        View userColor = (View) element.findViewById(R.id.userColor); 
+        View userColor = (View) element.findViewById(R.id.user_color); 
         TextView title = (TextView)element.findViewById(R.id.title);
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
@@ -65,8 +65,9 @@ public class MusicListAdapter extends BaseAdapter {
         title.setText(metadataList.get(position).getTitle());
         artist.setText(metadataList.get(position).getArtist());
         album.setText(metadataList.get(position).getAlbum());
-
         
+        artist.setMaxWidth(parent.getWidth()/2);
+
         return element;
     }
     
