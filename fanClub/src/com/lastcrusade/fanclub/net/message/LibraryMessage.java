@@ -25,7 +25,7 @@ public class LibraryMessage extends ADataMessage {
 	public void deserialize(InputStream input) throws IOException {
 		int librarySize = readInteger(input);
 		for(int i = 0; i < librarySize; i++) {
-			long id = Long.parseLong(readString(input));
+			long id = readLong(input);
 			String title = readString(input);
 			String artist = readString(input);
 			String album = readString(input);
@@ -39,7 +39,7 @@ public class LibraryMessage extends ADataMessage {
 	public void serialize(OutputStream output) throws IOException {
 		writeInteger(library.size(), output);
 		for(SongMetadata metadata : library) {
-			writeString(String.valueOf(metadata.getId()), output);
+			writeLong(metadata.getId(), output);
 			writeString(metadata.getTitle(), output);
 			writeString(metadata.getArtist(), output);
 			writeString(metadata.getAlbum(), output);

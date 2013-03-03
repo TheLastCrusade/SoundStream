@@ -19,12 +19,14 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 		// library populated with some metadata of the last few songs I was
 		// listening to at that time
 		List<SongMetadata> library = new ArrayList<SongMetadata>(Arrays.asList(
-				new SongMetadata(69, "Driver that Had a Dick on his Shoulder", 
+				new SongMetadata(69, "Driver that Had a Dick on His Shoulder", 
 						"Aziz Ansari", "Dangerously Delicious", "David"),
-	            new SongMetadata(1, "Lady with the Puppies", 
-	            		"Aziz Ansari", "Dangerously Delicious", "David"), 
-	            new SongMetadata(23, "Toronto Customs Lady", 
-	            		"Aziz Ansari", "Dangerously Delicious", "David")));		
+	            new SongMetadata(1, "Lady with the Puppies", null, 
+	            		"Dangerously Delicious", "David"), 
+	            new SongMetadata(23, "Toronto Customs Lady", "Aziz Ansari", null,
+	            		"David")));		
+				new SongMetadata(42, "Motley Crue Tour vs. Aziz Tour", 
+						"Aziz Ansari", "Dangerously Delicious", null);
 		
 		LibraryMessage preSerializationLibraryMessage = new LibraryMessage(library);
 		LibraryMessage postSerializationLibraryMessage = super.testSerializeMessage(preSerializationLibraryMessage);
