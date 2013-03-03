@@ -38,6 +38,7 @@ public class PlaybarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        Log.w(TAG, "onCreate view");
         View view =  inflater.inflate(R.layout.fragment_playbar, container, false);
     
         ((ImageButton) view.findViewById(R.id.btn_play_pause))
@@ -45,9 +46,9 @@ public class PlaybarFragment extends Fragment {
     
                 @Override
                 public void onClick(View v) {
+                    Log.w(TAG, "onclick called");
                     try {
                         PlaylistService service = playlistServiceLocator.getService();
-                        Log.w(TAG, "onclick called");
                         if (service.isPlaying()) {
                             service.pause();
                         } else {

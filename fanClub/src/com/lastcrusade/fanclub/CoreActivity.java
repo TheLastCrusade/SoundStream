@@ -2,6 +2,8 @@ package com.lastcrusade.fanclub;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.MotionEvent;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.fanclub.components.MenuFragment;
@@ -16,6 +18,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class CoreActivity extends SlidingFragmentActivity{
     private Fragment activeContent;
     private Fragment menu;
+    private final String TAG = CoreActivity.class.getName();
         
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
