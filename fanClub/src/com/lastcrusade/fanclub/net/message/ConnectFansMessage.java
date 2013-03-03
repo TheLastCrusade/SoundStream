@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ConnectFansMessage extends ADataMessage {
 
-    List<String> addresses = new ArrayList<String>();
+    private ArrayList<String> addresses = new ArrayList<String>();
     
     /**
      * Default constructor, required for Messenger.  All other users should use
@@ -38,7 +38,7 @@ public class ConnectFansMessage extends ADataMessage {
         }
     }
     
-    public List<String> getAddresses() {
+    public ArrayList<String> getAddresses() {
         return addresses;
     }
 }

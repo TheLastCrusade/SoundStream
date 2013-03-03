@@ -71,6 +71,9 @@ public class BluetoothUtils {
         discoverableIntent.putExtra(
                 BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         context.startActivity(discoverableIntent);
+//        new BroadcastIntent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
+//            .putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+//            .send(context);
     }
     
     public static String getLocalBluetoothName() {

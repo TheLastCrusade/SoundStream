@@ -10,7 +10,7 @@ import android.bluetooth.BluetoothDevice;
 
 public class FoundFansMessage extends ADataMessage {
 
-    private List<FoundFan> foundFans = new ArrayList<FoundFan>();
+    private ArrayList<FoundFan> foundFans = new ArrayList<FoundFan>();
     
     /**
      * Default constructor, required for Messenger.  All other users should use
@@ -43,7 +43,7 @@ public class FoundFansMessage extends ADataMessage {
         }
     }
     
-    public List<FoundFan> getFoundFans() {
+    public ArrayList<FoundFan> getFoundFans() {
         return foundFans;
     }
 }
