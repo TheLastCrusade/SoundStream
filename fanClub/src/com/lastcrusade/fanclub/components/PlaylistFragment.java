@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.CustomApp;
@@ -22,11 +23,15 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     static List<SongMetadata> metadataList = new ArrayList<SongMetadata>(
             Arrays.asList(new SongMetadata(), new SongMetadata(), new SongMetadata()));
     
+    private final int SHORT_VIEW = 1;
+    private final int EXPANDED_VIEW = 10;
+    
     public PlaylistFragment(){
         for(SongMetadata s : metadataList){
-            s.setTitle("Title");
-            s.setAlbum("Album");
-            s.setArtist("Artist");
+            s.setTitle("This is a really really really loooooooooooooooooooooo" +
+            		"ooooooooooooooooooooooooong Title");
+            s.setAlbum("Album is super freaking long too");
+            s.setArtist("Artist is too, but not as much");
          }
          metadataList.get(0).setUsername("Reid");
          metadataList.get(1).setUsername("Lizziemom");
@@ -51,7 +56,41 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     
     @Override
     public void onListItemClick(ListView lv, View v, int position, long id){
-        //TODO: expanding the particular song
+        toggleViewSize(v);
+    }
+    
+    private void toggleViewSize(View v){
+        TextView title = (TextView)v.findViewById(R.id.title); 
+        TextView album = (TextView)v.findViewById(R.id.album);
+        TextView artist = (TextView)v.findViewById(R.id.artist);
+        
+        //if the view height is larger than the standard element, set it back to the standard
+        if(v.getHeight()>getResources().getDimension(R.dimen.song_height)){
+            title.setMaxLines(SHORT_VIEW);
+            album.setMaxLines(SHORT_VIEW);
+            artist.setMaxLines(SHORT_VIEW);
+            
+            //set the height of the color bar to the standard song element height
+            v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
+        }
+        //otherwise, expand the view
+        else{
+            title.setMaxLines(EXPANDED_VIEW);
+            album.setMaxLines(EXPANDED_VIEW);
+            artist.setMaxLines(EXPANDED_VIEW);
+            
+            //get the additional height taken up by the expanded words
+            int titleHeight = (title.getLineCount()-1)*title.getLineHeight();
+            int artistHeight =  (artist.getLineCount()-1)*artist.getLineHeight();
+            int albumHeight = (album.getLineCount()-1)*album.getLineHeight();
+            
+            //calculate the total height of the expanded view
+            int viewHeight = (int) getResources().getDimension(R.dimen.song_height)
+                    + titleHeight + artistHeight + albumHeight;
+            
+            //set the height of the color bar to the new view height
+            v.findViewById(R.id.user_color).setMinimumHeight(viewHeight);
+        }  
     }
 
     @Override

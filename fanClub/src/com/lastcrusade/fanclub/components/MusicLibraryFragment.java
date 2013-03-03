@@ -1,5 +1,6 @@
 package com.lastcrusade.fanclub.components;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
     private MusicLibraryService mMusicLibraryService;
     private boolean boundToService = false; //Since you cannot instantly bind, set a boolean
                                     // after its safe to call methods
-    private List<SongMetadata> musicLibrary; //I dont like having this instance var
-    private Hashtable<String, String> users; //I dont like having this instance var
+    
+    private MusicListAdapter musicListAdapter;
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection musicLibraryConn = new ServiceConnection() {
@@ -42,15 +43,12 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
             MusicLibraryServiceBinder binder = (MusicLibraryServiceBinder) service;
+            
             mMusicLibraryService = binder.getService();
             boundToService = true;
-            setListAdapter(
-                    new MusicAdapter(
-                            MusicLibraryFragment.this.getActivity(),
-                            getMusicLibrary(),
-                            users
-                    )
-            );
+            
+            //update displayed music
+            musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
         }
 
         @Override
@@ -68,8 +66,13 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
             Intent intentML = new Intent(this.getActivity(), MusicLibraryService.class);
             this.getActivity().bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
         }
-        users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
-
+        
+        
+        Hashtable<String,String> users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
+        //make a new music list adapter and give it an empty list of songs to use until the service is connected
+        musicListAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
+        setListAdapter(musicListAdapter);
+        
         registerReceivers();
     }
     
@@ -96,14 +99,6 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         unregisterReceivers();
     }
 
-    private List<SongMetadata> getMusicLibrary() {
-        //If we can refresh our music library do otherwise return the old one
-        if(mMusicLibraryService != null && boundToService){
-            musicLibrary = mMusicLibraryService.getLibrary();
-        }
-        return musicLibrary;
-    }
-
     @Override
     public String getTitle() {
         return getString(R.string.music_library);
@@ -120,12 +115,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                setListAdapter(new MusicAdapter(
-                                context,
-                                getMusicLibrary(),
-                                users
-                              )
-                );
+               musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
 
             }
         }).register(this.getActivity());
