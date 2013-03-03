@@ -134,16 +134,12 @@ public class PlaylistService extends Service implements IPlayer {
         this.audioPlayer.setSongByPath(filePath);
     }
 
-    public void addMetadata(SongMetadata metadata) {
+    public void addSong(SongMetadata metadata) {
         playlist.add(metadata);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
     public Playlist getPlaylist() {
         return playlist;
-    }
-
-    public void setPlaylist(Playlist playlist) {
-        this.playlist = playlist;
     }
 }

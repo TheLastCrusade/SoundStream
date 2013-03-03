@@ -2,5 +2,7 @@
 <resources>
 
     <dimen name="show_content">80sp</dimen>
+    <dimen name="song_height">50sp</dimen>
+    
 
 </resources>
