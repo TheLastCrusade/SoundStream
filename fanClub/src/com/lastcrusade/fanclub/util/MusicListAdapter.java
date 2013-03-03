@@ -69,5 +69,16 @@ public class MusicListAdapter extends BaseAdapter {
         
         return element;
     }
+    
+    //updates the music shown and notifies the attached view that it needs to redraw
+    public void updateMusic(List<SongMetadata> metadataList){
+        this.metadataList = metadataList;
+        notifyDataSetChanged();
+    }
+    
+    public void updateUsers(Hashtable<String,String> users){
+        this.users = users;
+        notifyDataSetChanged();
+    }
 
 }
