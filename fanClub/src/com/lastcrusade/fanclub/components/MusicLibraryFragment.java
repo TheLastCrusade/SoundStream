@@ -24,7 +24,11 @@ import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
-import com.lastcrusade.fanclub.util.*;
+import com.lastcrusade.fanclub.util.BroadcastRegistrar;
+import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.fanclub.util.ITitleable;
+import com.lastcrusade.fanclub.util.MusicListAdapter;
+import com.lastcrusade.fanclub.util.Toaster;
 
 public class MusicLibraryFragment extends SherlockListFragment implements ITitleable {
     private final String TAG = MusicLibraryFragment.class.getName();
@@ -141,7 +145,18 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         this.registrar.unregister();
     }
 
-    private class MusicAdapter extends MusicListAdapter{
+    protected PlaylistService getPlaylistService() {
+        PlaylistService playlistService = null;
+
+        try {
+            playlistService = this.playlistServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return playlistService;
+    }
+
+    private class MusicAdapter extends MusicListAdapter {
         public MusicAdapter(
                 Context mContext,
                 List<SongMetadata> metadataList,
@@ -158,12 +173,8 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
 
         @Override
         public void onClick(View v) {
-            Toaster.iToast(MusicLibraryFragment.this.getActivity(), "Test #2 " + musicLibrary.get((Integer) v.getTag()).getTitle());
-            try {
-                playlistServiceLocator.getService().addMetadata(musicLibrary.get((Integer) v.getTag()));
-            } catch (ServiceNotBoundException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            SongMetadata meta = musicLibrary.get((Integer) v.getTag());
+            getPlaylistService().addMetadata(meta);
         }
     }
 }

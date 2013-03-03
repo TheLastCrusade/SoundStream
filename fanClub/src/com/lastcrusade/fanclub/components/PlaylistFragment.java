@@ -34,17 +34,6 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     private Playlist metadataList;
 
     private ServiceLocator<PlaylistService> playlistServiceServiceLocator;
-    
-    public PlaylistFragment(){
-//        for(SongMetadata s : metadataList){
-//            s.setTitle("Title");
-//            s.setAlbum("Album");
-//            s.setArtist("Artist");
-//        }
-//        metadataList.get(0).setUsername("Reid");
-//        metadataList.get(1).setUsername("Lizziemom");
-//        metadataList.get(2).setUsername("Greenie");
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -52,6 +41,7 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
+        //TODO: get the userlist better
         final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {

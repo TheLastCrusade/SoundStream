@@ -76,7 +76,7 @@ public class MusicListAdapter extends BaseAdapter implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        Toaster.iToast(mContext, "Test " + metadataList.get((Integer)v.getTag()).getTitle());
-
+        //Functionality implemented in musicadapter
+        //TODO: maybe find a way to make it implemented in musicadapter?
     }
 }
