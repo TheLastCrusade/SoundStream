@@ -11,12 +11,10 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageButton;
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
@@ -28,10 +26,9 @@ import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
-import com.lastcrusade.fanclub.util.ITitleable;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 
-public class MusicLibraryFragment extends SherlockListFragment implements ITitleable {
+public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getName();
     private BroadcastRegistrar registrar;
 
@@ -86,18 +83,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         registerReceivers();
     }
     
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.list, container, false);
-        return v;
-    }
-    
-    @Override
-    public void onResume(){
-        super.onResume();
-        getActivity().setTitle(getTitle());
-    }
-    
+        
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -134,6 +120,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
+    
 
     protected PlaylistService getPlaylistService() {
         PlaylistService playlistService = null;
