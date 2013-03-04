@@ -16,8 +16,6 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	
 	@Test
 	public void testSerializeLibraryMessage() throws IOException {
-		// library populated with some metadata of the last few songs 
-		// @dgreenhalgh was listening to at that time
 		List<SongMetadata> library = new ArrayList<SongMetadata>(Arrays.asList(
 				new SongMetadata(69, "Driver that Had a Dick on His Shoulder", 
 						"Aziz Ansari", "Dangerously Delicious", "David"),

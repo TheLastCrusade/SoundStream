@@ -1,5 +1,6 @@
 package com.lastcrusade.fanclub.net.message;
 
+
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -7,7 +8,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.lastcrusade.fanclub.model.*;
+import com.lastcrusade.fanclub.model.UserList;
 import com.lastcrusade.fanclub.net.message.UserListMessage;
 
 public class UserListMessageTest extends SerializationTest<UserListMessage> {
