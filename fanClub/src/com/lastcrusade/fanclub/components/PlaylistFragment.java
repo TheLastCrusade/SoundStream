@@ -139,12 +139,15 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
     }
 
     private Playlist getPlaylist() {
+        Playlist playlist = null;
+
         try {
-            return playlistServiceServiceLocator.getService().getPlaylist();
+            playlist = playlistServiceServiceLocator.getService().getPlaylist();
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
-            return null;
         }
+
+        return playlist;
     }
 
     protected PlaylistService getPlaylistService() {
