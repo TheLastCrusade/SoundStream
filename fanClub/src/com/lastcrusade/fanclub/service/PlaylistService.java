@@ -9,6 +9,8 @@ import android.telephony.TelephonyManager;
 
 import com.lastcrusade.fanclub.audio.IPlayer;
 import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
+import com.lastcrusade.fanclub.model.Playlist;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
@@ -44,7 +46,14 @@ public class PlaylistService extends Service implements IPlayer {
     public static final String ACTION_SKIPPING_AUDIO = PlaylistService.class
             .getName() + ".action.SkippingAudio";
 
+    /**
+     * Broadcast action sent when the playlist gets updated
+     */
+    public static final String ACTION_PLAYLIST_UPDATED = PlaylistService.class + ".action.PlaylistUpdated";
+
     private static final String TAG = PlaylistService.class.getName();
+
+    private Playlist playlist = new Playlist();
 
     /**
      * Class for clients to access. Because we know this service always runs in
@@ -123,5 +132,14 @@ public class PlaylistService extends Service implements IPlayer {
 
     public void setSongByPath(String filePath) {
         this.audioPlayer.setSongByPath(filePath);
+    }
+
+    public void addSong(SongMetadata metadata) {
+        playlist.add(metadata);
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+    }
+
+    public Playlist getPlaylist() {
+        return playlist;
     }
 }

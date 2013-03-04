@@ -65,6 +65,6 @@
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:visibility="invisible"
+        android:contentDescription="@string/add_to_playlist"
         android:background="@color/transparent"/>
-
 </RelativeLayout>
