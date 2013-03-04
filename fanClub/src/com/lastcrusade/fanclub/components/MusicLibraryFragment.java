@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageButton;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
@@ -156,14 +157,18 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         
         public View getView(int position, View convertView, ViewGroup parent){
             View v = super.getView(position, convertView, parent);
-            v.findViewById(R.id.add_to_playlist).setVisibility(View.VISIBLE);
-            return v;
-        }
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.add_to_playlist);
+            imageButton.setVisibility(View.VISIBLE);
 
-        @Override
-        public void onClick(View v) {
-            SongMetadata meta = mMusicLibraryService.getLibrary().get((Integer) v.getTag());
-            getPlaylistService().addSong(meta);
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SongMetadata meta = mMusicLibraryService.getLibrary().get((Integer) v.getTag());
+                    getPlaylistService().addSong(meta);
+                }
+            });
+
+            return v;
         }
     }
 }

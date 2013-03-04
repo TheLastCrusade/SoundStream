@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,9 @@ import android.widget.TextView;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
 
-public class MusicListAdapter extends BaseAdapter implements View.OnClickListener {
+public class MusicListAdapter extends BaseAdapter {
+    private final String TAG = MusicListAdapter.class.getName();
+
     private Context mContext;
     private List<SongMetadata> metadataList;
     private Hashtable<String,String> users;
@@ -62,7 +65,6 @@ public class MusicListAdapter extends BaseAdapter implements View.OnClickListene
         TextView album = (TextView) element.findViewById(R.id.album);
         ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
 
-        addButton.setOnClickListener(this);
         addButton.setTag(position);
 
         userColor.setBackgroundColor(Color.parseColor(users.get(metadataList.get(position).getUsername())));
@@ -84,11 +86,5 @@ public class MusicListAdapter extends BaseAdapter implements View.OnClickListene
     public void updateUsers(Hashtable<String,String> users){
         this.users = users;
         notifyDataSetChanged();
-    }
-
-    @Override
-    public void onClick(View v) {
-        //Functionality implemented in musicadapter
-        //TODO: maybe find a way to make it implemented in musicadapter?
     }
 }

@@ -142,7 +142,7 @@ public class PlaylistFragment extends SherlockListFragment implements ITitleable
         try {
             return playlistServiceServiceLocator.getService().getPlaylist();
         } catch (ServiceNotBoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            Log.wtf(TAG, e);
             return null;
         }
     }
