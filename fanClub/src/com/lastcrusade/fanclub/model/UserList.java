@@ -15,19 +15,30 @@ public class UserList {
     private Hashtable<String,String> connectedUsers = new Hashtable<String,String>();
     private int nextColor = 0;
     private String[] colors = {
-            "#ffff4444",
+            /*"#ffff4444",
             "#ff33b5e5",
             "#ffffbb33",
             "#ffaa66cc",
-            "#ff99cc00"
+            "#ff99cc00"*/
+            "#FFB3ED00",
+            "#FF02AD8C",
+            "#FFFFC600",
+            "#FFC10091",
+            "#FFF99500",
+            "#FFF94000",
+            "#FF91B22C",
+            "#FF1E7766",
+            "#FFCAA72B",
+            "#FF9B217D",
+            "#FFC88C32"
     };
 
     public UserList(){
-        connectedUsers.put("Reid", colors[0]);
-        connectedUsers.put("Greenie", colors[1]);
-        connectedUsers.put("Sills", colors[2]);
-        connectedUsers.put("Jesse", colors[3]);
-        connectedUsers.put("Lizziemom", colors[4]);
+        connectedUsers.put("Reid", colors[1]);
+        connectedUsers.put("Greenie", colors[7]);
+        connectedUsers.put("Sills", colors[8]);
+        connectedUsers.put("Jesse", colors[9]);
+        connectedUsers.put("Lizziemom", colors[10]);
         nextColor = 5 % colors.length;
     }
 
