@@ -37,7 +37,7 @@ public class PlaylistFragment extends MusicListFragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         CustomApp curApp = (CustomApp) this.getActivity().getApplication();
-        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList, curApp.getUserList().getUsers()));
+        setListAdapter(new MusicListAdapter(this.getActivity(), metadataList, curApp.getUserList()));
     }  
     
     @Override

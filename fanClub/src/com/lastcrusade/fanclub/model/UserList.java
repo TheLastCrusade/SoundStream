@@ -12,7 +12,7 @@ public class UserList {
      * their color ids. Color could be changed to an int if that works better - 
      * it would increase performance speed if it becomes an issue in parsing colors
      */
-    private Hashtable<String,String> connectedUsers = new Hashtable<String,String>();
+    private List<User> connectedUsers;
     private int nextColor = 0;
     private String[] colors = {
             /*"#ffff4444",
@@ -32,45 +32,70 @@ public class UserList {
             "#FF9B217D",
             "#FFC88C32"
     };
+    
+    private UserColors userColors;
 
     public UserList(){
-        connectedUsers.put("Reid", colors[1]);
-        connectedUsers.put("Greenie", colors[7]);
-        connectedUsers.put("Sills", colors[8]);
-        connectedUsers.put("Jesse", colors[9]);
-        connectedUsers.put("Lizziemom", colors[10]);
-        nextColor = 5 % colors.length;
+        userColors = new UserColors();
+        connectedUsers = new ArrayList<User>();
+        connectedUsers.add(new User("Reid", userColors.getNextAvailableColor()));
+        connectedUsers.add(new User("Greenie", userColors.getNextAvailableColor()));
+        connectedUsers.add(new User("Sills", userColors.getNextAvailableColor()));
+        connectedUsers.add(new User("Jesse", userColors.getNextAvailableColor()));
+        connectedUsers.add(new User("Lizziemom", userColors.getNextAvailableColor()));
+     
     }
 
     public UserList(String user){
-        connectedUsers.put(user, colors[nextColor]);
-        nextColor = (nextColor + 1) % colors.length;
+        userColors = new UserColors();
+        connectedUsers = new ArrayList<User>();
+        connectedUsers.add(new User(user, userColors.getNextAvailableColor()));
     }
 
     public void addUser(String user){
-        connectedUsers.put(user, colors[nextColor]);
-        nextColor = (nextColor + 1) % colors.length;
+        connectedUsers.add(new User(user, userColors.getNextAvailableColor()));
     }
 
     public void removeUser(String user){
-        connectedUsers.remove(user);
+        int removeIndex = -1;
+        for(int i=0; i<connectedUsers.size(); i++){
+            if(connectedUsers.get(i).getBluetoothID().equals(user)){
+                removeIndex = i;
+            }
+        }
+        if(removeIndex>-1){
+            int color = connectedUsers.get(removeIndex).getColor();
+            userColors.returnColor(color);
+            connectedUsers.remove(removeIndex);
+        }
     }
 
-    public Hashtable<String,String> getUsers(){
+    public List<User> getUsers(){
         return connectedUsers;
     }
 
+    
     public List<String> getUsernames(){
         ArrayList<String> usernames = new ArrayList<String>();
-        Iterator<Entry<String, String>> userListIterator = connectedUsers.entrySet().iterator();
 
-        while (userListIterator.hasNext()) {
-            Entry<String, String> entry = userListIterator.next();
-            usernames.add(entry.getKey());
+        for(User u:connectedUsers){
+            usernames.add(u.getBluetoothID());
         }
         //Uncomment line below if usernames need to come out in the same order
         //Collections.sort(usernames);
         return usernames;
+    }
+    
+    public User getUserByName(String username){
+        User user = null;
+        
+        for(User u:connectedUsers){
+            if(u.getBluetoothID().equals(username)){
+                user = u;
+            }
+        }
+        
+        return user;
     }
 
 }

@@ -1,7 +1,6 @@
 package com.lastcrusade.fanclub.components;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 import android.content.ComponentName;
@@ -10,14 +9,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.model.User;
+import com.lastcrusade.fanclub.model.UserList;
 import com.lastcrusade.fanclub.service.MusicLibraryService;
 import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
@@ -66,7 +65,7 @@ public class MusicLibraryFragment extends MusicListFragment {
         }
         
         
-        Hashtable<String,String> users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
+        UserList users = ((CustomApp) this.getActivity().getApplication()).getUserList();
         //make a new music list adapter and give it an empty list of songs to use until the service is connected
         musicListAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
         setListAdapter(musicListAdapter);
@@ -118,7 +117,7 @@ public class MusicLibraryFragment extends MusicListFragment {
         public MusicAdapter(
                 Context mContext,
                 List<SongMetadata> metadataList,
-                Hashtable<String, String> users
+                UserList users
                 ) {
             super(mContext, metadataList, users);
         }
