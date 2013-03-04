@@ -7,6 +7,7 @@ import java.io.OutputStream;
 
 
 public class SkipMessage implements IMessage {
+	private final String TAG = SkipMessage.class.getName();
 	private String string;
 	private final String SKIP_MESSAGE= "Skip";
 
