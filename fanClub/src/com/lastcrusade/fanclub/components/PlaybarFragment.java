@@ -1,5 +1,7 @@
 package com.lastcrusade.fanclub.components;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -10,10 +12,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
 import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
+import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 
 public class PlaybarFragment extends Fragment {
 
@@ -80,4 +84,5 @@ public class PlaybarFragment extends Fragment {
 
         return view;
     }
+    //TODO add register recievers with ACTION_SONG_FINISHED
 }

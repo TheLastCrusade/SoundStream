@@ -3,6 +3,8 @@ package com.lastcrusade.fanclub.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Binder;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
@@ -66,7 +68,13 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public IBinder onBind(Intent intent) {
-        this.audioPlayer = new SingleFileAudioPlayer();
+        this.audioPlayer = new SingleFileAudioPlayer(
+                new OnCompletionListener(){
+                    @Override public void onCompletion(MediaPlayer mp) {
+                        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(PlaylistService.this);
+                    }
+        });
+
         this.queue = new Playlist();
         queue.add((new MediaStoreWrapper(this)).list().get(0));
         // TODO: kick off a thread to feed the monster that is the audio service

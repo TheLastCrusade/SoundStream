@@ -2,28 +2,34 @@ package com.lastcrusade.fanclub.audio;
 
 import java.io.File;
 
+import com.lastcrusade.fanclub.service.MessagingService;
+import com.lastcrusade.fanclub.util.BroadcastIntent;
+
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
-
 /**
- * A simple audio player that expects an audio file to be located in an accessible folder.
+ * A simple audio player that expects an audio file to be located in an
+ * accessible folder.
  * 
  * This player takes in the path to the file to play, and can play
  * 
  * @author Jesse Rosalia
- *
  */
 public class SingleFileAudioPlayer implements IPlayer {
+
+    public static final String ACTION_SONG_FINISHED = SingleFileAudioPlayer.class.getName() + ".action.SongFinished";
 
     private static final String TAG = SingleFileAudioPlayer.class.getName();
     private String filePath;
     private MediaPlayer player;
 
-    public SingleFileAudioPlayer() {
+    public SingleFileAudioPlayer(OnCompletionListener onCompletion) {
         this.player = new MediaPlayer();
+        player.setOnCompletionListener(onCompletion);
     }
-    
+
     public void setSongByPath(String filePath) {
         this.filePath = filePath;
     }
@@ -32,10 +38,11 @@ public class SingleFileAudioPlayer implements IPlayer {
     public boolean isPlaying() {
         return player.isPlaying();
     }
-    
+
     public void play() {
         try {
-            new File((new File(this.filePath).getParentFile().list())[0]).exists();
+            new File((new File(this.filePath).getParentFile().list())[0])
+                    .exists();
             if (player.isPlaying()) {
                 player.stop();
             }
@@ -58,7 +65,7 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     @Override
     public void skip() {
-        //since this is a single file player, skip == stop
+        // since this is a single file player, skip == stop
         if (player.isPlaying()) {
             player.stop();
         }
