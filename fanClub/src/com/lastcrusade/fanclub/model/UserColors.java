@@ -2,13 +2,14 @@ package com.lastcrusade.fanclub.model;
 
 public class UserColors {
     private ColorEntry[] colors = new ColorEntry[] {
-        new ColorEntry(0xFFB3ED00),
+        
         new ColorEntry(0xFF02AD8C),
+        new ColorEntry(0xFFB3ED00),
         new ColorEntry(0xFFFFC600),
         new ColorEntry(0xFFC10091),
-        new ColorEntry( 0xFFF99500),
-        new ColorEntry(0xFFF94000),
+        new ColorEntry(0xFFF99500),
         new ColorEntry(0xFF91B22C),
+        new ColorEntry(0xFFF94000),
         new ColorEntry(0xFF1E7766),
         new ColorEntry(0xFFCAA72B),
         new ColorEntry(0xFF9B217D),

@@ -15,7 +15,5 @@ public class User {
     
     public int getColor(){
         return color;
-    }
-    
-    
+    } 
 }

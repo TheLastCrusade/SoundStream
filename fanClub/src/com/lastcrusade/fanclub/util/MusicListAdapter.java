@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
-import com.lastcrusade.fanclub.model.User;
 import com.lastcrusade.fanclub.model.UserList;
 
 public class MusicListAdapter extends BaseAdapter {
@@ -68,7 +67,9 @@ public class MusicListAdapter extends BaseAdapter {
         
         String username = metadataList.get(position).getUsername();
         
+        
         userColor.setBackgroundColor(users.getUserByName(username).getColor());
+        Log.i(TAG, "User :" + users.getUserByName(username) );
 
         ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
 

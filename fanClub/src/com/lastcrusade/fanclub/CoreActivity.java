@@ -52,6 +52,8 @@ public class CoreActivity extends SlidingFragmentActivity{
 
         //Add user to user list
         CustomApp curApp = ((CustomApp)getApplication());
+        
+        //TODO: Move this to something like connect activity or the connection fragment
         curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName());
     }
 

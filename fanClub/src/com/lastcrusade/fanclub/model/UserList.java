@@ -1,38 +1,13 @@
 package com.lastcrusade.fanclub.model;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
+
+import com.lastcrusade.fanclub.util.BluetoothUtils;
 
 public class UserList {
-    /*
-     * This is a way to keep track of the users and
-     * their color ids. Color could be changed to an int if that works better - 
-     * it would increase performance speed if it becomes an issue in parsing colors
-     */
-    private List<User> connectedUsers;
-    private int nextColor = 0;
-    private String[] colors = {
-            /*"#ffff4444",
-            "#ff33b5e5",
-            "#ffffbb33",
-            "#ffaa66cc",
-            "#ff99cc00"*/
-            "#FFB3ED00",
-            "#FF02AD8C",
-            "#FFFFC600",
-            "#FFC10091",
-            "#FFF99500",
-            "#FFF94000",
-            "#FF91B22C",
-            "#FF1E7766",
-            "#FFCAA72B",
-            "#FF9B217D",
-            "#FFC88C32"
-    };
-    
+
+    private List<User> connectedUsers;    
     private UserColors userColors;
 
     public UserList(){
@@ -43,7 +18,6 @@ public class UserList {
         connectedUsers.add(new User("Sills", userColors.getNextAvailableColor()));
         connectedUsers.add(new User("Jesse", userColors.getNextAvailableColor()));
         connectedUsers.add(new User("Lizziemom", userColors.getNextAvailableColor()));
-     
     }
 
     public UserList(String user){
@@ -52,8 +26,9 @@ public class UserList {
         connectedUsers.add(new User(user, userColors.getNextAvailableColor()));
     }
 
-    public void addUser(String user){
-        connectedUsers.add(new User(user, userColors.getNextAvailableColor()));
+    public void addUser(String username){
+        if(getUserByName(username)==null)
+            connectedUsers.add(new User(username, userColors.getNextAvailableColor()));
     }
 
     public void removeUser(String user){
@@ -97,5 +72,4 @@ public class UserList {
         
         return user;
     }
-
 }
