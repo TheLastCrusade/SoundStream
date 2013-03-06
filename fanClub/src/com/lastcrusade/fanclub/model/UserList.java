@@ -5,6 +5,14 @@ import java.util.List;
 
 import com.lastcrusade.fanclub.util.BluetoothUtils;
 
+
+/*
+ * TODO: determine if we want to keep track of an actual
+ * username for users as well as the bluetooth id. Right now,
+ * username is synonymous with bluetooth id - once we decide
+ * if we actually want username, we can add that in to user and 
+ * then swtich references to username here to the bluetooth id
+ */
 public class UserList {
 
     private List<User> connectedUsers;    
@@ -13,32 +21,29 @@ public class UserList {
     public UserList(){
         userColors = new UserColors();
         connectedUsers = new ArrayList<User>();
-        connectedUsers.add(new User("Reid", userColors.getNextAvailableColor()));
-        connectedUsers.add(new User("Greenie", userColors.getNextAvailableColor()));
-        connectedUsers.add(new User("Sills", userColors.getNextAvailableColor()));
-        connectedUsers.add(new User("Jesse", userColors.getNextAvailableColor()));
-        connectedUsers.add(new User("Lizziemom", userColors.getNextAvailableColor()));
     }
 
-    public UserList(String user){
-        userColors = new UserColors();
-        connectedUsers = new ArrayList<User>();
-        connectedUsers.add(new User(user, userColors.getNextAvailableColor()));
+    public UserList(String bluetoothID, String macAddress){
+        this();
+        connectedUsers.add(new User(bluetoothID, macAddress, userColors.getNextAvailableColor()));
     }
 
-    public void addUser(String username){
-        if(getUserByName(username)==null)
-            connectedUsers.add(new User(username, userColors.getNextAvailableColor()));
+    public void addUser(String bluetoothID, String macAddress){
+        //check to make sure that the user isn't already in the list before adding
+        if(getUserByMACAddress(macAddress)==null){
+            connectedUsers.add(new User(bluetoothID, macAddress, userColors.getNextAvailableColor()));
+        }
     }
 
-    public void removeUser(String user){
+    //untested
+    public void removeUser(String macAddress){
         int removeIndex = -1;
         for(int i=0; i<connectedUsers.size(); i++){
-            if(connectedUsers.get(i).getBluetoothID().equals(user)){
+            if(connectedUsers.get(i).getMacAddress().equals(macAddress)){
                 removeIndex = i;
             }
         }
-        if(removeIndex>-1){
+        if(removeIndex >-1){
             int color = connectedUsers.get(removeIndex).getColor();
             userColors.returnColor(color);
             connectedUsers.remove(removeIndex);
@@ -50,22 +55,32 @@ public class UserList {
     }
 
     
-    public List<String> getUsernames(){
-        ArrayList<String> usernames = new ArrayList<String>();
+    public List<String> getBluetoothIDs(){
+        ArrayList<String> bluetoothIDs = new ArrayList<String>();
 
         for(User u:connectedUsers){
-            usernames.add(u.getBluetoothID());
+            bluetoothIDs.add(u.getBluetoothID());
         }
-        //Uncomment line below if usernames need to come out in the same order
-        //Collections.sort(usernames);
-        return usernames;
+        
+        return bluetoothIDs;
     }
     
-    public User getUserByName(String username){
+    public List<String> getMacAddresses(){
+        ArrayList<String> macAddresses = new ArrayList<String>();
+
+        for(User u:connectedUsers){
+            macAddresses.add(u.getMacAddress());
+        }
+        
+        return macAddresses;
+    }
+    
+    //get the user associated with this name (actually bluetoothID)
+    public User getUserByMACAddress(String macAddress){
         User user = null;
         
         for(User u:connectedUsers){
-            if(u.getBluetoothID().equals(username)){
+            if(u.getMacAddress().equals(macAddress)){
                 user = u;
             }
         }

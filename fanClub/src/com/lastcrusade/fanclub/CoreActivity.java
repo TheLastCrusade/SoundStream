@@ -54,7 +54,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         CustomApp curApp = ((CustomApp)getApplication());
         
         //TODO: Move this to something like connect activity or the connection fragment
-        curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName());
+        curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

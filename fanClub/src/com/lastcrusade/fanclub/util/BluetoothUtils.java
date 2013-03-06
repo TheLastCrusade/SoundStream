@@ -92,4 +92,8 @@ public class BluetoothUtils {
         }
         return name;       
     }
+    
+    public static String getLocalBluetoothMAC(){
+        return "0:0:0";
+    }
 }

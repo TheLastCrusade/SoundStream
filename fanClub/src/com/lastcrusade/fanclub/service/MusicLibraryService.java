@@ -38,7 +38,7 @@ public class MusicLibraryService extends Service {
         String bluetoothName = BluetoothUtils.getLocalBluetoothName();
         for (SongMetadata song : metadataList) {
             // Should we store the username/bluetooth name somewhere
-            song.setUsername(bluetoothName);
+            song.setMacAddress(bluetoothName);
         }
     }
 
