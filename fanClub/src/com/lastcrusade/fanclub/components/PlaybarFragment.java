@@ -17,11 +17,14 @@ import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
+import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 
 public class PlaybarFragment extends Fragment {
 
     private static final String TAG = PlaybarFragment.class.getName();
+    
+    private BroadcastRegistrar registrar;
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
     //TODO PlaybarFragment floods logcat with errors if the screen is rotated
@@ -31,12 +34,14 @@ public class PlaybarFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
+        registerReceivers();
     }
     
     @Override
     public void onDestroy() {
         super.onDestroy();
         playlistServiceLocator.unbind();
+        unregisterReceivers();
     }
 
     @Override
@@ -53,8 +58,7 @@ public class PlaybarFragment extends Fragment {
                     PlaylistService service = playlistServiceLocator.getService();
                     if (service.isPlaying()) {
                         service.pause();
-                        playPause.setImageDrawable(
-                                getResources().getDrawable(R.drawable.av_play));
+                        setPlayImage(playPause);
                         Log.w(TAG, "pause called");
                     } else {
                         service.play();
@@ -66,6 +70,7 @@ public class PlaybarFragment extends Fragment {
                     Log.wtf(TAG, e);
                 }
             }
+
         });
 
         ((ImageButton) view.findViewById(R.id.btn_skip))
@@ -84,5 +89,30 @@ public class PlaybarFragment extends Fragment {
 
         return view;
     }
-    //TODO add register recievers with ACTION_SONG_FINISHED
+
+    private void setPlayImage(final ImageButton playPause) {
+        playPause.setImageDrawable(
+                getResources().getDrawable(R.drawable.av_play));
+    }
+
+    /**
+     * Register intent receivers to control this service
+     * 
+     */
+    private void registerReceivers() {
+        this.registrar = new BroadcastRegistrar();
+        this.registrar.addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                final ImageButton playPause = ((ImageButton) PlaybarFragment.this.getView().findViewById(R.id.btn_play_pause));
+                setPlayImage(playPause);
+            }
+        }).register(this.getActivity());
+    }
+
+    private void unregisterReceivers() {
+        this.registrar.unregister();
+    }
+
 }
