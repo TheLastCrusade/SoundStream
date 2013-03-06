@@ -50,12 +50,12 @@ public class PlaybarFragment extends Fragment {
                     if (service.isPlaying()) {
                         service.pause();
                         playPause.setImageDrawable(
-                                getResources().getDrawable(R.drawable.av_pause));
+                                getResources().getDrawable(R.drawable.av_play));
                         Log.w(TAG, "pause called");
                     } else {
                         service.play();
                         playPause.setImageDrawable(
-                                getResources().getDrawable(R.drawable.av_play));
+                                getResources().getDrawable(R.drawable.av_pause));
                         Log.w(TAG, "play called");
                         }
                 }catch (ServiceNotBoundException e) {
