@@ -89,18 +89,19 @@ public class BluetoothUtils {
     public static String getLocalBluetoothMAC() {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        String name = null;
+        String mac = null;
         if(mBluetoothAdapter!=null) {
-            name = mBluetoothAdapter.getAddress();
+            mac = mBluetoothAdapter.getAddress();
         }
         else{
             Log.wtf(TAG, "No Bluetooth Radio. Ok on emulator");
         }
 
-        if(name == null){
-            name = "00:00:00:00:00";
+        if(mac == null){
+            mac = "00:00:00:00:00";
+            Log.wtf(TAG, "Setting fake mac");
         }
-        return name;
+        return mac;
     }
 
 }
