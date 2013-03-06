@@ -40,25 +40,29 @@ public class PlaybarFragment extends Fragment {
             Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_playbar, container, false);
     
-        ((ImageButton) view.findViewById(R.id.btn_play_pause))
-            .setOnClickListener(new OnClickListener() {
-    
-                @Override
-                public void onClick(View v) {
-                    try {
-                        PlaylistService service = playlistServiceLocator.getService();
-                        if (service.isPlaying()) {
-                            service.pause();
-                            Log.w(TAG, "pause called");
-                        } else {
-                            service.play();
-                            Log.w(TAG, "play called");
+        final ImageButton playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
+
+        playPause.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    PlaylistService service = playlistServiceLocator.getService();
+                    if (service.isPlaying()) {
+                        service.pause();
+                        playPause.setImageDrawable(
+                                getResources().getDrawable(R.drawable.av_pause));
+                        Log.w(TAG, "pause called");
+                    } else {
+                        service.play();
+                        playPause.setImageDrawable(
+                                getResources().getDrawable(R.drawable.av_play));
+                        Log.w(TAG, "play called");
                         }
-                    } catch (ServiceNotBoundException e) {
-                        Log.wtf(TAG, e);
-                    }
+                }catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, e);
                 }
-            });
+            }
+        });
 
         ((ImageButton) view.findViewById(R.id.btn_skip))
             .setOnClickListener(new OnClickListener() {
