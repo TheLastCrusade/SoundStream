@@ -1,15 +1,8 @@
 package com.lastcrusade.fanclub.util;
 
-import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
-import android.os.ParcelUuid;
 import android.util.Log;
 
 import com.lastcrusade.fanclub.R;
@@ -92,4 +85,22 @@ public class BluetoothUtils {
         }
         return name;       
     }
+
+    public static String getLocalBluetoothMAC() {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        String name = null;
+        if(mBluetoothAdapter!=null) {
+            name = mBluetoothAdapter.getAddress();
+        }
+        else{
+            Log.wtf(TAG, "No Bluetooth Radio. Ok on emulator");
+        }
+
+        if(name == null){
+            name = "00:00:00:00:00";
+        }
+        return name;
+    }
+
 }
