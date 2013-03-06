@@ -42,6 +42,11 @@ public class PlaylistService extends Service implements IPlayer {
     public static final String ACTION_SKIPPING_AUDIO = PlaylistService.class
             .getName() + ".action.SkippingAudio";
 
+    /**
+     * Broadcast action sent when the playlist gets updated
+     */
+    public static final String ACTION_PLAYLIST_UPDATED = PlaylistService.class + ".action.PlaylistUpdated";
+
     private static final String TAG = PlaylistService.class.getName();
 
     /**
@@ -125,10 +130,6 @@ public class PlaylistService extends Service implements IPlayer {
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
     }
 
-    public void addSong(SongMetadata newSong){
-        queue.add(newSong);
-    }
-    
     private void setSong(SongMetadata songData) {
         MediaStoreWrapper msw = new  MediaStoreWrapper(this);
         try {
@@ -138,5 +139,13 @@ public class PlaylistService extends Service implements IPlayer {
             e.printStackTrace();
         }
     }
-    
+
+    public void addSong(SongMetadata metadata) {
+        queue.add(metadata);
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+    }
+
+    public Playlist getPlaylist() {
+        return queue;
+    }
 }

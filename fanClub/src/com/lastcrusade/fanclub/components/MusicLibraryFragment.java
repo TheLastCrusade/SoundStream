@@ -1,5 +1,6 @@
 package com.lastcrusade.fanclub.components;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -10,30 +11,34 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.service.MusicLibraryService;
 import com.lastcrusade.fanclub.service.MusicLibraryService.MusicLibraryServiceBinder;
+import com.lastcrusade.fanclub.service.PlaylistService;
+import com.lastcrusade.fanclub.service.PlaylistService.PlaylistServiceBinder;
+import com.lastcrusade.fanclub.service.ServiceLocator;
+import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
-import com.lastcrusade.fanclub.util.ITitleable;
 import com.lastcrusade.fanclub.util.MusicListAdapter;
 
-public class MusicLibraryFragment extends SherlockListFragment implements ITitleable {
+public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getName();
     private BroadcastRegistrar registrar;
+
+    private ServiceLocator<PlaylistService> playlistServiceLocator;
 
     private MusicLibraryService mMusicLibraryService;
     private boolean boundToService = false; //Since you cannot instantly bind, set a boolean
                                     // after its safe to call methods
-    private List<SongMetadata> musicLibrary; //I dont like having this instance var
-    private Hashtable<String, String> users; //I dont like having this instance var
+    
+    private MusicListAdapter musicListAdapter;
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection musicLibraryConn = new ServiceConnection() {
@@ -42,15 +47,12 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
             MusicLibraryServiceBinder binder = (MusicLibraryServiceBinder) service;
+            
             mMusicLibraryService = binder.getService();
             boundToService = true;
-            setListAdapter(
-                    new MusicAdapter(
-                            MusicLibraryFragment.this.getActivity(),
-                            getMusicLibrary(),
-                            users
-                    )
-            );
+            
+            //update displayed music
+            musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
         }
 
         @Override
@@ -63,28 +65,25 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        
+
+        playlistServiceLocator = new ServiceLocator<PlaylistService>(MusicLibraryFragment.this.getActivity(),
+                PlaylistService.class, PlaylistServiceBinder.class);
+
         if(boundToService == false){
             Intent intentML = new Intent(this.getActivity(), MusicLibraryService.class);
             this.getActivity().bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
         }
-        users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
-
+        
+        
+        Hashtable<String,String> users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
+        //make a new music list adapter and give it an empty list of songs to use until the service is connected
+        musicListAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
+        setListAdapter(musicListAdapter);
+        
         registerReceivers();
     }
     
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.list, container, false);
-        return v;
-    }
-    
-    @Override
-    public void onResume(){
-        super.onResume();
-        getActivity().setTitle(getTitle());
-    }
-    
+        
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -94,14 +93,6 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
             boundToService = false;
         }
         unregisterReceivers();
-    }
-
-    private List<SongMetadata> getMusicLibrary() {
-        //If we can refresh our music library do otherwise return the old one
-        if(mMusicLibraryService != null && boundToService){
-            musicLibrary = mMusicLibraryService.getLibrary();
-        }
-        return musicLibrary;
     }
 
     @Override
@@ -120,12 +111,7 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                setListAdapter(new MusicAdapter(
-                                context,
-                                getMusicLibrary(),
-                                users
-                              )
-                );
+               musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
 
             }
         }).register(this.getActivity());
@@ -134,9 +120,20 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
+    
 
-    private class MusicAdapter extends MusicListAdapter{
+    protected PlaylistService getPlaylistService() {
+        PlaylistService playlistService = null;
 
+        try {
+            playlistService = this.playlistServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return playlistService;
+    }
+
+    private class MusicAdapter extends MusicListAdapter {
         public MusicAdapter(
                 Context mContext,
                 List<SongMetadata> metadataList,
@@ -147,9 +144,18 @@ public class MusicLibraryFragment extends SherlockListFragment implements ITitle
         
         public View getView(int position, View convertView, ViewGroup parent){
             View v = super.getView(position, convertView, parent);
-            v.findViewById(R.id.add_to_playlist).setVisibility(View.VISIBLE);
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.add_to_playlist);
+            imageButton.setVisibility(View.VISIBLE);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SongMetadata meta = mMusicLibraryService.getLibrary().get((Integer) v.getTag());
+                    getPlaylistService().addSong(meta);
+                }
+            });
+
             return v;
         }
-        
     }
 }

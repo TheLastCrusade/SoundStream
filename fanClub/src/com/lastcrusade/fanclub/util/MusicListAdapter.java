@@ -5,16 +5,20 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
 
 public class MusicListAdapter extends BaseAdapter {
+    private final String TAG = MusicListAdapter.class.getName();
+
     private Context mContext;
     private List<SongMetadata> metadataList;
     private Hashtable<String,String> users;
@@ -55,19 +59,32 @@ public class MusicListAdapter extends BaseAdapter {
             element = inflater.inflate(R.layout.song_item, null);
         }
         
-        View userColor = (View) element.findViewById(R.id.userColor); 
+        View userColor = (View) element.findViewById(R.id.user_color); 
         TextView title = (TextView)element.findViewById(R.id.title);
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
-        
+        ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
 
-        userColor.setBackgroundColor(Color.parseColor(users.get(metadataList.get(position).getUsername())));
+        addButton.setTag(position);
+
+        userColor.setBackgroundColor(0xFFFFFFFF);
         title.setText(metadataList.get(position).getTitle());
         artist.setText(metadataList.get(position).getArtist());
         album.setText(metadataList.get(position).getAlbum());
-
         
+        artist.setMaxWidth(parent.getWidth()/2);
+
         return element;
     }
-
+    
+    //updates the music shown and notifies the attached view that it needs to redraw
+    public void updateMusic(List<SongMetadata> metadataList){
+        this.metadataList = metadataList;
+        notifyDataSetChanged();
+    }
+    
+    public void updateUsers(Hashtable<String,String> users){
+        this.users = users;
+        notifyDataSetChanged();
+    }
 }

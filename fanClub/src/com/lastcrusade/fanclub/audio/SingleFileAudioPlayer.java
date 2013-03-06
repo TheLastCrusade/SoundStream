@@ -39,6 +39,7 @@ public class SingleFileAudioPlayer implements IPlayer {
             if (player.isPlaying()) {
                 player.stop();
             }
+            player.reset();
             player.setDataSource(this.filePath);
             player.prepare();
             player.start();
