@@ -52,7 +52,12 @@ public class Playlist {
         return list.size();
     }
     
+    public SongMetadata getHead(){
+        return list.get(0);
+    }
+
     public SongMetadata getNext(){
+        list.remove(0);
         return list.get(0);
     }
 }
