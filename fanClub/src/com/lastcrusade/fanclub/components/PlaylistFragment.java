@@ -1,5 +1,8 @@
 package com.lastcrusade.fanclub.components;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.view.ViewGroup;
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.Playlist;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
@@ -30,6 +34,8 @@ public class PlaylistFragment extends MusicListFragment{
     private final int SHORT_VIEW = 1;
     private final int EXPANDED_VIEW = 10;
 
+    private MusicListAdapter mMusicListAdapter;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -38,12 +44,15 @@ public class PlaylistFragment extends MusicListFragment{
 
         //TODO: get the userlist better
         final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
+        Hashtable<String,String> users = ((CustomApp) this.getActivity().getApplication()).getUserList().getUsers();
+        mMusicListAdapter = new MusicListAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
+        setListAdapter(mMusicListAdapter);
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
                 metadataList = getPlaylistService().getPlaylist();
-                setListAdapter(new MusicListAdapter(PlaylistFragment.this.getActivity(), metadataList.getList(), curApp.getUserList().getUsers()));
+                mMusicListAdapter.updateMusic(metadataList.getList());
             }
         });
 
@@ -81,7 +90,7 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 Log.i(PlaylistFragment.class.getName(), "action playlist updated");
-                setListAdapter(new MusicListAdapter(context, getPlaylist().getList(), null));
+                mMusicListAdapter.updateMusic(metadataList.getList());
             }
         }).register(this.getActivity());
     }
