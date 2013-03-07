@@ -110,7 +110,7 @@ public class PlaylistService extends Service implements IPlayer {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                queue.getNext();
+                queue.moveNext();
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         }).register(this);

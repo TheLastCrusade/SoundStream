@@ -52,7 +52,7 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onServiceBound() {
                 metadataList = getPlaylistService().getPlaylist();
-                mMusicListAdapter.updateMusic(metadataList.getList());
+                mMusicListAdapter.updateMusic(metadataList.getUnPlayedList());
             }
         });
 
@@ -90,7 +90,7 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 Log.i(PlaylistFragment.class.getName(), "action playlist updated");
-                mMusicListAdapter.updateMusic(metadataList.getList());
+                mMusicListAdapter.updateMusic(metadataList.getUnPlayedList());
             }
         }).register(this.getActivity());
     }

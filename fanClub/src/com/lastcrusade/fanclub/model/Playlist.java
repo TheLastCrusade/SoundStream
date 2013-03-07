@@ -4,30 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Playlist {
-    private List<SongMetadata> list;
+    private List<SongMetadata> unPlayed;
+    private List<SongMetadata> played;
 
     public Playlist() {
-        list = new ArrayList<SongMetadata>();
+        unPlayed = new ArrayList<SongMetadata>();
     }
 
     public Playlist(SongMetadata meta) {
-        list = new ArrayList<SongMetadata>();
-        list.add(meta);
+        unPlayed = new ArrayList<SongMetadata>();
+        unPlayed.add(meta);
+    }
+    
+    public Playlist(List<SongMetadata> unPlayed, List<SongMetadata> played){
+        this.unPlayed = unPlayed;
+        this.played = played;
     }
 
     public void add(SongMetadata meta) {
-        list.add(meta);
+        unPlayed.add(meta);
     }
 
     public void addToNext(SongMetadata meta) {
-        list.add(1, meta);
+        unPlayed.add(1, meta);
     }
 
     public SongMetadata remove(SongMetadata meta) {
         SongMetadata removeMeta = null;
-        int index = list.indexOf(meta);
+        int index = unPlayed.indexOf(meta);
         if (index >= 0) {
-            removeMeta = list.remove(index);
+            removeMeta = unPlayed.remove(index);
         }
         return removeMeta;
     }
@@ -35,29 +41,46 @@ public class Playlist {
     public SongMetadata remove(int index) {
         SongMetadata removeMeta = null;
         if (index >= 0) {
-            removeMeta = list.remove(index);
+            removeMeta = unPlayed.remove(index);
         }
         return removeMeta;
     }
 
-    public List<SongMetadata> getList() {
-        return list;
+    public List<SongMetadata> getUnPlayedList() {
+        return unPlayed;
+    }
+    
+    public List<SongMetadata> getPlayedList(){
+        return played;
     }
 
-    public void setList(List<SongMetadata> list) {
-        this.list = list;
+    public void setUnPlayedList(List<SongMetadata> list) {
+        this.unPlayed = list;
+    }
+    
+    public void setPlaylist(List<SongMetadata> unPlayed, List<SongMetadata> played){
+        this.unPlayed = unPlayed;
+        this.played = played;
     }
     
     public int size(){
-        return list.size();
+        return unPlayed.size();
     }
     
     public SongMetadata getHead(){
-        return list.get(0);
+        return unPlayed.get(0);
     }
 
-    public SongMetadata getNext(){
-        list.remove(0);
-        return list.get(0);
+    /**
+     * Call this method to progress the playlist
+     * @return new top of unplayed list
+     */
+    public SongMetadata moveNext(){
+        //Add top of the unPlayed list to played list
+        played.add(unPlayed.get(0));
+        //Remove the top of unplayed list
+        unPlayed.remove(0);
+        //return the new top of the unplayed list
+        return unPlayed.get(0);
     }
 }
