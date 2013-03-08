@@ -10,8 +10,8 @@ public class SongMetadata {
 
     private String album;
 
-    private String macAddress; // macAddress of person who added song to
-                             // playlist
+    // macAddress of person who added song to playlist
+    private String macAddress; 
     
     public SongMetadata() {}
 

@@ -3,16 +3,6 @@ package com.lastcrusade.fanclub.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lastcrusade.fanclub.util.BluetoothUtils;
-
-
-/*
- * TODO: determine if we want to keep track of an actual
- * username for users as well as the bluetooth id. Right now,
- * username is synonymous with bluetooth id - once we decide
- * if we actually want username, we can add that in to user and 
- * then swtich references to username here to the bluetooth id
- */
 public class UserList {
 
     private List<User> connectedUsers;    

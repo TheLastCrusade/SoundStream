@@ -20,6 +20,7 @@ public class UserListAdapter extends BaseAdapter {
         this.users = users;
         this.mContext = mContext;
     }
+    
     @Override
     public int getCount() {
         return users.getUsers().size();
