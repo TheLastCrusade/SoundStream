@@ -20,19 +20,21 @@ public class UserListMessage extends ADataMessage {
 	public void deserialize(InputStream input) throws IOException {
 		int userListSize = readInteger(input);
 		for(int i = 0; i < userListSize; i++) {
-			String username = readString(input);
-			
-			userList.addUser(username);
+			String bluetoothID = readString(input);
+			String macAddress = readString(input);
+			userList.addUser(bluetoothID, macAddress);
 		}
 	}
 	
 	@Override
 	public void serialize(OutputStream output) throws IOException {
-		List<String> usernames = userList.getUsernames();
+		List<String> bluetoothIDs = userList.getBluetoothIDs();
+		List<String> macAddresses= userList.getMacAddresses();
 		
 		writeInteger(userList.getUsers().size(), output);
-		for(int i = 0; i < usernames.size(); i++) {
-			writeString(usernames.get(i), output);
+		for(int i = 0; i < bluetoothIDs.size(); i++) {
+			writeString(bluetoothIDs.get(i), output);
+			writeString(macAddresses.get(i), output);
 		}
 	}
 

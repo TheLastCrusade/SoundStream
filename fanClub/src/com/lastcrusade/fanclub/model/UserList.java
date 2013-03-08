@@ -1,65 +1,82 @@
 package com.lastcrusade.fanclub.model;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 public class UserList {
-    /*
-     * This is a way to keep track of the users and
-     * their color ids. Color could be changed to an int if that works better - 
-     * it would increase performance speed if it becomes an issue in parsing colors
-     */
-    private Hashtable<String,String> connectedUsers = new Hashtable<String,String>();
-    private int nextColor = 0;
-    private String[] colors = {
-            "#ffff4444",
-            "#ff33b5e5",
-            "#ffffbb33",
-            "#ffaa66cc",
-            "#ff99cc00"
-    };
+
+    private List<User> connectedUsers;    
+    private UserColors userColors;
 
     public UserList(){
-        connectedUsers.put("Reid", colors[0]);
-        connectedUsers.put("Greenie", colors[1]);
-        connectedUsers.put("Sills", colors[2]);
-        connectedUsers.put("Jesse", colors[3]);
-        connectedUsers.put("Lizziemom", colors[4]);
-        nextColor = 5 % colors.length;
+        userColors = new UserColors();
+        connectedUsers = new ArrayList<User>();
     }
 
-    public UserList(String user){
-        connectedUsers.put(user, colors[nextColor]);
-        nextColor = (nextColor + 1) % colors.length;
+    public UserList(String bluetoothID, String macAddress){
+        this();
+        connectedUsers.add(new User(bluetoothID, macAddress, userColors.getNextAvailableColor()));
     }
 
-    public void addUser(String user){
-        connectedUsers.put(user, colors[nextColor]);
-        nextColor = (nextColor + 1) % colors.length;
+    public void addUser(String bluetoothID, String macAddress){
+        //check to make sure that the user isn't already in the list before adding
+        if(getUserByMACAddress(macAddress)==null){
+            connectedUsers.add(new User(bluetoothID, macAddress, userColors.getNextAvailableColor()));
+        }
     }
 
-    public void removeUser(String user){
-        connectedUsers.remove(user);
+    //untested
+    public void removeUser(String macAddress){
+        int removeIndex = -1;
+        for(int i=0; i<connectedUsers.size(); i++){
+            if(connectedUsers.get(i).getMacAddress().equals(macAddress)){
+                removeIndex = i;
+            }
+        }
+        if(removeIndex >-1){
+            int color = connectedUsers.get(removeIndex).getColor();
+            userColors.returnColor(color);
+            connectedUsers.remove(removeIndex);
+        }
     }
 
-    public Hashtable<String,String> getUsers(){
+    public List<User> getUsers(){
         return connectedUsers;
     }
 
-    public List<String> getUsernames(){
-        ArrayList<String> usernames = new ArrayList<String>();
-        Iterator<Entry<String, String>> userListIterator = connectedUsers.entrySet().iterator();
+    //get a list of bluetoothIDs of the connected users
+    public List<String> getBluetoothIDs(){
+        ArrayList<String> bluetoothIDs = new ArrayList<String>();
 
-        while (userListIterator.hasNext()) {
-            Entry<String, String> entry = userListIterator.next();
-            usernames.add(entry.getKey());
+        for(User u:connectedUsers){
+            bluetoothIDs.add(u.getBluetoothID());
         }
-        //Uncomment line below if usernames need to come out in the same order
-        //Collections.sort(usernames);
-        return usernames;
+        
+        return bluetoothIDs;
     }
+    
+    //get a list of macAddresses of the connected users
+    public List<String> getMacAddresses(){
+        ArrayList<String> macAddresses = new ArrayList<String>();
 
+        for(User u:connectedUsers){
+            macAddresses.add(u.getMacAddress());
+        }
+        
+        return macAddresses;
+    }
+    
+    //using macAddress instead of bluetooth id to make sure that
+    //it is unique
+    public User getUserByMACAddress(String macAddress){
+        User user = null;
+        
+        for(User u:connectedUsers){
+            if(u.getMacAddress().equals(macAddress)){
+                user = u;
+            }
+        }
+        
+        return user;
+    }
 }

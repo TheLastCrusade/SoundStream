@@ -37,7 +37,7 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 			assertEquals(preSerializationSongMetadata.getTitle(), postSerializationSongMetadata.getTitle());
 			assertEquals(preSerializationSongMetadata.getArtist(), postSerializationSongMetadata.getArtist());
 			assertEquals(preSerializationSongMetadata.getAlbum(), postSerializationSongMetadata.getAlbum());
-			assertEquals(preSerializationSongMetadata.getUsername(), postSerializationSongMetadata.getUsername());
+			assertEquals(preSerializationSongMetadata.getMacAddress(), postSerializationSongMetadata.getMacAddress());
 		}
 	}
 }
