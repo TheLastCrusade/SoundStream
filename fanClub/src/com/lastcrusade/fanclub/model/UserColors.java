@@ -1,6 +1,7 @@
 package com.lastcrusade.fanclub.model;
 
 public class UserColors {
+    //color set not finished yet - might change some or all colors
     private ColorEntry[] colors = new ColorEntry[] {
         
         new ColorEntry(0xFF02AD8C),
@@ -16,6 +17,7 @@ public class UserColors {
         new ColorEntry(0xFFC88C32)
     };
     
+    //gets the next color that is not taken and marks it as such
     public int getNextAvailableColor(){
         for(ColorEntry c:colors){
             if(!c.isTaken()){
@@ -29,6 +31,8 @@ public class UserColors {
         
     }
     
+    // adds the color back into the pool - called from userlist's remove
+    // when a user is no longer connected to the network
     public void returnColor(int color){
         for(ColorEntry c:colors){
             if(c.getColor() == color){

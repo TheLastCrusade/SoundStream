@@ -35,10 +35,9 @@ public class MusicLibraryService extends Service {
     @Override
     public void onCreate() {
         metadataList = (new MediaStoreWrapper(this)).list();
-        String bluetoothName = BluetoothUtils.getLocalBluetoothName();
+        String macAddress = BluetoothUtils.getLocalBluetoothMAC();
         for (SongMetadata song : metadataList) {
-            // Should we store the username/bluetooth name somewhere
-            song.setMacAddress(bluetoothName);
+            song.setMacAddress(macAddress);
         }
     }
 

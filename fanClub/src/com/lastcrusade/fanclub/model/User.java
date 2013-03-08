@@ -1,7 +1,10 @@
 package com.lastcrusade.fanclub.model;
 
 public class User {
+    //keep track of bluetoothID for display name
     private String bluetoothID;
+    //keep track of macAddress for associating data with
+    //the correct user
     private String macAddress;
     private int color;
     

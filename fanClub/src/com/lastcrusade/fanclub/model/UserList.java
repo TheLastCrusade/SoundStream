@@ -54,7 +54,7 @@ public class UserList {
         return connectedUsers;
     }
 
-    
+    //get a list of bluetoothIDs of the connected users
     public List<String> getBluetoothIDs(){
         ArrayList<String> bluetoothIDs = new ArrayList<String>();
 
@@ -65,6 +65,7 @@ public class UserList {
         return bluetoothIDs;
     }
     
+    //get a list of macAddresses of the connected users
     public List<String> getMacAddresses(){
         ArrayList<String> macAddresses = new ArrayList<String>();
 
@@ -75,7 +76,8 @@ public class UserList {
         return macAddresses;
     }
     
-    //get the user associated with this name (actually bluetoothID)
+    //using macAddress instead of bluetooth id to make sure that
+    //it is unique
     public User getUserByMACAddress(String macAddress){
         User user = null;
         
