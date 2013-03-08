@@ -143,7 +143,10 @@ public class PlaylistService extends Service implements IPlayer {
     @Override
     public void skip() {
         this.audioPlayer.skip();
+        queue.moveNext();
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
     }
 
     private void setSong(SongMetadata songData) {

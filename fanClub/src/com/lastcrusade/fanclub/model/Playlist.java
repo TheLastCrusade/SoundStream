@@ -9,10 +9,12 @@ public class Playlist {
 
     public Playlist() {
         unPlayed = new ArrayList<SongMetadata>();
+        played = new ArrayList<SongMetadata>();
     }
 
     public Playlist(SongMetadata meta) {
         unPlayed = new ArrayList<SongMetadata>();
+        played = new ArrayList<SongMetadata>();
         unPlayed.add(meta);
     }
     
@@ -68,7 +70,11 @@ public class Playlist {
     }
     
     public SongMetadata getHead(){
-        return unPlayed.get(0);
+        if(unPlayed.size() > 0){
+            return unPlayed.get(0);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -76,11 +82,17 @@ public class Playlist {
      * @return new top of unplayed list
      */
     public SongMetadata moveNext(){
-        //Add top of the unPlayed list to played list
-        played.add(unPlayed.get(0));
-        //Remove the top of unplayed list
-        unPlayed.remove(0);
-        //return the new top of the unplayed list
-        return unPlayed.get(0);
+        if(unPlayed.size() > 0){
+            //Add top of the unPlayed list to played list
+            played.add(unPlayed.get(0));
+            //Remove the top of unplayed list
+            unPlayed.remove(0);
+        }
+        if(unPlayed.size() > 0){
+            //return the new top of the unplayed list
+            return unPlayed.get(0);
+        } else {
+            return null;
+        }
     }
 }
