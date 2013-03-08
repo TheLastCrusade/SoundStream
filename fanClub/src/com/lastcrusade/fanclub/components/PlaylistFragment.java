@@ -1,5 +1,7 @@
 package com.lastcrusade.fanclub.components;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.Playlist;
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
@@ -27,23 +30,22 @@ public class PlaylistFragment extends MusicListFragment{
 
     private ServiceLocator<PlaylistService> playlistServiceServiceLocator;
 
-    private final int SHORT_VIEW = 1;
-    private final int EXPANDED_VIEW = 10;
-
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
+        setListAdapter(new MusicListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList()));
+
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
-        //TODO: get the userlist better
-        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
                 metadataList = getPlaylistService().getPlaylist();
-                setListAdapter(new MusicListAdapter(PlaylistFragment.this.getActivity(), metadataList.getList(), curApp.getUserList().getUsers()));
+                setListAdapter(new MusicListAdapter(PlaylistFragment.this.getActivity(), metadataList.getList(), curApp.getUserList()));
             }
         });
 

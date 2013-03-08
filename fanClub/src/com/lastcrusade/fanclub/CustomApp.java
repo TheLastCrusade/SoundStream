@@ -14,7 +14,7 @@ public class CustomApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        userList = new UserList(); //Remember the default includes made up people
+        userList = new UserList();
     }
     
     public UserList getUserList(){
