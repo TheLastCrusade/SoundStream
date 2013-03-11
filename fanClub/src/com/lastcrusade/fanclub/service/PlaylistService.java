@@ -76,7 +76,6 @@ public class PlaylistService extends Service implements IPlayer {
         });
 
         this.queue = new Playlist();
-        queue.add((new MediaStoreWrapper(this)).list().get(0));
         // TODO: kick off a thread to feed the monster that is the audio service
         registerReceivers();
         return new PlaylistServiceBinder();
