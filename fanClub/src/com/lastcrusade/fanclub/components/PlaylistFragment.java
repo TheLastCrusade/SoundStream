@@ -1,7 +1,6 @@
 package com.lastcrusade.fanclub.components;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
@@ -30,12 +28,9 @@ public class PlaylistFragment extends MusicListFragment{
     private final String TAG = PlaylistFragment.class.getName();
 
     private BroadcastRegistrar registrar;
-    private Playlist metadataList;
+    private Playlist mPlaylist;
 
     private ServiceLocator<PlaylistService> playlistServiceServiceLocator;
-
-    private final int SHORT_VIEW = 1;
-    private final int EXPANDED_VIEW = 10;
 
     private PlayListAdapter mPlayListAdapter;
 
@@ -46,7 +41,6 @@ public class PlaylistFragment extends MusicListFragment{
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
-        //TODO: get the userlist better
         final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
         mPlayListAdapter = new PlayListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList());
         setListAdapter(mPlayListAdapter);
@@ -54,8 +48,8 @@ public class PlaylistFragment extends MusicListFragment{
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                metadataList = getPlaylistService().getPlaylist();
-                mPlayListAdapter.updateMusic(metadataList.getUnPlayedList(), metadataList.getPlayedList());
+                mPlaylist = getPlaylistService().getPlaylist();
+                mPlayListAdapter.updateMusic(mPlaylist.getUnPlayedList(), mPlaylist.getPlayedList());
             }
         });
 
@@ -93,7 +87,7 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 Log.i(PlaylistFragment.class.getName(), "action playlist updated");
-                mPlayListAdapter.updateMusic(metadataList.getUnPlayedList(), metadataList.getPlayedList());
+                mPlayListAdapter.updateMusic(mPlaylist.getUnPlayedList(), mPlaylist.getPlayedList());
             }
         }).register(this.getActivity());
     }
@@ -134,10 +128,21 @@ public class PlaylistFragment extends MusicListFragment{
             super(mContext, metadataList, users);
         }
 
-        public void updateMusic(List<SongMetadata> unPlayed, List<SongMetadata> played) {
-            List<SongMetadata> combinedList = new ArrayList<SongMetadata>(unPlayed);
+        public void updateMusic(List<SongMetadata> unplayed, List<SongMetadata> played) {
+            List<SongMetadata> combinedList = new ArrayList<SongMetadata>();
             combinedList.addAll(played);
+            combinedList.addAll(unplayed);
             super.updateMusic(combinedList);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View element = super.getView(position, convertView, parent);
+            //This depends on played music being above unplayed music
+            if(position < mPlaylist.getPlayedList().size()){
+                element.setBackgroundColor(getResources().getColor(R.color.used));
+            }
+            return element;
         }
     }
 

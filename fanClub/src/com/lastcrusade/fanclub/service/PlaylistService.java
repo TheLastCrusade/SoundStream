@@ -128,7 +128,7 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public void play() {
-        if(queue.size() > 1){
+        if(queue.size() >= 1){
             setSong(queue.getHead());
             this.audioPlayer.play();
             new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
@@ -146,7 +146,6 @@ public class PlaylistService extends Service implements IPlayer {
     @Override
     public void skip() {
         this.audioPlayer.skip();
-        queue.moveNext();
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
