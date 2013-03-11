@@ -27,7 +27,7 @@ public class PlaybarFragment extends Fragment {
     private BroadcastRegistrar registrar;
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
-    //TODO PlaybarFragment floods logcat with errors if the screen is rotated
+    ImageButton playPause;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,8 +48,7 @@ public class PlaybarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_playbar, container, false);
-    
-        final ImageButton playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
+        playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
 
         playPause.setOnClickListener(new OnClickListener() {
             @Override
@@ -58,14 +57,10 @@ public class PlaybarFragment extends Fragment {
                     PlaylistService service = playlistServiceLocator.getService();
                     if (service.isPlaying()) {
                         service.pause();
-                        setPlayImage(playPause);
-                        Log.w(TAG, "pause called");
                     } else {
                         service.play();
-                        playPause.setImageDrawable(
-                                getResources().getDrawable(R.drawable.av_pause));
-                        Log.w(TAG, "play called");
-                        }
+                    }
+                    smartSetPlayPauseImage(service);
                 }catch (ServiceNotBoundException e) {
                     Log.wtf(TAG, e);
                 }
@@ -90,9 +85,20 @@ public class PlaybarFragment extends Fragment {
         return view;
     }
 
-    private void setPlayImage(final ImageButton playPause) {
-        playPause.setImageDrawable(
-                getResources().getDrawable(R.drawable.av_play));
+    private void setPlayImage() {
+        playPause.setImageDrawable(getResources().getDrawable(R.drawable.av_play));
+    }
+
+    private void setPauseImage(){
+        playPause.setImageDrawable(getResources().getDrawable(R.drawable.av_pause));
+    }
+
+    private void smartSetPlayPauseImage(PlaylistService service){
+        if(service.isPlaying()){
+            setPauseImage();
+        } else {
+            setPlayImage();
+        }
     }
 
     /**
@@ -105,8 +111,7 @@ public class PlaybarFragment extends Fragment {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                final ImageButton playPause = ((ImageButton) PlaybarFragment.this.getView().findViewById(R.id.btn_play_pause));
-                setPlayImage(playPause);
+                setPlayImage();
             }
         }).register(this.getActivity());
     }

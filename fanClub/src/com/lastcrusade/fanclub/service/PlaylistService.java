@@ -19,6 +19,8 @@ import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.fanclub.util.Toaster;
+import com.lastcrusade.fanclub.R;
 
 /**
  * This service is responsible for holding the play queue
@@ -130,6 +132,8 @@ public class PlaylistService extends Service implements IPlayer {
             setSong(queue.getHead());
             this.audioPlayer.play();
             new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
+        } else {
+            Toaster.iToast(this, getString(R.string.playlist_empty));
         }
     }
 

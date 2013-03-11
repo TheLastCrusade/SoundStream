@@ -2,8 +2,6 @@ package com.lastcrusade.fanclub;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.MotionEvent;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.fanclub.components.MenuFragment;
