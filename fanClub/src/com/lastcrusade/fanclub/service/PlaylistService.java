@@ -66,7 +66,7 @@ public class PlaylistService extends Service implements IPlayer {
 
     private BroadcastRegistrar    registrar;
     private SingleFileAudioPlayer audioPlayer;
-    private Playlist queue;
+    private Playlist mPlaylist;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -77,7 +77,7 @@ public class PlaylistService extends Service implements IPlayer {
                     }
         });
 
-        this.queue = new Playlist();
+        this.mPlaylist = new Playlist();
         // TODO: kick off a thread to feed the monster that is the audio service
         registerReceivers();
         return new PlaylistServiceBinder();
@@ -111,7 +111,7 @@ public class PlaylistService extends Service implements IPlayer {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                queue.moveNext();
+                mPlaylist.moveNext();
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         }).register(this);
@@ -128,8 +128,8 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public void play() {
-        if(queue.size() >= 1){
-            setSong(queue.getHead());
+        if(mPlaylist.size() >= 1){
+            setSong(mPlaylist.getHead());
             this.audioPlayer.play();
             new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
         } else {
@@ -162,11 +162,11 @@ public class PlaylistService extends Service implements IPlayer {
     }
 
     public void addSong(SongMetadata metadata) {
-        queue.add(metadata);
+        mPlaylist.add(metadata);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
     public Playlist getPlaylist() {
-        return queue;
+        return mPlaylist;
     }
 }
