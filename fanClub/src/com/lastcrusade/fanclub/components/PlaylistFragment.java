@@ -2,6 +2,7 @@ package com.lastcrusade.fanclub.components;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
@@ -35,7 +37,7 @@ public class PlaylistFragment extends MusicListFragment{
     private final int SHORT_VIEW = 1;
     private final int EXPANDED_VIEW = 10;
 
-    private MusicListAdapter mMusicListAdapter;
+    private PlayListAdapter mPlayListAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -46,14 +48,14 @@ public class PlaylistFragment extends MusicListFragment{
 
         //TODO: get the userlist better
         final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
-        mMusicListAdapter = new MusicListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList());
-        setListAdapter(mMusicListAdapter);
+        mPlayListAdapter = new PlayListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList());
+        setListAdapter(mPlayListAdapter);
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
                 metadataList = getPlaylistService().getPlaylist();
-                mMusicListAdapter.updateMusic(metadataList.getUnPlayedList());
+                mPlayListAdapter.updateMusic(metadataList.getUnPlayedList(), metadataList.getPlayedList());
             }
         });
 
@@ -91,7 +93,7 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 Log.i(PlaylistFragment.class.getName(), "action playlist updated");
-                mMusicListAdapter.updateMusic(metadataList.getUnPlayedList());
+                mPlayListAdapter.updateMusic(metadataList.getUnPlayedList(), metadataList.getPlayedList());
             }
         }).register(this.getActivity());
     }
@@ -122,4 +124,21 @@ public class PlaylistFragment extends MusicListFragment{
         }
         return playlistService;
     }
+
+    private class PlayListAdapter extends MusicListAdapter {
+        public PlayListAdapter(
+                Context mContext,
+                List<SongMetadata> metadataList,
+                UserList users
+                ) {
+            super(mContext, metadataList, users);
+        }
+
+        public void updateMusic(List<SongMetadata> unPlayed, List<SongMetadata> played) {
+            List<SongMetadata> combinedList = new ArrayList<SongMetadata>(unPlayed);
+            combinedList.addAll(played);
+            super.updateMusic(combinedList);
+        }
+    }
+
 }
