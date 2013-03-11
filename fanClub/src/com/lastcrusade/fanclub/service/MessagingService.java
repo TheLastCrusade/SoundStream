@@ -43,6 +43,9 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
 
+    public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
+    public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
+
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
      * just map to an action.

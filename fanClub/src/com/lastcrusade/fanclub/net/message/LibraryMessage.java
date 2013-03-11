@@ -26,12 +26,12 @@ public class LibraryMessage extends ADataMessage {
 		int librarySize = readInteger(input);
 		for(int i = 0; i < librarySize; i++) {
 			long id = readLong(input);
-			String title = readString(input);
-			String artist = readString(input);
-			String album = readString(input);
-			String username = readString(input);
+			String title      = readString(input);
+			String artist     = readString(input);
+			String album      = readString(input);
+			String macAddress = readString(input);
 			
-			library.add(new SongMetadata(id, title, artist, album, username));
+			library.add(new SongMetadata(id, title, artist, album, macAddress));
 		}
 	}
 

@@ -38,7 +38,7 @@ public class MusicListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public SongMetadata getItem(int position) {
         return metadataList.get(position);
     }
 
