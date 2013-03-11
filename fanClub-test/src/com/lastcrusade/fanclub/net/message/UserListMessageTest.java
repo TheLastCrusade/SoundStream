@@ -18,15 +18,17 @@ public class UserListMessageTest extends SerializationTest<UserListMessage> {
 		UserList userList = new UserList();
 		populateTestUserList(userList);
 		
-		List<String> usernames = userList.getUsernames();
+		List<String> bluetoothIDs = userList.getBluetoothIDs();
+		List<String> macAddresses = userList.getMacAddresses();
 		
 		UserListMessage preSerializationUserListMessage = new UserListMessage();
 		preSerializationUserListMessage.setUserList(userList);
 		UserListMessage postSerializationUserListMessage = 
 				super.testSerializeMessage(preSerializationUserListMessage);
 		
-		for(int i = 0; i < usernames.size(); i++) {
-			assertEquals(usernames.get(i), postSerializationUserListMessage.getUserList().getUsernames().get(i));
+		for(int i = 0; i < bluetoothIDs.size(); i++) {
+			assertEquals(bluetoothIDs.get(i), postSerializationUserListMessage.getUserList().getBluetoothIDs().get(i));
+			assertEquals(macAddresses.get(i), postSerializationUserListMessage.getUserList().getMacAddresses().get(i));
 		}
 	}
 	
@@ -34,11 +36,11 @@ public class UserListMessageTest extends SerializationTest<UserListMessage> {
 	 * @return A UserList populated with data used to test UserList serialization
 	 */
 	public UserList populateTestUserList(UserList userList) {
-		userList.addUser("David");
-		userList.addUser("Jesse");
-		userList.addUser("Lizziemom");
-		userList.addUser("Sills");
-		userList.addUser("Reid");
+		userList.addUser("David","1");
+		userList.addUser("Jesse","2");
+		userList.addUser("Lizziemom","3");
+		userList.addUser("Sills","4");
+		userList.addUser("Reid","5");
 		
 		return userList;
 	}

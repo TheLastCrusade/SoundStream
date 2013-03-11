@@ -43,7 +43,7 @@ public class LibraryMessage extends ADataMessage {
 			writeString(metadata.getTitle(), output);
 			writeString(metadata.getArtist(), output);
 			writeString(metadata.getAlbum(), output);
-			writeString(metadata.getUsername(), output);
+			writeString(metadata.getMacAddress(), output);
 		}
 	}
 
