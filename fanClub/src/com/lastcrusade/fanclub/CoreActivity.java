@@ -2,6 +2,7 @@ package com.lastcrusade.fanclub;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.fanclub.components.MenuFragment;
@@ -52,7 +53,10 @@ public class CoreActivity extends SlidingFragmentActivity{
 
         //Add user to user list
         CustomApp curApp = ((CustomApp)getApplication());
-        curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName());
+        
+        //TODO: Move this to something like connect activity or the connection fragment
+        curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
+        //Log.i("Core", " " + curApp.getUserList().getUserByMACAddress(BluetoothUtils.getLocalBluetoothMAC()));
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

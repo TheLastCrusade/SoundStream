@@ -10,8 +10,19 @@ public class SongMetadata {
 
     private String album;
 
-    private String username; // Bluetooth id of person who added song to
-                             // playlist
+    // macAddress of person who added song to playlist
+    private String macAddress; 
+    
+    public SongMetadata() {}
+
+    public SongMetadata(long aId, String aTitle, String aArtist, String aAlbum, String aMacAddress) {
+    	//be careful setting the song ID
+        this.id = aId;
+    	this.title = aTitle;
+    	this.artist = aArtist;
+    	this.album = aAlbum;
+    	this.macAddress = aMacAddress;
+    }
 
     public long getId() {
         return id;
@@ -45,12 +56,12 @@ public class SongMetadata {
         this.album = album;
     }
 
-    public String getUsername() {
-        return username;
+    public String getMacAddress() {
+        return macAddress;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
     }
 
 }

@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants" >
 
     <View
         android:id="@+id/user_color"
@@ -64,6 +65,6 @@
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:visibility="invisible"
+        android:contentDescription="@string/add_to_playlist"
         android:background="@color/transparent"/>
-
 </RelativeLayout>
