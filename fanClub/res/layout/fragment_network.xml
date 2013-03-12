@@ -7,8 +7,7 @@
         android:id="@+id/add_members"
         android:text="@string/add_members"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content"/>
    
     
     <TextView 
