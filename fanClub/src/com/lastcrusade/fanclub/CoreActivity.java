@@ -2,11 +2,11 @@ package com.lastcrusade.fanclub;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.fanclub.components.MenuFragment;
 import com.lastcrusade.fanclub.components.MusicLibraryFragment;
+import com.lastcrusade.fanclub.components.NetworkFragment;
 import com.lastcrusade.fanclub.components.PlaybarFragment;
 import com.lastcrusade.fanclub.components.PlaylistFragment;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
@@ -118,6 +118,9 @@ public class CoreActivity extends SlidingFragmentActivity{
         }
         else if(fragmentName.equals(getString(R.string.menu))){
             newFragment =  new MenuFragment();
+        }
+        else if(fragmentName.equals(getString(R.string.network))){
+            newFragment = new NetworkFragment();
         }
         
         return newFragment;

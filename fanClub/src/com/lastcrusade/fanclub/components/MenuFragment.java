@@ -26,16 +26,18 @@ public class MenuFragment extends SherlockListFragment implements ITitleable {
     //is not attached to something, so this this what it is going to be for now.
     private final String PLAYLIST = "Playlist";
     private final String MUSIC_LIBRARY = "Music Library";
+    private final String NETWORK = "Network";
     private final Map<String, Integer> DRAWER = new HashMap<String, Integer>(){
         {
             put(PLAYLIST, 0);
             put(MUSIC_LIBRARY,1);
+            put(NETWORK,2);
         }
     }; 
     
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        String[] options = new String[] {"Playlist", "Music Library"};
+        String[] options = new String[] {"Playlist", "Music Library", "Network"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1,android.R.id.text1, options);
         setListAdapter(adapter);
@@ -51,6 +53,9 @@ public class MenuFragment extends SherlockListFragment implements ITitleable {
         }
         else if(DRAWER.get(MUSIC_LIBRARY) == position){
             switchContent(MUSIC_LIBRARY);
+        }
+        else if(DRAWER.get(NETWORK)==position){
+            switchContent(NETWORK);
         }
     }
     
