@@ -21,5 +21,8 @@
     <string name="menu">Menu</string>
     <string name="add_to_playlist">Add To Playlist</string>
     <string name="song_item_division">-</string>
+    <string name="network">Network</string>
+    <string name="add_members">Add Members to Network</string>
+    <string name="cur_member_label">Currently Connected Members</string>
 
 </resources>

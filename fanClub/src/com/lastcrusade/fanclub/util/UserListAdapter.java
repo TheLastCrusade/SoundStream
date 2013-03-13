@@ -47,7 +47,7 @@ public class UserListAdapter extends BaseAdapter {
         }
         
         View userColor = (View) userView.findViewById(R.id.user_color); 
-        TextView username = (TextView)userView.findViewById(R.id.username);
+        TextView username = (TextView)userView.findViewById(R.id.bluetoothID);
 
         
         userColor.setBackgroundColor( ((User)getItem(position)).getColor() );
