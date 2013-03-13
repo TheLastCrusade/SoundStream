@@ -48,6 +48,7 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     public void play() {
         try {
+            //This will fail and throw and Exception if the filepath is bad
             new File((new File(this.filePath).getParentFile().list())[0])
                     .exists();
             if (player.isPlaying()) {
