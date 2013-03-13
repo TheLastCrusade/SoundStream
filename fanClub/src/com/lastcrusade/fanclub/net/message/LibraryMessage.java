@@ -10,7 +10,10 @@ import com.lastcrusade.fanclub.model.SongMetadata;
 
 public class LibraryMessage extends ADataMessage {
 	private final String TAG = LibraryMessage.class.getName();
-	private List<SongMetadata> library = new ArrayList<SongMetadata>();
+	//JR, 03/13/13, I know this should be List, but Android intents allow you to
+	// bundle an ArrayList of parcelables and that functionality doesnt extend
+	// to the interface.
+	private ArrayList<SongMetadata> library = new ArrayList<SongMetadata>();
 	
 	/**
 	 * Default constructor required for Messenger, use the other one though
@@ -47,7 +50,7 @@ public class LibraryMessage extends ADataMessage {
 		}
 	}
 
-	public List<SongMetadata> getLibrary() {
+	public ArrayList<SongMetadata> getLibrary() {
 		return library;
 	}
 }

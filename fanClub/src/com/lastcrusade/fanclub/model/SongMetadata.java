@@ -28,6 +28,7 @@ public class SongMetadata implements Parcelable {
     }
 
     public SongMetadata(Parcel in) {
+        this.id         = in.readLong();
         this.title      = in.readString();
         this.artist     = in.readString();
         this.album      = in.readString();
@@ -41,10 +42,35 @@ public class SongMetadata implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
         dest.writeString(this.title);
         dest.writeString(this.artist);
         dest.writeString(this.album);
         dest.writeString(this.macAddress);
+    }
+    
+    public static final Parcelable.Creator<SongMetadata> CREATOR = new Parcelable.Creator<SongMetadata>() {
+        public SongMetadata createFromParcel(Parcel in) {
+            SongMetadata sm = null;
+            try {
+                if (in != null) {
+                    sm = new SongMetadata(in);
+                }
+            }
+            catch (Exception e) {
+            }
+
+            return sm;
+        }
+
+        public SongMetadata[] newArray(int size) {
+            return new SongMetadata[size];
+        }
+    };
+
+    @Override
+    public String toString() {
+        return String.format("%s by %s on %s from %s", this.title, this.artist, this.album, this.macAddress);
     }
     
     public long getId() {

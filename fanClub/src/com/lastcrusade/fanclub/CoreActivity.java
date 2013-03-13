@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.lastcrusade.fanclub.components.ConnectFragment;
 import com.lastcrusade.fanclub.components.MenuFragment;
 import com.lastcrusade.fanclub.components.MusicLibraryFragment;
 import com.lastcrusade.fanclub.components.NetworkFragment;
@@ -17,6 +18,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class CoreActivity extends SlidingFragmentActivity{
     private Fragment activeContent;
     private Fragment menu;
+    private boolean connected = false;
         
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -70,8 +72,11 @@ public class CoreActivity extends SlidingFragmentActivity{
         }
         return false;
     }
-    
-    
+
+    //TODO: this may go away, once Elizabeth is done with the transition singleton class
+    public void onConnected() {
+        this.connected  = true;
+    }
 
     public void switchActiveContent(String fragmentName) {
         // switch out the content fragments
@@ -120,7 +125,12 @@ public class CoreActivity extends SlidingFragmentActivity{
             newFragment =  new MenuFragment();
         }
         else if(fragmentName.equals(getString(R.string.network))){
-            newFragment = new NetworkFragment();
+            //if we're not "connected", start on the connect fragment
+            if (!connected) {
+                newFragment = new ConnectFragment();
+            } else {
+                newFragment = new NetworkFragment();
+            }
         }
         
         return newFragment;

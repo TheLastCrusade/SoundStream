@@ -44,6 +44,8 @@ public class MusicLibraryService extends Service {
     
     private BroadcastRegistrar registrar;
 
+    private String myMacAddress;
+
     public class MusicLibraryServiceBinder extends Binder implements
         ILocalBinder<MusicLibraryService> {
         public MusicLibraryService getService() {
@@ -57,9 +59,9 @@ public class MusicLibraryService extends Service {
         //load the local songs and set the mac address, so the metadata objects
         // can live in the library
         List<SongMetadata> metadataList = (new MediaStoreWrapper(this)).list();
-        String macAddress = BluetoothUtils.getLocalBluetoothMAC();
+        this.myMacAddress = BluetoothUtils.getLocalBluetoothMAC();
         for (SongMetadata song : metadataList) {
-            song.setMacAddress(macAddress);
+            song.setMacAddress(this.myMacAddress);
         }
         
         //update the library with the local songs
@@ -70,9 +72,14 @@ public class MusicLibraryService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                try {
+                    List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                    updateLibrary(remoteMetas);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
             }
-        });
+        }).register(this);
     }
 
     @Override
@@ -86,6 +93,20 @@ public class MusicLibraryService extends Service {
         synchronized(metadataMutex) {
             //unmodifiable copy, for safety
             return Collections.unmodifiableList(new ArrayList<SongMetadata>(metadataList));
+        }
+    }
+
+    public List<SongMetadata> getMyLibrary() {
+        synchronized(metadataMutex) {
+            List<SongMetadata> myLibrary = new ArrayList<SongMetadata>();
+            //look thru the library, and pull out songs with "my" mac address
+            for (SongMetadata meta : metadataList) {
+                if (meta.getMacAddress().equals(this.myMacAddress)) {
+                    myLibrary.add(meta);
+                }
+            }
+            //unmodifiable copy, for safety
+            return Collections.unmodifiableList(myLibrary);
         }
     }
 

@@ -65,7 +65,7 @@ public class MusicListAdapter extends BaseAdapter {
         
         String macAddress = metadataList.get(position).getMacAddress();
         
-        userColor.setBackgroundColor(users.getUserByMACAddress(macAddress).getColor());
+//        userColor.setBackgroundColor(users.getUserByMACAddress(macAddress).getColor());
 
         ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
 
