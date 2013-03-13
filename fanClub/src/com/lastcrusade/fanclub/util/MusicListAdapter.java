@@ -3,6 +3,7 @@ package com.lastcrusade.fanclub.util;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,9 +63,7 @@ public class MusicListAdapter extends BaseAdapter {
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
 
-        
         String macAddress = metadataList.get(position).getMacAddress();
-        
         userColor.setBackgroundColor(users.getUserByMACAddress(macAddress).getColor());
 
         ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);

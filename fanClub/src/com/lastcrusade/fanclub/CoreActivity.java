@@ -17,6 +17,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 public class CoreActivity extends SlidingFragmentActivity{
     private Fragment activeContent;
     private Fragment menu;
+    private final String TAG = CoreActivity.class.getName();
         
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
