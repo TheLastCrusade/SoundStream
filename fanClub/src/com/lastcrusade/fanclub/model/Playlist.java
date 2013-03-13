@@ -7,92 +7,52 @@ import android.util.Log;
 
 public class Playlist {
     private final static String TAG = Playlist.class.getName();
-    private List<SongMetadata> unPlayed;
-    private List<SongMetadata> played;
+    private List<SongMetadata> musicList;
+    private int index;
 
     public Playlist() {
-        unPlayed = new ArrayList<SongMetadata>();
-        played = new ArrayList<SongMetadata>();
+        musicList = new ArrayList<SongMetadata>();
+        index = 0;
     }
 
-    public Playlist(SongMetadata meta) {
-        unPlayed = new ArrayList<SongMetadata>();
-        played = new ArrayList<SongMetadata>();
-        unPlayed.add(meta);
-    }
-    
-    public Playlist(List<SongMetadata> unPlayed, List<SongMetadata> played){
-        this.unPlayed = unPlayed;
-        this.played = played;
+    public Playlist(List<SongMetadata> aMusicList){
+        musicList = aMusicList;
+        index = 0;
     }
 
     public void add(SongMetadata meta) {
-        unPlayed.add(meta);
-    }
-
-    public void addToNext(SongMetadata meta) {
-        unPlayed.add(1, meta);
-    }
-
-    public SongMetadata remove(SongMetadata meta) {
-        SongMetadata removeMeta = null;
-        int index = unPlayed.indexOf(meta);
-        if (index >= 0) {
-            removeMeta = unPlayed.remove(index);
-        }
-        return removeMeta;
+        musicList.add(meta);
     }
 
     public SongMetadata remove(int index) {
         SongMetadata removeMeta = null;
         if (index >= 0) {
-            removeMeta = unPlayed.remove(index);
+            removeMeta = musicList.remove(index);
         }
         return removeMeta;
     }
 
-    public List<SongMetadata> getUnPlayedList() {
-        return unPlayed;
-    }
-    
-    public List<SongMetadata> getPlayedList(){
-        return played;
+    public List<SongMetadata> getSongsToPlay(){
+        return musicList;
     }
 
-    public void setUnPlayedList(List<SongMetadata> list) {
-        this.unPlayed = list;
-    }
-    
-    public void setPlaylist(List<SongMetadata> unPlayed, List<SongMetadata> played){
-        this.unPlayed = unPlayed;
-        this.played = played;
-    }
-    
     public int size(){
-        return unPlayed.size();
+        return musicList.size();
     }
-    
-    public SongMetadata getHead(){
-        if(unPlayed.size() > 0){
-            return unPlayed.get(0);
-        } else {
-            return null;
-        }
+
+    public int getIndex(){
+        return index;
+    }
+
+    public SongMetadata getNextSong(){
+        index = index % musicList.size();
+        return musicList.get(index);
     }
 
     /**
      * Call this method to progress the playlist
-     * @return new top of unplayed list
      */
     public void moveNext(){
-        if(unPlayed.size() > 0){
-            //Add top of the unPlayed list to played list
-            played.add(unPlayed.get(0));
-            //Remove the top of unplayed list
-            unPlayed.remove(0);
-        } else {
-            //TODO in playlist refactor make this loop
-            Log.i(TAG, "Cannot moveNext out of songs");
-        }
+            index++;
     }
 }
