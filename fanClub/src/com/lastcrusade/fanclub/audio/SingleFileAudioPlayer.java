@@ -3,8 +3,10 @@ package com.lastcrusade.fanclub.audio;
 import java.io.File;
 
 import com.lastcrusade.fanclub.service.MessagingService;
+import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.util.BroadcastIntent;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
@@ -25,9 +27,14 @@ public class SingleFileAudioPlayer implements IPlayer {
     private String filePath;
     private MediaPlayer player;
 
-    public SingleFileAudioPlayer(OnCompletionListener onCompletion) {
+    public SingleFileAudioPlayer(final Context context) {
         this.player = new MediaPlayer();
-        player.setOnCompletionListener(onCompletion);
+        player.setOnCompletionListener(
+                new OnCompletionListener(){
+                    @Override public void onCompletion(MediaPlayer mp) {
+                        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(context);
+                    }
+        });
     }
 
     public void setSongByPath(String filePath) {

@@ -3,7 +3,10 @@ package com.lastcrusade.fanclub.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
 public class Playlist {
+    private final static String TAG = Playlist.class.getName();
     private List<SongMetadata> unPlayed;
     private List<SongMetadata> played;
 
@@ -81,18 +84,15 @@ public class Playlist {
      * Call this method to progress the playlist
      * @return new top of unplayed list
      */
-    public SongMetadata moveNext(){
+    public void moveNext(){
         if(unPlayed.size() > 0){
             //Add top of the unPlayed list to played list
             played.add(unPlayed.get(0));
             //Remove the top of unplayed list
             unPlayed.remove(0);
-        }
-        if(unPlayed.size() > 0){
-            //return the new top of the unplayed list
-            return unPlayed.get(0);
         } else {
-            return null;
+            //TODO in playlist refactor make this loop
+            Log.i(TAG, "Cannot moveNext out of songs");
         }
     }
 }

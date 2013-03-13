@@ -70,12 +70,7 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public IBinder onBind(Intent intent) {
-        this.audioPlayer = new SingleFileAudioPlayer(
-                new OnCompletionListener(){
-                    @Override public void onCompletion(MediaPlayer mp) {
-                        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(PlaylistService.this);
-                    }
-        });
+        this.audioPlayer = new SingleFileAudioPlayer(this);
 
         this.mPlaylist = new Playlist();
         // TODO: kick off a thread to feed the monster that is the audio service
