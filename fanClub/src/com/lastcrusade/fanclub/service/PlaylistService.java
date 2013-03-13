@@ -23,7 +23,8 @@ import com.lastcrusade.fanclub.util.Toaster;
 import com.lastcrusade.fanclub.R;
 
 /**
- * This service is responsible for holding the play queue
+ * This service is responsible for holding the play queue and sending songs to
+ * the SingleFileAudioPlayer
  */
 public class PlaylistService extends Service implements IPlayer {
 
