@@ -255,6 +255,27 @@ public class MessagingService extends Service implements IMessagingService {
         sendMessageToHost(msg);
     }
 
+    @Override
+    public void sendPauseMessage() {
+        PauseMessage msg = new PauseMessage();
+        //send the message to the host
+        sendMessageToHost(msg);
+    }
+
+    @Override
+    public void sendPlayMessage() {
+        PlayMessage msg = new PlayMessage();
+        //send the message to the host
+        sendMessageToHost(msg);
+    }
+
+    @Override
+    public void sendSkipMessage() {
+        SkipMessage msg = new SkipMessage();
+        //send the message to the host
+        sendMessageToHost(msg);
+    }
+
     public void sendStringMessage(String message) {
         StringMessage sm = new StringMessage();
         sm.setString(message);

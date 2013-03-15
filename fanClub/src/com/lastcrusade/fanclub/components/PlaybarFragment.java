@@ -107,13 +107,29 @@ public class PlaybarFragment extends Fragment {
      */
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
-            
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                setPlayImage();
-            }
-        }).register(this.getActivity());
+        this.registrar
+            .addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    setPlayImage();
+                }
+            })
+            .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    setPauseImage();
+                }
+            })
+            .addAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    setPlayImage();
+                }
+            })
+            .register(this.getActivity());
     }
 
     private void unregisterReceivers() {
