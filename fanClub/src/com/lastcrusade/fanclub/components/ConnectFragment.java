@@ -25,12 +25,14 @@ import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.fanclub.util.ITitleable;
+import com.lastcrusade.fanclub.util.Transitions;
 
 /*
  * This fragment should be what is first presented to the user when
  * they enter the app and are not connected to any network
  */
-public class ConnectFragment extends SherlockFragment {
+public class ConnectFragment extends SherlockFragment implements ITitleable{
     
     private static final String TAG = ConnectFragment.class.getName();
 
@@ -58,7 +60,7 @@ public class ConnectFragment extends SherlockFragment {
             public void onClick(View v) {
                 //TODO: these will go away once Elizabeth completes her transition singleton
                 ((CoreActivity)getActivity()).onConnected();
-                ((CoreActivity)getActivity()).switchActiveContent(getString(R.string.playlist));
+                Transitions.transitionToHome((CoreActivity)getActivity());
             }
         });
         
@@ -112,7 +114,7 @@ public class ConnectFragment extends SherlockFragment {
                         }
                         ((CoreActivity)getActivity()).onConnected();
                         //switch 
-                        ((CoreActivity)getActivity()).switchActiveContent(getString(R.string.playlist));
+                        Transitions.transitionToHome((CoreActivity)getActivity());
                     }
                 })
             .register(this.getActivity());
@@ -120,5 +122,10 @@ public class ConnectFragment extends SherlockFragment {
 
     private void unregisterReceivers() {
         this.broadcastRegistrar.unregister();
+    }
+
+    @Override
+    public int getTitle() {
+        return R.string.connect;
     }
 }
