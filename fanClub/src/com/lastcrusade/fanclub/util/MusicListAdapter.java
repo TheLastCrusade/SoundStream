@@ -64,7 +64,6 @@ public class MusicListAdapter extends BaseAdapter {
         TextView artist = (TextView) element.findViewById(R.id.artist);
         TextView album = (TextView) element.findViewById(R.id.album);
 
-        
         String macAddress = metadataList.get(position).getMacAddress();
         
         User user = users.getUserByMACAddress(macAddress);

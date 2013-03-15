@@ -9,31 +9,31 @@ import android.telephony.TelephonyManager;
 
 import com.lastcrusade.fanclub.audio.IPlayer;
 import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
+import com.lastcrusade.fanclub.library.MediaStoreWrapper;
+import com.lastcrusade.fanclub.library.SongNotFoundException;
 import com.lastcrusade.fanclub.model.Playlist;
+import com.lastcrusade.fanclub.model.Song;
 import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.fanclub.util.Toaster;
+import com.lastcrusade.fanclub.R;
 
 /**
- * This service is responsible for holding the play queue, and feeding songs to
- * the Audio player service.
- * 
- * @author Jesse Rosalia
- * 
+ * This service is responsible for holding the play queue and sending songs to
+ * the SingleFileAudioPlayer
  */
 public class PlaylistService extends Service implements IPlayer {
 
     /**
      * Broadcast action sent when the Audio Player service is paused.
-     * 
      */
     public static final String ACTION_PAUSED_AUDIO = PlaylistService.class
             .getName() + ".action.PausedAudio";
 
     /**
      * Broadcast action sent when the Audio Player service starts playing.
-     * 
      */
     public static final String ACTION_PLAYING_AUDIO = PlaylistService.class
             .getName() + ".action.PlayingAudio";
@@ -41,7 +41,6 @@ public class PlaylistService extends Service implements IPlayer {
     /**
      * Broadcast action sent when the Audio Player service is asked to skip a
      * song.
-     * 
      */
     public static final String ACTION_SKIPPING_AUDIO = PlaylistService.class
             .getName() + ".action.SkippingAudio";
@@ -52,8 +51,6 @@ public class PlaylistService extends Service implements IPlayer {
     public static final String ACTION_PLAYLIST_UPDATED = PlaylistService.class + ".action.PlaylistUpdated";
 
     private static final String TAG = PlaylistService.class.getName();
-
-    private Playlist playlist = new Playlist();
 
     /**
      * Class for clients to access. Because we know this service always runs in
@@ -68,19 +65,21 @@ public class PlaylistService extends Service implements IPlayer {
 
     private BroadcastRegistrar    registrar;
     private SingleFileAudioPlayer audioPlayer;
+    private Playlist mPlaylist;
 
     @Override
     public IBinder onBind(Intent intent) {
-        this.audioPlayer = new SingleFileAudioPlayer();
+        this.audioPlayer = new SingleFileAudioPlayer(this);
+
+        this.mPlaylist = new Playlist();
         // TODO: kick off a thread to feed the monster that is the audio service
-        // TODO: registerReceivers, if this is where we want it
+        registerReceivers();
         return new PlaylistServiceBinder();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        
-        // TODO: unregisterReceivers, if this is where we want it
+        unregisterReceivers();
         return super.onUnbind(intent);
     }
 
@@ -101,6 +100,15 @@ public class PlaylistService extends Service implements IPlayer {
                 }
             }
         }).register(this);
+
+        this.registrar.addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                mPlaylist.moveNext();
+                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+            }
+        }).register(this);
     }
 
     private void unregisterReceivers() {
@@ -114,8 +122,13 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public void play() {
-        this.audioPlayer.play();
-        new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
+        if(mPlaylist.size() > 0){
+            setSong(mPlaylist.getNextSong());
+            this.audioPlayer.play();
+            new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
+        } else {
+            Toaster.iToast(this, getString(R.string.playlist_empty));
+        }
     }
 
     @Override
@@ -128,18 +141,25 @@ public class PlaylistService extends Service implements IPlayer {
     public void skip() {
         this.audioPlayer.skip();
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
+        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
     }
 
-    public void setSongByPath(String filePath) {
-        this.audioPlayer.setSongByPath(filePath);
+    private void setSong(SongMetadata songData) {
+        MediaStoreWrapper msw = new  MediaStoreWrapper(this);
+        try {
+            Song s = msw.loadSongData(songData);
+            this.audioPlayer.setSongByPath(s.getFilePath());
+        } catch (SongNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addSong(SongMetadata metadata) {
-        playlist.add(metadata);
+        mPlaylist.add(metadata);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
     public Playlist getPlaylist() {
-        return playlist;
+        return mPlaylist;
     }
 }

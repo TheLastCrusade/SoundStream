@@ -16,6 +16,8 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity{
+    private final String TAG = CoreActivity.class.getName();
+
     private Fragment activeContent;
     private Fragment menu;
     private boolean connected = false;

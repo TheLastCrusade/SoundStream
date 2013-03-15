@@ -1,6 +1,7 @@
 package com.lastcrusade.fanclub.components;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.Playlist;
 import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.model.UserList;
 import com.lastcrusade.fanclub.service.PlaylistService;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
@@ -26,26 +28,28 @@ public class PlaylistFragment extends MusicListFragment{
     private final String TAG = PlaylistFragment.class.getName();
 
     private BroadcastRegistrar registrar;
-    private Playlist metadataList;
+    private Playlist mPlaylist;
 
     private ServiceLocator<PlaylistService> playlistServiceServiceLocator;
+
+    private PlayListAdapter mPlayListAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
-        setListAdapter(new MusicListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList()));
-
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
+        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
+        mPlayListAdapter = new PlayListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList());
+        setListAdapter(mPlayListAdapter);
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                metadataList = getPlaylistService().getPlaylist();
-                setListAdapter(new MusicListAdapter(PlaylistFragment.this.getActivity(), metadataList.getList(), curApp.getUserList()));
+                mPlaylist = getPlaylistService().getPlaylist();
+                mPlayListAdapter.updateMusic(mPlaylist);
             }
         });
 
@@ -82,8 +86,7 @@ public class PlaylistFragment extends MusicListFragment{
         this.registrar.addAction(PlaylistService.ACTION_PLAYLIST_UPDATED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                Log.i(PlaylistFragment.class.getName(), "action playlist updated");
-                setListAdapter(new MusicListAdapter(context, getPlaylist().getList(), null));
+                mPlayListAdapter.updateMusic(mPlaylist);
             }
         }).register(this.getActivity());
     }
@@ -100,7 +103,6 @@ public class PlaylistFragment extends MusicListFragment{
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
-
         return playlist;
     }
 
@@ -114,4 +116,31 @@ public class PlaylistFragment extends MusicListFragment{
         }
         return playlistService;
     }
+
+    private class PlayListAdapter extends MusicListAdapter {
+        public PlayListAdapter(
+                Context mContext,
+                List<SongMetadata> metadataList,
+                UserList users
+                ) {
+            super(mContext, metadataList, users);
+        }
+
+        public void updateMusic(Playlist musicList){
+            super.updateMusic(musicList.getSongsToPlay());
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View element = super.getView(position, convertView, parent);
+            //This depends on played music being above unplayed music
+            if(position < mPlaylist.getIndex()){
+                element.setBackgroundColor(getResources().getColor(R.color.used));
+            } else {
+                element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
+            }
+            return element;
+        }
+    }
+
 }

@@ -3,48 +3,56 @@ package com.lastcrusade.fanclub.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
 public class Playlist {
-    private List<SongMetadata> list;
+    private final static String TAG = Playlist.class.getName();
+    private List<SongMetadata> musicList;
+    private int index;
 
     public Playlist() {
-        list = new ArrayList<SongMetadata>();
+        musicList = new ArrayList<SongMetadata>();
+        index = 0;
     }
 
-    public Playlist(SongMetadata meta) {
-        list = new ArrayList<SongMetadata>();
-        list.add(meta);
+    public Playlist(List<SongMetadata> aMusicList){
+        musicList = aMusicList;
+        index = 0;
     }
 
     public void add(SongMetadata meta) {
-        list.add(meta);
-    }
-
-    public void addToNext(SongMetadata meta) {
-        list.add(1, meta);
-    }
-
-    public SongMetadata remove(SongMetadata meta) {
-        SongMetadata removeMeta = null;
-        int index = list.indexOf(meta);
-        if (index >= 0) {
-            removeMeta = list.remove(index);
-        }
-        return removeMeta;
+        musicList.add(meta);
     }
 
     public SongMetadata remove(int index) {
         SongMetadata removeMeta = null;
         if (index >= 0) {
-            removeMeta = list.remove(index);
+            removeMeta = musicList.remove(index);
         }
         return removeMeta;
     }
 
-    public List<SongMetadata> getList() {
-        return list;
+    public List<SongMetadata> getSongsToPlay(){
+        return musicList;
     }
 
-    public void setList(List<SongMetadata> list) {
-        this.list = list;
+    public int size(){
+        return musicList.size();
+    }
+
+    public int getIndex(){
+        return index;
+    }
+
+    public SongMetadata getNextSong(){
+        index = index % musicList.size();
+        return musicList.get(index);
+    }
+
+    /**
+     * Call this method to progress the playlist
+     */
+    public void moveNext(){
+            index++;
     }
 }
