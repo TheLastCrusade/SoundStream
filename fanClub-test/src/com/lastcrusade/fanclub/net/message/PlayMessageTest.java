@@ -9,6 +9,8 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.PlayMessage;
+
 public class PlayMessageTest extends SerializationTest<PlayMessage> {
     
     @Test

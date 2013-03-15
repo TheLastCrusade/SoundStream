@@ -7,9 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lastcrusade.fanclub.model.SongMetadata;
-import com.lastcrusade.fanclub.util.BroadcastRegistrar;
-import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
 

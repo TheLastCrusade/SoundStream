@@ -21,6 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        class="com.lastcrusade.fanclub.components.PlaybarFragment" />
+        class="com.lastcrusade.soundstream.components.PlaybarFragment" />
 
 </LinearLayout>

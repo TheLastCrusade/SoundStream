@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.lastcrusade.fanclub.model.SongMetadata;
-import com.lastcrusade.fanclub.net.message.LibraryMessage;
+import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.net.message.LibraryMessage;
 
 public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	

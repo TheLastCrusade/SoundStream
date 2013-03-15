@@ -6,12 +6,13 @@ import android.os.Handler;
 import android.test.ServiceTestCase;
 import android.util.Log;
 
-import com.lastcrusade.fanclub.net.message.IMessage;
-import com.lastcrusade.fanclub.net.message.PauseMessage;
-import com.lastcrusade.fanclub.net.message.PlayMessage;
-import com.lastcrusade.fanclub.net.message.SkipMessage;
-import com.lastcrusade.fanclub.util.BroadcastRegistrar;
-import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.net.message.IMessage;
+import com.lastcrusade.soundstream.net.message.PauseMessage;
+import com.lastcrusade.soundstream.net.message.PlayMessage;
+import com.lastcrusade.soundstream.net.message.SkipMessage;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class MessagingServiceTest extends ServiceTestCase {
 

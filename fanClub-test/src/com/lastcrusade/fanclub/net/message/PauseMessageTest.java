@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.PauseMessage;
+
 public class PauseMessageTest extends SerializationTest<PauseMessage> {
     
     @Test

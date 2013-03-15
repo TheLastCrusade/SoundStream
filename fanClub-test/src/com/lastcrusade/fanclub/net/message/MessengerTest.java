@@ -12,6 +12,10 @@ import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.IMessage;
+import com.lastcrusade.soundstream.net.message.Messenger;
+import com.lastcrusade.soundstream.net.message.StringMessage;
+
 /**
  * Doesn't inherit from SerializationTest and is separate from its generalized
  * test structure. Meaning, the code repetition between this class and

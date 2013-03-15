@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
+
 public class ConnectFansMessageTest extends SerializationTest<ConnectFansMessage> {
 
     @Test

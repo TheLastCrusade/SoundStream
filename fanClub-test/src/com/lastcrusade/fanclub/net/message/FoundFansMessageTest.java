@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.FoundFan;
+import com.lastcrusade.soundstream.net.message.FoundFansMessage;
+
 public class FoundFansMessageTest extends SerializationTest<FoundFansMessage> {
 
     @Test

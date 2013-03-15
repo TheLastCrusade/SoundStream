@@ -12,6 +12,9 @@ import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.IMessage;
+import com.lastcrusade.soundstream.net.message.Messenger;
+
 public class SerializationTest<T extends IMessage> {
     
     public T testSerializeMessage(T message) throws IOException {

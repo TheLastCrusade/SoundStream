@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.message.FindNewFansMessage;
+
 public class FindNewFansMessageTest extends SerializationTest<FindNewFansMessage> {
 
     @Test

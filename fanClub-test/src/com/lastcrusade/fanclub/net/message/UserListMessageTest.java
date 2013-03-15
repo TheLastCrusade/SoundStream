@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.lastcrusade.fanclub.model.UserList;
-import com.lastcrusade.fanclub.net.message.UserListMessage;
+import com.lastcrusade.soundstream.model.UserList;
+import com.lastcrusade.soundstream.net.message.UserListMessage;
 
 public class UserListMessageTest extends SerializationTest<UserListMessage> {
 		
