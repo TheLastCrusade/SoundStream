@@ -15,10 +15,14 @@ public class UserListAdapter extends BaseAdapter {
 
     private Context mContext;
     private UserList users;
+    //variable to keep track of whether the list is displaying on the
+    //menu or not - if it is, the text color changes
+    private boolean isOnMenu;
     
-    public UserListAdapter(Context mContext, UserList users){
+    public UserListAdapter(Context mContext, UserList users, boolean isOnMenu){
         this.users = users;
         this.mContext = mContext;
+        this.isOnMenu = isOnMenu;
     }
     
     @Override
@@ -51,6 +55,10 @@ public class UserListAdapter extends BaseAdapter {
 
         
         userColor.setBackgroundColor( ((User)getItem(position)).getColor() );
+        
+        if(isOnMenu){
+            username.setTextColor(mContext.getResources().getColor(R.color.white));
+        }
         username.setText(((User)getItem(position)).getBluetoothID());
 
         

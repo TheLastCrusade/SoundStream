@@ -52,7 +52,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             boundToService = true;
             
             //update displayed music
-            musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
+            updateMusicList();
         }
 
         @Override
@@ -61,6 +61,14 @@ public class MusicLibraryFragment extends MusicListFragment {
         }
     };
 
+
+    /**
+     * 
+     */
+    private void updateMusicList() {
+        //TODO: unsure whether we should do this adapting here, in the library, or in the adapter
+        musicListAdapter.updateMusic(new ArrayList<SongMetadata>(mMusicLibraryService.getLibrary()));
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -96,8 +104,8 @@ public class MusicLibraryFragment extends MusicListFragment {
     }
 
     @Override
-    public String getTitle() {
-        return getString(R.string.music_library);
+    public int getTitle() {
+        return R.string.music_library;
     }
     
     /**
@@ -111,8 +119,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-               musicListAdapter.updateMusic(mMusicLibraryService.getLibrary());
-
+                updateMusicList();
             }
         }).register(this.getActivity());
     }
@@ -133,6 +140,10 @@ public class MusicLibraryFragment extends MusicListFragment {
         return playlistService;
     }
 
+    /**
+     * Inner class extends MusicListAdapter to add the add to playlist image button, and click listener
+     * 
+     */
     private class MusicAdapter extends MusicListAdapter {
         public MusicAdapter(
                 Context mContext,
@@ -150,7 +161,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SongMetadata meta = mMusicLibraryService.getLibrary().get((Integer) v.getTag());
+                    SongMetadata meta = getItem((Integer) v.getTag()); //mMusicLibraryService.getLibrary().get((Integer) v.getTag());
                     getPlaylistService().addSong(meta);
                 }
             });
