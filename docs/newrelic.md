@@ -9,7 +9,7 @@ This changes our deployment process from eclipse's build and run to an Ant build
 
    You can check by typing `export` in your terminal and looking for `ANDROID_HOME`. If it is not you can set it by adding the following line to your .bash_profile.
    `export ANDROID_HOME=<YOUR FILE PATH>`
-4. Set and environment variable for new relic in your bash profile
+4. Set an environment variable for new relic in your bash profile
    `export NEWRELIC_HOME=<YOUR FILE PATH>`
 5. After you are all setup you can build and install to your connect phone or emulator with `$NEWRELIC_HOME/bin/nrandroid-ant clean debug install`
 
