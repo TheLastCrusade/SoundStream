@@ -103,7 +103,6 @@ public class NetworkFragment extends SherlockFragment {
         //TODO: this should probably use FoundFan, to decouple this code from the bluetooth code
         List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES);
         
-//            Toaster.iToast(this, R.string.found_fans);
         new MultiSelectListDialog<BluetoothDevice>(this.getActivity(),
                 R.string.select_fans, R.string.connect)
                 .setItems(devices)
