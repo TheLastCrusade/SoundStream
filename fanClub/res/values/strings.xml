@@ -9,20 +9,34 @@
     <string name="title_activity_host">HostActivity</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
-    <string name="playlist">Playlist</string>
+    
     <string name="enable_bluetooth">Enabling Bluetooth...</string>
     <string name="finding_new_fans">Finding new fans...</string>
     <string name="found_fans">Found fans</string>
     <string name="now_playing">Now Playing</string>
-    <string name="music_library">Music Library</string>
+   
     <string name="select_fans">Select fans...</string>
-    <string name="connect">Connect</string>
+    
     <string name="no_fans_found">No fans found</string>    
     <string name="menu">Menu</string>
     <string name="add_to_playlist">Add To Playlist</string>
     <string name="song_item_division">-</string>
-    <string name="network">Network</string>
+    
+    
+    
+    <!-- button labels -->
     <string name="add_members">Add Members to Network</string>
+    <string name="connect">Connect</string>
+    
+    <!-- text labels -->
     <string name="cur_member_label">Currently Connected Members</string>
+    <string name="music_label">Music</string>
+    <string name="network_label">Network</string>
 
+    
+    <!--  fragment titles -->
+	<string name="network">Network</string>
+	<string name="music_library">Music Library</string>
+	<string name="playlist">Playlist</string>
+	
 </resources>

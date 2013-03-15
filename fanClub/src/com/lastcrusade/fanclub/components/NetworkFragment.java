@@ -42,7 +42,7 @@ public class NetworkFragment extends SherlockFragment {
         
         ListView users = (ListView)v.findViewById(R.id.connected_users);
         
-        users.setAdapter(new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList() ));
+        users.setAdapter(new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList(), false ));
         
         
         return v;
