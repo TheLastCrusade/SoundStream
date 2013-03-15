@@ -16,6 +16,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.fanclub.CustomApp;
 import com.lastcrusade.fanclub.R;
+import com.lastcrusade.fanclub.model.UserList;
 import com.lastcrusade.fanclub.net.BluetoothDeviceDialogFormatter;
 import com.lastcrusade.fanclub.service.ConnectionService;
 import com.lastcrusade.fanclub.service.MessagingService;
@@ -29,6 +30,7 @@ import com.lastcrusade.fanclub.util.UserListAdapter;
 public class NetworkFragment extends SherlockFragment {
     private BroadcastRegistrar broadcastRegistrar;
     private Button addMembersButton;
+    private UserListAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,8 @@ public class NetworkFragment extends SherlockFragment {
         
         ListView users = (ListView)v.findViewById(R.id.connected_users);
         
-        users.setAdapter(new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList() ));
+        this.adapter = new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList() );
+        users.setAdapter(this.adapter);
         return v;
     }
     
@@ -80,6 +83,13 @@ public class NetworkFragment extends SherlockFragment {
                         addMembersButton.setEnabled(true);
                     }
                 })
+            .addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    adapter.notifyDataSetChanged();
+                }
+            })
             .register(this.getActivity());
     }
 

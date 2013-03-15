@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.lastcrusade.fanclub.net.message.ConnectedMessage;
-import com.lastcrusade.fanclub.net.message.DisconnectedMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
 import com.lastcrusade.fanclub.net.message.Messenger;
 
@@ -22,9 +20,10 @@ import com.lastcrusade.fanclub.net.message.Messenger;
  * @author Jesse Rosalia
  *
  */
-public class MessageThread extends Thread {
+public abstract class MessageThread extends Thread {
     private final String TAG = MessageThread.class.getName();
     public static final int MESSAGE_READ = 1;
+
     public static final String EXTRA_ADDRESS = MessageThread.class.getName() + ".extra.Address";
 
     private final BluetoothSocket mmSocket;
@@ -70,11 +69,6 @@ public class MessageThread extends Thread {
     public void run() {
         // Keep listening to the InputStream until an exception occurs
         BluetoothDevice remoteDevice = mmSocket.getRemoteDevice();
-        //NOTE: this uses network messages to signal connected and disconnected.  This is
-        // a little funky, but it makes use of an existing mechanism and gets us what we want
-        //...if we can think of a better way, or if this expands beyond connect and
-        // disconnect, we will want to change this -- JR, 03/13/13.
-        sendMessageToHandler(new ConnectedMessage(), remoteDevice.getAddress());
         while (true) { //TODO: need way to kill this thread normally
             try {
                 //attempt to deserialize from the socket input stream
@@ -95,6 +89,8 @@ public class MessageThread extends Thread {
         cancel();
     }
  
+    public abstract void onDisconnected();
+
     /**
      * Send the network message to the appropriate handler.
      * 
@@ -129,7 +125,7 @@ public class MessageThread extends Thread {
             
         } finally {
             //before we exit, notify the launcher thread that the connection is dead
-            sendMessageToHandler(new DisconnectedMessage(), mmSocket.getRemoteDevice().getAddress());
+            onDisconnected();
         }
     }
 }

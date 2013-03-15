@@ -73,7 +73,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         SongMetadata meta = new SongMetadata(1,
                 "Bridge over troubled waters", "The Tacoma Narrows",
                 "Shake Rattle and Roll", "00:11:22:33:44:55");
-        service.updateLibrary(Arrays.asList(meta));
+        service.updateLibrary(Arrays.asList(meta), true);
         List<SongMetadata> library = service.getLibrary();
 
         // list should be unmodifiable
@@ -103,7 +103,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             SongMetadata meta = new SongMetadata(1,
                     "Bridge over troubled waters", "The Tacoma Narrows",
                     "Shake Rattle and Roll", "00:11:22:33:44:55");
-            service.updateLibrary(Arrays.asList(meta));
+            service.updateLibrary(Arrays.asList(meta), true);
             List<SongMetadata> library = service.getLibrary();
             assertEquals(1, library.size());
             assertSongMetaEquals(meta, library.get(0));
@@ -114,7 +114,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             SongMetadata meta3 = new SongMetadata(2, "Crosstown",
                     "Booklyn Bombs", "NYC, The place to be",
                     "00:11:22:33:44:56");
-            service.updateLibrary(Arrays.asList(meta2, meta3));
+            service.updateLibrary(Arrays.asList(meta2, meta3), true);
             library = service.getLibrary();
             assertEquals(3, library.size());
             // check the individual items (in the order they were added)
@@ -151,7 +151,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             SongMetadata meta = new SongMetadata(1,
                     "Bridge over troubled waters", "The Tacoma Narrows",
                     "Shake Rattle and Roll", "00:11:22:33:44:55");
-            service.updateLibrary(Arrays.asList(meta));
+            service.updateLibrary(Arrays.asList(meta), true);
             List<SongMetadata> library = service.getLibrary();
             assertEquals(1, library.size());
             assertSongMetaEquals(meta, library.get(0));
@@ -160,11 +160,51 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             // replace the Bridge over troubled waters metadata.
             SongMetadata meta2 = new SongMetadata(1, "Frisky Frisco",
                     "The Golden Gates", "California", "00:11:22:33:44:55");
-            service.updateLibrary(Arrays.asList(meta2));
+            service.updateLibrary(Arrays.asList(meta2), true);
             library = service.getLibrary();
             assertEquals(1, library.size());
             // check the individual items
             assertSongMetaEquals(meta2, library.get(0));
+
+            // this should have been called 2 times (one for each call to
+            // updateLibrary.
+            assertEquals(2, handler.getReceiveActionCalled());
+        } finally {
+            registrar.unregister();
+        }
+    }
+
+    /**
+     * Test what happens when we update an existing song.
+     * 
+     * We expect the library not to grow, and the old data to be replaced.
+     * 
+     */
+    public void testRemoveLibraryForAddress() {
+        MusicLibraryService service = getTheService();
+        BroadcastRegistrar registrar = new BroadcastRegistrar();
+        try {
+            TestHandler handler = new TestHandler();
+            registrar.addAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
+                    handler).register(service);
+
+            // add one song, make sure we have 1 good item
+            SongMetadata meta = new SongMetadata(1,
+                    "Bridge over troubled waters", "The Tacoma Narrows",
+                    "Shake Rattle and Roll", "00:11:22:33:44:55");
+            // add a metadata with the same id and mac address...this should
+            // replace the Bridge over troubled waters metadata.
+            SongMetadata meta2 = new SongMetadata(2, "Frisky Frisco",
+                    "The Golden Gates", "California", "00:11:22:33:44:55");
+            service.updateLibrary(Arrays.asList(meta, meta2), true);
+            List<SongMetadata> library = service.getLibrary();
+            assertEquals(1, library.size());
+            assertSongMetaEquals(meta,  library.get(0));
+            assertSongMetaEquals(meta2, library.get(1));
+
+            service.removeLibraryForAddress("00:11:22:33:44:55", true);
+            library = service.getLibrary();
+            assertEquals(0, library.size());
 
             // this should have been called 2 times (one for each call to
             // updateLibrary.

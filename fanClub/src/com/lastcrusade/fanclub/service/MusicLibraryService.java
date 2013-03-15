@@ -34,7 +34,7 @@ public class MusicLibraryService extends Service {
      * This lets us maintain the order in which things are added, but also allows
      * us to quickly account for duplicates/replace with updated data.
      * 
-     * This is also the solution to a common interview quesiton :-)
+     * This is also the solution to a common interview question :-)
      * 
      */
     private Map<String, Integer> metadataMap  = new HashMap<String, Integer>();
@@ -65,21 +65,15 @@ public class MusicLibraryService extends Service {
         }
         
         //update the library with the local songs
-        updateLibrary(metadataList);
+        updateLibrary(metadataList, true);
 
-        this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(MessagingService.ACTION_LIBRARY_MESSAGE, new IBroadcastActionHandler() {
-            
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                try {
-                    List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
-                    updateLibrary(remoteMetas);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-            }
-        }).register(this);
+        registerReceivers();
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceivers();
+        super.onDestroy();
     }
 
     @Override
@@ -87,6 +81,39 @@ public class MusicLibraryService extends Service {
         return new MusicLibraryServiceBinder();
     }
     
+    /**
+     * 
+     */
+    private void registerReceivers() {
+        this.registrar = new BroadcastRegistrar();
+        this.registrar
+            .addAction(MessagingService.ACTION_LIBRARY_MESSAGE, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    try {
+                        List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                        updateLibrary(remoteMetas, true);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+            })
+            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    removeLibraryForAddress(macAddress, true);
+                }
+                
+            })
+            .register(this);
+    }
+
+    private void unregisterReceivers() {
+        this.registrar.unregister();
+    }
     /** Methods for clients */
 
     public List<SongMetadata> getLibrary() {
@@ -110,7 +137,16 @@ public class MusicLibraryService extends Service {
         }
     }
 
-    public void updateLibrary(Collection<SongMetadata> additionalSongs) {
+    /**
+     * Update the library with the additional songs passed in.
+     * 
+     * NOTE: This should not be called by an outside user.  It is package protected to allow us to unit test
+     * it, but generally speaking, the library gets updated from network messages and the onCreate method.
+     * 
+     * @param additionalSongs
+     * @param notify
+     */
+    void updateLibrary(Collection<SongMetadata> additionalSongs, boolean notify) {
         synchronized(metadataMutex) {
             for (SongMetadata song : additionalSongs) {
                 String key = createSongKey(song);
@@ -125,7 +161,41 @@ public class MusicLibraryService extends Service {
                 }
             }
         }
-        new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        if (notify) {
+            new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        }
+    }
+
+    /**
+     * Remove all songs that belong to the specified mac address.
+     * 
+     * NOTE: This should not be called by an outside user.  It is package protected to allow us to unit test
+     * it, but generally speaking, the library gets updated from network messages and the onCreate method.
+     * 
+     * @param additionalSongs
+     * @param notify
+     */
+    void removeLibraryForAddress(String macAddress, boolean notify) {
+        synchronized(metadataMutex) {
+            //remove the songs for the specified address by assembling a new list
+            // and map with all songs except those for that address
+            List<SongMetadata>   newList = new ArrayList<SongMetadata>();
+            Map<String, Integer> newMap  = new HashMap<String, Integer>();
+            for (SongMetadata song : metadataList) {
+                if (!song.getMacAddress().equals(macAddress)) {
+                    int nextInx = newList.size();
+                    newList.add(song);
+                    String key = createSongKey(song);
+                    newMap.put(key, nextInx);
+                }
+            }
+            //replace THE list and map with the new structures
+            metadataList = newList;
+            metadataMap = newMap;
+        }
+        if (notify) {
+            new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        }
     }
 
     /**

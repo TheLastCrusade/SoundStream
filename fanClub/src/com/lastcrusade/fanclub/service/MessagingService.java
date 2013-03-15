@@ -15,8 +15,6 @@ import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch;
 import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.fanclub.net.message.ConnectFansMessage;
-import com.lastcrusade.fanclub.net.message.ConnectedMessage;
-import com.lastcrusade.fanclub.net.message.DisconnectedMessage;
 import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
 import com.lastcrusade.fanclub.net.message.FoundFansMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
@@ -122,7 +120,6 @@ public class MessagingService extends Service implements IMessagingService {
     private void registerMessageHandlers() {
         this.messageDispatch = new MessageThreadMessageDispatch();
         registerStringMessageHandler();
-        registerConnectionMessageHandlders();
         registerFindNewFansMessageHandler();
         registerLibraryMessageHandler();
         registerConnectFansMessageHandler();
@@ -130,29 +127,6 @@ public class MessagingService extends Service implements IMessagingService {
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
-    }
-
-    private void registerConnectionMessageHandlders() {
-//        this.messageDispatch.registerHandler(ConnectedMessage.class, new IMessageHandler<ConnectedMessage>() {
-//
-//            @Override
-//            public void handleMessage(int messageNo,
-//                    ConnectedMessage message, String fromAddr) {
-//                new BroadcastIntent(ACTION_)
-//                    .putParcelableArrayListExtra(EXTRA_FOUND_FANS, message.getFoundFans())
-//                    .send(MessagingService.this);
-//            }
-//        });
-//        this.messageDispatch.registerHandler(DisconnectedMessage.class, new IMessageHandler<DisconnectedMessage>() {
-//
-//            @Override
-//            public void handleMessage(int messageNo,
-//                    DisconnectedMessage message, String fromAddr) {
-//                new BroadcastIntent(ACTION_FOUND_FANS_MESSAGE)
-//                    .putParcelableArrayListExtra(EXTRA_FOUND_FANS, message.getFoundFans())
-//                    .send(MessagingService.this);
-//            }
-//        });
     }
 
     private void registerFoundFansHandler() {

@@ -98,7 +98,7 @@ public class ConnectFragment extends SherlockFragment {
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(ConnectionService.ACTION_CONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
 
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {

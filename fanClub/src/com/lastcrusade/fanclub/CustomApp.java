@@ -57,13 +57,19 @@ public class CustomApp extends Application {
             .addAction(ConnectionService.ACTION_FAN_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    
+                    String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
+                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    userList.addUser(bluetoothID, macAddress);
+                    userList.notifyUpdate(CustomApp.this);
                 }
             })
-            .addAction(ConnectionService.ACTION_FAN_CONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    userList.removeUser(macAddress);
+                    userList.notifyUpdate(CustomApp.this);
                 }
             })
             .register(this);
