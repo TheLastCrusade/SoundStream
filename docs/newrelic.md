@@ -1,4 +1,4 @@
-# Using new relic analytic's
+# Using new relic analytics
 
 This changes our deployment process from eclipse's build and run to an Ant build. Their instructions are located at [New Relic website](http://newrelic.wistia.com/medias/rzbz77365w)
 
