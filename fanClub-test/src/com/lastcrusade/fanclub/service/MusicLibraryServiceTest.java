@@ -215,6 +215,8 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
     }
 
     /**
+     * Test to ensure SongMetadata objects are equal.
+     * 
      * @param meta
      * @param libraryItem
      */
