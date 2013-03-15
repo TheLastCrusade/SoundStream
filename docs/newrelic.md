@@ -2,7 +2,7 @@
 
 This changes our deployment process from eclipse's build and run to an Ant build. Their instructions are located at [New Relic website](http://newrelic.wistia.com/medias/rzbz77365w)
 
-## Dependency's 
+## Dependencies
 1. [Android SDK](http://developer.android.com/sdk/index.html)
 2. [Ant](http://ant.apache.org/)
 
