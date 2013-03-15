@@ -21,3 +21,8 @@ local.properties
 *.ipr
 *.iws
 .idea/
+
+# Newrelic things
+/local.properties
+/AndroidManifest.xml.bak
+/.nrwork
