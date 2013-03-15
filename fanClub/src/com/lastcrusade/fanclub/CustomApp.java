@@ -103,5 +103,4 @@ public class CustomApp extends Application {
         }
         return messagingService;
     }
-
 }
