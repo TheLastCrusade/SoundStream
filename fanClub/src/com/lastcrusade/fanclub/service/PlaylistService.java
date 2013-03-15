@@ -7,7 +7,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 
+import com.lastcrusade.fanclub.CustomApp;
+import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.audio.IPlayer;
+import com.lastcrusade.fanclub.audio.RemoteAudioPlayer;
 import com.lastcrusade.fanclub.audio.SingleFileAudioPlayer;
 import com.lastcrusade.fanclub.library.MediaStoreWrapper;
 import com.lastcrusade.fanclub.library.SongNotFoundException;
@@ -18,7 +21,6 @@ import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 import com.lastcrusade.fanclub.util.Toaster;
-import com.lastcrusade.fanclub.R;
 
 /**
  * This service is responsible for holding the play queue and sending songs to
@@ -64,12 +66,16 @@ public class PlaylistService extends Service implements IPlayer {
     }
 
     private BroadcastRegistrar    registrar;
+    private IPlayer               thePlayer;
     private SingleFileAudioPlayer audioPlayer;
     private Playlist mPlaylist;
 
     @Override
     public IBinder onBind(Intent intent) {
-        this.audioPlayer = new SingleFileAudioPlayer(this);
+        //create the local player in a separate variable, and use that
+        // as the player until we see a host connected
+        this.audioPlayer  = new SingleFileAudioPlayer(this);
+        this.thePlayer    = audioPlayer;
 
         this.mPlaylist = new Playlist();
         // TODO: kick off a thread to feed the monster that is the audio service
@@ -99,16 +105,51 @@ public class PlaylistService extends Service implements IPlayer {
                     pause();
                 }
             }
-        }).register(this);
-
-        this.registrar.addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+        })
+        .addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 mPlaylist.moveNext();
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
-        }).register(this);
+        })
+        .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                thePlayer = new RemoteAudioPlayer((CustomApp) getApplication());
+            }
+        })
+        .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                thePlayer = audioPlayer;
+            }
+        })
+        .addAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                pause();
+            }
+        })
+        .addAction(MessagingService.ACTION_PLAY_MESSAGE, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                play();
+            }
+        })
+        .addAction(MessagingService.ACTION_SKIP_MESSAGE, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                skip();
+            }
+        })
+        .register(this);
     }
 
     private void unregisterReceivers() {
@@ -122,29 +163,42 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public void play() {
-        if(mPlaylist.size() > 0){
-            setSong(mPlaylist.getNextSong());
-            this.audioPlayer.play();
-            new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
-        } else {
-            Toaster.iToast(this, getString(R.string.playlist_empty));
+        if(isLocalPlayer()) {
+            if (mPlaylist.size() > 0){
+                setSong(mPlaylist.getNextSong());
+            } else {
+                Toaster.iToast(this, getString(R.string.playlist_empty));
+                return; //SECOND RETURN PATH that makes the code nicer
+            }
         }
+        //we have stuff to play...play it and send a notification
+        this.thePlayer.play();
+        new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
     }
 
     @Override
     public void pause() {
-        this.audioPlayer.pause();
+        this.thePlayer.pause();
         new BroadcastIntent(ACTION_PAUSED_AUDIO).send(this);
     }
 
     @Override
     public void skip() {
-        this.audioPlayer.skip();
+        this.thePlayer.skip();
+        if (isLocalPlayer()) {
+            new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
+        }
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
-        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
+    }
+
+    private boolean isLocalPlayer() {
+        return this.thePlayer == this.audioPlayer;
     }
 
     private void setSong(SongMetadata songData) {
+        if (!isLocalPlayer()) {
+            throw new IllegalStateException("Cannot call setSong when using a remote player");
+        }
         MediaStoreWrapper msw = new  MediaStoreWrapper(this);
         try {
             Song s = msw.loadSongData(songData);

@@ -38,7 +38,7 @@ public class MusicLibraryFragment extends MusicListFragment {
     private boolean boundToService = false; //Since you cannot instantly bind, set a boolean
                                     // after its safe to call methods
     
-    private MusicListAdapter musicListAdapter;
+    private MusicAdapter musicAdapter;
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection musicLibraryConn = new ServiceConnection() {
@@ -52,7 +52,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             boundToService = true;
             
             //update displayed music
-            updateMusicList();
+            musicAdapter.updateMusicFromLibrary();
         }
 
         @Override
@@ -61,14 +61,6 @@ public class MusicLibraryFragment extends MusicListFragment {
         }
     };
 
-
-    /**
-     * 
-     */
-    private void updateMusicList() {
-        //TODO: unsure whether we should do this adapting here, in the library, or in the adapter
-        musicListAdapter.updateMusic(new ArrayList<SongMetadata>(mMusicLibraryService.getLibrary()));
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -85,8 +77,8 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         UserList users = ((CustomApp) this.getActivity().getApplication()).getUserList();
         //make a new music list adapter and give it an empty list of songs to use until the service is connected
-        musicListAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
-        setListAdapter(musicListAdapter);
+        musicAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
+        setListAdapter(musicAdapter);
         
         registerReceivers();
     }
@@ -119,7 +111,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                updateMusicList();
+                musicAdapter.updateMusicFromLibrary();
             }
         }).register(this.getActivity());
     }
@@ -167,6 +159,13 @@ public class MusicLibraryFragment extends MusicListFragment {
             });
 
             return v;
+        }
+
+        /**
+         * Update the list with music from the library
+         */
+        private void updateMusicFromLibrary() {
+            this.updateMusic(new ArrayList<SongMetadata>(mMusicLibraryService.getLibrary()));
         }
     }
 }
