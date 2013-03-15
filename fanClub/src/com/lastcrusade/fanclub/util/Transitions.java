@@ -8,11 +8,17 @@ import com.lastcrusade.fanclub.components.MusicLibraryFragment;
 import com.lastcrusade.fanclub.components.NetworkFragment;
 import com.lastcrusade.fanclub.components.PlaylistFragment;
 
+/**
+ * Singleton class to manage transitions of the active content
+ * displayed on the app. 
+ */
 public class Transitions {
     
     private final static int PLAYLIST = R.string.playlist;
     private final static int MUSIC_LIBRARY = R.string.music_library;
     private final static int NETWORK  = R.string.network;
+    //Home is where you get sent after connecting to the network - for now
+    //this is the playlist
     private final static int HOME = PLAYLIST;
     
     public static void transitionToHome(CoreActivity activity){
@@ -41,12 +47,6 @@ public class Transitions {
         activity.showContent();
     }
     
-    /*
-     * Get the fragment associated with the name passed in.
-     * If later we decide we want to save the state of the fragments we can
-     * rework this to get saved states instead of creating a new fragment
-     * every time
-     */
     private static Fragment getFragment(int fragmentName) {
         Fragment newFragment = null;
         

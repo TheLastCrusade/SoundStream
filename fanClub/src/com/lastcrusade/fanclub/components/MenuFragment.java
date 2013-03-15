@@ -16,16 +16,10 @@ import com.lastcrusade.fanclub.util.ITitleable;
 import com.lastcrusade.fanclub.util.Transitions;
 import com.lastcrusade.fanclub.util.UserListAdapter;
 
-//This will probably change to a regular fragment instead of a list one
-//once I (@ejohnson44) get into the layout more
+
 public class MenuFragment extends SherlockFragment implements ITitleable {
  
-   
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        
-    }
-    
+ 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.menu, container,false);
@@ -60,9 +54,9 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             }
         });
         
-        ListView users = (ListView)v.findViewById(R.id.connected_users);
-        
-        users.setAdapter(new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList(),true ));
+        ListView users = (ListView)v.findViewById(R.id.connected_users); 
+        users.setAdapter(new UserListAdapter(getActivity(), 
+                ((CustomApp)getActivity().getApplication()).getUserList(),true ));
         
         return v;
     }
