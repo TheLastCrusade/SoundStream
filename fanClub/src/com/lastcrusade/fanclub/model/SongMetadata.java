@@ -1,6 +1,14 @@
 package com.lastcrusade.fanclub.model;
 
-public class SongMetadata {
+import com.lastcrusade.fanclub.util.DefaultParcelableCreator;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class SongMetadata implements Parcelable {
+
+    //this is REQUIRED for Parcelable to work properly
+    public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(SongMetadata.class);
 
     private long id;
 
@@ -24,6 +32,33 @@ public class SongMetadata {
     	this.macAddress = aMacAddress;
     }
 
+    public SongMetadata(Parcel in) {
+        this.id         = in.readLong();
+        this.title      = in.readString();
+        this.artist     = in.readString();
+        this.album      = in.readString();
+        this.macAddress = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0; //default, no special kind of objects
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.artist);
+        dest.writeString(this.album);
+        dest.writeString(this.macAddress);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s by %s on %s from %s", this.title, this.artist, this.album, this.macAddress);
+    }
+    
     public long getId() {
         return id;
     }

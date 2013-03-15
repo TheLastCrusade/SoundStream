@@ -20,10 +20,11 @@ import com.lastcrusade.fanclub.net.message.Messenger;
  * @author Jesse Rosalia
  *
  */
-public class MessageThread extends Thread {
+public abstract class MessageThread extends Thread {
     private final String TAG = MessageThread.class.getName();
     public static final int MESSAGE_READ = 1;
-    public static final String EXTRA_ADDRESS = "com.lastcrusade.fanclub.net.extraAddress";
+
+    public static final String EXTRA_ADDRESS = MessageThread.class.getName() + ".extra.Address";
 
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
@@ -32,9 +33,10 @@ public class MessageThread extends Thread {
     private int   messageNumber = 0;
     private Handler mmHandler;
 
+    private String mmDisconnectAction;
     //NOTE: Messenger is stateless
     private final Messenger mmMessenger;
-    public MessageThread(BluetoothSocket socket, Handler handler) {
+    public MessageThread(BluetoothSocket socket, Handler handler, String disconnectAction) {
         super("MessageThread-" + safeSocketName(socket));
         mmSocket  = socket;
         mmHandler = handler;
@@ -51,6 +53,8 @@ public class MessageThread extends Thread {
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
         
+        mmDisconnectAction = disconnectAction;
+        
         mmMessenger = new Messenger();
     }
  
@@ -64,17 +68,14 @@ public class MessageThread extends Thread {
 
     public void run() {
         // Keep listening to the InputStream until an exception occurs
-        while (true) {
+        BluetoothDevice remoteDevice = mmSocket.getRemoteDevice();
+        while (true) { //TODO: need way to kill this thread normally
             try {
                 //attempt to deserialize from the socket input stream
                 boolean messageRecvd = mmMessenger.deserializeMessage(mmInStream);
                 if (messageRecvd) {
                     //dispatch the message to the 
-                    Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, mmMessenger.getReceivedMessage());
-                    Bundle bundle = new Bundle();
-                    bundle.putString(EXTRA_ADDRESS, mmSocket.getRemoteDevice().getAddress());
-                    androidMsg.setData(bundle);
-                    androidMsg.sendToTarget();
+                    sendMessageToHandler(mmMessenger.getReceivedMessage(), remoteDevice.getAddress());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -84,10 +85,26 @@ public class MessageThread extends Thread {
                 break;
             }
         }
-        //before we exit, notify the launcher thread that the connection is dead
-//        notifyDisconnect();
+        //cancel and notify the handlers that the connection is dead
+        cancel();
     }
  
+    public abstract void onDisconnected();
+
+    /**
+     * Send the network message to the appropriate handler.
+     * 
+     * @param message
+     * @param remoteAddr
+     */
+    private void sendMessageToHandler(IMessage message, String remoteAddr) {
+        Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, message);
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_ADDRESS, remoteAddr);
+        androidMsg.setData(bundle);
+        androidMsg.sendToTarget();
+    }
+
     /* Call this from the main activity to send data to the remote device */
     public void write(IMessage message) {
         try {
@@ -108,7 +125,7 @@ public class MessageThread extends Thread {
             
         } finally {
             //before we exit, notify the launcher thread that the connection is dead
-//          notifyDisconnect();
+            onDisconnected();
         }
     }
 }

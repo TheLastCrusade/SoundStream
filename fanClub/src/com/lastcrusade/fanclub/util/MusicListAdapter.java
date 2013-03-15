@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.lastcrusade.fanclub.R;
 import com.lastcrusade.fanclub.model.SongMetadata;
+import com.lastcrusade.fanclub.model.User;
 import com.lastcrusade.fanclub.model.UserList;
 
 public class MusicListAdapter extends BaseAdapter {
@@ -39,7 +40,7 @@ public class MusicListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public SongMetadata getItem(int position) {
         return metadataList.get(position);
     }
 
@@ -64,7 +65,14 @@ public class MusicListAdapter extends BaseAdapter {
         TextView album = (TextView) element.findViewById(R.id.album);
 
         String macAddress = metadataList.get(position).getMacAddress();
-        userColor.setBackgroundColor(users.getUserByMACAddress(macAddress).getColor());
+        
+        User user = users.getUserByMACAddress(macAddress);
+        if (user != null) {
+            userColor.setBackgroundColor(user.getColor());
+        } else {
+            Log.wtf(TAG, "User with mac address " + macAddress + " not found.  Using default color.");
+            userColor.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
+        }
 
         ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
 
