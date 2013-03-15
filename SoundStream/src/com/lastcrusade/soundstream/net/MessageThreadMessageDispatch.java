@@ -11,7 +11,7 @@ import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHand
 import com.lastcrusade.soundstream.net.message.IMessage;
 
 /**
- * An Android Handler used as a fanClub network message dispatch.  This will receive
+ * An Android Handler used as a SoundStream network message dispatch.  This will receive
  * Android Message objects that represent network messages, and dispatch them to the
  * appropriate handler.
  * 

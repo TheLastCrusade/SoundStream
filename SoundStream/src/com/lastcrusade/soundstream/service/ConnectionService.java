@@ -313,7 +313,7 @@ public class ConnectionService extends Service {
             //one thread per device found...if there are multiple devices,
             // there are multiple threads
             //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
-            // and if the first 3 of those devices are not fanclub, itll pause for a while attempting to conenct, which will delay
+            // and if the first 3 of those devices are not SoundStream, it will pause for a while attempting to connect, which will delay
             // connection of the actual fan
             ConnectThread connectThread = new ConnectThread(this, device) {
 
