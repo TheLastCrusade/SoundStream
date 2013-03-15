@@ -77,8 +77,8 @@ public class PlaylistFragment extends MusicListFragment{
     }
 
     @Override
-    public String getTitle() {
-        return getString(R.string.playlist);
+    public int getTitle() {
+        return R.string.playlist;
     }
 
     private void registerReceivers() {

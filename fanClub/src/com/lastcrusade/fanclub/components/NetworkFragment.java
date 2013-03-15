@@ -22,12 +22,13 @@ import com.lastcrusade.fanclub.service.ConnectionService;
 import com.lastcrusade.fanclub.service.MessagingService;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
+import com.lastcrusade.fanclub.util.ITitleable;
 import com.lastcrusade.fanclub.util.UserListAdapter;
 /*
  * This fragment handles the ability for members to add new members to 
  * the network and to view the currently connected members
  */
-public class NetworkFragment extends SherlockFragment {
+public class NetworkFragment extends SherlockFragment implements ITitleable{
     private BroadcastRegistrar broadcastRegistrar;
     private Button addMembersButton;
     private UserListAdapter adapter;
@@ -56,7 +57,7 @@ public class NetworkFragment extends SherlockFragment {
         
         ListView users = (ListView)v.findViewById(R.id.connected_users);
         
-        this.adapter = new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList() );
+        this.adapter = new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList(), false );
         users.setAdapter(this.adapter);
         return v;
     }
@@ -98,6 +99,7 @@ public class NetworkFragment extends SherlockFragment {
     }
 
     private void onDiscoveredDevices(Intent intent) {
+
         
         //locally initiated device discovery...pop up a dialog for the user
         //TODO: this should probably use FoundFan, to decouple this code from the bluetooth code
@@ -118,5 +120,10 @@ public class NetworkFragment extends SherlockFragment {
                         })
                 .setFormatter(new BluetoothDeviceDialogFormatter())
                 .show();
+    }
+
+    @Override
+    public int getTitle() {
+        return R.string.network;
     }
 }

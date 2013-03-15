@@ -104,8 +104,8 @@ public class MusicLibraryFragment extends MusicListFragment {
     }
 
     @Override
-    public String getTitle() {
-        return getString(R.string.music_library);
+    public int getTitle() {
+        return R.string.music_library;
     }
     
     /**
