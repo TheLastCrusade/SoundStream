@@ -3,8 +3,6 @@ package com.lastcrusade.fanclub.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Binder;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
@@ -124,8 +122,8 @@ public class PlaylistService extends Service implements IPlayer {
 
     @Override
     public void play() {
-        if(mPlaylist.size() >= 1){
-            setSong(mPlaylist.getHead());
+        if(mPlaylist.size() > 0){
+            setSong(mPlaylist.getNextSong());
             this.audioPlayer.play();
             new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
         } else {
@@ -143,7 +141,6 @@ public class PlaylistService extends Service implements IPlayer {
     public void skip() {
         this.audioPlayer.skip();
         new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
     }
 

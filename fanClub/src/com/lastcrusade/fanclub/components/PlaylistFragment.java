@@ -49,7 +49,7 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onServiceBound() {
                 mPlaylist = getPlaylistService().getPlaylist();
-                mPlayListAdapter.updateMusic(mPlaylist.getUnPlayedList(), mPlaylist.getPlayedList());
+                mPlayListAdapter.updateMusic(mPlaylist);
             }
         });
 
@@ -86,8 +86,7 @@ public class PlaylistFragment extends MusicListFragment{
         this.registrar.addAction(PlaylistService.ACTION_PLAYLIST_UPDATED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                Log.i(PlaylistFragment.class.getName(), "action playlist updated");
-                mPlayListAdapter.updateMusic(mPlaylist.getUnPlayedList(), mPlaylist.getPlayedList());
+                mPlayListAdapter.updateMusic(mPlaylist);
             }
         }).register(this.getActivity());
     }
@@ -104,7 +103,6 @@ public class PlaylistFragment extends MusicListFragment{
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
-
         return playlist;
     }
 
@@ -128,19 +126,18 @@ public class PlaylistFragment extends MusicListFragment{
             super(mContext, metadataList, users);
         }
 
-        public void updateMusic(List<SongMetadata> unplayed, List<SongMetadata> played) {
-            List<SongMetadata> combinedList = new ArrayList<SongMetadata>();
-            combinedList.addAll(played);
-            combinedList.addAll(unplayed);
-            super.updateMusic(combinedList);
+        public void updateMusic(Playlist musicList){
+            super.updateMusic(musicList.getSongsToPlay());
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View element = super.getView(position, convertView, parent);
             //This depends on played music being above unplayed music
-            if(position < mPlaylist.getPlayedList().size()){
+            if(position < mPlaylist.getIndex()){
                 element.setBackgroundColor(getResources().getColor(R.color.used));
+            } else {
+                element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
             }
             return element;
         }
