@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <View
+        android:id="@+id/user_color"
+        android:layout_width="20sp"
+        android:layout_height="20sp"
+        android:layout_margin="4sp">
+    </View>
+
+    <TextView
+        android:id="@+id/bluetoothID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/user_color"
+        android:layout_alignBottom="@id/user_color"
+        android:layout_marginLeft="4sp"
+        android:textColorHighlight="#656565"
+        android:textSize="18sp" >
+    </TextView>
+
+
+</RelativeLayout>

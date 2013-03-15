@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants" >
+
+    <View
+        android:id="@+id/user_color"
+        android:layout_width="10sp"
+        android:layout_height="match_parent"
+        android:minHeight="@dimen/song_height"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="4sp" >
+    </View>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/user_color"
+        android:paddingTop="6sp"
+        android:maxLines="1"
+        android:textSize="16sp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:layout_toRightOf="@+id/user_color"
+        android:paddingRight="2sp"
+        android:maxLines="1"
+        android:textSize="12sp">
+    </TextView>
+    
+     <TextView
+        android:id="@+id/division"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/artist"
+        android:layout_toRightOf="@+id/artist"
+        android:paddingRight="2sp"
+        android:maxLines="1"
+        android:textSize="12sp"
+        android:text="@string/song_item_division" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/album"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/artist"
+        android:layout_toRightOf="@+id/division"
+        android:maxLines="1"
+        android:textSize="12sp" >
+    </TextView>
+    
+    <ImageButton
+        android:id="@+id/add_to_playlist"
+        android:src="@drawable/add_to_queue"
+        android:layout_width = "wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:contentDescription="@string/add_to_playlist"
+        android:background="@color/transparent"/>
+</RelativeLayout>
