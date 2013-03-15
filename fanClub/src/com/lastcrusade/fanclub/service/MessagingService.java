@@ -1,6 +1,8 @@
 package com.lastcrusade.fanclub.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.app.Service;
@@ -9,12 +11,14 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.fanclub.model.SongMetadata;
 import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch;
 import com.lastcrusade.fanclub.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.fanclub.net.message.ConnectFansMessage;
 import com.lastcrusade.fanclub.net.message.FindNewFansMessage;
 import com.lastcrusade.fanclub.net.message.FoundFansMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
+import com.lastcrusade.fanclub.net.message.LibraryMessage;
 import com.lastcrusade.fanclub.net.message.PauseMessage;
 import com.lastcrusade.fanclub.net.message.PlayMessage;
 import com.lastcrusade.fanclub.net.message.SkipMessage;
@@ -42,6 +46,9 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
+
+    public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
+    public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -114,6 +121,7 @@ public class MessagingService extends Service implements IMessagingService {
         this.messageDispatch = new MessageThreadMessageDispatch();
         registerStringMessageHandler();
         registerFindNewFansMessageHandler();
+        registerLibraryMessageHandler();
         registerConnectFansMessageHandler();
         registerFoundFansHandler();
         registerPauseMessageHandler();
@@ -160,6 +168,35 @@ public class MessagingService extends Service implements IMessagingService {
         });
     }
 
+    private void registerLibraryMessageHandler() {
+        this.messageDispatch.registerHandler(LibraryMessage.class, new IMessageHandler<LibraryMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    LibraryMessage message, String fromAddr) {
+                //sanity check...make sure the mac address is set properly, or
+                // raise a flag if its not
+                //JR, 03/13/13, I didn't want to set it here, because if we ever allow
+                // fans to send on other fans libraries, this would cause issues.  Rather
+                // how we want to handle that, or if that is even a thing, just check
+                // that our current assumptions are met and raise purgatory if not.
+                ArrayList<SongMetadata> remoteLibrary = new ArrayList<SongMetadata>();
+                for (SongMetadata meta : message.getLibrary()) {
+                    if (!meta.getMacAddress().equals(fromAddr)) {
+                        Log.wtf(TAG, "Song received from " + fromAddr + " with mac address " + meta.getMacAddress() + "\n" + meta.toString());
+                        //continue on to the next one
+                    } else {
+                        remoteLibrary.add(meta);
+                    }
+                }
+
+                new BroadcastIntent(ACTION_LIBRARY_MESSAGE)
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remoteLibrary)
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
     private void registerStringMessageHandler() {
         this.messageDispatch.registerHandler(StringMessage.class, new IMessageHandler<StringMessage>() {
 
@@ -197,12 +234,6 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
 
-    public void sendFindNewFansMessage() {
-        FindNewFansMessage msg = new FindNewFansMessage();
-        //send the message to the host
-        sendMessageToHost(msg);
-    }
-
     private void sendMessageToHost(IMessage msg) {
         try {
             this.connectServiceLocator.getService().sendMessageToHost(msg);
@@ -211,6 +242,19 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
+    public void sendFindNewFansMessage() {
+        FindNewFansMessage msg = new FindNewFansMessage();
+        //send the message to the host
+        sendMessageToHost(msg);
+    }
+
+    @Override
+    public void sendLibraryMessage(List<SongMetadata> library) {
+        LibraryMessage msg = new LibraryMessage(library);
+        //send the message to the host
+        sendMessageToHost(msg);
+    }
+
     public void sendStringMessage(String message) {
         StringMessage sm = new StringMessage();
         sm.setString(message);
