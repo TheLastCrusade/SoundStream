@@ -1,5 +1,6 @@
 package com.lastcrusade.soundstream;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -7,6 +8,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
@@ -91,5 +93,12 @@ public class CoreActivity extends SlidingFragmentActivity{
     //TODO: this may go away, once Elizabeth is done with the transition singleton class
     public void onConnected() {
         this.connected  = true;
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        //Make sure to destroy services when the application closes
+        Intent intent = new Intent(this, MusicLibraryService.class);
+        stopService(intent);
     }
 }
