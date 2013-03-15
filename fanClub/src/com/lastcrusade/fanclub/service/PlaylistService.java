@@ -158,7 +158,7 @@ public class PlaylistService extends Service implements IPlayer {
   
     @Override
     public boolean isPlaying() {
-        return this.audioPlayer.isPlaying();
+        return this.thePlayer.isPlaying();
     }
 
     @Override
