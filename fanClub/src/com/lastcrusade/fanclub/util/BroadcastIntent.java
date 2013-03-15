@@ -40,6 +40,16 @@ public class BroadcastIntent extends Intent {
         return (BroadcastIntent) super.putExtra(name, value);
     }
 
+    @Override
+    public BroadcastIntent putExtra(String name, Parcelable value) {
+        return (BroadcastIntent) super.putExtra(name, value);
+    }
+
+    @Override
+    public BroadcastIntent putExtra(String name, Parcelable[] values) {
+        return (BroadcastIntent) super.putExtra(name, values);
+    }
+
     //Overridden to return BroadcastIntent, so we can chain method calls
     @Override
     public BroadcastIntent putParcelableArrayListExtra(String name,

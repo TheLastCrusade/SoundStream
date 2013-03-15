@@ -62,7 +62,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     }
     
     @Override
-    public String getTitle() {
-        return getString(R.string.app_name);
+    public int getTitle() {
+        return R.string.app_name;
     }
 }

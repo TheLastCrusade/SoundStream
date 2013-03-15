@@ -102,10 +102,13 @@ public class Messenger {
     public boolean deserializeMessage(InputStream input) throws IOException {
         
         boolean processed = false;
-        //read all we can
-        while(input.available() > 0) {
-            inputBuffer.write(input.read());
-        }
+        //read all we can...
+        do {
+            //NOTE: this is so input.read can block, and will throw an exception when the connection
+            // goes down.  this is the only way we'll get a notification of a downed client
+            int read = input.read();
+            inputBuffer.write(read);
+        } while (input.available() > 0);
 
         //if we need to, consume the message length (to make sure we read until we have a complete message)
         if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {

@@ -29,6 +29,7 @@ import com.lastcrusade.fanclub.net.message.FoundFansMessage;
 import com.lastcrusade.fanclub.net.message.IMessage;
 import com.lastcrusade.fanclub.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.fanclub.util.BluetoothUtils;
+import com.lastcrusade.fanclub.util.BroadcastIntent;
 import com.lastcrusade.fanclub.util.BroadcastRegistrar;
 import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 import com.lastcrusade.fanclub.util.Toaster;
@@ -45,6 +46,7 @@ public class ConnectionService extends Service {
      * 
      */
     public static final String ACTION_FIND_FINISHED        = ConnectionService.class.getName() + ".action.FindFinished";
+
     /**
      * Action to indicate find fans action has finished.  This action is sent in response to a remote FindNewFans message.
      * 
@@ -53,7 +55,18 @@ public class ConnectionService extends Service {
      */
     public static final String ACTION_REMOTE_FIND_FINISHED = ConnectionService.class.getName() + ".action.RemoteFindFinished";
     public static final String EXTRA_DEVICES               = ConnectionService.class.getName() + ".extra.Devices";
+    
+    /**
+     * Action to indicate the connection service is connected.  This applies both to connections to a host and to a fan.
+     * 
+     */
+    public static final String ACTION_FAN_CONNECTED        = ConnectionService.class.getName() + ".action.FanConnected";
+    public static final String EXTRA_FAN_NAME              = ConnectionService.class.getName() + ".extra.FanName";
+    public static final String EXTRA_FAN_ADDRESS           = ConnectionService.class.getName() + ".extra.FanAddress";
+    public static final String ACTION_FAN_DISCONNECTED     = ConnectionService.class.getName() + ".action.FanDisconected";
 
+    public static final String ACTION_HOST_CONNECTED       = ConnectionService.class.getName() + ".action.HostConnected";
+    public static final String ACTION_HOST_DISCONNECTED    = ConnectionService.class.getName() + ".action.HostDisconnected";
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -224,13 +237,28 @@ public class ConnectionService extends Service {
      * 
      * @param socket
      */
-    protected void onConnectedFan(BluetoothSocket socket) {
+    protected void onConnectedFan(final BluetoothSocket socket) {
         Log.w(TAG, "Connected to server");
 
         //create the message thread, which will be responsible for reading and writing messages
-        MessageThread newMessageThread = new MessageThread(socket, this.messageDispatch);
+        MessageThread newMessageThread = new MessageThread(socket, this.messageDispatch, ACTION_FAN_DISCONNECTED) {
+
+            @Override
+            public void onDisconnected() {
+                fans.remove(this);
+                new BroadcastIntent(ACTION_FAN_DISCONNECTED)
+                    .putExtra(EXTRA_FAN_ADDRESS, socket.getRemoteDevice().getAddress())
+                    .send(ConnectionService.this);
+            }
+        };
         newMessageThread.start();
         this.fans.add(newMessageThread);
+
+        //announce that we're connected
+        new BroadcastIntent(ACTION_FAN_CONNECTED)
+            .putExtra(EXTRA_FAN_NAME,    socket.getRemoteDevice().getName())
+            .putExtra(EXTRA_FAN_ADDRESS, socket.getRemoteDevice().getAddress())
+            .send(this);
     }
 
     public void findNewFans() {
@@ -324,7 +352,6 @@ public class ConnectionService extends Service {
                     protected void onAccepted(BluetoothSocket socket) {
                         onAcceptedHost(socket);
                     }
-                    
                 };
                 thread.execute();
             }
@@ -345,7 +372,17 @@ public class ConnectionService extends Service {
         BluetoothUtils.disableDiscovery(this);
 
         //create the message thread for handling this connection
-        this.host = new MessageThread(socket, this.messageDispatch);
+        this.host = new MessageThread(socket, this.messageDispatch, ACTION_HOST_DISCONNECTED) {
+
+            @Override
+            public void onDisconnected() {
+                host = null;
+                new BroadcastIntent(ACTION_HOST_DISCONNECTED).send(ConnectionService.this);
+            }
+        };
         this.host.start();
+
+        //announce that we're connected
+        new BroadcastIntent(ACTION_HOST_CONNECTED).send(this);
     }
 }

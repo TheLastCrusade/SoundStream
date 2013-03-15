@@ -1,16 +1,20 @@
 package com.lastcrusade.fanclub;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+
 import com.lastcrusade.fanclub.model.UserList;
 import com.lastcrusade.fanclub.service.ConnectionService;
+import com.lastcrusade.fanclub.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.fanclub.service.IMessagingService;
 import com.lastcrusade.fanclub.service.MessagingService;
+import com.lastcrusade.fanclub.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.fanclub.service.ServiceLocator;
 import com.lastcrusade.fanclub.service.ServiceNotBoundException;
-import com.lastcrusade.fanclub.service.ConnectionService.ConnectionServiceBinder;
-import com.lastcrusade.fanclub.service.MessagingService.MessagingServiceBinder;
-
-import android.app.Application;
-import android.util.Log;
+import com.lastcrusade.fanclub.util.BroadcastRegistrar;
+import com.lastcrusade.fanclub.util.IBroadcastActionHandler;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getName();
@@ -19,6 +23,8 @@ public class CustomApp extends Application {
     
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<MessagingService>  messagingServiceLocator;
+
+    private BroadcastRegistrar registrar;
 
     public CustomApp() {
         super();
@@ -35,8 +41,45 @@ public class CustomApp extends Application {
         
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingServiceBinder.class);
+        
+        registerReceivers();
     }
     
+    @Override
+    public void onTerminate() {
+        unregisterReceivers();
+        super.onTerminate();
+    }
+
+    private void registerReceivers() {
+        this.registrar = new BroadcastRegistrar();
+        this.registrar
+            .addAction(ConnectionService.ACTION_FAN_CONNECTED, new IBroadcastActionHandler() {
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
+                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    userList.addUser(bluetoothID, macAddress);
+                    userList.notifyUpdate(CustomApp.this);
+                }
+            })
+            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    userList.removeUser(macAddress);
+                    userList.notifyUpdate(CustomApp.this);
+                }
+            })
+            .register(this);
+        
+    }
+
+    private void unregisterReceivers() {
+        this.registrar.unregister();
+    }
+
     public UserList getUserList(){
         return userList;
     }

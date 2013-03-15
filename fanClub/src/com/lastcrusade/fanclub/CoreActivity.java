@@ -13,9 +13,10 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity{
-    private Fragment activeContent;
-    private Fragment menu;
     private final String TAG = CoreActivity.class.getName();
+
+    private Fragment menu;
+    private boolean connected = false;
         
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -37,8 +38,12 @@ public class CoreActivity extends SlidingFragmentActivity{
         // the activity is created
         if(savedInstanceState == null){
             //add the initial content fragment and set the title on the action bar
-            Transitions.transitionToHome(this);
-            setTitle(getString(R.string.playlist));
+            if(!connected)
+                Transitions.transitionToConnect(this);
+            else{
+                Transitions.transitionToHome(this);
+                setTitle(getString(R.string.playlist));
+            }
         }
 
         // setup the sliding bar
@@ -75,8 +80,15 @@ public class CoreActivity extends SlidingFragmentActivity{
         }
         return false;
     }
+
     
     public void showContent(){
         getSlidingMenu().showContent();
+    }
+
+
+    //TODO: this may go away, once Elizabeth is done with the transition singleton class
+    public void onConnected() {
+        this.connected  = true;
     }
 }
