@@ -7,12 +7,12 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.ConnectionService;
+import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
-import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -60,7 +60,7 @@ public class CustomApp extends Application {
                     String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
                     String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
                     userList.addUser(bluetoothID, macAddress);
-                    userList.notifyUpdate(CustomApp.this);
+                    userList.notifyUpdate(CustomApp.this);                    
                 }
             })
             .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
@@ -102,5 +102,5 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return messagingService;
-    }
+    }    
 }
