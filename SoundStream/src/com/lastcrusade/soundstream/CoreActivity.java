@@ -1,5 +1,6 @@
 package com.lastcrusade.soundstream;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -7,6 +8,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
