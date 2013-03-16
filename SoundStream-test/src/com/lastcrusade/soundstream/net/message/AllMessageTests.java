@@ -8,7 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ ConnectFansMessageTest.class, FindNewFansMessageTest.class,
         FoundFansMessageTest.class, LibraryMessageTest.class,
         MessengerTest.class, PauseMessageTest.class, PlayMessageTest.class,
-        SkipMessageTest.class, UserListMessageTest.class })
+        SkipMessageTest.class, UserListMessageTest.class, PlaylistMessageTest.class })
 public class AllMessageTests {
 
 }
