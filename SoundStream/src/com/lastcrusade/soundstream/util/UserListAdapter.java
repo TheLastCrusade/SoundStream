@@ -60,14 +60,8 @@ public class UserListAdapter extends BaseAdapter {
             username.setTextColor(mContext.getResources().getColor(R.color.white));
         }
         username.setText(((User)getItem(position)).getBluetoothID());
-
         
         return userView;
-    }
-    
-    public void updateUserList(UserList users){
-        this.users=users;
-        notifyDataSetChanged();
     }
 
 }

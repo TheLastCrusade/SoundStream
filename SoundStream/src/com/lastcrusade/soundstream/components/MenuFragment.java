@@ -96,9 +96,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                Log.i("MenuFragment", "User list update intent caught");
-                ((UserListAdapter)userView.getAdapter())
-                    .updateUserList( ( (CustomApp)getActivity().getApplication() ).getUserList());
+                ((UserListAdapter)userView.getAdapter()).notifyDataSetChanged();
             }
         }).register(this.getActivity());
     }
