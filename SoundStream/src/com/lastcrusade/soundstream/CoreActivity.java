@@ -94,11 +94,4 @@ public class CoreActivity extends SlidingFragmentActivity{
     public void onConnected() {
         this.connected  = true;
     }
-
-    protected void onDestroy() {
-        super.onDestroy();
-        //Make sure to destroy services when the application closes
-        Intent intent = new Intent(this, MusicLibraryService.class);
-        stopService(intent);
-    }
 }
