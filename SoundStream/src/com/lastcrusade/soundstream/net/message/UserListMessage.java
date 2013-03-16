@@ -10,11 +10,15 @@ import com.lastcrusade.soundstream.model.UserList;
 public class UserListMessage extends ADataMessage {
 	private final String TAG = UserListMessage.class.getName();
 	
-	private UserList userList = new UserList(); 
+	private UserList userList; 
 	
-	public UserListMessage() {}
+	public UserListMessage() {
+	    this(new UserList());
+	}
 	
-	public UserListMessage(UserList userList) {}
+	public UserListMessage(UserList userList) {
+	    this.userList = userList;
+	}
 	
 	@Override
 	public void deserialize(InputStream input) throws IOException {

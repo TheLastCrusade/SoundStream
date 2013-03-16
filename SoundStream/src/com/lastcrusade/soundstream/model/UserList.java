@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
 
-public class UserList {
+public class UserList implements Parcelable{
 
+    public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(UserList.class);
+
+    
     public static final String ACTION_USER_LIST_UPDATE = UserList.class.getName() + ".action.UserList";
 
     private List<User> connectedUsers;    
@@ -24,6 +30,14 @@ public class UserList {
     public UserList(String bluetoothID, String macAddress){
         this();
         connectedUsers.add(new User(bluetoothID, macAddress, userColors.getNextAvailableColor()));
+    }
+    
+    public UserList(Parcel in){
+        this();
+        int numUsers = in.readInt();
+        for(int i=0; i<numUsers; i++){
+            addUser(in.readString(), in.readString());
+        }
     }
 
     public void addUser(String bluetoothID, String macAddress){
@@ -92,10 +106,6 @@ public class UserList {
         return user;
     }
 
-    public void notifyUpdate(Context context) {
-        new BroadcastIntent(ACTION_USER_LIST_UPDATE).send(context);
-    }
-
     @Override
     public String toString() {
         String users;
@@ -112,5 +122,21 @@ public class UserList {
             users = sb.toString();
         }
         return users;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(connectedUsers.size());
+        
+        for(User u:connectedUsers){
+            dest.writeString(u.getBluetoothID());
+            dest.writeString(u.getMacAddress());
+        }
+        
     }
 }
