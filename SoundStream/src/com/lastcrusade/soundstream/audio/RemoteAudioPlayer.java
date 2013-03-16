@@ -1,14 +1,22 @@
 package com.lastcrusade.soundstream.audio;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class RemoteAudioPlayer implements IPlayer {
 
     private CustomApp application;
     private boolean playing;
+    
+    BroadcastRegistrar registrar;
 
     public RemoteAudioPlayer(CustomApp application) {
         this.application = application;
@@ -38,5 +46,22 @@ public class RemoteAudioPlayer implements IPlayer {
     @Override
     public void skip() {
         this.application.getMessagingService().sendSkipMessage();
+    }
+    
+    private void registerReceivers() {
+    	this.registrar = new BroadcastRegistrar();
+    	this.registrar.addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
+			
+			@Override
+			public void onReceiveAction(Context context, Intent intent) {
+				if(MessagingService.ACTION_PLAY_STATUS_MESSAGE == "Play") {
+					new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO);
+				}
+				else if(MessagingService.ACTION_PLAY_STATUS_MESSAGE == "Pause") {
+					new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO);
+				}
+				
+			}
+		}).register(this.application);
     }
 }
