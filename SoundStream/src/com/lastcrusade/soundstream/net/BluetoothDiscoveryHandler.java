@@ -52,15 +52,6 @@ public class BluetoothDiscoveryHandler {
      */
     public void onDiscoveryFinished() {
         Log.w(TAG, "Discovery finished");
-        if (this.discoveredDevices.isEmpty()) {
-            Toaster.iToast(this.context, R.string.no_fans_found);
-        } else {
-
-            sendDiscoveredDevices();
-        }
-    }
-
-    private void sendDiscoveredDevices() {
         //if its remote initiated, we want to send a different action
         String action = this.remoteInitiated
                           ? ConnectionService.ACTION_REMOTE_FIND_FINISHED
