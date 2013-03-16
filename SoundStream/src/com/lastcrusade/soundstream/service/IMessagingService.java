@@ -6,10 +6,50 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 
 public interface IMessagingService {
 
-    public void sendLibraryMessage(List<SongMetadata> library);
+    /**
+     * Send the library to the currently connected host.
+     * 
+     * @param library
+     */
+    public void sendLibraryMessageToHost(List<SongMetadata> library);
+    
+    /**
+     * Send the library to all currently connected fans.
+     * 
+     * @param library
+     */
+    public void sendLibraryMessageToFans(List<SongMetadata> library);
+    
+    /**
+     * Send a find new fans message to the host.
+     * 
+     */
     public void sendFindNewFansMessage();
+    
+    /**
+     * Send a pause message to the host.
+     * 
+     */
     public void sendPauseMessage();
+    
+    /**
+     * Send a play message to the host.
+     * 
+     */
     public void sendPlayMessage();
+    
+    /**
+     * Send a skip message to the host.
+     * 
+     */
     public void sendSkipMessage();
+    
+    /**
+     * FOR TESTING
+     * 
+     * Send a string message to all connected devices (host or fan).
+     * 
+     * @param message
+     */
     public void sendStringMessage(String message);
 }
