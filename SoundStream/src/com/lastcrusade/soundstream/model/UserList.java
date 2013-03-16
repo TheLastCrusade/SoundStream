@@ -3,17 +3,16 @@ package com.lastcrusade.soundstream.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
 
 public class UserList implements Parcelable{
 
-    public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(UserList.class);
+    //this is REQUIRED for Parcelable to work properly
+    public static final Parcelable.Creator<UserList> CREATOR = new DefaultParcelableCreator(UserList.class);
 
     
     public static final String ACTION_USER_LIST_UPDATE = UserList.class.getName() + ".action.UserList";
@@ -28,11 +27,13 @@ public class UserList implements Parcelable{
     }
 
     public UserList(String bluetoothID, String macAddress){
+       //calls the constructor that initializes everything
         this();
         connectedUsers.add(new User(bluetoothID, macAddress, userColors.getNextAvailableColor()));
     }
     
     public UserList(Parcel in){
+        //calls the constructor that initializes everything
         this();
         int numUsers = in.readInt();
         for(int i=0; i<numUsers; i++){
@@ -124,6 +125,7 @@ public class UserList implements Parcelable{
         return users;
     }
 
+    //required for parcelable
     @Override
     public int describeContents() {
         return 0;

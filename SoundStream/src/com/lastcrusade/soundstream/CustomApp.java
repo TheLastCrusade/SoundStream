@@ -61,7 +61,6 @@ public class CustomApp extends Application {
                     String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
                     String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
                     userList.addUser(bluetoothID, macAddress);
-                    Log.i(TAG, "User List: " + userList.toString());
                     notifyUserListUpdate();
                 }
             })
@@ -74,13 +73,13 @@ public class CustomApp extends Application {
                     notifyUserListUpdate();
                 }
             })
-            .addAction(MessagingService.ACTION_NEW_CONNECTED_USERS, new IBroadcastActionHandler() {
+            .addAction(MessagingService.ACTION_NEW_CONNECTED_USERS_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    Log.i(TAG, "New Connected Users Message Recieved");
+                    //extract the new user list from the intent
                     userList = intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST);
-                    Log.i(TAG,"New User List:" + userList.toString());
+                    //tell app to update the user list in all the UI
                     new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
                 }
             })

@@ -52,7 +52,7 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
-    public static final String ACTION_NEW_CONNECTED_USERS = MessagingService.class.getName() + ".action.UserListMessage";
+    public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
     public static final String EXTRA_USER_LIST    = MessagingService.class.getName() + ".extra.UserList";
 
     /**
@@ -238,7 +238,7 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo, UserListMessage message,
                     String fromAddr) {
-                new BroadcastIntent(ACTION_NEW_CONNECTED_USERS)
+                new BroadcastIntent(ACTION_NEW_CONNECTED_USERS_MESSAGE)
                     .putExtra(EXTRA_USER_LIST, message.getUserList())
                     .send(MessagingService.this);
                 
@@ -320,6 +320,5 @@ public class MessagingService extends Service implements IMessagingService {
     public void sendUserListMessage(UserList userlist){
         UserListMessage ulm = new UserListMessage(userlist);
         broadcastMessageToFans(ulm);
-        Log.i("Messaging Service", "User List Message Sent");
     }
 }
