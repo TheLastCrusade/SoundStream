@@ -2,22 +2,15 @@
 <resources>
 
     <string name="app_uuid">e271f460-d1ad-4ea8-b555-5e59b19c71ff</string>
-    <string name="app_name">fanClub</string>
+    <string name="app_name">SoundStream</string>
     
-    <!-- Landing Page Things -->
-    <string name="welcome_text">Welcome to fanClub</string>
-    <string name="menu_settings">Settings</string>
-    <string name="title_activity_fan">FanActivity</string>
-    <string name="title_activity_host">HostActivity</string>  
-    <string name="enable_bluetooth">Enabling Bluetooth...</string>
-    <string name="finding_new_fans">Finding new fans...</string>
+    <string name="enable_bluetooth">Enabling Bluetooth&#x2026;</string>
+    <string name="finding_new_fans">Finding new fans&#x2026;</string>
     <string name="found_fans">Found fans</string>
-    <string name="now_playing">Now Playing</string>
-    <string name="select_fans">Select fans...</string>
+    <string name="select_fans">Select fans&#x2026;</string>
     <string name="no_fans_found">No fans found</string>    
-    <string name="menu">Menu</string>
     
-    
+    <string name="now_playing">Now Playing</string>
     
     <!-- button labels -->
     <string name="add_members">Add Members to Network</string>
