@@ -21,6 +21,7 @@ import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
+import com.lastcrusade.soundstream.net.message.PlaylistMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
@@ -49,6 +50,9 @@ public class MessagingService extends Service implements IMessagingService {
 
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
+
+    //This also uses EXTRA_SONG_METADATA
+    public static final String ACTION_PLAYLIST_UPDATED_MESSAGE = MessagingService.class.getName() + ".action.PlaylistUpdated";
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -224,6 +228,11 @@ public class MessagingService extends Service implements IMessagingService {
     private void registerSkipMessageHandler() {
         this.messageDispatch.registerHandler(SkipMessage.class,
                 new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
+    }
+
+    private void registerPlaylistMessageHandler(){
+        this.messageDispatch.registerHandler(PlaylistMessage.class,
+                new CommandHandler<PlaylistMessage>(ACTION_PLAYLIST_UPDATED_MESSAGE));
     }
 
     private void broadcastMessageToFans(IMessage msg) {
