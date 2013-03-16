@@ -47,7 +47,9 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
-
+    
+    public static final String ACTION_PLAY_STATUS_MESSAGE = MessagingService.class.getName() + ".action.PlayStatusMessage";  
+    
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
@@ -128,6 +130,7 @@ public class MessagingService extends Service implements IMessagingService {
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
+        registerPlayStatusMessageHandler();
     }
 
     private void registerFoundFansHandler() {
@@ -225,6 +228,11 @@ public class MessagingService extends Service implements IMessagingService {
     private void registerSkipMessageHandler() {
         this.messageDispatch.registerHandler(SkipMessage.class,
                 new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
+    }
+    
+    private void registerPlayStatusMessageHandler() {
+    	this.messageDispatch.registerHandler(PlayStatusMessage.class,
+    			new CommandHandler<PlayStatusMessage>(ACTION_PLAY_STATUS_MESSAGE));
     }
 
     private void broadcastMessageToFans(IMessage msg) {
