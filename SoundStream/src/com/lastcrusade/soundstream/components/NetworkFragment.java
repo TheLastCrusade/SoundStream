@@ -23,6 +23,7 @@ import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
+import com.lastcrusade.soundstream.util.Toaster;
 import com.lastcrusade.soundstream.util.UserListAdapter;
 /*
  * This fragment handles the ability for members to add new members to 
@@ -80,8 +81,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
 
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {
-                        onDiscoveredDevices(intent);
-                        addMembersButton.setEnabled(true);
+                        onFindFinished(intent);
                     }
                 })
             .addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
@@ -98,27 +98,37 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
         this.broadcastRegistrar.unregister();
     }
 
-    private void onDiscoveredDevices(Intent intent) {
-
+    /**
+     * Called to handle a find finished method.  This may be to pop up a dialog
+     * or notify the user that no fans were found
+     * 
+     * @param intent
+     */
+    private void onFindFinished(Intent intent) {
+        //first thing...reenable the add members button
+        addMembersButton.setEnabled(true);
         
         //locally initiated device discovery...pop up a dialog for the user
         //TODO: this should probably use FoundFan, to decouple this code from the bluetooth code
         List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES);
-        
-        new MultiSelectListDialog<BluetoothDevice>(this.getActivity(),
-                R.string.select_fans, R.string.connect)
-                .setItems(devices)
-                .setOnClickListener(
-                        new IOnDialogItemClickListener<BluetoothDevice>() {
-
-                            @Override
-                            public void onItemClick(
-                                    BluetoothDevice device) {
-                                getConnectionService().connectToFan(device);
-                            }
-                        })
-                .setFormatter(new BluetoothDeviceDialogFormatter())
-                .show();
+        if (devices.isEmpty()) {
+            Toaster.iToast(this.getActivity(), R.string.no_fans_found);
+        } else {
+            new MultiSelectListDialog<BluetoothDevice>(this.getActivity(),
+                    R.string.select_fans, R.string.connect)
+                    .setItems(devices)
+                    .setOnClickListener(
+                            new IOnDialogItemClickListener<BluetoothDevice>() {
+    
+                                @Override
+                                public void onItemClick(
+                                        BluetoothDevice device) {
+                                    getConnectionService().connectToFan(device);
+                                }
+                            })
+                    .setFormatter(new BluetoothDeviceDialogFormatter())
+                    .show();
+        }
     }
 
     @Override

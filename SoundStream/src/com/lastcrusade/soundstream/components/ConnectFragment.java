@@ -60,7 +60,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             public void onClick(View v) {
                 //TODO: these will go away once Elizabeth completes her transition singleton
                 ((CoreActivity)getActivity()).onConnected();
-                Transitions.transitionToHome((CoreActivity)getActivity());
+                Transitions.transitionToNetwork((CoreActivity)getActivity());
             }
         });
         
