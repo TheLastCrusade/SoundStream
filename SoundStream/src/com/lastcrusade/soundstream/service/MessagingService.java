@@ -21,6 +21,7 @@ import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
@@ -274,6 +275,12 @@ public class MessagingService extends Service implements IMessagingService {
         SkipMessage msg = new SkipMessage();
         //send the message to the host
         sendMessageToHost(msg);
+    }
+    
+    public void sendPlayStatusMessage() {
+    	PlayStatusMessage msg = new PlayStatusMessage();
+    	//send the message to the host
+    	sendMessageToHost(msg);
     }
 
     public void sendStringMessage(String message) {
