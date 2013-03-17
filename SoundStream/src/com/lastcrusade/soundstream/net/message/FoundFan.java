@@ -1,9 +1,16 @@
 package com.lastcrusade.soundstream.net.message;
 
+import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class FoundFan implements Parcelable {
+
+    //this is REQUIRED for Parcelable to work properly
+    public static final Parcelable.Creator<FoundFan> CREATOR = new DefaultParcelableCreator(FoundFan.class);
+
     private String name;
     private String address;
 

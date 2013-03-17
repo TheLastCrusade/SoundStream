@@ -23,6 +23,8 @@ import com.lastcrusade.soundstream.net.BluetoothNotSupportedException;
 import com.lastcrusade.soundstream.net.ConnectThread;
 import com.lastcrusade.soundstream.net.MessageThread;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
+import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
 import com.lastcrusade.soundstream.net.message.FindNewFansMessage;
 import com.lastcrusade.soundstream.net.message.FoundFan;
 import com.lastcrusade.soundstream.net.message.FoundFansMessage;
@@ -54,7 +56,7 @@ public class ConnectionService extends Service {
      * 
      */
     public static final String ACTION_REMOTE_FIND_FINISHED = ConnectionService.class.getName() + ".action.RemoteFindFinished";
-    public static final String EXTRA_DEVICES               = ConnectionService.class.getName() + ".extra.Devices";
+    public static final String EXTRA_FANS                  = ConnectionService.class.getName() + ".extra.Fans";
     
     /**
      * Action to indicate the connection service is connected.  This applies both to connections to a host and to a fan.
@@ -114,22 +116,92 @@ public class ConnectionService extends Service {
         this.messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingServiceBinder.class);
         
-        this.messageDispatch = new MessageThreadMessageDispatch() {
-            
+        this.messageDispatch = new MessageThreadMessageDispatch();
+        
+        registerMessageHandlers();
+    }
+
+    /**
+     * Register message handlers for the messages handled by the connection service
+     * and use the default handler to dispatch other messages to the messaging service.
+     */
+    private void registerMessageHandlers() {
+        registerFindNewFansHandler();
+        registerFoundFansHandler();
+        registerConnectFansHandler();
+        //register a handler to route all other messages to
+        // the messaging service
+        registerMessagingServiceHandler();
+    }
+
+    /**
+     * 
+     */
+    private void registerFindNewFansHandler() {
+        this.messageDispatch.registerHandler(FindNewFansMessage.class, new IMessageHandler<FindNewFansMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    FindNewFansMessage message, String fromAddr) {
+                handleFindNewFansMessage(fromAddr);
+            }
+        });
+    }
+
+    /**
+     * 
+     */
+    private void registerFoundFansHandler() {
+        this.messageDispatch.registerHandler(FoundFansMessage.class, new IMessageHandler<FoundFansMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo, FoundFansMessage message,
+                    String fromAddr) {
+                //send the same intent that is sent for local finds...the listening mechanism should be
+                // the same for both processes.
+                new BroadcastIntent(ACTION_FIND_FINISHED)
+                    .putParcelableArrayListExtra(ConnectionService.EXTRA_FANS, message.getFoundFans())
+                    .send(ConnectionService.this);
+            }
+        });
+    }
+
+    /**
+     * 
+     */
+    private void registerConnectFansHandler() {
+        this.messageDispatch.registerHandler(ConnectFansMessage.class, new IMessageHandler<ConnectFansMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo, ConnectFansMessage message,
+                    String fromAddr) {
+                for (String fanAddr : message.getAddresses()) {
+                    //this will always return a device for a valid address, so this is safe
+                    // to do w/o checks
+                    connectToFanLocal(adapter.getRemoteDevice(fanAddr));
+                }
+            }
+        });
+    }
+
+    /**
+     * Register a handler to route all unhandled messages to
+     * the messaging service
+     */
+    private void registerMessagingServiceHandler() {
+        this.messageDispatch.setDefaultHandler(new IMessageHandler<IMessage>() {
+
             @Override
             public void handleMessage(int messageNo, IMessage message,
                     String fromAddr) {
-                if (message instanceof FindNewFansMessage) {
-                    
-                } else {
-                    try {
-                        messagingServiceLocator.getService().receiveMessage(messageNo, message, fromAddr);
-                    } catch (ServiceNotBoundException e) {
-                        Log.wtf(TAG, e);
-                    }
+                try {
+                    messagingServiceLocator.getService().receiveMessage(
+                            messageNo, message, fromAddr);
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, e);
                 }
             }
-        };
+        });
     }
 
     @Override
@@ -179,15 +251,15 @@ public class ConnectionService extends Service {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     //remote initiated device discovery...we want to send the list of devices back to the client
-                    List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES);
-                    List<FoundFan> foundFans = new ArrayList<FoundFan>();
-                    for (BluetoothDevice device : devices) {
-                        // send the found fans back to the client.
-                        foundFans.add(new FoundFan(device.getName(), device.getAddress()));
-                    }
-                    FoundFansMessage msg = new FoundFansMessage(
-                            foundFans);
+                    List<FoundFan> foundFans = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_FANS);
+//                    List<FoundFan> foundFans = new ArrayList<FoundFan>();
+//                    for (BluetoothDevice device : devices) {
+//                        // send the found fans back to the client.
+//                        foundFans.add(new FoundFan(device.getName(), device.getAddress()));
+//                    }
+                    FoundFansMessage msg = new FoundFansMessage(foundFans);
                     discoveryInitiator.write(msg);
+                    discoveryInitiator = null; //clear the initiator to handle the next one
                 }
             })
            .register(this);
@@ -263,11 +335,18 @@ public class ConnectionService extends Service {
 
     public void findNewFans() {
         Log.w(TAG, "Starting Discovery");
-        if (adapter == null) {
-            Toaster.iToast(this,
-                    "Device may not support bluetooth");
+        if (isHostConnected()) {
+            //NOTE: this does not originate at the messaging service...consumer code doesn't need to worry about
+            // how new fans are found, and this is a mechanism that applies directly to how connection
+            // was implemented.
+            sendMessageToHost(new FindNewFansMessage());
         } else {
-            adapter.startDiscovery();
+            if (adapter == null) {
+                Toaster.iToast(this,
+                        "Device may not support bluetooth");
+            } else {
+                adapter.startDiscovery();
+            }
         }
     }
 
@@ -308,7 +387,24 @@ public class ConnectionService extends Service {
      * 
      * @param device
      */
-    public void connectToFan(BluetoothDevice device) {
+    public void connectToFans(List<FoundFan> foundFans) {
+        if (isHostConnected()) {
+            List<String> addresses = new ArrayList<String>();
+            //we need to send only the addresses back to the host
+            for (FoundFan fan : foundFans) {
+                addresses.add(fan.getAddress());
+            }
+            sendMessageToHost(new ConnectFansMessage(addresses));
+        } else {
+            for (FoundFan fan : foundFans) {
+                //this will always return a device for a valid address, so this is safe
+                // to do w/o checks
+                connectToFanLocal(this.adapter.getRemoteDevice(fan.getAddress()));
+            }
+        }
+    }
+
+    private void connectToFanLocal(BluetoothDevice device) {
         try {
             //one thread per device found...if there are multiple devices,
             // there are multiple threads

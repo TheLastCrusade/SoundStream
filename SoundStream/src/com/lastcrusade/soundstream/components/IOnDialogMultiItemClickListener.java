@@ -1,5 +1,7 @@
 package com.lastcrusade.soundstream.components;
 
+import java.util.List;
+
 /**
  * This interface defines an API for receiving selections from the ListViewDialog
  * 
@@ -7,7 +9,7 @@ package com.lastcrusade.soundstream.components;
  *
  * @param <T>
  */
-public interface IOnDialogItemClickListener<T> {
+public interface IOnDialogMultiItemClickListener<T> {
 
-    public void onItemClick(T item);
+    public void onItemsClick(List<T> items);
 }

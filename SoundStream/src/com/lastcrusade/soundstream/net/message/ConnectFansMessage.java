@@ -6,6 +6,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This message is sent from a fan to the host to request the host
+ * connect to new fans, identified by the addresses attribute.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class ConnectFansMessage extends ADataMessage {
 
     private ArrayList<String> addresses = new ArrayList<String>();

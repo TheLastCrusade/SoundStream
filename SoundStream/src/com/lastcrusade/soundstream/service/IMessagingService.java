@@ -21,12 +21,12 @@ public interface IMessagingService {
      */
     public void sendLibraryMessageToFans(List<SongMetadata> library);
     
-    /**
-     * Send a find new fans message to the host.
-     * 
-     */
-    public void sendFindNewFansMessage();
-    
+//    /**
+//     * Send a find new fans message to the host.
+//     * 
+//     */
+//    public void sendFindNewFansMessage();
+//    
     /**
      * Send a pause message to the host.
      * 

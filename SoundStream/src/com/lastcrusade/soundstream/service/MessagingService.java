@@ -37,15 +37,6 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_STRING_MESSAGE = MessagingService.class.getName() + ".action.StringMessage";
     public static final String EXTRA_STRING          = MessagingService.class.getName() + ".extra.String";
     
-    public static final String ACTION_FOUND_FANS_MESSAGE = MessagingService.class.getName() + ".action.FoundFansMessage";
-    public static final String EXTRA_FOUND_FANS          = MessagingService.class.getName() + ".extra.FoundFans";
-    
-    public static final String ACTION_CONNECT_FANS_MESSAGE = MessagingService.class.getName() + ".action.ConnectFansMessage";
-    public static final String EXTRA_FAN_ADDRESSES         = MessagingService.class.getName() + ".extra.FanAddresses";
-    
-    public static final String ACTION_FIND_FANS_MESSAGE = MessagingService.class.getName() + ".action.FindFansMessage";
-    public static final String EXTRA_REQUEST_ADDRESS    = MessagingService.class.getName() + ".extra.RequestAddress";
-    
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
@@ -123,60 +114,19 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     public void receiveMessage(int messageNo, IMessage message, String fromAddr) {
+        //for ease of implementation, this also uses a message dispatch object.
         this.messageDispatch.handleMessage(messageNo, message, fromAddr);
     }
 
     private void registerMessageHandlers() {
         this.messageDispatch = new MessageThreadMessageDispatch();
         registerStringMessageHandler();
-        registerFindNewFansMessageHandler();
         registerLibraryMessageHandler();
-        registerConnectFansMessageHandler();
-        registerFoundFansHandler();
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
         registerPlayStatusMessageHandler();
         registerUserListMessageHandler();
-    }
-
-    private void registerFoundFansHandler() {
-        this.messageDispatch.registerHandler(FoundFansMessage.class, new IMessageHandler<FoundFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    FoundFansMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_FOUND_FANS_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_FOUND_FANS, message.getFoundFans())
-                    .send(MessagingService.this);
-            }
-        });
-    }
-
-    private void registerConnectFansMessageHandler() {
-        this.messageDispatch.registerHandler(ConnectFansMessage.class, new IMessageHandler<ConnectFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    ConnectFansMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_CONNECT_FANS_MESSAGE)
-                    .putStringArrayListExtra(EXTRA_FAN_ADDRESSES, message.getAddresses())
-                    .send(MessagingService.this);
-            }
-        });
-    }
-
-    private void registerFindNewFansMessageHandler() {
-        this.messageDispatch.registerHandler(FindNewFansMessage.class, new IMessageHandler<FindNewFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    FindNewFansMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_FIND_FANS_MESSAGE)
-                    .putExtra(EXTRA_REQUEST_ADDRESS, fromAddr)
-                    .send(MessagingService.this);
-            }
-        });
     }
 
     private void registerLibraryMessageHandler() {
@@ -285,11 +235,11 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
-    public void sendFindNewFansMessage() {
-        FindNewFansMessage msg = new FindNewFansMessage();
-        //send the message to the host
-        sendMessageToHost(msg);
-    }
+//    public void sendFindNewFansMessage() {
+//        FindNewFansMessage msg = new FindNewFansMessage();
+//        //send the message to the host
+//        sendMessageToHost(msg);
+//    }
 
     @Override
     public void sendLibraryMessageToHost(List<SongMetadata> library) {

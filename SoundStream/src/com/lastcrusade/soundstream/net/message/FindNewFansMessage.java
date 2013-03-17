@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * A message sent from a fan to the host
+ * to find new fans for the network.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class FindNewFansMessage implements IMessage {
 
     @Override
