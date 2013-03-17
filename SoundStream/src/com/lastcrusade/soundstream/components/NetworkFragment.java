@@ -14,12 +14,11 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.BluetoothDeviceDialogFormatter;
 import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
