@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
@@ -25,6 +26,7 @@ import com.lastcrusade.soundstream.net.message.PlayMessage;
 import com.lastcrusade.soundstream.net.message.PlaylistMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
+import com.lastcrusade.soundstream.net.message.UserListMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -52,8 +54,12 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
+
     //This also uses EXTRA_SONG_METADATA
     public static final String ACTION_PLAYLIST_UPDATED_MESSAGE = MessagingService.class.getName() + ".action.PlaylistUpdated";
+    
+    public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
+    public static final String EXTRA_USER_LIST                    = MessagingService.class.getName() + ".extra.UserList";
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -133,6 +139,7 @@ public class MessagingService extends Service implements IMessagingService {
         registerPlayMessageHandler();
         registerSkipMessageHandler();
         registerPlaylistMessageHandler();
+        registerUserListMessageHandler();
     }
 
     private void registerFoundFansHandler() {
@@ -230,6 +237,20 @@ public class MessagingService extends Service implements IMessagingService {
     private void registerSkipMessageHandler() {
         this.messageDispatch.registerHandler(SkipMessage.class,
                 new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
+    }
+    
+    private void registerUserListMessageHandler(){
+        this.messageDispatch.registerHandler(UserListMessage.class, new IMessageHandler<UserListMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo, UserListMessage message,
+                    String fromAddr) {
+                new BroadcastIntent(ACTION_NEW_CONNECTED_USERS_MESSAGE)
+                    .putExtra(EXTRA_USER_LIST, message.getUserList())
+                    .send(MessagingService.this);
+                
+            }
+        });
     }
 
     private void registerPlaylistMessageHandler() {
@@ -335,5 +356,23 @@ public class MessagingService extends Service implements IMessagingService {
             Log.wtf(TAG, e);
         }
 
+    }
+    
+    //sends the user list out to everyone
+    public void sendUserListMessage(UserList userlist){
+        UserListMessage ulm = new UserListMessage(userlist);
+        
+        try {
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(ulm);
+            }
+
+            if (this.connectServiceLocator.getService().isFanConnected()) {
+                sendMessageToFans(ulm);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 }
