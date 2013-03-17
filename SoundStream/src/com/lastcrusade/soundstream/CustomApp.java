@@ -13,6 +13,7 @@ import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -60,7 +61,7 @@ public class CustomApp extends Application {
                     String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
                     String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
                     userList.addUser(bluetoothID, macAddress);
-                    userList.notifyUpdate(CustomApp.this);
+                    notifyUserListUpdate();
                 }
             })
             .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
@@ -69,7 +70,17 @@ public class CustomApp extends Application {
                 public void onReceiveAction(Context context, Intent intent) {
                     String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
                     userList.removeUser(macAddress);
-                    userList.notifyUpdate(CustomApp.this);
+                    notifyUserListUpdate();
+                }
+            })
+            .addAction(MessagingService.ACTION_NEW_CONNECTED_USERS_MESSAGE, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    //extract the new user list from the intent
+                    userList = intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST);
+                    //tell app to update the user list in all the UI
+                    new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
                 }
             })
             .register(this);
@@ -102,5 +113,10 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return messagingService;
+    }
+    
+    public void notifyUserListUpdate() {
+        new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
+        getMessagingService().sendUserListMessage(userList);
     }
 }
