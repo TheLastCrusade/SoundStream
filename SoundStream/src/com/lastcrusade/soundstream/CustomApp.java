@@ -80,7 +80,6 @@ public class CustomApp extends Application {
                     //extract the new user list from the intent
                     userList = intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST);
                     //tell app to update the user list in all the UI
-                    Log.i(TAG, userList.toString());
                     new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
                 }
             })
@@ -118,7 +117,6 @@ public class CustomApp extends Application {
     
     public void notifyUserListUpdate() {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
-        Log.i(TAG, "User List: " + userList);
         getMessagingService().sendUserListMessage(userList);
     }
 }
