@@ -1,5 +1,7 @@
 package com.lastcrusade.soundstream.service;
 
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -149,6 +151,15 @@ public class PlaylistService extends Service implements IPlayer {
                 skip();
             }
         })
+        .addAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                List<SongMetadata> newList = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                mPlaylist = new Playlist(newList);
+                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+            }
+        })
         .register(this);
     }
 
@@ -211,6 +222,7 @@ public class PlaylistService extends Service implements IPlayer {
     public void addSong(SongMetadata metadata) {
         mPlaylist.add(metadata);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist);
     }
 
     public Playlist getPlaylist() {
