@@ -321,6 +321,19 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     public void sendPlaylistMessage(Playlist playlist){
-        broadcastMessageToFans(new PlaylistMessage(playlist));
+        try {
+            PlaylistMessage playlistMessage = new PlaylistMessage(playlist);
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(playlistMessage);
+            }
+
+            if (this.connectServiceLocator.getService().isFanConnected()) {
+                broadcastMessageToFans(playlistMessage);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+
     }
 }
