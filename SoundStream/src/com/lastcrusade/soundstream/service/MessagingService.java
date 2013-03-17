@@ -248,7 +248,9 @@ public class MessagingService extends Service implements IMessagingService {
 
     private void broadcastMessageToFans(IMessage msg) {
         try {
-            this.connectServiceLocator.getService().broadcastMessageToFans(msg);
+            if (this.connectServiceLocator.getService().isFanConnected()) {
+                this.connectServiceLocator.getService().broadcastMessageToFans(msg);
+            }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -256,7 +258,9 @@ public class MessagingService extends Service implements IMessagingService {
 
     private void sendMessageToHost(IMessage msg) {
         try {
-            this.connectServiceLocator.getService().sendMessageToHost(msg);
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                this.connectServiceLocator.getService().sendMessageToHost(msg);
+            }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -269,10 +273,17 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     @Override
-    public void sendLibraryMessage(List<SongMetadata> library) {
+    public void sendLibraryMessageToHost(List<SongMetadata> library) {
         LibraryMessage msg = new LibraryMessage(library);
         //send the message to the host
         sendMessageToHost(msg);
+    }
+    
+    @Override
+    public void sendLibraryMessageToFans(List<SongMetadata> library) {
+        LibraryMessage msg = new LibraryMessage(library);
+        //send the message to the fans
+        broadcastMessageToFans(msg);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
@@ -65,7 +66,7 @@ public class MusicLibraryService extends Service {
         }
         
         //update the library with the local songs
-        updateLibrary(metadataList, true);
+        updateLibrary(metadataList, false);
 
         registerReceivers();
     }
@@ -91,12 +92,8 @@ public class MusicLibraryService extends Service {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    try {
-                        List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
-                        updateLibrary(remoteMetas, true);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
+                    List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                    updateLibrary(remoteMetas, true);
                 }
             })
             .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
@@ -106,7 +103,6 @@ public class MusicLibraryService extends Service {
                     String macAddress = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
                     removeLibraryForAddress(macAddress, true);
                 }
-                
             })
             .register(this);
     }
@@ -162,7 +158,20 @@ public class MusicLibraryService extends Service {
             }
         }
         if (notify) {
-            new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+            notifyLibraryUpdated();
+        }
+    }
+
+    /**
+     * Notify that the library was updated.  This includes
+     * sending an intent to the system, and sending the library out
+     * to the fans.
+     */
+    private void notifyLibraryUpdated() {
+        new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        //send the updated library to all the fans out there
+        if (((CustomApp)getApplication()).getMessagingService() != null) {
+            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToFans(getLibrary());
         }
     }
 
@@ -194,7 +203,7 @@ public class MusicLibraryService extends Service {
             metadataMap = newMap;
         }
         if (notify) {
-            new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+            notifyLibraryUpdated();
         }
     }
 
