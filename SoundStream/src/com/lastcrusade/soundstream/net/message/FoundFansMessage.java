@@ -6,8 +6,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.bluetooth.BluetoothDevice;
-
 public class FoundFansMessage extends ADataMessage {
 
     private ArrayList<FoundFan> foundFans = new ArrayList<FoundFan>();

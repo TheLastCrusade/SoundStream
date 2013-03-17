@@ -2,8 +2,6 @@ package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
 
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 
 import android.content.Context;
