@@ -9,12 +9,17 @@ package com.lastcrusade.soundstream.audio;
  */
 public interface IPlayer {
 
+    public boolean isPaused();
+
     public boolean isPlaying();
     
     public void play();
 
     public void pause();
     
+    public void resume();
+    
     public void skip();
+
 
 }

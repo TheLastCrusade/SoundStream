@@ -13,6 +13,7 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 public class RemoteAudioPlayer implements IPlayer {
 
     private CustomApp application;
+    private boolean paused;
     private boolean playing;
     
     BroadcastRegistrar registrar;
@@ -20,12 +21,18 @@ public class RemoteAudioPlayer implements IPlayer {
     public RemoteAudioPlayer(CustomApp application) {
         this.application = application;
         this.playing = false;
+        this.paused  = false;
         registerReceivers();
     }
 
     @Override
+    public boolean isPaused() {
+        return this.paused;
+    }
+    
+    @Override
     public boolean isPlaying() {
-        return this.playing;
+        return this.playing && !this.paused;
     }
 
     @Override
@@ -44,6 +51,15 @@ public class RemoteAudioPlayer implements IPlayer {
     }
 
     @Override
+    public void resume() {
+        //TODO: see above
+        this.playing = true;
+        this.paused  = false;
+        //TODO: this should probably send a resume message
+        this.application.getMessagingService().sendPlayMessage();
+    }
+
+    @Override
     public void skip() {
         this.application.getMessagingService().sendSkipMessage();
     }
@@ -57,9 +73,11 @@ public class RemoteAudioPlayer implements IPlayer {
 			public void onReceiveAction(Context context, Intent intent) {
 				playing = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
 				if(playing) {
+				    paused = false;
 					new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(application);
 				}
 				else {
+				    paused = true;
 					new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(application);
 				}
 			}
