@@ -60,7 +60,7 @@ public class CustomApp extends Application {
                     String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
                     String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
                     userList.addUser(bluetoothID, macAddress);
-                    userList.notifyUpdate(CustomApp.this);                    
+                    userList.notifyUpdate(CustomApp.this);
                 }
             })
             .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
@@ -102,5 +102,5 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return messagingService;
-    }    
+    }
 }

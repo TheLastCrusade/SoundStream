@@ -257,7 +257,6 @@ public class MessagingService extends Service implements IMessagingService {
         LibraryMessage msg = new LibraryMessage(library);
         //send the message to the host
         sendMessageToHost(msg);
-
     }
     
     @Override
