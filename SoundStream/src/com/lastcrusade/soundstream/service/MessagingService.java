@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
@@ -131,6 +132,7 @@ public class MessagingService extends Service implements IMessagingService {
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
+        registerPlaylistMessageHandler();
     }
 
     private void registerFoundFansHandler() {
@@ -230,10 +232,23 @@ public class MessagingService extends Service implements IMessagingService {
                 new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
     }
 
-    private void registerPlaylistMessageHandler(){
+    private void registerPlaylistMessageHandler() {
         this.messageDispatch.registerHandler(PlaylistMessage.class,
-                new CommandHandler<PlaylistMessage>(ACTION_PLAYLIST_UPDATED_MESSAGE));
+                new IMessageHandler<PlaylistMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    PlaylistMessage message, String fromAddr) {
+                //This is because you can pass an ArrayList of parseables but not a List
+                ArrayList<SongMetadata> remotePlaylist = (ArrayList<SongMetadata>) message.getPlaylist().getSongsToPlay();
+
+                new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remotePlaylist)
+                    .send(MessagingService.this);
+            }
+        });
     }
+
 
     private void broadcastMessageToFans(IMessage msg) {
         try {
@@ -303,5 +318,9 @@ public class MessagingService extends Service implements IMessagingService {
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
+    }
+    
+    public void sendPlaylistMessage(Playlist playlist){
+        broadcastMessageToFans(new PlaylistMessage(playlist));
     }
 }
