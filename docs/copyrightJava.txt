@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
  * 
  * This file is part of SoundStream.
