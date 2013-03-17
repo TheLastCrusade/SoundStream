@@ -10,11 +10,20 @@ import com.lastcrusade.soundstream.model.UserList;
 public class UserListMessage extends ADataMessage {
 	private final String TAG = UserListMessage.class.getName();
 	
-	private UserList userList = new UserList(); 
+	private UserList userList; 
 	
-	public UserListMessage() {}
+	/**
+	 * Default constructor, required for Messenger.  All other users should use
+	 * the other constructor.
+	 * 
+	 */
+	UserListMessage() {
+	    this(new UserList());
+	}
 	
-	public UserListMessage(UserList userList) {}
+	public UserListMessage(UserList userList) {
+	    this.userList = userList;
+	}
 	
 	@Override
 	public void deserialize(InputStream input) throws IOException {
