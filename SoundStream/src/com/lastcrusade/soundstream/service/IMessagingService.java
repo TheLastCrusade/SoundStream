@@ -53,5 +53,6 @@ public interface IMessagingService {
      * @param message
      */
     public void sendStringMessage(String message);
+    public void sendPlayStatusMessage(String playStatusMessage);
     public void sendUserListMessage(UserList userlist);
 }

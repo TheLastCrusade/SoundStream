@@ -111,6 +111,9 @@ public class PlaylistService extends Service implements IPlayer {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 mPlaylist.moveNext();
+                // TODO: Right now, we don't move automatically to the next song.
+                // Until we make that change, this is appropriate
+                ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Pause");
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
@@ -166,6 +169,7 @@ public class PlaylistService extends Service implements IPlayer {
         if(isLocalPlayer()) {
             if (mPlaylist.size() > 0){
                 setSong(mPlaylist.getNextSong());
+                ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Play");
             } else {
                 Toaster.iToast(this, getString(R.string.playlist_empty));
                 return; //SECOND RETURN PATH that makes the code nicer
@@ -179,6 +183,7 @@ public class PlaylistService extends Service implements IPlayer {
     @Override
     public void pause() {
         this.thePlayer.pause();
+        ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Pause");
         new BroadcastIntent(ACTION_PAUSED_AUDIO).send(this);
     }
 
