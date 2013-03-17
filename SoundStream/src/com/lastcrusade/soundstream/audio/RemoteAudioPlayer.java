@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
@@ -21,6 +20,7 @@ public class RemoteAudioPlayer implements IPlayer {
     public RemoteAudioPlayer(CustomApp application) {
         this.application = application;
         this.playing = false;
+        registerReceivers();
     }
 
     @Override
@@ -54,13 +54,13 @@ public class RemoteAudioPlayer implements IPlayer {
 			
 			@Override
 			public void onReceiveAction(Context context, Intent intent) {
-				if(MessagingService.ACTION_PLAY_STATUS_MESSAGE == "Play") {
-					new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO);
+				playing = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
+				if(playing) {
+					new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(application);
 				}
-				else if(MessagingService.ACTION_PLAY_STATUS_MESSAGE == "Pause") {
-					new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO);
+				else {
+					new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(application);
 				}
-				
 			}
 		}).register(this.application);
     }

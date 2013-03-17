@@ -48,7 +48,8 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
     
-    public static final String ACTION_PLAY_STATUS_MESSAGE = MessagingService.class.getName() + ".action.PlayStatusMessage";  
+    public static final String ACTION_PLAY_STATUS_MESSAGE = MessagingService.class.getName() + ".action.PlayStatusMessage";
+    public static final String EXTRA_IS_PLAYING = MessagingService.class.getName() + ".extra.IsPlaying";
     
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
@@ -232,7 +233,16 @@ public class MessagingService extends Service implements IMessagingService {
     
     private void registerPlayStatusMessageHandler() {
     	this.messageDispatch.registerHandler(PlayStatusMessage.class,
-    			new CommandHandler<PlayStatusMessage>(ACTION_PLAY_STATUS_MESSAGE));
+    			new IMessageHandler<PlayStatusMessage>() {
+					
+					@Override
+					public void handleMessage(int messageNo, PlayStatusMessage message,
+							String fromAddr) {
+						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
+							.putExtra(EXTRA_IS_PLAYING, message.getString().equals("Play"))
+							.send(MessagingService.this);
+					}
+				});
     }
 
     private void broadcastMessageToFans(IMessage msg) {
@@ -285,10 +295,10 @@ public class MessagingService extends Service implements IMessagingService {
         sendMessageToHost(msg);
     }
     
-    public void sendPlayStatusMessage() {
-    	PlayStatusMessage msg = new PlayStatusMessage();
-    	//send the message to the host
-    	sendMessageToHost(msg);
+    public void sendPlayStatusMessage(String playStatusMessage) {
+    	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
+    	//send the message to the fans
+    	broadcastMessageToFans(msg);
     }
 
     public void sendStringMessage(String message) {

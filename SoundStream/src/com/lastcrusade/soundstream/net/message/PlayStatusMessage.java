@@ -5,12 +5,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.util.Log;
+
 public class PlayStatusMessage extends ADataMessage {
 	
 	private final String TAG = PlayStatusMessage.class.getName();
 	private final String PLAY_MESSAGE = "Play";
 	private final String PAUSE_MESSAGE = "Pause";
 	private String string = "";
+	
+	public PlayStatusMessage() {}
+
+	public PlayStatusMessage(String playStatusMessage) {
+		if(playStatusMessage.equals(PLAY_MESSAGE) || playStatusMessage.equals(PAUSE_MESSAGE)) {
+			this.setString(playStatusMessage);
+		}
+		else {
+			Log.wtf(TAG, "Status msg passed not Play or Pause");
+		}
+	}
 
 	@Override
 	public void deserialize(InputStream input) throws IOException {
@@ -26,20 +39,6 @@ public class PlayStatusMessage extends ADataMessage {
 	@Override
 	public void serialize(OutputStream output) throws IOException {
 		output.write(getString().getBytes());
-		/*if(output.toString() == PLAY_MESSAGE) {
-			output.write(PLAY_MESSAGE.getBytes());
-		}
-		else if(output.toString() == PAUSE_MESSAGE) {
-			output.write(PAUSE_MESSAGE.getBytes());
-		}*/
-	}
-	
-	public String getPlayMessage() {
-		return PLAY_MESSAGE;
-	}
-	
-	public String getPauseMessage() {
-		return PAUSE_MESSAGE;
 	}
 
 	public String getString() {

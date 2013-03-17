@@ -12,4 +12,5 @@ public interface IMessagingService {
     public void sendPlayMessage();
     public void sendSkipMessage();
     public void sendStringMessage(String message);
+    public void sendPlayStatusMessage(String playStatusMessage);
 }
