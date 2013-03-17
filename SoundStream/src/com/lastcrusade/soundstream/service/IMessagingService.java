@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.model.UserList;
 
 public interface IMessagingService {
 
@@ -14,4 +15,5 @@ public interface IMessagingService {
     public void sendSkipMessage();
     public void sendStringMessage(String message);
     public void sendPlaylistMessage(Playlist playlist);
+    public void sendUserListMessage(UserList userlist);
 }
