@@ -7,6 +7,11 @@ import java.io.OutputStream;
 
 import android.util.Log;
 
+
+/**
+ * TODO: Potential refactor
+ * @theJenix believes that PlayStatus should be a boolean. 
+ */
 public class PlayStatusMessage extends ADataMessage {
 	
 	private final String TAG = PlayStatusMessage.class.getName();
