@@ -53,4 +53,8 @@ public class Playlist {
     public void moveNext(){
             index++;
     }
+    
+    public SongMetadata getSong(int index){
+        return musicList.get(index);
+    }
 }

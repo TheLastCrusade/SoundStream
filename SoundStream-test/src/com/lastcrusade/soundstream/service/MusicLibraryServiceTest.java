@@ -11,6 +11,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import static com.lastcrusade.soundstream.util.CustomAssert.*;
 
 public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
 
@@ -213,19 +214,5 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         } finally {
             registrar.unregister();
         }
-    }
-
-    /**
-     * Test to ensure SongMetadata objects are equal.
-     * 
-     * @param meta
-     * @param libraryItem
-     */
-    private void assertSongMetaEquals(SongMetadata meta,
-            SongMetadata libraryItem) {
-        assertEquals(meta.getTitle(), libraryItem.getTitle());
-        assertEquals(meta.getArtist(), libraryItem.getArtist());
-        assertEquals(meta.getAlbum(), libraryItem.getAlbum());
-        assertEquals(meta.getMacAddress(), libraryItem.getMacAddress());
     }
 }
