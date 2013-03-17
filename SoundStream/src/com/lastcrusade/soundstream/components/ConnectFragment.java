@@ -38,15 +38,11 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     private BroadcastRegistrar broadcastRegistrar;
     private Button connectButton;
-    private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         registerReceivers();
-
-        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(this.getActivity(),
-                MusicLibraryService.class, MusicLibraryServiceBinder.class);
 
     }
 
@@ -58,8 +54,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             
             @Override
             public void onClick(View v) {
-                //TODO: these will go away once Elizabeth completes her transition singleton
-                ((CoreActivity)getActivity()).onConnected();
                 Transitions.transitionToNetwork((CoreActivity)getActivity());
             }
         });
@@ -93,10 +87,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         return app.getMessagingService();
     }
     
-    private MusicLibraryService getMusicLibraryService() throws ServiceNotBoundException {
-        return this.musicLibraryLocator.getService();
-    }
-    
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
@@ -105,14 +95,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {
                         connectButton.setEnabled(true);
-                        //send the library to the connected host
-                        try {
-                            List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
-                            getMessagingService().sendLibraryMessage(metadata);
-                        } catch (ServiceNotBoundException e) {
-                            Log.wtf(TAG, e);
-                        }
-                        ((CoreActivity)getActivity()).onConnected();
                         //switch 
                         Transitions.transitionToHome((CoreActivity)getActivity());
                     }
