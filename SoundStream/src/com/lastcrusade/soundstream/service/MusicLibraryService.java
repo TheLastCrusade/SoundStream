@@ -116,7 +116,7 @@ public class MusicLibraryService extends Service {
         synchronized(metadataMutex) {
             
             //sorts the list before returning it - for now,
-            //order is simply alphabetical
+            //order is simply alphabetical by artist, album, then song.
             ArrayList<SongMetadata> music = new ArrayList<SongMetadata>(metadataList);
             Collections.sort(music);
             //unmodifiable copy, for safety
