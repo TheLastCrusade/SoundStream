@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/gray">
+    android:background="@color/gray"
+    android:paddingRight="4sp"
+    android:paddingLeft="4sp">
 
     <!-- singleLine is deprecated, but it appears to be
          the only way to get the fading to work correctly.
