@@ -12,7 +12,12 @@ public class UserListMessage extends ADataMessage {
 	
 	private UserList userList; 
 	
-	public UserListMessage() {
+	/**
+	 * Default constructor, required for Messenger.  All other users should use
+	 * the other constructor.
+	 * 
+	 */
+	UserListMessage() {
 	    this(new UserList());
 	}
 	
