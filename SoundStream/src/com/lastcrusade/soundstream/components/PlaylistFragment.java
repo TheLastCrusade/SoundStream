@@ -72,7 +72,7 @@ public class PlaylistFragment extends MusicListFragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        playlistServiceServiceLocator.unbind();
         unregisterReceivers();
     }
 
