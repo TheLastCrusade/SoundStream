@@ -250,7 +250,7 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
 
-    private void broadcastMessageToFans(IMessage msg) {
+    private void sendMessageToFans(IMessage msg) {
         try {
             this.connectServiceLocator.getService().broadcastMessageToFans(msg);
         } catch (ServiceNotBoundException e) {
@@ -313,7 +313,7 @@ public class MessagingService extends Service implements IMessagingService {
             }
             
             if (this.connectServiceLocator.getService().isFanConnected()) {
-                broadcastMessageToFans(sm);
+                sendMessageToFans(sm);
             }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
@@ -329,7 +329,7 @@ public class MessagingService extends Service implements IMessagingService {
             }
 
             if (this.connectServiceLocator.getService().isFanConnected()) {
-                broadcastMessageToFans(playlistMessage);
+                sendMessageToFans(playlistMessage);
             }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
