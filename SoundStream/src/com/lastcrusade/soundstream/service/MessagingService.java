@@ -22,6 +22,7 @@ import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
 import com.lastcrusade.soundstream.net.message.UserListMessage;
@@ -48,7 +49,10 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
-
+    
+    public static final String ACTION_PLAY_STATUS_MESSAGE = MessagingService.class.getName() + ".action.PlayStatusMessage";
+    public static final String EXTRA_IS_PLAYING = MessagingService.class.getName() + ".extra.IsPlaying";
+    
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
@@ -132,6 +136,7 @@ public class MessagingService extends Service implements IMessagingService {
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
+        registerPlayStatusMessageHandler();
         registerUserListMessageHandler();
     }
 
@@ -232,6 +237,20 @@ public class MessagingService extends Service implements IMessagingService {
                 new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
     }
     
+    private void registerPlayStatusMessageHandler() {
+    	this.messageDispatch.registerHandler(PlayStatusMessage.class,
+    			new IMessageHandler<PlayStatusMessage>() {
+					
+					@Override
+					public void handleMessage(int messageNo, PlayStatusMessage message,
+							String fromAddr) {
+						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
+							.putExtra(EXTRA_IS_PLAYING, message.getString().equals("Play"))
+							.send(MessagingService.this);
+					}
+				});
+    }
+    
     private void registerUserListMessageHandler(){
         this.messageDispatch.registerHandler(UserListMessage.class, new IMessageHandler<UserListMessage>() {
 
@@ -305,6 +324,12 @@ public class MessagingService extends Service implements IMessagingService {
         SkipMessage msg = new SkipMessage();
         //send the message to the host
         sendMessageToHost(msg);
+    }
+    
+    public void sendPlayStatusMessage(String playStatusMessage) {
+    	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
+    	//send the message to the fans
+    	broadcastMessageToFans(msg);
     }
 
     public void sendStringMessage(String message) {
