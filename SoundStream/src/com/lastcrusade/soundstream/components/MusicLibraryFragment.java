@@ -148,7 +148,7 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         public View getView(int position, View convertView, ViewGroup parent){
             View v = super.getView(position, convertView, parent);
-            ImageButton imageButton = (ImageButton) v.findViewById(R.id.add_to_playlist);
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.btn_add_to_playlist);
             imageButton.setVisibility(View.VISIBLE);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
