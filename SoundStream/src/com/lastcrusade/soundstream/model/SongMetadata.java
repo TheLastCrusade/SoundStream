@@ -1,13 +1,11 @@
 package com.lastcrusade.soundstream.model;
 
-import java.util.Arrays;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
 
-public class SongMetadata implements Parcelable, Comparable<SongMetadata> {
+public class SongMetadata implements Parcelable{
 
     //this is REQUIRED for Parcelable to work properly
     public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(SongMetadata.class);
@@ -99,29 +97,6 @@ public class SongMetadata implements Parcelable, Comparable<SongMetadata> {
 
     public void setMacAddress(String macAddress) {
         this.macAddress = macAddress;
-    }
-
-
-    /*
-     * To aid in ordering music - compares music by
-     * artist, then album, then song title
-     */
-    @Override
-    public int compareTo(SongMetadata another) {
-        int artistComp = artist.compareTo(another.getArtist());
-        int albumComp = album.compareTo(another.getAlbum());
-        int titleComp = title.compareTo(another.getTitle());
-        
-        if(artistComp!=0){
-            return artistComp;
-        }
-        
-        if(albumComp!=0){
-            return albumComp;
-        }
-        
-        return titleComp;
-            
     }
 
 }

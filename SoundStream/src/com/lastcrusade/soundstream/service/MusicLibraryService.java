@@ -16,6 +16,7 @@ import android.os.IBinder;
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -115,10 +116,19 @@ public class MusicLibraryService extends Service {
     public List<SongMetadata> getLibrary() {
         synchronized(metadataMutex) {
             
+            /*
+             * I (@ejohnson44) recognize that this is not the best
+             * place for sorting, but I am not sure what the best method is - 
+             * the original metadatalist keeps track of songs in order added
+             * and uses an additional hashmap to aid in this, so I am not sure
+             * if we want to have a duplicate of sorted data or if we just want to
+             * reorder and then update the hashmap
+             */
+            
             //sorts the list before returning it - for now,
             //order is simply alphabetical by artist, album, then song.
             ArrayList<SongMetadata> music = new ArrayList<SongMetadata>(metadataList);
-            Collections.sort(music);
+            Collections.sort(music, new AlphabeticalComparator());
             //unmodifiable copy, for safety
             return Collections.unmodifiableList(music);
         }
