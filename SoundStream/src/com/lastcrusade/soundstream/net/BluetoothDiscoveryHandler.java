@@ -10,7 +10,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.net.message.FoundFan;
+import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.Toaster;
@@ -58,13 +58,13 @@ public class BluetoothDiscoveryHandler {
         String action = this.remoteInitiated
                           ? ConnectionService.ACTION_REMOTE_FIND_FINISHED
                           : ConnectionService.ACTION_FIND_FINISHED;
-        ArrayList<FoundFan> foundFans = new ArrayList<FoundFan>();
+        ArrayList<FoundGuest> foundFans = new ArrayList<FoundGuest>();
         for (BluetoothDevice device : this.discoveredDevices) {
             // send the found fans back to the client.
-            foundFans.add(new FoundFan(device.getName(), device.getAddress()));
+            foundFans.add(new FoundGuest(device.getName(), device.getAddress()));
         }
         new BroadcastIntent(action)
-            .putParcelableArrayListExtra(ConnectionService.EXTRA_FANS, foundFans)
+            .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, foundFans)
             .send(this.context);
     }
 

@@ -6,13 +6,13 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import com.lastcrusade.soundstream.net.message.FindNewFansMessage;
+import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
 
-public class FindNewFansMessageTest extends SerializationTest<FindNewFansMessage> {
+public class FindNewGuestsMessageTest extends SerializationTest<FindNewGuestsMessage> {
 
     @Test
     public void testSerializeFindNewFansMessage() throws IOException {
         //NOTE: no fields to check, and the base class will ensure we create the right class.
-        FindNewFansMessage newMessage = super.testSerializeMessage(new FindNewFansMessage());
+        FindNewGuestsMessage newMessage = super.testSerializeMessage(new FindNewGuestsMessage());
     }
 }

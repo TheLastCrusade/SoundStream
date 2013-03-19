@@ -68,7 +68,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             @Override
             public void onClick(View v) {
                 connectButton.setEnabled(false);
-                getConnectionService().broadcastFan(getActivity());
+                getConnectionService().broadcastGuest(getActivity());
             }
         });
 

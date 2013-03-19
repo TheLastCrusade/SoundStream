@@ -19,14 +19,8 @@ public interface IMessagingService {
      * 
      * @param library
      */
-    public void sendLibraryMessageToFans(List<SongMetadata> library);
+    public void sendLibraryMessageToGuests(List<SongMetadata> library);
     
-//    /**
-//     * Send a find new fans message to the host.
-//     * 
-//     */
-//    public void sendFindNewFansMessage();
-//    
     /**
      * Send a pause message to the host.
      * 

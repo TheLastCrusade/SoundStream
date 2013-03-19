@@ -24,10 +24,10 @@ import com.lastcrusade.soundstream.net.ConnectThread;
 import com.lastcrusade.soundstream.net.MessageThread;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
-import com.lastcrusade.soundstream.net.message.FindNewFansMessage;
-import com.lastcrusade.soundstream.net.message.FoundFan;
-import com.lastcrusade.soundstream.net.message.FoundFansMessage;
+import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
+import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
+import com.lastcrusade.soundstream.net.message.FoundGuest;
+import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
@@ -41,7 +41,7 @@ public class ConnectionService extends Service {
     private static final String TAG = ConnectionService.class.getName();
 
     /**
-     * Action to indicate find fans action has finished.  This action is sent in response to local UI initiated
+     * Action to indicate find guests action has finished.  This action is sent in response to local UI initiated
      * find.
      * 
      * This uses EXTRA_DEVICES to report the devices found.
@@ -50,22 +50,22 @@ public class ConnectionService extends Service {
     public static final String ACTION_FIND_FINISHED        = ConnectionService.class.getName() + ".action.FindFinished";
 
     /**
-     * Action to indicate find fans action has finished.  This action is sent in response to a remote FindNewFans message.
+     * Action to indicate find guests action has finished.  This action is sent in response to a remote FindNewGuests message.
      * 
      * This uses EXTRA_DEVICES to report the devices found.
      * 
      */
     public static final String ACTION_REMOTE_FIND_FINISHED = ConnectionService.class.getName() + ".action.RemoteFindFinished";
-    public static final String EXTRA_FANS                  = ConnectionService.class.getName() + ".extra.Fans";
+    public static final String EXTRA_GUESTS                = ConnectionService.class.getName() + ".extra.Guestss";
     
     /**
-     * Action to indicate the connection service is connected.  This applies both to connections to a host and to a fan.
+     * Action to indicate the connection service is connected.  This applies both to connections to a host and to a guest.
      * 
      */
-    public static final String ACTION_FAN_CONNECTED        = ConnectionService.class.getName() + ".action.FanConnected";
-    public static final String EXTRA_FAN_NAME              = ConnectionService.class.getName() + ".extra.FanName";
-    public static final String EXTRA_FAN_ADDRESS           = ConnectionService.class.getName() + ".extra.FanAddress";
-    public static final String ACTION_FAN_DISCONNECTED     = ConnectionService.class.getName() + ".action.FanDisconected";
+    public static final String ACTION_GUEST_CONNECTED      = ConnectionService.class.getName() + ".action.GuestConnected";
+    public static final String EXTRA_GUEST_NAME            = ConnectionService.class.getName() + ".extra.GuestName";
+    public static final String EXTRA_GUEST_ADDRESS         = ConnectionService.class.getName() + ".extra.GuestAddress";
+    public static final String ACTION_GUEST_DISCONNECTED   = ConnectionService.class.getName() + ".action.GuestDisconected";
 
     public static final String ACTION_HOST_CONNECTED       = ConnectionService.class.getName() + ".action.HostConnected";
     public static final String ACTION_HOST_DISCONNECTED    = ConnectionService.class.getName() + ".action.HostDisconnected";
@@ -81,12 +81,12 @@ public class ConnectionService extends Service {
         }
     }
 
-    private BluetoothAdapter adapter;
+    private BluetoothAdapter    adapter;
     private List<ConnectThread> pendingConnections = new ArrayList<ConnectThread>();
-    private List<MessageThread> fans     = new ArrayList<MessageThread>();
-    private MessageThreadMessageDispatch messageDispatch;
+    private List<MessageThread> guests             = new ArrayList<MessageThread>();
+    private MessageThreadMessageDispatch     messageDispatch;
     private ServiceLocator<MessagingService> messagingServiceLocator;
-    private BluetoothDiscoveryHandler bluetoothDiscoveryHandler;
+    private BluetoothDiscoveryHandler        bluetoothDiscoveryHandler;
 
     private MessageThread discoveryInitiator;
 
@@ -126,9 +126,9 @@ public class ConnectionService extends Service {
      * and use the default handler to dispatch other messages to the messaging service.
      */
     private void registerMessageHandlers() {
-        registerFindNewFansHandler();
-        registerFoundFansHandler();
-        registerConnectFansHandler();
+        registerFindNewGuestsHandler();
+        registerFoundGuestsHandler();
+        registerConnectGuestsHandler();
         //register a handler to route all other messages to
         // the messaging service
         registerMessagingServiceHandler();
@@ -137,13 +137,13 @@ public class ConnectionService extends Service {
     /**
      * 
      */
-    private void registerFindNewFansHandler() {
-        this.messageDispatch.registerHandler(FindNewFansMessage.class, new IMessageHandler<FindNewFansMessage>() {
+    private void registerFindNewGuestsHandler() {
+        this.messageDispatch.registerHandler(FindNewGuestsMessage.class, new IMessageHandler<FindNewGuestsMessage>() {
 
             @Override
             public void handleMessage(int messageNo,
-                    FindNewFansMessage message, String fromAddr) {
-                handleFindNewFansMessage(fromAddr);
+                    FindNewGuestsMessage message, String fromAddr) {
+                handleFindNewGuestsMessage(fromAddr);
             }
         });
     }
@@ -151,16 +151,16 @@ public class ConnectionService extends Service {
     /**
      * 
      */
-    private void registerFoundFansHandler() {
-        this.messageDispatch.registerHandler(FoundFansMessage.class, new IMessageHandler<FoundFansMessage>() {
+    private void registerFoundGuestsHandler() {
+        this.messageDispatch.registerHandler(FoundGuestsMessage.class, new IMessageHandler<FoundGuestsMessage>() {
 
             @Override
-            public void handleMessage(int messageNo, FoundFansMessage message,
+            public void handleMessage(int messageNo, FoundGuestsMessage message,
                     String fromAddr) {
                 //send the same intent that is sent for local finds...the listening mechanism should be
                 // the same for both processes.
                 new BroadcastIntent(ACTION_FIND_FINISHED)
-                    .putParcelableArrayListExtra(ConnectionService.EXTRA_FANS, message.getFoundFans())
+                    .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, message.getFoundGuests())
                     .send(ConnectionService.this);
             }
         });
@@ -169,16 +169,16 @@ public class ConnectionService extends Service {
     /**
      * 
      */
-    private void registerConnectFansHandler() {
-        this.messageDispatch.registerHandler(ConnectFansMessage.class, new IMessageHandler<ConnectFansMessage>() {
+    private void registerConnectGuestsHandler() {
+        this.messageDispatch.registerHandler(ConnectGuestsMessage.class, new IMessageHandler<ConnectGuestsMessage>() {
 
             @Override
-            public void handleMessage(int messageNo, ConnectFansMessage message,
+            public void handleMessage(int messageNo, ConnectGuestsMessage message,
                     String fromAddr) {
-                for (String fanAddr : message.getAddresses()) {
+                for (String guestAddr : message.getAddresses()) {
                     //this will always return a device for a valid address, so this is safe
                     // to do w/o checks
-                    connectToFanLocal(adapter.getRemoteDevice(fanAddr));
+                    connectToGuestLocal(adapter.getRemoteDevice(guestAddr));
                 }
             }
         });
@@ -251,13 +251,8 @@ public class ConnectionService extends Service {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     //remote initiated device discovery...we want to send the list of devices back to the client
-                    List<FoundFan> foundFans = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_FANS);
-//                    List<FoundFan> foundFans = new ArrayList<FoundFan>();
-//                    for (BluetoothDevice device : devices) {
-//                        // send the found fans back to the client.
-//                        foundFans.add(new FoundFan(device.getName(), device.getAddress()));
-//                    }
-                    FoundFansMessage msg = new FoundFansMessage(foundFans);
+                    List<FoundGuest> foundGuests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
+                    FoundGuestsMessage msg = new FoundGuestsMessage(foundGuests);
                     discoveryInitiator.write(msg);
                     discoveryInitiator = null; //clear the initiator to handle the next one
                 }
@@ -270,13 +265,13 @@ public class ConnectionService extends Service {
     }
     
     /**
-     * Handle the FindNewFansMessage, which enables discovery on this device and
+     * Handle the FindNewGuestsMessage, which enables discovery on this device and
      * reports the results back to the requestor.
      * 
      * @param remoteAddr
      */
-    private void handleFindNewFansMessage(final String remoteAddr) {
-        Toaster.iToast(this, R.string.finding_new_fans);
+    private void handleFindNewGuestsMessage(final String remoteAddr) {
+        Toaster.iToast(this, R.string.finding_new_guests);
 
         //NOTE: we assume that the adapter is nonnull, because the activity will not
         // get past onCreate on a device w/o Bluetooth...and also, because this method is
@@ -287,7 +282,7 @@ public class ConnectionService extends Service {
         // device
         BluetoothDevice remoteDevice = adapter.getRemoteDevice(remoteAddr);
         MessageThread found = null;
-        for (MessageThread thread : this.fans) {
+        for (MessageThread thread : this.guests) {
             if (thread.isRemoteDevice(remoteDevice)) {
                 found = thread;
                 break;
@@ -300,7 +295,7 @@ public class ConnectionService extends Service {
         }
 
         this.discoveryInitiator = found;
-        findNewFans();
+        findNewGuests();
     }
 
     /**
@@ -309,37 +304,37 @@ public class ConnectionService extends Service {
      * 
      * @param socket
      */
-    protected void onConnectedFan(final BluetoothSocket socket) {
+    protected void onConnectedGuest(final BluetoothSocket socket) {
         Log.w(TAG, "Connected to server");
 
         //create the message thread, which will be responsible for reading and writing messages
-        MessageThread newMessageThread = new MessageThread(socket, this.messageDispatch, ACTION_FAN_DISCONNECTED) {
+        MessageThread newMessageThread = new MessageThread(socket, this.messageDispatch, ACTION_GUEST_DISCONNECTED) {
 
             @Override
             public void onDisconnected() {
-                fans.remove(this);
-                new BroadcastIntent(ACTION_FAN_DISCONNECTED)
-                    .putExtra(EXTRA_FAN_ADDRESS, socket.getRemoteDevice().getAddress())
+                guests.remove(this);
+                new BroadcastIntent(ACTION_GUEST_DISCONNECTED)
+                    .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
                     .send(ConnectionService.this);
             }
         };
         newMessageThread.start();
-        this.fans.add(newMessageThread);
+        this.guests.add(newMessageThread);
 
         //announce that we're connected
-        new BroadcastIntent(ACTION_FAN_CONNECTED)
-            .putExtra(EXTRA_FAN_NAME,    socket.getRemoteDevice().getName())
-            .putExtra(EXTRA_FAN_ADDRESS, socket.getRemoteDevice().getAddress())
+        new BroadcastIntent(ACTION_GUEST_CONNECTED)
+            .putExtra(EXTRA_GUEST_NAME,    socket.getRemoteDevice().getName())
+            .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
             .send(this);
     }
 
-    public void findNewFans() {
+    public void findNewGuests() {
         Log.w(TAG, "Starting Discovery");
         if (isHostConnected()) {
             //NOTE: this does not originate at the messaging service...consumer code doesn't need to worry about
-            // how new fans are found, and this is a mechanism that applies directly to how connection
+            // how new guests are found, and this is a mechanism that applies directly to how connection
             // was implemented.
-            sendMessageToHost(new FindNewFansMessage());
+            sendMessageToHost(new FindNewGuestsMessage());
         } else {
             if (adapter == null) {
                 Toaster.iToast(this,
@@ -350,13 +345,13 @@ public class ConnectionService extends Service {
         }
     }
 
-    public void broadcastMessageToFans(IMessage msg) {
-        if (isFanConnected()) {
-            for (MessageThread fan : this.fans) {
-                fan.write(msg);
+    public void broadcastMessageToGuests(IMessage msg) {
+        if (isGuestConnected()) {
+            for (MessageThread guest : this.guests) {
+                guest.write(msg);
             }
         } else {
-            Toaster.eToast(this, "No Fans connected");
+            Toaster.eToast(this, "No Guests connected");
         }
     }
 
@@ -372,14 +367,14 @@ public class ConnectionService extends Service {
         return this.host != null;
     }
 
-    public void disconnectAllFans() {
-        for (MessageThread thread : this.fans) {
+    public void disconnectAllGuests() {
+        for (MessageThread thread : this.guests) {
             thread.cancel();
         }
     }
 
-    public boolean isFanConnected() {
-        return !this.fans.isEmpty();
+    public boolean isGuestConnected() {
+        return !this.guests.isEmpty();
     }
 
     /**
@@ -387,38 +382,37 @@ public class ConnectionService extends Service {
      * 
      * @param device
      */
-    public void connectToFans(List<FoundFan> foundFans) {
+    public void connectToGuests(List<FoundGuest> foundGuests) {
         if (isHostConnected()) {
             List<String> addresses = new ArrayList<String>();
             //we need to send only the addresses back to the host
-            for (FoundFan fan : foundFans) {
-                addresses.add(fan.getAddress());
+            for (FoundGuest guest : foundGuests) {
+                addresses.add(guest.getAddress());
             }
-            sendMessageToHost(new ConnectFansMessage(addresses));
+            sendMessageToHost(new ConnectGuestsMessage(addresses));
         } else {
-            for (FoundFan fan : foundFans) {
+            for (FoundGuest guest : foundGuests) {
                 //this will always return a device for a valid address, so this is safe
                 // to do w/o checks
-                connectToFanLocal(this.adapter.getRemoteDevice(fan.getAddress()));
+                connectToGuestLocal(this.adapter.getRemoteDevice(guest.getAddress()));
             }
         }
     }
 
-    private void connectToFanLocal(BluetoothDevice device) {
+    private void connectToGuestLocal(BluetoothDevice device) {
         try {
             //one thread per device found...if there are multiple devices,
             // there are multiple threads
             //TODO: asyncTask may not work....if the host discovers 4 devices, it appears to still only use 1 async task thread
             // and if the first 3 of those devices are not SoundStream, it will pause for a while attempting to connect, which will delay
-            // connection of the actual fan
+            // connection of the actual guest
             ConnectThread connectThread = new ConnectThread(this, device) {
 
                 @Override
                 protected void onConnected(BluetoothSocket socket) {
                     pendingConnections.remove(this);
-                    onConnectedFan(socket);
+                    onConnectedGuest(socket);
                 }
-                
             };
             this.pendingConnections.add(connectThread);
             connectThread.execute();
@@ -435,7 +429,7 @@ public class ConnectionService extends Service {
      * TODO: this exposes an implementation detail, namely that bluetooth discoverability
      * @param activity
      */
-    public void broadcastFan(Activity activity) {
+    public void broadcastGuest(Activity activity) {
         BluetoothUtils.enableDiscovery(activity);
 
         try {

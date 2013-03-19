@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
+import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
 
-public class ConnectFansMessageTest extends SerializationTest<ConnectFansMessage> {
+public class ConnectGuestsMessageTest extends SerializationTest<ConnectGuestsMessage> {
 
     @Test
     public void testSerializeFoundFansMessage() throws IOException {
@@ -21,8 +21,8 @@ public class ConnectFansMessageTest extends SerializationTest<ConnectFansMessage
         addresses.add("00:11:22:33:44:55:68");
         addresses.add("00:11:22:33:44:55:69");
 
-        ConnectFansMessage oldMessage = new ConnectFansMessage(addresses);
-        ConnectFansMessage newMessage = super.testSerializeMessage(oldMessage);
+        ConnectGuestsMessage oldMessage = new ConnectGuestsMessage(addresses);
+        ConnectGuestsMessage newMessage = super.testSerializeMessage(oldMessage);
         //verify that the FoundFan objects are equal and in the same order.
         for (int ii = 0; ii < addresses.size(); ii++) {
             String expected = addresses.get(ii);

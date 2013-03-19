@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This message is sent from a fan to the host to request the host
- * connect to new fans, identified by the addresses attribute.
+ * This message is sent from a guest to the host to request the host
+ * connect to new guests, identified by the addresses attribute.
  * 
  * @author Jesse Rosalia
  *
  */
-public class ConnectFansMessage extends ADataMessage {
+public class ConnectGuestsMessage extends ADataMessage {
 
     private ArrayList<String> addresses = new ArrayList<String>();
     
@@ -22,10 +22,10 @@ public class ConnectFansMessage extends ADataMessage {
      * the other constructor.
      * 
      */
-    ConnectFansMessage() {
+    ConnectGuestsMessage() {
     }
 
-    public ConnectFansMessage(List<String> addresses) {
+    public ConnectGuestsMessage(List<String> addresses) {
         this.addresses.addAll(addresses);
     }
 

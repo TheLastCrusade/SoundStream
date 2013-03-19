@@ -15,9 +15,9 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
-import com.lastcrusade.soundstream.net.message.FindNewFansMessage;
-import com.lastcrusade.soundstream.net.message.FoundFansMessage;
+import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
+import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
+import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
@@ -138,7 +138,7 @@ public class MessagingService extends Service implements IMessagingService {
                 //sanity check...make sure the mac address is set properly, or
                 // raise a flag if its not
                 //JR, 03/13/13, I didn't want to set it here, because if we ever allow
-                // fans to send on other fans libraries, this would cause issues.  Rather
+                // guests to send on other guests libraries, this would cause issues.  Rather
                 // how we want to handle that, or if that is even a thing, just check
                 // that our current assumptions are met and raise purgatory if not.
                 ArrayList<SongMetadata> remoteLibrary = new ArrayList<SongMetadata>();
@@ -215,10 +215,10 @@ public class MessagingService extends Service implements IMessagingService {
         });
     }
 
-    private void broadcastMessageToFans(IMessage msg) {
+    private void sendMessageToGuests(IMessage msg) {
         try {
-            if (this.connectServiceLocator.getService().isFanConnected()) {
-                this.connectServiceLocator.getService().broadcastMessageToFans(msg);
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                this.connectServiceLocator.getService().broadcastMessageToGuests(msg);
             }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
@@ -235,12 +235,6 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
-//    public void sendFindNewFansMessage() {
-//        FindNewFansMessage msg = new FindNewFansMessage();
-//        //send the message to the host
-//        sendMessageToHost(msg);
-//    }
-
     @Override
     public void sendLibraryMessageToHost(List<SongMetadata> library) {
         LibraryMessage msg = new LibraryMessage(library);
@@ -249,10 +243,10 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     @Override
-    public void sendLibraryMessageToFans(List<SongMetadata> library) {
+    public void sendLibraryMessageToGuests(List<SongMetadata> library) {
         LibraryMessage msg = new LibraryMessage(library);
-        //send the message to the fans
-        broadcastMessageToFans(msg);
+        //send the message to the guests
+        sendMessageToGuests(msg);
     }
 
     @Override
@@ -278,15 +272,15 @@ public class MessagingService extends Service implements IMessagingService {
     
     public void sendPlayStatusMessage(String playStatusMessage) {
     	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
-    	//send the message to the fans
-    	broadcastMessageToFans(msg);
+    	//send the message to the guests
+    	sendMessageToGuests(msg);
     }
 
     public void sendStringMessage(String message) {
         StringMessage sm = new StringMessage();
         sm.setString(message);
         //JR, 03/02/12, TODO: the connection service should be changed to only deal with "connections".  The mode of connection will
-        // be determined by which method is called initially (braodcastFan vs findNewFans), but after that point, it should just
+        // be determined by which method is called initially (braodcastGuest vs findNewGuests), but after that point, it should just
         // work with connections
         try {
             //send the message to the host
@@ -294,8 +288,8 @@ public class MessagingService extends Service implements IMessagingService {
                 sendMessageToHost(sm);
             }
             
-            if (this.connectServiceLocator.getService().isFanConnected()) {
-                broadcastMessageToFans(sm);
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                sendMessageToGuests(sm);
             }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
@@ -305,6 +299,6 @@ public class MessagingService extends Service implements IMessagingService {
     //sends the user list out to everyone
     public void sendUserListMessage(UserList userlist){
         UserListMessage ulm = new UserListMessage(userlist);
-        broadcastMessageToFans(ulm);
+        sendMessageToGuests(ulm);
     }
 }

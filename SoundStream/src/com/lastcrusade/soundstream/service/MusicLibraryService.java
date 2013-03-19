@@ -96,11 +96,11 @@ public class MusicLibraryService extends Service {
                     updateLibrary(remoteMetas, true);
                 }
             })
-            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                     removeLibraryForAddress(macAddress, true);
                 }
             })
@@ -171,7 +171,7 @@ public class MusicLibraryService extends Service {
         new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
         //send the updated library to all the fans out there
         if (((CustomApp)getApplication()).getMessagingService() != null) {
-            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToFans(getLibrary());
+            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToGuests(getLibrary());
         }
     }
 

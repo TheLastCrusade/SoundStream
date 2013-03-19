@@ -6,20 +6,20 @@ import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class FoundFan implements Parcelable {
+public class FoundGuest implements Parcelable {
 
     //this is REQUIRED for Parcelable to work properly
-    public static final Parcelable.Creator<FoundFan> CREATOR = new DefaultParcelableCreator(FoundFan.class);
+    public static final Parcelable.Creator<FoundGuest> CREATOR = new DefaultParcelableCreator(FoundGuest.class);
 
     private String name;
     private String address;
 
-    public FoundFan(String name, String address) {
+    public FoundGuest(String name, String address) {
         this.name = name;
         this.address = address;
     }
     
-    public FoundFan(Parcel in) {
+    public FoundGuest(Parcel in) {
         this.name    = in.readString();
         this.address = in.readString();
     }
@@ -62,9 +62,9 @@ public class FoundFan implements Parcelable {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof FoundFan))
+        if (!(obj instanceof FoundGuest))
             return false;
-        FoundFan other = (FoundFan) obj;
+        FoundGuest other = (FoundGuest) obj;
         if (address == null) {
             if (other.address != null)
                 return false;

@@ -18,7 +18,7 @@ import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.BluetoothDeviceDialogFormatter;
-import com.lastcrusade.soundstream.net.message.FoundFan;
+import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -53,7 +53,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
             public void onClick(View v) {
                 addMembersButton.setEnabled(false);
                 //TODO: add some kind of visual indicator while discovering...seconds until discovery is finished, number of clients found, etc
-                getConnectionService().findNewFans();
+                getConnectionService().findNewGuests();
             }
         });
         
@@ -110,20 +110,20 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
         addMembersButton.setEnabled(true);
         
         //locally initiated device discovery...pop up a dialog for the user
-        List<FoundFan> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_FANS);
+        List<FoundGuest> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
         if (devices.isEmpty()) {
-            Toaster.iToast(this.getActivity(), R.string.no_fans_found);
+            Toaster.iToast(this.getActivity(), R.string.no_guests_found);
         } else {
-            new MultiSelectListDialog<FoundFan>(this.getActivity(),
-                    R.string.select_fans, R.string.connect)
+            new MultiSelectListDialog<FoundGuest>(this.getActivity(),
+                    R.string.select_guests, R.string.connect)
                     .setItems(devices)
                     .setOnClickListener(
-                            new IOnDialogMultiItemClickListener<FoundFan>() {
+                            new IOnDialogMultiItemClickListener<FoundGuest>() {
     
                                 @Override
                                 public void onItemsClick(
-                                        List<FoundFan> foundFans) {
-                                    getConnectionService().connectToFans(foundFans);
+                                        List<FoundGuest> foundGuests) {
+                                    getConnectionService().connectToGuests(foundGuests);
                                 }
                             })
                     .show();

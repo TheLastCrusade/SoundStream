@@ -81,7 +81,7 @@ public class MultiSelectListDialog<T> {
         //NOTE: this must not be a list, because we are dealing with integer data
         // and List#remove can get confused with integer data (it may attempt to remove
         // the item at position n), instead of with value n.
-        final Set<Integer> selectedInds = new HashSet<Integer>();
+        final Set<Integer> selectedIndices = new HashSet<Integer>();
 
         // set dialog message
         alertDialogBuilder
@@ -93,9 +93,9 @@ public class MultiSelectListDialog<T> {
                         // The 'which' argument contains the index
                         // position the selected item
                         if (isChecked) {
-                            selectedInds.add(which);
+                            selectedIndices.add(which);
                         } else {
-                            selectedInds.remove(which);
+                            selectedIndices.remove(which);
                         }
                     }
                 })
@@ -103,7 +103,7 @@ public class MultiSelectListDialog<T> {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         List<T> selectedItems = new ArrayList<T>();
-                        for (int ind : selectedInds) {
+                        for (int ind : selectedIndices) {
                             selectedItems.add(items.get(ind));
                         }
                         onClickListener.onItemsClick(selectedItems);
