@@ -66,6 +66,7 @@ public class UserListAdapter extends BaseAdapter {
     
     public void updateUsers(UserList users){
         this.users = users;
+        notifyDataSetChanged();
     }
 
 }
