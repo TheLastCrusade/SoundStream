@@ -2,18 +2,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingLeft="4sp"
+    android:paddingRight="4sp"
     android:orientation="horizontal"
     android:background="@color/gray">
 
+   <!-- singleLine is deprecated, but it appears to be
+        the only way to get the fading to work correctly.
+        All of the advise found online suggests to just
+        use the deprecated method -->
     <TextView
         android:id="@+id/text_now_playing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/btn_play_pause"
         android:padding="4sp"
         android:text="@string/now_playing"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
      <ImageButton
          android:id="@+id/btn_play_pause"
