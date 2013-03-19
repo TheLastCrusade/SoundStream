@@ -74,7 +74,7 @@ public class MusicListAdapter extends BaseAdapter {
             userColor.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
         }
 
-        ImageButton addButton = (ImageButton) element.findViewById(R.id.add_to_playlist);
+        ImageButton addButton = (ImageButton) element.findViewById(R.id.btn_add_to_playlist);
 
         addButton.setTag(position);
 
