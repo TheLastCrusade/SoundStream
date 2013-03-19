@@ -1,29 +1,36 @@
 package com.lastcrusade.soundstream;
 
+import java.util.List;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.Transitions;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getName();
     
     private UserList userList;
     
-    private ServiceLocator<ConnectionService> connectionServiceLocator;
-    private ServiceLocator<MessagingService>  messagingServiceLocator;
+    private ServiceLocator<ConnectionService>   connectionServiceLocator;
+    private ServiceLocator<MessagingService>    messagingServiceLocator;
+    private ServiceLocator<MusicLibraryService> musicLibraryLocator;
 
     private BroadcastRegistrar registrar;
 
@@ -43,6 +50,9 @@ public class CustomApp extends Application {
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingServiceBinder.class);
         
+        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
         registerReceivers();
     }
     
@@ -73,6 +83,15 @@ public class CustomApp extends Application {
                     notifyUserListUpdate();
                 }
             })
+            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    //send the library to the connected host
+                    List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
+                    getMessagingService().sendLibraryMessageToHost(metadata);
+                }
+            })
             .addAction(MessagingService.ACTION_NEW_CONNECTED_USERS_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
@@ -86,7 +105,7 @@ public class CustomApp extends Application {
             .register(this);
         
     }
-
+ 
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
@@ -113,6 +132,16 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return messagingService;
+    }
+    
+    public MusicLibraryService getMusicLibraryService() {
+        MusicLibraryService musicLibraryService = null;
+        try {
+            musicLibraryService = this.musicLibraryLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return musicLibraryService;
     }
     
     public void notifyUserListUpdate() {

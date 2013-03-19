@@ -2,6 +2,7 @@ package com.lastcrusade.soundstream.service;
 
 import java.util.List;
 
+import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 
@@ -47,6 +48,10 @@ public interface IMessagingService {
      * @param message
      */
     public void sendStringMessage(String message);
+
+    public void sendPlaylistMessage(Playlist playlist);
+
     public void sendPlayStatusMessage(String playStatusMessage);
+
     public void sendUserListMessage(UserList userlist);
 }

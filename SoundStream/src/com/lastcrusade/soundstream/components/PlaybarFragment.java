@@ -10,13 +10,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.audio.SingleFileAudioPlayer;
+import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -28,6 +29,8 @@ public class PlaybarFragment extends Fragment {
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
     ImageButton playPause;
+
+    private TextView songTitle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,8 @@ public class PlaybarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_playbar, container, false);
+        
+        songTitle = (TextView) view.findViewById(R.id.text_now_playing);
         playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
 
         playPause.setOnClickListener(new OnClickListener() {
@@ -108,11 +113,12 @@ public class PlaybarFragment extends Fragment {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+            .addAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    setPlayImage();
+                    SongMetadata song = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
+                    songTitle.setText(song.getTitle());
                 }
             })
             .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {

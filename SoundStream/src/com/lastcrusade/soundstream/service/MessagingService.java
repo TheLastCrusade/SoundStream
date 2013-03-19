@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
@@ -22,6 +23,7 @@ import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
+import com.lastcrusade.soundstream.net.message.PlaylistMessage;
 import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
@@ -47,6 +49,9 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
+    //This also uses EXTRA_SONG_METADATA
+    public static final String ACTION_PLAYLIST_UPDATED_MESSAGE = MessagingService.class.getName() + ".action.PlaylistUpdated";
+    
     public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
     public static final String EXTRA_USER_LIST                    = MessagingService.class.getName() + ".extra.UserList";
 
@@ -125,6 +130,7 @@ public class MessagingService extends Service implements IMessagingService {
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
+        registerPlaylistMessageHandler();
         registerPlayStatusMessageHandler();
         registerUserListMessageHandler();
     }
@@ -215,6 +221,23 @@ public class MessagingService extends Service implements IMessagingService {
         });
     }
 
+    private void registerPlaylistMessageHandler() {
+        this.messageDispatch.registerHandler(PlaylistMessage.class,
+                new IMessageHandler<PlaylistMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    PlaylistMessage message, String fromAddr) {
+                //This is because you can pass an ArrayList of parseables but not a List
+                ArrayList<SongMetadata> remotePlaylist = (ArrayList<SongMetadata>) message.getPlaylist().getSongsToPlay();
+
+                new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remotePlaylist)
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
     private void sendMessageToGuests(IMessage msg) {
         try {
             if (this.connectServiceLocator.getService().isGuestConnected()) {
@@ -296,9 +319,37 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
+    public void sendPlaylistMessage(Playlist playlist){
+        try {
+            PlaylistMessage playlistMessage = new PlaylistMessage(playlist);
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(playlistMessage);
+            }
+
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                sendMessageToGuests(playlistMessage);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+
+    }
+    
     //sends the user list out to everyone
     public void sendUserListMessage(UserList userlist){
         UserListMessage ulm = new UserListMessage(userlist);
-        sendMessageToGuests(ulm);
+        try {
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(ulm);
+            }
+
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                sendMessageToGuests(ulm);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 }

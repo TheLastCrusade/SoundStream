@@ -1,5 +1,7 @@
 package com.lastcrusade.soundstream.service;
 
+import java.util.List;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +28,7 @@ import com.lastcrusade.soundstream.util.Toaster;
  * This service is responsible for holding the play queue and sending songs to
  * the SingleFileAudioPlayer
  */
-public class PlaylistService extends Service implements IPlayer {
+public class PlaylistService extends Service {
 
     /**
      * Broadcast action sent when the Audio Player service is paused.
@@ -51,6 +53,9 @@ public class PlaylistService extends Service implements IPlayer {
      * Broadcast action sent when the playlist gets updated
      */
     public static final String ACTION_PLAYLIST_UPDATED = PlaylistService.class + ".action.PlaylistUpdated";
+
+    public static final String ACTION_SONG_PLAYING     = PlaylistService.class + ".action.SongPlaying";
+    public static final String EXTRA_SONG              = PlaylistService.class + ".extra.Song";
 
     private static final String TAG = PlaylistService.class.getName();
 
@@ -110,10 +115,11 @@ public class PlaylistService extends Service implements IPlayer {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
+                // automatically play the next song, but only if we're not paused
                 mPlaylist.moveNext();
-                // TODO: Right now, we don't move automatically to the next song.
-                // Until we make that change, this is appropriate
-                ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Pause");
+                if (!thePlayer.isPaused()) {
+                    play();
+                }
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
@@ -152,6 +158,15 @@ public class PlaylistService extends Service implements IPlayer {
                 skip();
             }
         })
+        .addAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                List<SongMetadata> newList = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                mPlaylist = new Playlist(newList);
+                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+            }
+        })
         .register(this);
     }
 
@@ -159,35 +174,47 @@ public class PlaylistService extends Service implements IPlayer {
         this.registrar.unregister();
     }
   
-    @Override
     public boolean isPlaying() {
         return this.thePlayer.isPlaying();
     }
 
-    @Override
     public void play() {
-        if(isLocalPlayer()) {
-            if (mPlaylist.size() > 0){
-                setSong(mPlaylist.getNextSong());
-                ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Play");
-            } else {
-                Toaster.iToast(this, getString(R.string.playlist_empty));
-                return; //SECOND RETURN PATH that makes the code nicer
+        if (this.thePlayer.isPaused()) {
+            this.thePlayer.resume();
+        } else {
+            if(isLocalPlayer()) {
+                playLocal();
             }
+            //we have stuff to play...play it and send a notification
+            this.thePlayer.play();
         }
-        //we have stuff to play...play it and send a notification
-        this.thePlayer.play();
         new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
     }
 
-    @Override
+    /**
+     * Helper method to manage all of the things we need to do to play a
+     * song locally (e.g. on the host).
+     */
+    private void playLocal() {
+        if (mPlaylist.size() > 0){
+            SongMetadata song = mPlaylist.getNextSong();
+            setSong(song);
+            new BroadcastIntent(ACTION_SONG_PLAYING)
+                .putExtra(EXTRA_SONG, song)
+                .send(this);
+            ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Play");
+        } else {
+            Toaster.iToast(this, getString(R.string.playlist_empty));
+            return; //SECOND RETURN PATH that makes the code nicer
+        }
+    }
+
     public void pause() {
         this.thePlayer.pause();
         ((CustomApp)getApplication()).getMessagingService().sendPlayStatusMessage("Pause");
         new BroadcastIntent(ACTION_PAUSED_AUDIO).send(this);
     }
 
-    @Override
     public void skip() {
         this.thePlayer.skip();
         if (isLocalPlayer()) {
@@ -216,6 +243,7 @@ public class PlaylistService extends Service implements IPlayer {
     public void addSong(SongMetadata metadata) {
         mPlaylist.add(metadata);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist);
     }
 
     public Playlist getPlaylist() {
