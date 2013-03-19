@@ -115,22 +115,8 @@ public class MusicLibraryService extends Service {
 
     public List<SongMetadata> getLibrary() {
         synchronized(metadataMutex) {
-            
-            /*
-             * I (@ejohnson44) recognize that this is not the best
-             * place for sorting, but I am not sure what the best method is - 
-             * the original metadatalist keeps track of songs in order added
-             * and uses an additional hashmap to aid in this, so I am not sure
-             * if we want to have a duplicate of sorted data or if we just want to
-             * reorder and then update the hashmap
-             */
-            
-            //sorts the list before returning it - for now,
-            //order is simply alphabetical by artist, album, then song.
-            ArrayList<SongMetadata> music = new ArrayList<SongMetadata>(metadataList);
-            Collections.sort(music, new AlphabeticalComparator());
             //unmodifiable copy, for safety
-            return Collections.unmodifiableList(music);
+            return Collections.unmodifiableList(new ArrayList<SongMetadata>(metadataList));
         }
     }
 
@@ -171,6 +157,13 @@ public class MusicLibraryService extends Service {
                     metadataMap.put(key, nextInx);
                 }
             }
+            
+            /*
+             * by default we want to order alphabetically
+             * when we have more options, this can be moved elsewhere
+             * and governed by some type of flag.
+             */
+            orderAlphabetically();
         }
         if (notify) {
             notifyLibraryUpdated();
@@ -232,5 +225,24 @@ public class MusicLibraryService extends Service {
      */
     private String createSongKey(SongMetadata song) {
         return song.getMacAddress() + "_" + song.getId();
+    }
+    
+    /**
+     * Orders the song metadata and related map alphabetically by Artist,
+     * Album, and Title
+     */
+    private void orderAlphabetically(){
+        synchronized (metadataMutex) {
+            //sort the metadata alphabetically
+            Collections.sort(metadataList, new AlphabeticalComparator());
+            
+            //recreate the map
+            Map<String, Integer> newMap  = new HashMap<String, Integer>();
+            for(int i=0; i<metadataList.size(); i++){
+                String key = createSongKey(metadataList.get(i));
+                newMap.put(key, i);
+            }
+            metadataMap = newMap;
+        }
     }
 }
