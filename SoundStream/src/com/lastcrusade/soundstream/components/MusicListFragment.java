@@ -12,9 +12,6 @@ import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.util.ITitleable;
 
 public abstract class MusicListFragment extends SherlockListFragment implements ITitleable{
-
-    private final int SHORT_VIEW = 1;
-    private final int EXPANDED_VIEW = 10;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,23 +34,24 @@ public abstract class MusicListFragment extends SherlockListFragment implements 
         
         //if the view height is larger than the standard element, set it back to the standard
         if(v.getHeight()>getResources().getDimension(R.dimen.song_height)){
-            title.setMaxLines(SHORT_VIEW);
-            album.setMaxLines(SHORT_VIEW);
-            artist.setMaxLines(SHORT_VIEW);
+            
+            title.setSingleLine(true);
+            artist.setSingleLine(true);
+            album.setSingleLine(true);
             
             //set the height of the color bar to the standard song element height
             v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
         }
         //otherwise, expand the view
-        else{
-            title.setMaxLines(EXPANDED_VIEW);
-            album.setMaxLines(EXPANDED_VIEW);
-            artist.setMaxLines(EXPANDED_VIEW);
+        else{            
+            title.setSingleLine(false);
+            artist.setSingleLine(false);
+            album.setSingleLine(false);
             
             //get the additional height taken up by the expanded words
-            int titleHeight = (title.getLineCount()-1)*title.getLineHeight();
-            int artistHeight =  (artist.getLineCount()-1)*artist.getLineHeight();
-            int albumHeight = (album.getLineCount()-1)*album.getLineHeight();
+            int titleHeight = title.getHeight() - title.getLineHeight();
+            int artistHeight = artist.getHeight() - artist.getLineHeight();
+            int albumHeight = album.getHeight() - album.getLineHeight();
             
             //calculate the total height of the expanded view
             int viewHeight = (int) getResources().getDimension(R.dimen.song_height)
