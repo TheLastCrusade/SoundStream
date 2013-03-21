@@ -37,7 +37,9 @@
             android:text="@string/playlist"
             android:textColor="@color/white"
             android:clickable="true"
-            android:background="@color/transparent"/>
+            android:background="@color/transparent"
+            android:drawableLeft="@drawable/playlist_icon"
+            android:drawablePadding="6sp"/>
         
         <Button 
             android:id="@+id/music_library_btn"
@@ -49,6 +51,8 @@
             android:textColor="@color/white"
             android:clickable="true"
             android:background="@color/transparent"
+            android:drawableLeft="@drawable/music_library_icon"
+            android:drawablePadding="6sp"
             />
     </RelativeLayout>
     
@@ -89,6 +93,8 @@
             android:clickable="true"
             android:layout_marginLeft="20sp"
             android:background="@color/transparent"
+            android:drawableLeft="@drawable/network_icon"
+            android:drawablePadding="6sp"
             />
     </RelativeLayout>
     
