@@ -65,20 +65,20 @@ public class CustomApp extends Application {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(ConnectionService.ACTION_FAN_CONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_FAN_NAME);
-                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_GUEST_NAME);
+                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                     userList.addUser(bluetoothID, macAddress);
                     notifyUserListUpdate();
                 }
             })
-            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                     userList.removeUser(macAddress);
                     notifyUserListUpdate();
                 }

@@ -1,5 +1,6 @@
 package com.lastcrusade.soundstream.components;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,13 +9,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-
-import com.lastcrusade.soundstream.R;
 
 /**
  * A cancelable dialog that displays a list, allows the user to select multiple items
@@ -26,7 +20,7 @@ import com.lastcrusade.soundstream.R;
 public class MultiSelectListDialog<T> {
 
     private Activity activity;
-    private IOnDialogItemClickListener<T> onClickListener;
+    private IOnDialogMultiItemClickListener<T> onClickListener;
     private IDialogFormatter<T> formatter;
     private int titleResId;
     private int okButtonResId;
@@ -44,10 +38,10 @@ public class MultiSelectListDialog<T> {
             }
         };
 
-        this.onClickListener = new IOnDialogItemClickListener<T>() {
+        this.onClickListener = new IOnDialogMultiItemClickListener<T>() {
 
             @Override
-            public void onItemClick(T item) {
+            public void onItemsClick(List<T> items) {
                 //NO OP
             }
         };
@@ -64,7 +58,7 @@ public class MultiSelectListDialog<T> {
         return this;
     }
 
-    public MultiSelectListDialog<T> setOnClickListener(IOnDialogItemClickListener<T> onClickListener) {
+    public MultiSelectListDialog<T> setOnClickListener(IOnDialogMultiItemClickListener<T> onClickListener) {
         this.onClickListener = onClickListener;
         return this;
     }
@@ -87,7 +81,7 @@ public class MultiSelectListDialog<T> {
         //NOTE: this must not be a list, because we are dealing with integer data
         // and List#remove can get confused with integer data (it may attempt to remove
         // the item at position n), instead of with value n.
-        final Set<Integer> selectedItems = new HashSet<Integer>();
+        final Set<Integer> selectedIndices = new HashSet<Integer>();
 
         // set dialog message
         alertDialogBuilder
@@ -99,20 +93,20 @@ public class MultiSelectListDialog<T> {
                         // The 'which' argument contains the index
                         // position the selected item
                         if (isChecked) {
-                            selectedItems.add(which);
+                            selectedIndices.add(which);
                         } else {
-                            selectedItems.remove(which);
+                            selectedIndices.remove(which);
                         }
                     }
                 })
                 .setPositiveButton(this.okButtonResId, new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //called when the user clicks "connect"...only then should
-                        // we notify the caller
-                        for (int sel : selectedItems) {
-                            onClickListener.onItemClick(items.get(sel));
+                        List<T> selectedItems = new ArrayList<T>();
+                        for (int ind : selectedIndices) {
+                            selectedItems.add(items.get(ind));
                         }
+                        onClickListener.onItemsClick(selectedItems);
                     }
                 });
 
