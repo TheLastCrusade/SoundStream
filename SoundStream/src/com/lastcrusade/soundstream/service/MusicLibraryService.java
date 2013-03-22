@@ -16,6 +16,7 @@ import android.os.IBinder;
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -156,6 +157,13 @@ public class MusicLibraryService extends Service {
                     metadataMap.put(key, nextInx);
                 }
             }
+            
+            /*
+             * by default we want to order alphabetically
+             * when we have more options, this can be moved elsewhere
+             * and governed by some type of flag.
+             */
+            orderAlphabetically();
         }
         if (notify) {
             notifyLibraryUpdated();
@@ -217,5 +225,24 @@ public class MusicLibraryService extends Service {
      */
     private String createSongKey(SongMetadata song) {
         return song.getMacAddress() + "_" + song.getId();
+    }
+    
+    /**
+     * Orders the song metadata and related map alphabetically by Artist,
+     * Album, and Title
+     */
+    private void orderAlphabetically(){
+        synchronized (metadataMutex) {
+            //sort the metadata alphabetically
+            Collections.sort(metadataList, new AlphabeticalComparator());
+            
+            //recreate the map
+            Map<String, Integer> newMap  = new HashMap<String, Integer>();
+            for(int i=0; i<metadataList.size(); i++){
+                String key = createSongKey(metadataList.get(i));
+                newMap.put(key, i);
+            }
+            metadataMap = newMap;
+        }
     }
 }

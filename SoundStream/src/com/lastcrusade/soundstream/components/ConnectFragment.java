@@ -78,7 +78,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     @Override
     public void onDestroy() {
         unregisterReceivers();
-        musicLibraryLocator.unbind();
         super.onDestroy();
     }
     
