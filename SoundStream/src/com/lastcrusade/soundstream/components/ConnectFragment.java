@@ -39,15 +39,10 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     private BroadcastRegistrar broadcastRegistrar;
     private Button connectButton;
     
-    private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         registerReceivers();
-        
-        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
