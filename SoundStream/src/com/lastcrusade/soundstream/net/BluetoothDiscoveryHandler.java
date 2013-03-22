@@ -2,16 +2,13 @@ package com.lastcrusade.soundstream.net;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
-import com.lastcrusade.soundstream.util.Toaster;
 
 /**
  * A generic handler for discovering devices.  This handler will accumulate discovered devices and
