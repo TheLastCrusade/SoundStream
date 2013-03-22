@@ -173,11 +173,11 @@ public class MusicLibraryService extends Service {
     /**
      * Notify that the library was updated.  This includes
      * sending an intent to the system, and sending the library out
-     * to the fans.
+     * to the guests.
      */
     private void notifyLibraryUpdated() {
         new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
-        //send the updated library to all the fans out there
+        //send the updated library to all the guests out there
         if (((CustomApp)getApplication()).getMessagingService() != null) {
             ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToGuests(getLibrary());
         }
