@@ -101,7 +101,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
 
     /**
      * Called to handle a find finished method.  This may be to pop up a dialog
-     * or notify the user that no fans were found
+     * or notify the user that no guests were found
      * 
      * @param intent
      */

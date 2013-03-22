@@ -23,7 +23,7 @@ public class ConnectGuestsMessageTest extends SerializationTest<ConnectGuestsMes
 
         ConnectGuestsMessage oldMessage = new ConnectGuestsMessage(addresses);
         ConnectGuestsMessage newMessage = super.testSerializeMessage(oldMessage);
-        //verify that the FoundFan objects are equal and in the same order.
+        //verify that the FoundGuest objects are equal and in the same order.
         for (int ii = 0; ii < addresses.size(); ii++) {
             String expected = addresses.get(ii);
             String actual   = newMessage.getAddresses().get(ii);

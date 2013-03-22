@@ -16,7 +16,7 @@ public interface IMessagingService {
     public void sendLibraryMessageToHost(List<SongMetadata> library);
     
     /**
-     * Send the library to all currently connected fans.
+     * Send the library to all currently connected guests.
      * 
      * @param library
      */
@@ -43,7 +43,7 @@ public interface IMessagingService {
     /**
      * FOR TESTING
      * 
-     * Send a string message to all connected devices (host or fan).
+     * Send a string message to all connected devices (host or guests).
      * 
      * @param message
      */
