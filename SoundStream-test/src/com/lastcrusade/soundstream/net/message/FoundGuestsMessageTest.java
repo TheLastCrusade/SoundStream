@@ -16,17 +16,17 @@ public class FoundGuestsMessageTest extends SerializationTest<FoundGuestsMessage
     @Test
     public void testSerializeFoundFansMessage() throws IOException {
         //NOTE: no fields to check, and the base class will ensure we create the right class.
-        List<FoundGuest> foundFans = new ArrayList<FoundGuest>();
-        foundFans.add(new FoundGuest("Test1", "00:11:22:33:44:55:66"));
-        foundFans.add(new FoundGuest("Test2", "00:11:22:33:44:55:67"));
-        foundFans.add(new FoundGuest("Test3", "00:11:22:33:44:55:68"));
-        foundFans.add(new FoundGuest("Test4", "00:11:22:33:44:55:69"));
+        List<FoundGuest> foundGuests = new ArrayList<FoundGuest>();
+        foundGuests.add(new FoundGuest("Test1", "00:11:22:33:44:55:66"));
+        foundGuests.add(new FoundGuest("Test2", "00:11:22:33:44:55:67"));
+        foundGuests.add(new FoundGuest("Test3", "00:11:22:33:44:55:68"));
+        foundGuests.add(new FoundGuest("Test4", "00:11:22:33:44:55:69"));
 
-        FoundGuestsMessage oldMessage = new FoundGuestsMessage(foundFans);
+        FoundGuestsMessage oldMessage = new FoundGuestsMessage(foundGuests);
         FoundGuestsMessage newMessage = super.testSerializeMessage(oldMessage);
         //verify that the FoundFan objects are equal and in the same order.
-        for (int ii = 0; ii < foundFans.size(); ii++) {
-            FoundGuest expected = foundFans.get(ii);
+        for (int ii = 0; ii < foundGuests.size(); ii++) {
+            FoundGuest expected = foundGuests.get(ii);
             FoundGuest actual   = newMessage.getFoundGuests().get(ii);
             assertEquals(expected, actual);
         }
