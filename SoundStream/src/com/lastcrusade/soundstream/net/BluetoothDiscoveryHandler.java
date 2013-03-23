@@ -1,12 +1,18 @@
 package com.lastcrusade.soundstream.net;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
+<<<<<<< HEAD
+=======
+import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.net.message.FoundGuest;
+>>>>>>> 1eba51df712f8bc95137e135db90f44ce49b7eac
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 
@@ -53,8 +59,13 @@ public class BluetoothDiscoveryHandler {
         String action = this.remoteInitiated
                           ? ConnectionService.ACTION_REMOTE_FIND_FINISHED
                           : ConnectionService.ACTION_FIND_FINISHED;
+        ArrayList<FoundGuest> foundGuests = new ArrayList<FoundGuest>();
+        for (BluetoothDevice device : this.discoveredDevices) {
+            // send the found guests back to the client.
+            foundGuests.add(new FoundGuest(device.getName(), device.getAddress()));
+        }
         new BroadcastIntent(action)
-            .putParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES, this.discoveredDevices)
+            .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, foundGuests)
             .send(this.context);
     }
 

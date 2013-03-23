@@ -81,7 +81,7 @@ public class MessageThreadMessageDispatch extends Handler {
         IMessageHandler handler   = dispatchMap.get(message.getClass());
         
         if (handler != null) {
-            Log.w(TAG, "Message received: " + messageNo);
+            Log.w(TAG, "Message received: " + messageNo + ", it's a " + message.getClass().getName());
             handler.handleMessage(messageNo, message, fromAddr);
         } else if (defaultHandler != null) {
             this.defaultHandler.handleMessage(messageNo, message, fromAddr);

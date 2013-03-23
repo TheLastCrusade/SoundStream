@@ -5,10 +5,10 @@
     <string name="app_name">SoundStream</string>
     
     <string name="enable_bluetooth">Enabling Bluetooth&#x2026;</string>
-    <string name="finding_new_fans">Finding new fans&#x2026;</string>
-    <string name="found_fans">Found fans</string>
-    <string name="select_fans">Select fans&#x2026;</string>
-    <string name="no_fans_found">No fans found</string>    
+    <string name="finding_new_guests">Finding new guests&#x2026;</string>
+    <string name="found_guests">Found guests</string>
+    <string name="select_guests">Select guests&#x2026;</string>
+    <string name="no_guests_found">No guests found</string>    
     
     <string name="now_playing">Now Playing</string>
     
