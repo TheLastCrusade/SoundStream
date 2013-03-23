@@ -3,12 +3,15 @@ package com.lastcrusade.soundstream.manager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
@@ -28,7 +31,7 @@ public class PlaylistDataManager implements Runnable {
     private PlaylistService playlistService;
     private CustomApp application;
     private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
-    private Queue<PlaylistEntry> remotelyLoaded = new LinkedList<PlaylistEntry>();
+    private Set<PlaylistEntry> remotelyLoaded = new HashSet<PlaylistEntry>();
     private Thread stoppingThread;
     private boolean running;
     private BroadcastRegistrar registrar;
@@ -36,6 +39,8 @@ public class PlaylistDataManager implements Runnable {
     private long maxBytesToLoad = 512 * 1024 * 1024; //512MB default max bytes
     private long bytesRequested = 0;
     private float loadFactor    = 0.5f;
+    
+    private final Object entryMutex = new Object();
 
     public PlaylistDataManager(PlaylistService playlistService, CustomApp application) {
         this.playlistService = playlistService;
@@ -50,21 +55,8 @@ public class PlaylistDataManager implements Runnable {
             while (running) {
                 //first, clean up any already played remote files...this frees up space
                 // to request new files.
-                //NOTE: only do this if we need to...to minimize network traffic/playback issues
-//                if (bytesRequested > maxBytesToLoad * loadFactor) {
-                    List<PlaylistEntry> toRemove = new LinkedList<PlaylistEntry>();
-                    long toRemoveBytes = 0;
-                    for (PlaylistEntry entry : remotelyLoaded) {
-                        if (entry.isPlayed()) {
-                            toRemove.add(entry);
-                            toRemoveBytes += entry.getFileSize();
-                        }
-                    }
-                    
-                    deleteTempFileData(toRemove);
-                    remotelyLoaded.removeAll(toRemove);
-                    bytesRequested -= toRemoveBytes;
-//                }                
+                clearOldLoadedFiles();
+
                 //next, see if we can start loading any additional files
                 while (!loadQueue.isEmpty() &&
                         loadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
@@ -98,6 +90,31 @@ public class PlaylistDataManager implements Runnable {
         }
     }
 
+    /**
+     * 
+     */
+    private void clearOldLoadedFiles() {
+        //NOTE: only do this if we need to...to minimize network traffic/playback issues
+//                if (bytesRequested > maxBytesToLoad * loadFactor) {
+            Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
+            long toRemoveBytes = 0;
+            for (PlaylistEntry entry : remotelyLoaded) {
+                synchronized(entryMutex) {
+                    if (entry.isPlayed()) {
+                        //indicate the entry isnt loaded, so the playlist wont try and play it
+                        entry.setLoaded(false);
+                        toRemove.add(entry);
+                        toRemoveBytes += entry.getFileSize();
+                    }
+                }
+            }
+            
+            deleteTempFileData(toRemove);
+            remotelyLoaded.removeAll(toRemove);
+            bytesRequested -= toRemoveBytes;
+//                }                
+    }
+
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
@@ -120,8 +137,9 @@ public class PlaylistDataManager implements Runnable {
         this.registrar.unregister();
     }
 
-    private void deleteTempFileData(List<PlaylistEntry> entries) {
+    private void deleteTempFileData(Collection<PlaylistEntry> entries) {
         for (PlaylistEntry entry : entries) {
+            Log.i(TAG, "Deleting data for entry " + entry);
             File file = new File(entry.getFilePath());
             this.application.deleteFile(file.getName());
             entry.setFilePath(null);
@@ -130,13 +148,17 @@ public class PlaylistDataManager implements Runnable {
 
     protected void saveTempFileData(String fromAddr, long songId, String fileName, byte[] fileData) {
         PlaylistEntry entry = findSongByAddressAndId(fromAddr, songId);
+        if (entry == null) {
+            throw new IllegalStateException("Unable to save data for a song entry that doesnt exist");
+        }
         //build a composite name from the macAddress
         String compositeFileName = String.format("%s_%s", SongMetadataUtils.getUniqueKey(fromAddr, songId), fileName);
         try {
             FileOutputStream fos = this.application.openFileOutput(compositeFileName, Context.MODE_PRIVATE);
             fos.write(fileData);
             fos.close();
-            entry.setFilePath(this.application.getFileStreamPath(compositeFileName).getCanonicalPath());
+            String filePath = this.application.getFileStreamPath(compositeFileName).getCanonicalPath();
+            entry.setFilePath(filePath);
         } catch (IOException e) {
             this.application.deleteFile(compositeFileName);
             //TODO: set flag to indicate file is broken
@@ -154,7 +176,19 @@ public class PlaylistDataManager implements Runnable {
     }
 
     public void addToLoadQueue(PlaylistEntry entry) {
-        this.loadQueue.add(entry);
+        //if the entry isnt already loaded, add it to the load queue
+        //NOTE: if it is loaded, we can assume its already in remotelyLoaded
+        synchronized(entryMutex) {
+            if (!entry.isLoaded()) {
+                if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
+                    this.loadQueue.add(entry);
+                }
+            } else {
+                if (!remotelyLoaded.contains(entry)) {
+                    Log.wtf(TAG, "Entry " + entry + " loaded but not managed.  WTF");
+                }
+            }
+        }
     }
     
     private void loadLocal(PlaylistEntry entry) {

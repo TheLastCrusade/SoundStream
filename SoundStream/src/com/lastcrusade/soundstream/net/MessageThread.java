@@ -22,7 +22,7 @@ import com.lastcrusade.soundstream.net.message.Messenger;
  *
  */
 public abstract class MessageThread extends Thread {
-    private final String TAG = MessageThread.class.getName();
+    private final String TAG = MessageThread.class.getSimpleName();
     public static final int MESSAGE_READ = 1;
 
     public static final String EXTRA_ADDRESS = MessageThread.class.getName() + ".extra.Address";
@@ -31,7 +31,7 @@ public abstract class MessageThread extends Thread {
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
  
-    private int   messageNumber = 0;
+    private int   messageNumber = 1;
     private Handler mmHandler;
 
     private String mmDisconnectAction;
@@ -99,7 +99,7 @@ public abstract class MessageThread extends Thread {
      * @param remoteAddr
      */
     private void sendMessageToHandler(IMessage message, String remoteAddr) {
-        Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, message);
+        Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber++, 0, message);
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_ADDRESS, remoteAddr);
         androidMsg.setData(bundle);
@@ -109,6 +109,7 @@ public abstract class MessageThread extends Thread {
     /* Call this from the main activity to send data to the remote device */
     public synchronized void write(IMessage message) {
         Log.d(TAG, "write called from " + Thread.currentThread().getName());
+        Log.i(TAG, "Message sent, it's a " + message.getClass().getSimpleName());
         try {
             mmMessenger.serializeMessage(message);
             byte[] bytes = mmMessenger.getOutputBytes();

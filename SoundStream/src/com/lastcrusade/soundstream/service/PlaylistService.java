@@ -124,14 +124,15 @@ public class PlaylistService extends Service {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                // automatically play the next song, but only if we're not paused
-                if (!mThePlayer.isPaused()) {
-                    play();
-                }
                 //NOTE: this is an indicator that the song data can be deleted...therefore, we don't
                 //want to set the flag until after the song has been played
                 if (currentSong != null) {
                     currentSong.setPlayed(true);
+                    currentSong = null;
+                }
+                // automatically play the next song, but only if we're not paused
+                if (!mThePlayer.isPaused()) {
+                    play();
                 }
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -218,15 +219,17 @@ public class PlaylistService extends Service {
     }
 
     public void play() {
-        boolean notify = true;
         if (this.mThePlayer.isPaused()) {
             this.mThePlayer.resume();
         } else {
+            boolean play = true;
             if(isLocalPlayer()) {
-                setNextSong();
+                play = setNextSong();
             }
             //we have stuff to play...play it and send a notification
-            this.mThePlayer.play();
+            if (play) {
+                this.mThePlayer.play();
+            }
         }
     }
 
@@ -250,6 +253,10 @@ public class PlaylistService extends Service {
             //still no available music..this means we're waiting for data to come in
             //...display a warning, but don't play.
             if (song == null) {
+                //TODO: instead of this, we may want to repost a message to wait for the next song to be available
+                //stop the player
+                this.mAudioPlayer.stop();
+                //pop up the notice
                 Toaster.iToast(this, getString(R.string.no_available_songs));
             } else {   
                 this.currentSong = song;
@@ -272,9 +279,8 @@ public class PlaylistService extends Service {
             //we may need to re-add entries to the data manager, for remote
             // loading
             for (PlaylistEntry entry : mPlaylist.getSongsToPlay()) {
-                if (!entry.isLoaded() && !entry.isPlayed()) {
-                    mDataManager.addToLoadQueue(entry);
-                }
+                //add all of the entries to the load queue
+                mDataManager.addToLoadQueue(entry);
             }
         }
     }

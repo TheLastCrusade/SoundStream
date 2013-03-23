@@ -5,16 +5,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * A data structure for holding the playlist.  It keeps track of two queues of PlaylistEntry
+ * objects; the seam between them represents the current play position.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class Playlist {
+    
     private final static String TAG = Playlist.class.getName();
+    
     private Queue<PlaylistEntry> playedList;
     private Queue<PlaylistEntry> musicList;
-    private int index;
 
     public Playlist() {
         playedList = new LinkedList<PlaylistEntry>();
         musicList  = new LinkedList<PlaylistEntry>();
-        index = 0;
     }
 
     public void add(PlaylistEntry entry) {
@@ -22,8 +29,8 @@ public class Playlist {
     }
 
     public void clear() {
+        playedList.clear();
         musicList.clear();
-        index = 0;
     }
 
     public SongMetadata remove(SongMetadata meta) {

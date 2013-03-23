@@ -43,6 +43,14 @@ public class SingleFileAudioPlayer implements IPlayer {
         });
     }
 
+    /**
+     * Set the song path and accompanying metadata to play.
+     * 
+     * NOTE: these can be null, to clear the currently playing song.
+     * 
+     * @param filePath
+     * @param song
+     */
     public void setSong(String filePath, SongMetadata song) {
         this.filePath = filePath;
         new BroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
@@ -84,11 +92,28 @@ public class SingleFileAudioPlayer implements IPlayer {
         ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
     }
 
+
+    /**
+     * Stop the player, and clear the active song.
+     * 
+     * Note that currently, stop is not a function exposed to the rest of the application
+     * so we report that the player is "paused".
+     * 
+     */
+    public void stop() {
+        this.paused = false;
+        this.player.stop();
+        this.setSong(null, null);
+        //indicate the system is paused
+        new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.application);
+//        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+    }
+
     @Override
     public void resume() {
         player.start();
         paused = false;
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
+//        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
     }
 
     @Override
@@ -105,5 +130,4 @@ public class SingleFileAudioPlayer implements IPlayer {
     public boolean isPaused() {
         return paused;
     }
-
 }

@@ -1,6 +1,7 @@
 package com.lastcrusade.soundstream.model;
 
 import com.lastcrusade.soundstream.util.BluetoothUtils;
+import com.lastcrusade.soundstream.util.SongMetadataUtils;
 
 public class PlaylistEntry extends SongMetadata {
 
@@ -22,6 +23,7 @@ public class PlaylistEntry extends SongMetadata {
         this.setArtist(metadata.getArtist());
         this.setId(metadata.getId());
         this.setMacAddress(metadata.getMacAddress());
+        this.setFileSize(metadata.getFileSize());
         this.setTitle(metadata.getTitle());
     }
 
@@ -54,5 +56,18 @@ public class PlaylistEntry extends SongMetadata {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
         this.setLoaded(filePath != null);
+    }
+    
+    @Override
+    public int hashCode() {
+        return SongMetadataUtils.getUniqueKey(this).hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PlaylistEntry)) {
+            return false;
+        }
+        return SongMetadataUtils.getUniqueKey(this).equals(SongMetadataUtils.getUniqueKey((PlaylistEntry)o));
     }
 }
