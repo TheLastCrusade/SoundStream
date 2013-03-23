@@ -95,7 +95,7 @@ public class PlaylistDataManager implements Runnable {
      */
     private void clearOldLoadedFiles() {
         //NOTE: only do this if we need to...to minimize network traffic/playback issues
-//                if (bytesRequested > maxBytesToLoad * loadFactor) {
+        if (bytesRequested > maxBytesToLoad * loadFactor) {
             Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
             long toRemoveBytes = 0;
             for (PlaylistEntry entry : remotelyLoaded) {
@@ -112,7 +112,7 @@ public class PlaylistDataManager implements Runnable {
             deleteTempFileData(toRemove);
             remotelyLoaded.removeAll(toRemove);
             bytesRequested -= toRemoveBytes;
-//                }                
+        }
     }
 
     private void registerReceivers() {

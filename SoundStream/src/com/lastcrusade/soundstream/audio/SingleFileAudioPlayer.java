@@ -106,14 +106,14 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.setSong(null, null);
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.application);
-//        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
     }
 
     @Override
     public void resume() {
         player.start();
         paused = false;
-//        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
+        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
     }
 
     @Override
