@@ -102,13 +102,12 @@ public class Messenger {
     public boolean deserializeMessage(InputStream input) throws IOException {
         
         boolean processed = false;
-        //read all we can...
-        do {
-            //NOTE: this is so input.read can block, and will throw an exception when the connection
-            // goes down.  this is the only way we'll get a notification of a downed client
-            int read = input.read();
-            inputBuffer.write(read);
-        } while (input.available() > 0);
+        //read one byte at a time...we want to make sure we run thru the logic below after each byte
+        // so we don't hold a message in inputBuffer while waiting for the next byte to come in
+        //NOTE: this is so input.read can block, and will throw an exception when the connection
+        // goes down.  this is the only way we'll get a notification of a downed client
+        int read = input.read();
+        inputBuffer.write(read);
 
         //if we need to, consume the message length (to make sure we read until we have a complete message)
         if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
@@ -155,15 +154,8 @@ public class Messenger {
                 //otherwise, it's a WTF
                 Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
             }
-        } catch (InstantiationException e) {
-            
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-            
+        } catch (Exception e) {
+            Log.wtf(TAG, e);
         } finally {
             //consume this message either way
             int bufferLen = inputBuffer.size();
