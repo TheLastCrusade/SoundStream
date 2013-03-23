@@ -49,6 +49,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
+        getSlidingMenu().setEnabled(false);
         
         //add the playbar fragment onto the active content view
         getSupportFragmentManager()
@@ -56,8 +57,8 @@ public class CoreActivity extends SlidingFragmentActivity{
             .replace(R.id.playbar, new PlaybarFragment())
             .commit();
         
-        // enables the icon to act as the up
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
+        
         
         //setTitle(getString(R.string.playlist));
 
@@ -110,5 +111,11 @@ public class CoreActivity extends SlidingFragmentActivity{
 
     public void showContent(){
         getSlidingMenu().showContent();
+    }
+    
+    public void enableSlidingMenu(){
+     // enables the icon to act as the up
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSlidingMenu().setEnabled(true);
     }
 }
