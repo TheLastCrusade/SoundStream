@@ -49,6 +49,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
+        getSlidingMenu().setEnabled(false);
         
         //add the playbar fragment onto the active content view
         getSupportFragmentManager()
@@ -56,8 +57,8 @@ public class CoreActivity extends SlidingFragmentActivity{
             .replace(R.id.playbar, new PlaybarFragment())
             .commit();
         
-        // enables the icon to act as the up
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
+        
         
         //setTitle(getString(R.string.playlist));
 
@@ -96,7 +97,7 @@ public class CoreActivity extends SlidingFragmentActivity{
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    //after the host has been disconnected, pull the fan back to the connect page
+                    //after the host has been disconnected, pull the guest back to the connect page
                     Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
@@ -110,5 +111,11 @@ public class CoreActivity extends SlidingFragmentActivity{
 
     public void showContent(){
         getSlidingMenu().showContent();
+    }
+    
+    public void enableSlidingMenu(){
+     // enables the icon to act as the up
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSlidingMenu().setEnabled(true);
     }
 }

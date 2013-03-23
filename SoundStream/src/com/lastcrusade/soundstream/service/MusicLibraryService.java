@@ -113,11 +113,11 @@ public class MusicLibraryService extends Service {
                     sendSongData(fromAddr, songId);
                 }
             })
-            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                     removeLibraryForAddress(macAddress, true);
                 }
             })
@@ -189,13 +189,13 @@ public class MusicLibraryService extends Service {
     /**
      * Notify that the library was updated.  This includes
      * sending an intent to the system, and sending the library out
-     * to the fans.
+     * to the guests.
      */
     private void notifyLibraryUpdated() {
         new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
-        //send the updated library to all the fans out there
+        //send the updated library to all the guests out there
         if (((CustomApp)getApplication()).getMessagingService() != null) {
-            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToFans(getLibrary());
+            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToGuests(getLibrary());
         }
     }
 

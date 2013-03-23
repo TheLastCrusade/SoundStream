@@ -1,11 +1,8 @@
 package com.lastcrusade.soundstream.components;
 
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,16 +10,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.IMessagingService;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -43,7 +35,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         registerReceivers();
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,6 +46,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             @Override
             public void onClick(View v) {
                 Transitions.transitionToNetwork((CoreActivity)getActivity());
+                ((CoreActivity)getActivity()).enableSlidingMenu();
             }
         });
         
@@ -64,7 +56,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             @Override
             public void onClick(View v) {
                 connectButton.setEnabled(false);
-                getConnectionService().broadcastFan(getActivity());
+                getConnectionService().broadcastGuest(getActivity());
             }
         });
 
@@ -97,6 +89,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         connectButton.setEnabled(true);
                         //switch 
                         Transitions.transitionToHome((CoreActivity)getActivity());
+                        ((CoreActivity)getActivity()).enableSlidingMenu();
                     }
                 })
             .register(this.getActivity());
