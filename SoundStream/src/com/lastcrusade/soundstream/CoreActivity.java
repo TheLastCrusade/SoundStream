@@ -96,7 +96,7 @@ public class CoreActivity extends SlidingFragmentActivity{
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    //after the host has been disconnected, pull the fan back to the connect page
+                    //after the host has been disconnected, pull the guest back to the connect page
                     Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
