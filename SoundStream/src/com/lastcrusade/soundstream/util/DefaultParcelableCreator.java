@@ -3,8 +3,6 @@ package com.lastcrusade.soundstream.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
