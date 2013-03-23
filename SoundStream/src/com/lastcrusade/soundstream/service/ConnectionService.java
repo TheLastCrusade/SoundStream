@@ -289,11 +289,6 @@ public class ConnectionService extends Service {
      * @return
      */
     private MessageThread findMessageThreadByAddress(String address) {
-        //NOTE: we assume that the adapter is nonnull, because the activity will not
-        // get past onCreate on a device w/o Bluetooth...and also, because this method is
-        // called in response to a network message over Bluetooth
-//        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
         // look up the message thread that manages the connection to the remote
         // device
         BluetoothDevice remoteDevice = adapter.getRemoteDevice(address);

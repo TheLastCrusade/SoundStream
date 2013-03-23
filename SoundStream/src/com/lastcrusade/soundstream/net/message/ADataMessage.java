@@ -23,9 +23,6 @@ public abstract class ADataMessage implements IMessage {
         }
         else {
             writeBytes(string.getBytes(), output);
-//            bytes = string.getBytes();
-//            writeInteger(bytes.length, output);
-//            output.write(bytes);
         }
     }
 
@@ -36,16 +33,6 @@ public abstract class ADataMessage implements IMessage {
         } else {
             return null;
         }
-//        int length = readInteger(input);
-//        //TODO: should put an upper bound here, and use a ByteArrayOutputStream to accumulate bytes
-//        if(length > 0) {
-//	        byte[] buffer = new byte[length];
-//	        input.read(buffer, 0, length);
-//	        return new String(buffer);
-//        }
-//        else {
-//        	return null;
-//        }
     }
 
     protected void writeInteger(int integer, OutputStream output) throws IOException {

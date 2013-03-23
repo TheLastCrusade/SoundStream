@@ -95,17 +95,6 @@ public class PlaylistFragment extends MusicListFragment{
         this.registrar.unregister();
     }
 
-//    private Playlist getPlaylist() {
-//        Playlist playlist = null;
-//
-//        try {
-//            playlist = playlistServiceServiceLocator.getService().getPlaylist();
-//        } catch (ServiceNotBoundException e) {
-//            Log.wtf(TAG, e);
-//        }
-//        return playlist;
-//    }
-//
     protected PlaylistService getPlaylistService() {
         PlaylistService playlistService = null;
 
