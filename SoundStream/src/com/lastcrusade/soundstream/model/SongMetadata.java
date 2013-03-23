@@ -1,11 +1,11 @@
 package com.lastcrusade.soundstream.model;
 
-import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class SongMetadata implements Parcelable {
+import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
+
+public class SongMetadata implements Parcelable{
 
     //this is REQUIRED for Parcelable to work properly
     public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(SongMetadata.class);

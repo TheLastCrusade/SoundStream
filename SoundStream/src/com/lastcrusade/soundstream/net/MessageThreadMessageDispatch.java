@@ -7,11 +7,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.soundstream.net.message.IMessage;
 
 /**
- * An Android Handler used as a fanClub network message dispatch.  This will receive
+ * An Android Handler used as a SoundStream network message dispatch.  This will receive
  * Android Message objects that represent network messages, and dispatch them to the
  * appropriate handler.
  * 
@@ -82,7 +81,7 @@ public class MessageThreadMessageDispatch extends Handler {
         IMessageHandler handler   = dispatchMap.get(message.getClass());
         
         if (handler != null) {
-            Log.w(TAG, "Message received: " + messageNo);
+            Log.w(TAG, "Message received: " + messageNo + ", it's a " + message.getClass().getName());
             handler.handleMessage(messageNo, message, fromAddr);
         } else if (defaultHandler != null) {
             this.defaultHandler.handleMessage(messageNo, message, fromAddr);

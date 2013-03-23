@@ -1,11 +1,8 @@
 package com.lastcrusade.soundstream.components;
 
-import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,16 +10,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.IMessagingService;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -38,16 +30,11 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     private BroadcastRegistrar broadcastRegistrar;
     private Button connectButton;
-    private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         registerReceivers();
-
-        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(this.getActivity(),
-                MusicLibraryService.class, MusicLibraryServiceBinder.class);
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,9 +45,8 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             
             @Override
             public void onClick(View v) {
-                //TODO: these will go away once Elizabeth completes her transition singleton
-                ((CoreActivity)getActivity()).onConnected();
-                Transitions.transitionToHome((CoreActivity)getActivity());
+                Transitions.transitionToNetwork((CoreActivity)getActivity());
+                ((CoreActivity)getActivity()).enableSlidingMenu();
             }
         });
         
@@ -70,7 +56,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             @Override
             public void onClick(View v) {
                 connectButton.setEnabled(false);
-                getConnectionService().broadcastFan(getActivity());
+                getConnectionService().broadcastGuest(getActivity());
             }
         });
 
@@ -93,10 +79,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         return app.getMessagingService();
     }
     
-    private MusicLibraryService getMusicLibraryService() throws ServiceNotBoundException {
-        return this.musicLibraryLocator.getService();
-    }
-    
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
@@ -105,16 +87,9 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {
                         connectButton.setEnabled(true);
-                        //send the library to the connected host
-                        try {
-                            List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
-                            getMessagingService().sendLibraryMessage(metadata);
-                        } catch (ServiceNotBoundException e) {
-                            Log.wtf(TAG, e);
-                        }
-                        ((CoreActivity)getActivity()).onConnected();
                         //switch 
                         Transitions.transitionToHome((CoreActivity)getActivity());
+                        ((CoreActivity)getActivity()).enableSlidingMenu();
                     }
                 })
             .register(this.getActivity());

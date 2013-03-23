@@ -1,23 +1,38 @@
 package com.lastcrusade.soundstream.audio;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class RemoteAudioPlayer implements IPlayer {
 
     private CustomApp application;
+    private boolean paused;
     private boolean playing;
+    
+    BroadcastRegistrar registrar;
 
     public RemoteAudioPlayer(CustomApp application) {
         this.application = application;
         this.playing = false;
+        this.paused  = false;
+        registerReceivers();
     }
 
     @Override
+    public boolean isPaused() {
+        return this.paused;
+    }
+    
+    @Override
     public boolean isPlaying() {
-        return this.playing;
+        return this.playing && !this.paused;
     }
 
     @Override
@@ -36,7 +51,36 @@ public class RemoteAudioPlayer implements IPlayer {
     }
 
     @Override
+    public void resume() {
+        //TODO: see above
+        this.playing = true;
+        this.paused  = false;
+        //TODO: this should probably send a resume message
+        this.application.getMessagingService().sendPlayMessage();
+    }
+
+    @Override
     public void skip() {
         this.application.getMessagingService().sendSkipMessage();
+    }
+    
+    private void registerReceivers() {
+    	this.registrar = new BroadcastRegistrar();
+    	this.registrar.addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE,
+    			new IBroadcastActionHandler() {
+			
+			@Override
+			public void onReceiveAction(Context context, Intent intent) {
+				playing = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
+				if(playing) {
+				    paused = false;
+					new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(application);
+				}
+				else {
+				    paused = true;
+					new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(application);
+				}
+			}
+		}).register(this.application);
     }
 }

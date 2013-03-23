@@ -5,10 +5,10 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ ConnectFansMessageTest.class, FindNewFansMessageTest.class,
-        FoundFansMessageTest.class, LibraryMessageTest.class,
+@SuiteClasses({ ConnectGuestsMessageTest.class, FindNewGuestsMessageTest.class,
+        FoundGuestsMessageTest.class, LibraryMessageTest.class,
         MessengerTest.class, PauseMessageTest.class, PlayMessageTest.class,
-        SkipMessageTest.class, UserListMessageTest.class })
+        SkipMessageTest.class, UserListMessageTest.class, PlaylistMessageTest.class })
 public class AllMessageTests {
 
 }

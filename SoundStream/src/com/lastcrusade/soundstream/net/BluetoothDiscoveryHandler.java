@@ -1,17 +1,17 @@
 package com.lastcrusade.soundstream.net;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
-import com.lastcrusade.soundstream.util.Toaster;
 
 /**
  * A generic handler for discovering devices.  This handler will accumulate discovered devices and
@@ -52,21 +52,17 @@ public class BluetoothDiscoveryHandler {
      */
     public void onDiscoveryFinished() {
         Log.w(TAG, "Discovery finished");
-        if (this.discoveredDevices.isEmpty()) {
-            Toaster.iToast(this.context, R.string.no_fans_found);
-        } else {
-
-            sendDiscoveredDevices();
-        }
-    }
-
-    private void sendDiscoveredDevices() {
         //if its remote initiated, we want to send a different action
         String action = this.remoteInitiated
                           ? ConnectionService.ACTION_REMOTE_FIND_FINISHED
                           : ConnectionService.ACTION_FIND_FINISHED;
+        ArrayList<FoundGuest> foundGuests = new ArrayList<FoundGuest>();
+        for (BluetoothDevice device : this.discoveredDevices) {
+            // send the found guests back to the client.
+            foundGuests.add(new FoundGuest(device.getName(), device.getAddress()));
+        }
         new BroadcastIntent(action)
-            .putParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES, this.discoveredDevices)
+            .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, foundGuests)
             .send(this.context);
     }
 

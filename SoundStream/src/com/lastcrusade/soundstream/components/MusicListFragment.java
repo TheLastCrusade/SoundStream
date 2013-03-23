@@ -1,6 +1,8 @@
 package com.lastcrusade.soundstream.components;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +14,6 @@ import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.util.ITitleable;
 
 public abstract class MusicListFragment extends SherlockListFragment implements ITitleable{
-
-    private final int SHORT_VIEW = 1;
-    private final int EXPANDED_VIEW = 10;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,27 +36,52 @@ public abstract class MusicListFragment extends SherlockListFragment implements 
         
         //if the view height is larger than the standard element, set it back to the standard
         if(v.getHeight()>getResources().getDimension(R.dimen.song_height)){
-            title.setMaxLines(SHORT_VIEW);
-            album.setMaxLines(SHORT_VIEW);
-            artist.setMaxLines(SHORT_VIEW);
+            
+            title.setSingleLine(true);
+            artist.setSingleLine(true);
+            album.setSingleLine(true);
             
             //set the height of the color bar to the standard song element height
             v.findViewById(R.id.user_color).setMinimumHeight((int) getResources().getDimension(R.dimen.song_height));
         }
         //otherwise, expand the view
-        else{
-            title.setMaxLines(EXPANDED_VIEW);
-            album.setMaxLines(EXPANDED_VIEW);
-            artist.setMaxLines(EXPANDED_VIEW);
+        else{            
+            title.setSingleLine(false);
+            artist.setSingleLine(false);
+            album.setSingleLine(false);
             
-            //get the additional height taken up by the expanded words
-            int titleHeight = (title.getLineCount()-1)*title.getLineHeight();
-            int artistHeight =  (artist.getLineCount()-1)*artist.getLineHeight();
-            int albumHeight = (album.getLineCount()-1)*album.getLineHeight();
+            /*
+             * Calculates the number of additional lines needed to contain the text
+             */
+            Rect titleBounds = new Rect();
+            title.getPaint().getTextBounds(title.getText().toString(), 0, title.length(), titleBounds);
+            int titleLines = titleBounds.width()/title.getWidth();
+           
+            Rect artistBounds = new Rect();
+            artist.getPaint().getTextBounds(artist.getText().toString(), 0, artist.length(), artistBounds);
+            int artistLines = artistBounds.width()/artist.getWidth();
+            
+            Rect albumBounds = new Rect();
+            album.getPaint().getTextBounds(album.getText().toString(), 0, album.length(), albumBounds);
+            /*
+             *  +1 accounts for the fact that since album wraps its contents, it is almost
+             * always exactly as big as it needs to b. This makes album think it is a pixel
+             * larger than it is, which eliminates the possibility of thinking we have
+             * to add another line when in reality it is just a perfect match
+             */
+            int albumLines = albumBounds.width()/(album.getWidth()+1);
+            
+            // determines whether artist or album is longer, that way expansion can
+            // reference the correct one
+            int bottomLines = artistLines;
+            if(albumLines > bottomLines){
+                bottomLines = albumLines;
+            }
             
             //calculate the total height of the expanded view
             int viewHeight = (int) getResources().getDimension(R.dimen.song_height)
-                    + titleHeight + artistHeight + albumHeight;
+                    + titleLines*title.getLineHeight() + bottomLines*artist.getLineHeight();
+            
             
             //set the height of the color bar to the new view height
             v.findViewById(R.id.user_color).setMinimumHeight(viewHeight);

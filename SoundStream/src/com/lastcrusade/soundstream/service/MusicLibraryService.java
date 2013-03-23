@@ -13,8 +13,10 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -65,7 +67,7 @@ public class MusicLibraryService extends Service {
         }
         
         //update the library with the local songs
-        updateLibrary(metadataList, true);
+        updateLibrary(metadataList, false);
 
         registerReceivers();
     }
@@ -91,22 +93,17 @@ public class MusicLibraryService extends Service {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    try {
-                        List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
-                        updateLibrary(remoteMetas, true);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
+                    List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                    updateLibrary(remoteMetas, true);
                 }
             })
-            .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
+            .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_FAN_ADDRESS);
+                    String macAddress = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                     removeLibraryForAddress(macAddress, true);
                 }
-                
             })
             .register(this);
     }
@@ -160,9 +157,29 @@ public class MusicLibraryService extends Service {
                     metadataMap.put(key, nextInx);
                 }
             }
+            
+            /*
+             * by default we want to order alphabetically
+             * when we have more options, this can be moved elsewhere
+             * and governed by some type of flag.
+             */
+            orderAlphabetically();
         }
         if (notify) {
-            new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+            notifyLibraryUpdated();
+        }
+    }
+
+    /**
+     * Notify that the library was updated.  This includes
+     * sending an intent to the system, and sending the library out
+     * to the guests.
+     */
+    private void notifyLibraryUpdated() {
+        new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        //send the updated library to all the guests out there
+        if (((CustomApp)getApplication()).getMessagingService() != null) {
+            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToGuests(getLibrary());
         }
     }
 
@@ -194,7 +211,7 @@ public class MusicLibraryService extends Service {
             metadataMap = newMap;
         }
         if (notify) {
-            new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+            notifyLibraryUpdated();
         }
     }
 
@@ -208,5 +225,24 @@ public class MusicLibraryService extends Service {
      */
     private String createSongKey(SongMetadata song) {
         return song.getMacAddress() + "_" + song.getId();
+    }
+    
+    /**
+     * Orders the song metadata and related map alphabetically by Artist,
+     * Album, and Title
+     */
+    private void orderAlphabetically(){
+        synchronized (metadataMutex) {
+            //sort the metadata alphabetically
+            Collections.sort(metadataList, new AlphabeticalComparator());
+            
+            //recreate the map
+            Map<String, Integer> newMap  = new HashMap<String, Integer>();
+            for(int i=0; i<metadataList.size(); i++){
+                String key = createSongKey(metadataList.get(i));
+                newMap.put(key, i);
+            }
+            metadataMap = newMap;
+        }
     }
 }

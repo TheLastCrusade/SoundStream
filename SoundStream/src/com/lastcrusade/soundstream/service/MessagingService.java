@@ -11,18 +11,23 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.soundstream.net.message.ConnectFansMessage;
-import com.lastcrusade.soundstream.net.message.FindNewFansMessage;
-import com.lastcrusade.soundstream.net.message.FoundFansMessage;
+import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
+import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
+import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
+import com.lastcrusade.soundstream.net.message.PlaylistMessage;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
+import com.lastcrusade.soundstream.net.message.UserListMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -34,21 +39,21 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_STRING_MESSAGE = MessagingService.class.getName() + ".action.StringMessage";
     public static final String EXTRA_STRING          = MessagingService.class.getName() + ".extra.String";
     
-    public static final String ACTION_FOUND_FANS_MESSAGE = MessagingService.class.getName() + ".action.FoundFansMessage";
-    public static final String EXTRA_FOUND_FANS          = MessagingService.class.getName() + ".extra.FoundFans";
-    
-    public static final String ACTION_CONNECT_FANS_MESSAGE = MessagingService.class.getName() + ".action.ConnectFansMessage";
-    public static final String EXTRA_FAN_ADDRESSES         = MessagingService.class.getName() + ".extra.FanAddresses";
-    
-    public static final String ACTION_FIND_FANS_MESSAGE = MessagingService.class.getName() + ".action.FindFansMessage";
-    public static final String EXTRA_REQUEST_ADDRESS    = MessagingService.class.getName() + ".extra.RequestAddress";
-    
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
-
+    
+    public static final String ACTION_PLAY_STATUS_MESSAGE = MessagingService.class.getName() + ".action.PlayStatusMessage";
+    public static final String EXTRA_IS_PLAYING = MessagingService.class.getName() + ".extra.IsPlaying";
+    
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
+
+    //This also uses EXTRA_SONG_METADATA
+    public static final String ACTION_PLAYLIST_UPDATED_MESSAGE = MessagingService.class.getName() + ".action.PlaylistUpdated";
+    
+    public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
+    public static final String EXTRA_USER_LIST                    = MessagingService.class.getName() + ".extra.UserList";
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -114,58 +119,20 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     public void receiveMessage(int messageNo, IMessage message, String fromAddr) {
+        //for ease of implementation, this also uses a message dispatch object.
         this.messageDispatch.handleMessage(messageNo, message, fromAddr);
     }
 
     private void registerMessageHandlers() {
         this.messageDispatch = new MessageThreadMessageDispatch();
         registerStringMessageHandler();
-        registerFindNewFansMessageHandler();
         registerLibraryMessageHandler();
-        registerConnectFansMessageHandler();
-        registerFoundFansHandler();
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
-    }
-
-    private void registerFoundFansHandler() {
-        this.messageDispatch.registerHandler(FoundFansMessage.class, new IMessageHandler<FoundFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    FoundFansMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_FOUND_FANS_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_FOUND_FANS, message.getFoundFans())
-                    .send(MessagingService.this);
-            }
-        });
-    }
-
-    private void registerConnectFansMessageHandler() {
-        this.messageDispatch.registerHandler(ConnectFansMessage.class, new IMessageHandler<ConnectFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    ConnectFansMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_CONNECT_FANS_MESSAGE)
-                    .putStringArrayListExtra(EXTRA_FAN_ADDRESSES, message.getAddresses())
-                    .send(MessagingService.this);
-            }
-        });
-    }
-
-    private void registerFindNewFansMessageHandler() {
-        this.messageDispatch.registerHandler(FindNewFansMessage.class, new IMessageHandler<FindNewFansMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    FindNewFansMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_FIND_FANS_MESSAGE)
-                    .putExtra(EXTRA_REQUEST_ADDRESS, fromAddr)
-                    .send(MessagingService.this);
-            }
-        });
+        registerPlaylistMessageHandler();
+        registerPlayStatusMessageHandler();
+        registerUserListMessageHandler();
     }
 
     private void registerLibraryMessageHandler() {
@@ -177,7 +144,7 @@ public class MessagingService extends Service implements IMessagingService {
                 //sanity check...make sure the mac address is set properly, or
                 // raise a flag if its not
                 //JR, 03/13/13, I didn't want to set it here, because if we ever allow
-                // fans to send on other fans libraries, this would cause issues.  Rather
+                // guests to send on other guests libraries, this would cause issues.  Rather
                 // how we want to handle that, or if that is even a thing, just check
                 // that our current assumptions are met and raise purgatory if not.
                 ArrayList<SongMetadata> remoteLibrary = new ArrayList<SongMetadata>();
@@ -225,10 +192,57 @@ public class MessagingService extends Service implements IMessagingService {
         this.messageDispatch.registerHandler(SkipMessage.class,
                 new CommandHandler<SkipMessage>(ACTION_SKIP_MESSAGE));
     }
+    
+    private void registerPlayStatusMessageHandler() {
+    	this.messageDispatch.registerHandler(PlayStatusMessage.class,
+    			new IMessageHandler<PlayStatusMessage>() {
+					
+					@Override
+					public void handleMessage(int messageNo, PlayStatusMessage message,
+							String fromAddr) {
+						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
+							.putExtra(EXTRA_IS_PLAYING, message.getString().equals("Play"))
+							.send(MessagingService.this);
+					}
+				});
+    }
+    
+    private void registerUserListMessageHandler(){
+        this.messageDispatch.registerHandler(UserListMessage.class, new IMessageHandler<UserListMessage>() {
 
-    private void broadcastMessageToFans(IMessage msg) {
+            @Override
+            public void handleMessage(int messageNo, UserListMessage message,
+                    String fromAddr) {
+                new BroadcastIntent(ACTION_NEW_CONNECTED_USERS_MESSAGE)
+                    .putExtra(EXTRA_USER_LIST, message.getUserList())
+                    .send(MessagingService.this);
+                
+            }
+        });
+    }
+
+    private void registerPlaylistMessageHandler() {
+        this.messageDispatch.registerHandler(PlaylistMessage.class,
+                new IMessageHandler<PlaylistMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    PlaylistMessage message, String fromAddr) {
+                //This is because you can pass an ArrayList of parseables but not a List
+                ArrayList<SongMetadata> remotePlaylist = (ArrayList<SongMetadata>) message.getPlaylist().getSongsToPlay();
+
+                new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remotePlaylist)
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
+    private void sendMessageToGuests(IMessage msg) {
         try {
-            this.connectServiceLocator.getService().broadcastMessageToFans(msg);
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                this.connectServiceLocator.getService().broadcastMessageToGuests(msg);
+            }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -236,23 +250,26 @@ public class MessagingService extends Service implements IMessagingService {
 
     private void sendMessageToHost(IMessage msg) {
         try {
-            this.connectServiceLocator.getService().sendMessageToHost(msg);
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                this.connectServiceLocator.getService().sendMessageToHost(msg);
+            }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
     }
     
-    public void sendFindNewFansMessage() {
-        FindNewFansMessage msg = new FindNewFansMessage();
-        //send the message to the host
-        sendMessageToHost(msg);
-    }
-
     @Override
-    public void sendLibraryMessage(List<SongMetadata> library) {
+    public void sendLibraryMessageToHost(List<SongMetadata> library) {
         LibraryMessage msg = new LibraryMessage(library);
         //send the message to the host
         sendMessageToHost(msg);
+    }
+    
+    @Override
+    public void sendLibraryMessageToGuests(List<SongMetadata> library) {
+        LibraryMessage msg = new LibraryMessage(library);
+        //send the message to the guests
+        sendMessageToGuests(msg);
     }
 
     @Override
@@ -275,12 +292,18 @@ public class MessagingService extends Service implements IMessagingService {
         //send the message to the host
         sendMessageToHost(msg);
     }
+    
+    public void sendPlayStatusMessage(String playStatusMessage) {
+    	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
+    	//send the message to the guests
+    	sendMessageToGuests(msg);
+    }
 
     public void sendStringMessage(String message) {
         StringMessage sm = new StringMessage();
         sm.setString(message);
         //JR, 03/02/12, TODO: the connection service should be changed to only deal with "connections".  The mode of connection will
-        // be determined by which method is called initially (braodcastFan vs findNewFans), but after that point, it should just
+        // be determined by which method is called initially (braodcastGuest vs findNewGuests), but after that point, it should just
         // work with connections
         try {
             //send the message to the host
@@ -288,8 +311,42 @@ public class MessagingService extends Service implements IMessagingService {
                 sendMessageToHost(sm);
             }
             
-            if (this.connectServiceLocator.getService().isFanConnected()) {
-                broadcastMessageToFans(sm);
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                sendMessageToGuests(sm);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+    }
+    
+    public void sendPlaylistMessage(Playlist playlist){
+        try {
+            PlaylistMessage playlistMessage = new PlaylistMessage(playlist);
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(playlistMessage);
+            }
+
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                sendMessageToGuests(playlistMessage);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+
+    }
+    
+    //sends the user list out to everyone
+    public void sendUserListMessage(UserList userlist){
+        UserListMessage ulm = new UserListMessage(userlist);
+        try {
+            //send the message to the host
+            if (this.connectServiceLocator.getService().isHostConnected()) {
+                sendMessageToHost(ulm);
+            }
+
+            if (this.connectServiceLocator.getService().isGuestConnected()) {
+                sendMessageToGuests(ulm);
             }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);

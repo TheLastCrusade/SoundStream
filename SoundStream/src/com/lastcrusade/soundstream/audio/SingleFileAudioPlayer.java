@@ -2,8 +2,6 @@ package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
 
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 
 import android.content.Context;
@@ -27,6 +25,8 @@ public class SingleFileAudioPlayer implements IPlayer {
     private String filePath;
     private MediaPlayer player;
 
+    private boolean paused;
+
     public SingleFileAudioPlayer(final Context context) {
         this.player = new MediaPlayer();
         player.setOnCompletionListener(
@@ -43,7 +43,7 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     @Override
     public boolean isPlaying() {
-        return player.isPlaying();
+        return player.isPlaying() && !paused;
     }
 
     public void play() {
@@ -54,6 +54,7 @@ public class SingleFileAudioPlayer implements IPlayer {
             if (player.isPlaying()) {
                 player.stop();
             }
+            this.paused = false;
             player.reset();
             player.setDataSource(this.filePath);
             player.prepare();
@@ -69,6 +70,13 @@ public class SingleFileAudioPlayer implements IPlayer {
         if (player.isPlaying()) {
             player.pause();
         }
+        this.paused = true;
+    }
+
+    @Override
+    public void resume() {
+        player.start();
+        paused = false;
     }
 
     @Override
@@ -77,5 +85,10 @@ public class SingleFileAudioPlayer implements IPlayer {
         if (player.isPlaying()) {
             player.stop();
         }
+        paused = false;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 }

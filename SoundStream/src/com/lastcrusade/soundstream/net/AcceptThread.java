@@ -55,6 +55,8 @@ public abstract class AcceptThread extends AsyncTask<Void, Void, BluetoothSocket
             Log.i(TAG, "Connection accepted");
         } catch (IOException e) {
             Log.e(TAG, "Unable to accept connection", e);
+        } finally {
+            cancel();
         }
         return socket;
     }

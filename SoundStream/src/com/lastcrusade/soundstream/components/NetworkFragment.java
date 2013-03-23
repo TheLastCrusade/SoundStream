@@ -14,17 +14,19 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.BluetoothDeviceDialogFormatter;
+import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
+import com.lastcrusade.soundstream.util.Toaster;
 import com.lastcrusade.soundstream.util.UserListAdapter;
-/*
+
+/**
  * This fragment handles the ability for members to add new members to 
  * the network and to view the currently connected members
  */
@@ -51,7 +53,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
             public void onClick(View v) {
                 addMembersButton.setEnabled(false);
                 //TODO: add some kind of visual indicator while discovering...seconds until discovery is finished, number of clients found, etc
-                getConnectionService().findNewFans();
+                getConnectionService().findNewGuests();
             }
         });
         
@@ -78,12 +80,11 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
         this.broadcastRegistrar
             .addAction(ConnectionService.ACTION_FIND_FINISHED, new IBroadcastActionHandler() {
 
-                    @Override
-                    public void onReceiveAction(Context context, Intent intent) {
-                        onDiscoveredDevices(intent);
-                        addMembersButton.setEnabled(true);
-                    }
-                })
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    onFindFinished(intent);
+                }
+            })
             .addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
                 
                 @Override
@@ -98,27 +99,35 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
         this.broadcastRegistrar.unregister();
     }
 
-    private void onDiscoveredDevices(Intent intent) {
-
+    /**
+     * Called to handle a find finished method.  This may be to pop up a dialog
+     * or notify the user that no guests were found
+     * 
+     * @param intent
+     */
+    private void onFindFinished(Intent intent) {
+        //first thing...reenable the add members button
+        addMembersButton.setEnabled(true);
         
         //locally initiated device discovery...pop up a dialog for the user
-        //TODO: this should probably use FoundFan, to decouple this code from the bluetooth code
-        List<BluetoothDevice> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_DEVICES);
-        
-        new MultiSelectListDialog<BluetoothDevice>(this.getActivity(),
-                R.string.select_fans, R.string.connect)
-                .setItems(devices)
-                .setOnClickListener(
-                        new IOnDialogItemClickListener<BluetoothDevice>() {
-
-                            @Override
-                            public void onItemClick(
-                                    BluetoothDevice device) {
-                                getConnectionService().connectToFan(device);
-                            }
-                        })
-                .setFormatter(new BluetoothDeviceDialogFormatter())
-                .show();
+        List<FoundGuest> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
+        if (devices.isEmpty()) {
+            Toaster.iToast(this.getActivity(), R.string.no_guests_found);
+        } else {
+            new MultiSelectListDialog<FoundGuest>(this.getActivity(),
+                    R.string.select_guests, R.string.connect)
+                    .setItems(devices)
+                    .setOnClickListener(
+                            new IOnDialogMultiItemClickListener<FoundGuest>() {
+    
+                                @Override
+                                public void onItemsClick(
+                                        List<FoundGuest> foundGuests) {
+                                    getConnectionService().connectToGuests(foundGuests);
+                                }
+                            })
+                    .show();
+        }
     }
 
     @Override

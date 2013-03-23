@@ -1,13 +1,17 @@
 package com.lastcrusade.soundstream;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
+import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
+import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
@@ -17,7 +21,8 @@ public class CoreActivity extends SlidingFragmentActivity{
     private final String TAG = CoreActivity.class.getName();
 
     private Fragment menu;
-    private boolean connected = false;
+
+    private BroadcastRegistrar registrar;
         
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -35,21 +40,16 @@ public class CoreActivity extends SlidingFragmentActivity{
             .replace(R.id.menu_frame, menu)
             .commit();
         
-        //We want to start off at the playlist if this is the first time
+        //We want to start off at the connect page if this is the first time
         // the activity is created
-        if(savedInstanceState == null){
-            //add the initial content fragment and set the title on the action bar
-            if(!connected)
-                Transitions.transitionToConnect(this);
-            else{
-                Transitions.transitionToHome(this);
-                setTitle(getString(R.string.playlist));
-            }
+        if(savedInstanceState == null) {
+            Transitions.transitionToConnect(this);
         }
 
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
+        getSlidingMenu().setEnabled(false);
         
         //add the playbar fragment onto the active content view
         getSupportFragmentManager()
@@ -57,8 +57,8 @@ public class CoreActivity extends SlidingFragmentActivity{
             .replace(R.id.playbar, new PlaybarFragment())
             .commit();
         
-        // enables the icon to act as the up
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
+        
         
         //setTitle(getString(R.string.playlist));
 
@@ -68,6 +68,8 @@ public class CoreActivity extends SlidingFragmentActivity{
         //TODO: Move this to something like connect activity or the connection fragment
         curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
         //Log.i("Core", " " + curApp.getUserList().getUserByMACAddress(BluetoothUtils.getLocalBluetoothMAC()));
+        
+        registerReceivers();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -82,14 +84,38 @@ public class CoreActivity extends SlidingFragmentActivity{
         return false;
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceivers();
+        super.onDestroy();
+    }
     
+    private void registerReceivers() {
+        this.registrar = new BroadcastRegistrar();
+        this.registrar
+            .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+            
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    //after the host has been disconnected, pull the guest back to the connect page
+                    Transitions.transitionToConnect(CoreActivity.this);
+                }
+            })
+            .register(this);
+        
+    }
+
+    private void unregisterReceivers() {
+        this.registrar.unregister();
+    }
+
     public void showContent(){
         getSlidingMenu().showContent();
     }
-
-
-    //TODO: this may go away, once Elizabeth is done with the transition singleton class
-    public void onConnected() {
-        this.connected  = true;
+    
+    public void enableSlidingMenu(){
+     // enables the icon to act as the up
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSlidingMenu().setEnabled(true);
     }
 }
