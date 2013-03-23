@@ -1,62 +1,71 @@
 package com.lastcrusade.soundstream.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
-import android.util.Log;
+import java.util.Queue;
 
 public class Playlist {
     private final static String TAG = Playlist.class.getName();
-    private List<SongMetadata> musicList;
+    private Queue<PlaylistEntry> playedList;
+    private Queue<PlaylistEntry> musicList;
     private int index;
 
     public Playlist() {
-        musicList = new ArrayList<SongMetadata>();
+        playedList = new LinkedList<PlaylistEntry>();
+        musicList  = new LinkedList<PlaylistEntry>();
         index = 0;
     }
 
-    public Playlist(List<SongMetadata> aMusicList){
-        musicList = aMusicList;
+    public void add(PlaylistEntry entry) {
+        musicList.add(entry);
+    }
+
+    public void clear() {
+        musicList.clear();
         index = 0;
     }
 
-    public void add(SongMetadata meta) {
-        musicList.add(meta);
-    }
-
-    public SongMetadata remove(int index) {
-        SongMetadata removeMeta = null;
-        if (index >= 0) {
-            removeMeta = musicList.remove(index);
+    public SongMetadata remove(SongMetadata meta) {
+        SongMetadata removeMeta = meta;
+        boolean removed = musicList.remove(meta);
+        if (!removed) {
+            removeMeta = null;
         }
         return removeMeta;
     }
 
-    public List<SongMetadata> getSongsToPlay(){
-        return musicList;
+    public List<PlaylistEntry> getSongsToPlay() {
+        List<PlaylistEntry> songsToPlay = new ArrayList<PlaylistEntry>();
+        songsToPlay.addAll(playedList);
+        songsToPlay.addAll(musicList);
+        return songsToPlay;
     }
 
     public int size(){
-        return musicList.size();
+        return playedList.size() + musicList.size();
     }
 
-    public int getIndex(){
-        return index;
+    public PlaylistEntry getNextAvailableSong(){
+        PlaylistEntry nextAvail = null;
+        for (PlaylistEntry entry : musicList) {
+            if (entry.isLoaded()) {
+                nextAvail = entry;
+                break;
+            }
+        }
+        
+        if (nextAvail != null) {
+            musicList.remove(nextAvail);
+            playedList.add(nextAvail);
+            nextAvail.setPlayed(true);
+        }
+        return nextAvail;
     }
 
-    public SongMetadata getNextSong(){
-        index = index % musicList.size();
-        return musicList.get(index);
-    }
-
-    /**
-     * Call this method to progress the playlist
-     */
-    public void moveNext(){
-            index++;
-    }
-    
-    public SongMetadata getSong(int index){
-        return musicList.get(index);
+    public void reset() {
+        playedList.addAll(musicList);
+        musicList = playedList;
+        playedList = new LinkedList<PlaylistEntry>();
     }
 }

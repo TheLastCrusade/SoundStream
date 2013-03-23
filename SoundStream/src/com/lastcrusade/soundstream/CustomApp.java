@@ -97,7 +97,7 @@ public class CustomApp extends Application {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     //extract the new user list from the intent
-                    userList = intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST);
+                    userList.copyFrom((UserList) intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST));
                     //tell app to update the user list in all the UI
                     new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
                 }

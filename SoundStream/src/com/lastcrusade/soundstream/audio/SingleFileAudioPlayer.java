@@ -2,6 +2,7 @@ package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
 
+import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
@@ -29,8 +30,11 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     private boolean paused;
 
-    public SingleFileAudioPlayer(final Context context) {
+    private CustomApp application;
+
+    public SingleFileAudioPlayer(final Context context, CustomApp application) {
         this.player = new MediaPlayer();
+        this.application = application;
         player.setOnCompletionListener(
                 new OnCompletionListener(){
                     @Override public void onCompletion(MediaPlayer mp) {
@@ -61,6 +65,7 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.setDataSource(this.filePath);
             player.prepare();
             player.start();
+            ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
         } catch (Exception e) {
             Log.wtf(TAG, "Unable to play song: " + this.filePath);
             e.printStackTrace();
@@ -73,12 +78,14 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.pause();
         }
         this.paused = true;
+        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
     }
 
     @Override
     public void resume() {
         player.start();
         paused = false;
+        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
     }
 
     @Override

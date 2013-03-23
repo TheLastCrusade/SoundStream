@@ -1,5 +1,9 @@
 package com.lastcrusade.soundstream.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,12 +19,14 @@ import android.os.IBinder;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
+import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.SongMetadataUtils;
 
 public class MusicLibraryService extends Service {
     /**
@@ -97,6 +103,16 @@ public class MusicLibraryService extends Service {
                     updateLibrary(remoteMetas, true);
                 }
             })
+            .addAction(MessagingService.ACTION_REQUEST_SONG_MESSAGE, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, -1 /*SongMetadata.UNKNOWN_SONG*/);
+
+                    sendSongData(fromAddr, songId);
+                }
+            })
             .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
 
                 @Override
@@ -146,7 +162,7 @@ public class MusicLibraryService extends Service {
     void updateLibrary(Collection<SongMetadata> additionalSongs, boolean notify) {
         synchronized(metadataMutex) {
             for (SongMetadata song : additionalSongs) {
-                String key = createSongKey(song);
+                String key = SongMetadataUtils.getUniqueKey(song);
                 if (metadataMap.containsKey(key)) {
                     //song already exists, replace the existing entry in the list with the new data.
                     metadataList.set(metadataMap.get(key), song);
@@ -202,7 +218,7 @@ public class MusicLibraryService extends Service {
                 if (!song.getMacAddress().equals(macAddress)) {
                     int nextInx = newList.size();
                     newList.add(song);
-                    String key = createSongKey(song);
+                    String key = SongMetadataUtils.getUniqueKey(song);
                     newMap.put(key, nextInx);
                 }
             }
@@ -216,33 +232,52 @@ public class MusicLibraryService extends Service {
     }
 
     /**
-     * Create a unique key for this song.  This unique key consists of:
-     *  Mac address (uniquely identifies a device)
-     *  Song id (uniquely identifies a song on the device)
-     * 
-     * @param song
-     * @return
-     */
-    private String createSongKey(SongMetadata song) {
-        return song.getMacAddress() + "_" + song.getId();
-    }
-    
-    /**
      * Orders the song metadata and related map alphabetically by Artist,
      * Album, and Title
      */
     private void orderAlphabetically(){
-        synchronized (metadataMutex) {
+        synchronized(metadataMutex) {
             //sort the metadata alphabetically
             Collections.sort(metadataList, new AlphabeticalComparator());
             
             //recreate the map
             Map<String, Integer> newMap  = new HashMap<String, Integer>();
             for(int i=0; i<metadataList.size(); i++){
-                String key = createSongKey(metadataList.get(i));
+                String key = SongMetadataUtils.getUniqueKey(metadataList.get(i));
                 newMap.put(key, i);
             }
             metadataMap = newMap;
         }
+    }
+
+    private SongMetadata lookupMySongById(long songId) {
+        synchronized(metadataMutex) {
+            //TODO: remove use of bluetoothutils...replace with reference to userlist or some other way
+            // of getting "my" address
+            String key = SongMetadataUtils.getUniqueKey(BluetoothUtils.getLocalBluetoothMAC(), songId);
+            Integer inx = metadataMap.get(key);
+            return inx != null ? metadataList.get(inx) : null;
+        }
+    }
+    private void sendSongData(String fromAddr, long songId) {
+        MediaStoreWrapper msw = new  MediaStoreWrapper(MusicLibraryService.this);
+        try {
+            SongMetadata song = lookupMySongById(songId);
+            String filePath   = msw.getSongFilePath(song);
+            File   songFile   = new File(filePath);
+            byte[] bytes      = loadFile(songFile);
+            ((CustomApp)getApplication()).getMessagingService().sendTransferSongMessage(fromAddr, songId, songFile.getName(), bytes);
+        } catch (SongNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] loadFile(File file) throws IOException {
+        FileInputStream fis = new FileInputStream(file);
+        byte[] bytes = new byte[fis.available()];
+        fis.read(bytes);
+        return bytes;
     }
 }

@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.Messenger;
@@ -106,7 +107,8 @@ public abstract class MessageThread extends Thread {
     }
 
     /* Call this from the main activity to send data to the remote device */
-    public void write(IMessage message) {
+    public synchronized void write(IMessage message) {
+        Log.d(TAG, "write called from " + Thread.currentThread().getName());
         try {
             mmMessenger.serializeMessage(message);
             byte[] bytes = mmMessenger.getOutputBytes();
