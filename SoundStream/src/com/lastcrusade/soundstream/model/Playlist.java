@@ -46,7 +46,7 @@ public class Playlist {
         return playedList.size() + musicList.size();
     }
 
-    public PlaylistEntry getNextAvailableSong(){
+    public PlaylistEntry getNextAvailableSong() {
         PlaylistEntry nextAvail = null;
         for (PlaylistEntry entry : musicList) {
             if (entry.isLoaded()) {
@@ -58,7 +58,6 @@ public class Playlist {
         if (nextAvail != null) {
             musicList.remove(nextAvail);
             playedList.add(nextAvail);
-            nextAvail.setPlayed(true);
         }
         return nextAvail;
     }
@@ -67,5 +66,9 @@ public class Playlist {
         playedList.addAll(musicList);
         musicList = playedList;
         playedList = new LinkedList<PlaylistEntry>();
+        //reset the play status on all of the entries
+        for (PlaylistEntry entry : musicList) {
+            entry.setPlayed(false);
+        }
     }
 }

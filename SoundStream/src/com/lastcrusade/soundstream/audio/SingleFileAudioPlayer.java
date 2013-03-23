@@ -2,15 +2,15 @@ package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
 
-import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
-
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
+
+import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.util.BroadcastIntent;
 
 /**
  * A simple audio player that expects an audio file to be located in an
@@ -43,8 +43,11 @@ public class SingleFileAudioPlayer implements IPlayer {
         });
     }
 
-    public void setSongByPath(String filePath) {
+    public void setSong(String filePath, SongMetadata song) {
         this.filePath = filePath;
+        new BroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
+            .putExtra(PlaylistService.EXTRA_SONG, song)
+            .send(this.application);
     }
 
     @Override
@@ -94,10 +97,13 @@ public class SingleFileAudioPlayer implements IPlayer {
         if (player.isPlaying()) {
             player.stop();
         }
+        //send this action to move to the next song
+        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this.application);
         paused = false;
     }
 
     public boolean isPaused() {
         return paused;
     }
+
 }

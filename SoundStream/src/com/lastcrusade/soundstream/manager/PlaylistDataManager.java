@@ -27,7 +27,7 @@ public class PlaylistDataManager implements Runnable {
 
     private PlaylistService playlistService;
     private CustomApp application;
-    private Queue<PlaylistEntry> toLoadQueue = new LinkedList<PlaylistEntry>();
+    private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
     private Queue<PlaylistEntry> remotelyLoaded = new LinkedList<PlaylistEntry>();
     private Thread stoppingThread;
     private boolean running;
@@ -35,6 +35,7 @@ public class PlaylistDataManager implements Runnable {
 
     private long maxBytesToLoad = 512 * 1024 * 1024; //512MB default max bytes
     private long bytesRequested = 0;
+    private float loadFactor    = 0.5f;
 
     public PlaylistDataManager(PlaylistService playlistService, CustomApp application) {
         this.playlistService = playlistService;
@@ -49,23 +50,25 @@ public class PlaylistDataManager implements Runnable {
             while (running) {
                 //first, clean up any already played remote files...this frees up space
                 // to request new files.
-                List<PlaylistEntry> toRemove = new LinkedList<PlaylistEntry>();
-                long toRemoveBytes = 0;
-                for (PlaylistEntry entry : remotelyLoaded) {
-                    if (entry.isPlayed()) {
-                        toRemove.add(entry);
-                        toRemoveBytes += entry.getFileSize();
+                //NOTE: only do this if we need to...to minimize network traffic/playback issues
+//                if (bytesRequested > maxBytesToLoad * loadFactor) {
+                    List<PlaylistEntry> toRemove = new LinkedList<PlaylistEntry>();
+                    long toRemoveBytes = 0;
+                    for (PlaylistEntry entry : remotelyLoaded) {
+                        if (entry.isPlayed()) {
+                            toRemove.add(entry);
+                            toRemoveBytes += entry.getFileSize();
+                        }
                     }
-                }
-                
-                deleteTempFileData(toRemove);
-                remotelyLoaded.removeAll(toRemove);
-                bytesRequested -= toRemoveBytes;
-                
+                    
+                    deleteTempFileData(toRemove);
+                    remotelyLoaded.removeAll(toRemove);
+                    bytesRequested -= toRemoveBytes;
+//                }                
                 //next, see if we can start loading any additional files
-                while (!toLoadQueue.isEmpty() &&
-                        toLoadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
-                    PlaylistEntry entry = toLoadQueue.poll();
+                while (!loadQueue.isEmpty() &&
+                        loadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
+                    PlaylistEntry entry = loadQueue.poll();
                     if (entry.isLocalFile()) {
                         //if its local, just load the file path and remove the entry
                         loadLocal(entry);
@@ -150,8 +153,8 @@ public class PlaylistDataManager implements Runnable {
         return found;
     }
 
-    public void addToLoader(PlaylistEntry entry) {
-        this.toLoadQueue.add(entry);
+    public void addToLoadQueue(PlaylistEntry entry) {
+        this.loadQueue.add(entry);
     }
     
     private void loadLocal(PlaylistEntry entry) {

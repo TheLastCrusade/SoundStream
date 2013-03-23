@@ -76,9 +76,10 @@ public class PlaylistService extends Service {
     private SingleFileAudioPlayer mAudioPlayer;
     private Playlist              mPlaylist;
 
-    private Thread mDataManagerThread;
+    private Thread                mDataManagerThread;
+    private PlaylistDataManager   mDataManager;
 
-    private PlaylistDataManager mDataManager;
+    private PlaylistEntry currentSong;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -86,11 +87,13 @@ public class PlaylistService extends Service {
         // as the player until we see a host connected
         this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
         this.mThePlayer    = mAudioPlayer;
-
-        this.mPlaylist = new Playlist();
-        // TODO: kick off a thread to feed the monster that is the audio service
+        this.mPlaylist     = new Playlist();
+        
         registerReceivers();
         
+        //start the data manager by default...it is disabled when
+        // a host is connected
+        startDataManager();
         return new PlaylistServiceBinder();
     }
 
@@ -125,6 +128,11 @@ public class PlaylistService extends Service {
                 if (!mThePlayer.isPaused()) {
                     play();
                 }
+                //NOTE: this is an indicator that the song data can be deleted...therefore, we don't
+                //want to set the flag until after the song has been played
+                if (currentSong != null) {
+                    currentSong.setPlayed(true);
+                }
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
@@ -133,6 +141,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 mThePlayer = new RemoteAudioPlayer((CustomApp) getApplication());
+                stopDataManager();
             }
         })
         .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
@@ -140,28 +149,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 mThePlayer = mAudioPlayer;
-            }
-        })
-        .addAction(ConnectionService.ACTION_FAN_CONNECTED, new IBroadcastActionHandler() {
-            
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                if (mDataManager == null) {
-                    mDataManager       = new PlaylistDataManager(PlaylistService.this, (CustomApp) getApplication());
-                    mDataManagerThread = new Thread(mDataManager, PlaylistDataManager.class.getSimpleName() + " Thread");
-                    mDataManagerThread.start();
-                }
-            }
-        })
-        .addAction(ConnectionService.ACTION_FAN_DISCONNECTED, new IBroadcastActionHandler() {
-            
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                if (mDataManager != null) {
-                    mDataManager.stopLoading();
-                    mDataManager = null;
-                    mDataManagerThread = null;
-                }
+                startDataManager();
             }
         })
         .addAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
@@ -193,6 +181,9 @@ public class PlaylistService extends Service {
                 mPlaylist.clear();
                 for (SongMetadata metadata : newList) {
                     PlaylistEntry entry = new PlaylistEntry(metadata);
+                    //for the UI, assume that the song is "loaded" when displayed on the remote guest
+                    //TODO: this should actually reflect the real status on the host, which requires
+                    // modifying the message to send PlaylistEntry objects
                     entry.setLoaded(mDataManager == null);
                     mPlaylist.add(entry);
                 }
@@ -200,6 +191,22 @@ public class PlaylistService extends Service {
             }
         })
         .register(this);
+    }
+
+    protected void startDataManager() {
+        if (mDataManager == null) {
+            mDataManager       = new PlaylistDataManager(PlaylistService.this, (CustomApp) getApplication());
+            mDataManagerThread = new Thread(mDataManager, PlaylistDataManager.class.getSimpleName() + " Thread");
+            mDataManagerThread.start();
+        }
+    }
+
+    protected void stopDataManager() {
+        if (mDataManager != null) {
+            mDataManager.stopLoading();
+            mDataManager = null;
+            mDataManagerThread = null;
+        }
     }
 
     private void unregisterReceivers() {
@@ -211,6 +218,7 @@ public class PlaylistService extends Service {
     }
 
     public void play() {
+        boolean notify = true;
         if (this.mThePlayer.isPaused()) {
             this.mThePlayer.resume();
         } else {
@@ -220,51 +228,67 @@ public class PlaylistService extends Service {
             //we have stuff to play...play it and send a notification
             this.mThePlayer.play();
         }
-        new BroadcastIntent(ACTION_PLAYING_AUDIO).send(this);
     }
 
     /**
-     * Helper method to manage all of the things we need to do to play a
-     * song locally (e.g. on the host).
+     * Helper method to manage all of the things we need to do to set a song
+     * to play locally (e.g. on the host).
      */
-    private void setNextSong() {
-        if (mPlaylist.size() > 0){
+    private boolean setNextSong() {
+        if (!isLocalPlayer()) {
+            throw new IllegalStateException("Cannot call setSong when using a remote player");
+        }
+        boolean songSet = false;
+        //only 
+        if (mPlaylist.size() > 0) {
             PlaylistEntry song = mPlaylist.getNextAvailableSong();
+            //we've reached the end of the playlist...reset it to the beginning and try again
             if (song == null) {
-                mPlaylist.reset();
+                resetPlaylist();
                 song = mPlaylist.getNextAvailableSong();
             }
-            setSong(song);
-            new BroadcastIntent(ACTION_SONG_PLAYING)
-                .putExtra(EXTRA_SONG, song)
-                .send(this);
+            //still no available music..this means we're waiting for data to come in
+            //...display a warning, but don't play.
+            if (song == null) {
+                Toaster.iToast(this, getString(R.string.no_available_songs));
+            } else {   
+                this.currentSong = song;
+                this.mAudioPlayer.setSong(song.getFilePath(), song);
+                //the song has been set...indicate this in the return value
+                songSet = true;
+            }
         } else {
             Toaster.iToast(this, getString(R.string.playlist_empty));
+        }
+        return songSet;
+    }
+
+    /**
+     * 
+     */
+    private void resetPlaylist() {
+        mPlaylist.reset();
+        if (isLocalPlayer()) {
+            //we may need to re-add entries to the data manager, for remote
+            // loading
+            for (PlaylistEntry entry : mPlaylist.getSongsToPlay()) {
+                if (!entry.isLoaded() && !entry.isPlayed()) {
+                    mDataManager.addToLoadQueue(entry);
+                }
+            }
         }
     }
 
     public void pause() {
         this.mThePlayer.pause();
-        new BroadcastIntent(ACTION_PAUSED_AUDIO).send(this);
     }
 
     public void skip() {
         this.mThePlayer.skip();
-        if (isLocalPlayer()) {
-            new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this);
-        }
-        new BroadcastIntent(ACTION_SKIPPING_AUDIO).send(this);
     }
 
     private boolean isLocalPlayer() {
         return this.mThePlayer == this.mAudioPlayer;
-    }
-
-    private void setSong(PlaylistEntry entry) {
-        if (!isLocalPlayer()) {
-            throw new IllegalStateException("Cannot call setSong when using a remote player");
-        }
-        this.mAudioPlayer.setSongByPath(entry.getFilePath());
     }
 
     public void addSong(SongMetadata metadata) {
@@ -276,7 +300,7 @@ public class PlaylistService extends Service {
         // will load data into the same objects that are held in the playlist
         mPlaylist.add(entry);
         if (isLocalPlayer()) {
-            mDataManager.addToLoader(entry);
+            mDataManager.addToLoadQueue(entry);
         }
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
