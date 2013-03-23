@@ -8,11 +8,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
-<<<<<<< HEAD
-=======
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.net.message.FoundGuest;
->>>>>>> 1eba51df712f8bc95137e135db90f44ce49b7eac
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 
