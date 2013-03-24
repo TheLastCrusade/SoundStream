@@ -1,60 +1,81 @@
 package com.lastcrusade.soundstream.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
+/**
+ * A data structure for holding the playlist.  It keeps track of two queues of PlaylistEntry
+ * objects; the seam between them represents the current play position.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
 public class Playlist {
+    
     private final static String TAG = Playlist.class.getName();
-    private List<SongMetadata> musicList;
-    private int index;
+    
+    private Queue<PlaylistEntry> playedList;
+    private Queue<PlaylistEntry> musicList;
 
     public Playlist() {
-        musicList = new ArrayList<SongMetadata>();
-        index = 0;
+        playedList = new LinkedList<PlaylistEntry>();
+        musicList  = new LinkedList<PlaylistEntry>();
     }
 
-    public Playlist(List<SongMetadata> aMusicList){
-        musicList = aMusicList;
-        index = 0;
+    public void add(PlaylistEntry entry) {
+        musicList.add(entry);
     }
 
-    public void add(SongMetadata meta) {
-        musicList.add(meta);
+    public void clear() {
+        playedList.clear();
+        musicList.clear();
     }
 
-    public SongMetadata remove(int index) {
-        SongMetadata removeMeta = null;
-        if (index >= 0) {
-            removeMeta = musicList.remove(index);
+    public SongMetadata remove(SongMetadata meta) {
+        SongMetadata removeMeta = meta;
+        boolean removed = musicList.remove(meta);
+        if (!removed) {
+            removeMeta = null;
         }
         return removeMeta;
     }
 
-    public List<SongMetadata> getSongsToPlay(){
-        return musicList;
+    public List<PlaylistEntry> getSongsToPlay() {
+        List<PlaylistEntry> songsToPlay = new ArrayList<PlaylistEntry>();
+        songsToPlay.addAll(playedList);
+        songsToPlay.addAll(musicList);
+        return songsToPlay;
     }
 
     public int size(){
-        return musicList.size();
+        return playedList.size() + musicList.size();
     }
 
-    public int getIndex(){
-        return index;
+    public PlaylistEntry getNextAvailableSong() {
+        PlaylistEntry nextAvail = null;
+        for (PlaylistEntry entry : musicList) {
+            if (entry.isLoaded()) {
+                nextAvail = entry;
+                break;
+            }
+        }
+        
+        if (nextAvail != null) {
+            musicList.remove(nextAvail);
+            playedList.add(nextAvail);
+        }
+        return nextAvail;
     }
 
-    public SongMetadata getNextSong(){
-        index = index % musicList.size();
-        return musicList.get(index);
-    }
-
-    /**
-     * Call this method to progress the playlist
-     */
-    public void moveNext(){
-            index++;
-    }
-    
-    public SongMetadata getSong(int index){
-        return musicList.get(index);
+    public void reset() {
+        playedList.addAll(musicList);
+        musicList = playedList;
+        playedList = new LinkedList<PlaylistEntry>();
+        //reset the play status on all of the entries
+        for (PlaylistEntry entry : musicList) {
+            entry.setPlayed(false);
+        }
     }
 }

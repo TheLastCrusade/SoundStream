@@ -118,7 +118,12 @@ public class PlaybarFragment extends Fragment {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     SongMetadata song = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
-                    songTitle.setText(song.getTitle());
+                    if (song != null) {
+                        songTitle.setText(song.getTitle());
+                    } else {
+                        //TODO: what do we want to display when there are no songs to play?
+                        songTitle.setText("");
+                    }
                 }
             })
             .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {

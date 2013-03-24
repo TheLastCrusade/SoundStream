@@ -27,14 +27,8 @@ public class LibraryMessage extends ADataMessage {
 	@Override
 	public void deserialize(InputStream input) throws IOException {
 		int librarySize = readInteger(input);
-		for(int i = 0; i < librarySize; i++) {
-			long id = readLong(input);
-			String title      = readString(input);
-			String artist     = readString(input);
-			String album      = readString(input);
-			String macAddress = readString(input);
-			
-			library.add(new SongMetadata(id, title, artist, album, macAddress));
+		for(int i = 0; i < librarySize; i++) {			
+			library.add(readSongMetadata(input));
 		}
 	}
 
@@ -42,11 +36,7 @@ public class LibraryMessage extends ADataMessage {
 	public void serialize(OutputStream output) throws IOException {
 		writeInteger(library.size(), output);
 		for(SongMetadata metadata : library) {
-			writeLong(metadata.getId(), output);
-			writeString(metadata.getTitle(), output);
-			writeString(metadata.getArtist(), output);
-			writeString(metadata.getAlbum(), output);
-			writeString(metadata.getMacAddress(), output);
+		    writeSongMetadata(metadata, output);
 		}
 	}
 

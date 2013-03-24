@@ -63,6 +63,12 @@ public class UserList implements Parcelable{
         }
     }
 
+    public void copyFrom(UserList userList) {
+        this.userColors = userList.userColors;
+        this.connectedUsers.clear();
+        this.connectedUsers.addAll(userList.connectedUsers);
+    }
+
     public List<User> getUsers(){
         return connectedUsers;
     }
