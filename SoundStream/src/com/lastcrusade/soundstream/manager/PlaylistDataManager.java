@@ -183,6 +183,11 @@ public class PlaylistDataManager implements Runnable {
             //set the file path in the playlist entry, which allows the file to be played
             String filePath = this.application.getFileStreamPath(compositeFileName).getCanonicalPath();
             entry.setFilePath(filePath);
+            
+            //NOTE: THIS IS A HACK.  This ultimately belongs down in MessagingService, where the temp file is
+            // created, but this was put here for Alpha testing so we don't fill up our tester's phones.
+            new File(fileDataPath).delete();
+
         } catch (IOException e) {
             this.application.deleteFile(compositeFileName);
             //TODO: set flag to indicate file is broken
