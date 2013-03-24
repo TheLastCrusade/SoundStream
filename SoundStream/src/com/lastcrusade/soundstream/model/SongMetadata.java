@@ -11,6 +11,8 @@ public class SongMetadata implements Parcelable{
     //this is REQUIRED for Parcelable to work properly
     public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(SongMetadata.class);
 
+    public static final long UNKNOWN_SONG = -1;
+
     private long id;
 
     private String title;

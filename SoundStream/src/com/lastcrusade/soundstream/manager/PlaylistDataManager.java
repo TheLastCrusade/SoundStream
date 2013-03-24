@@ -17,6 +17,7 @@ import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
+import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
@@ -74,10 +75,7 @@ public class PlaylistDataManager implements Runnable {
                     }
                 }
                 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
+                pauseForNextRun();
             }
         } finally {
             //clean up on the way out
@@ -87,6 +85,17 @@ public class PlaylistDataManager implements Runnable {
                     this.stoppingThread.notify();
                 }
             }
+        }
+    }
+
+    /**
+     * Pause the thread before running through the data clear/load process
+     */
+    private void pauseForNextRun() {
+        try {
+            int pauseInMS = 1000; //1 second pause
+            Thread.sleep(pauseInMS);
+        } catch (InterruptedException e) {
         }
     }
 
@@ -123,11 +132,15 @@ public class PlaylistDataManager implements Runnable {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, -1 /*SongMetadata.UNKNOWN_SONG*/);
+                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
                     String fileName = intent.getStringExtra(MessagingService.EXTRA_SONG_FILE_NAME);
                     byte[] fileData = intent.getByteArrayExtra(MessagingService.EXTRA_SONG_DATA);
-                    saveTempFileData(fromAddr, songId, fileName, fileData);
-                    new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(playlistService);
+                    if (songId == SongMetadata.UNKNOWN_SONG) {
+                       Log.wtf(TAG, "TRANSFER_SONG_MESSAGE action received without a valid song id"); 
+                    } else {
+                        saveTempFileData(fromAddr, songId, fileName, fileData);
+                        new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(playlistService);
+                    }
                 }
             })
             .register(this.playlistService);
@@ -214,7 +227,10 @@ public class PlaylistDataManager implements Runnable {
         this.running = false;
         synchronized(this.stoppingThread) {
             try {
-                this.stoppingThread.wait(1000);
+                //wait for the thread to stop, or for 1.5 seconds.  this number was selected to correspond
+                // with the delay in the run function, plus some time to let the thread die.
+                int waitTimeInMS = 1500;
+                this.stoppingThread.wait(waitTimeInMS);
             } catch (InterruptedException e) {
                 //fall thru, nothing to do
             }

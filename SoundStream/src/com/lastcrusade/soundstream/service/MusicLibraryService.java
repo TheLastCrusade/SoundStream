@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
@@ -29,6 +30,9 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 
 public class MusicLibraryService extends Service {
+    
+    private static String TAG = MusicLibraryService.class.getSimpleName();
+
     /**
      * Broadcast action sent when the MusicLibrary gets or loses music
      *
@@ -108,9 +112,13 @@ public class MusicLibraryService extends Service {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, -1 /*SongMetadata.UNKNOWN_SONG*/);
+                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
 
-                    sendSongData(fromAddr, songId);
+                    if (songId == SongMetadata.UNKNOWN_SONG) {
+                        Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
+                    } else {
+                        sendSongData(fromAddr, songId);
+                    }
                 }
             })
             .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
