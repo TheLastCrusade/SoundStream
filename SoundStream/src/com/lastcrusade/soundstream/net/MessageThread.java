@@ -136,7 +136,10 @@ public abstract class MessageThread extends Thread {
         mmWriteThreadRunning = false;
         synchronized(mmStoppingThread) {
             try {
-                mmStoppingThread.wait(1000);
+                //wait for the thread to stop, or for 1 second.  This number may have to be adjusted
+                // as we test with larger and larger files.
+                int waitTimeInMS = 1000;
+                mmStoppingThread.wait(waitTimeInMS);
             } catch (InterruptedException e) {
                 //fall thru, nothing to do
             }
