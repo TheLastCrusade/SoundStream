@@ -14,6 +14,7 @@ import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBi
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -31,6 +32,7 @@ public class CustomApp extends Application {
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
+    private ServiceLocator<PlaylistService> playlistServiceLocator;
 
     private BroadcastRegistrar registrar;
 
@@ -52,6 +54,9 @@ public class CustomApp extends Application {
         
         musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
                 this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
+        playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
         registerReceivers();
     }
@@ -148,4 +153,5 @@ public class CustomApp extends Application {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
     }
+
 }
