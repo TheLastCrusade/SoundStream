@@ -18,7 +18,8 @@ public class TransferSongMessageTest extends SerializationTest<TransferSongMessa
         FileInputStream fis = new FileInputStream(file);
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes);
-        TransferSongMessage oldMessage = new TransferSongMessage(132452L, file.getName(), bytes);
+        long songId = 132452L;
+        TransferSongMessage oldMessage = new TransferSongMessage(songId, file.getName(), bytes);
         TransferSongMessage newMessage = super.testSerializeMessage(oldMessage);
 
         //compare the song information
