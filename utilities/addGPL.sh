@@ -47,3 +47,12 @@ do
 		cat ../docs/copyrightJava.txt $i > $i.new && mv $i.new $i
 	fi
 done
+
+# Edge case: CustomApp.java and CoreActivity.java
+for i in ../SoundStream*/src/com/lastcrusade/soundstream/*.java
+do
+	if ! grep -q Copyright\ 2013\ The\ Last\ Crusade\ ContactLastCrusade@gmail.com $i
+	then
+		cat ../docs/copyrightJava.txt $i > $i.new && mv $i.new $i
+	fi
+done
