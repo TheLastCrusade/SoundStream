@@ -258,7 +258,8 @@ public class PlaylistService extends Service {
                 this.mAudioPlayer.stop();
                 //pop up the notice
                 Toaster.iToast(this, getString(R.string.no_available_songs));
-            } else {   
+            } else {
+                //we have a song available to play...play it!
                 this.currentSong = song;
                 this.mAudioPlayer.setSong(song.getFilePath(), song);
                 //the song has been set...indicate this in the return value
