@@ -53,10 +53,24 @@ public class MessageThreadWriter {
     }
 
     public void writeOne() throws IOException {
+        int maxWriteSize = 8192;
         QueueEntry qe = queue.poll();
         if (qe != null) {
-            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.type.getSimpleName());
-            this.outStream.write(qe.bytes);
+            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.type.getSimpleName() + ", " + qe.bytes.length + " bytes in length");
+            //TODO: this may or may not be needed...for now it does not appear it is, but I'd like to leave this in until I
+            // finish with all of the transfer song debugging -- Jesse Rosalia, 03/24/13
+//            int written = 0;
+//            for (int bufPos = 0; bufPos < qe.bytes.length; bufPos += written) {
+//                int writeSize = Math.min(qe.bytes.length - bufPos, maxWriteSize);
+//                Log.d(TAG, "Writing " + writeSize + " bytes...");
+//                this.outStream.write(qe.bytes, bufPos, writeSize);
+//                written = writeSize;
+//                try {
+//                    Thread.sleep(10);
+//                } catch (InterruptedException e) {
+//                }
+//            }
+            outStream.write(qe.bytes);
             Log.i(TAG, "Message " + qe.messageNo + " finished writing");
         }
     }

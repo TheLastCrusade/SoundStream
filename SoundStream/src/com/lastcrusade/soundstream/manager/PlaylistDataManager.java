@@ -180,6 +180,10 @@ public class PlaylistDataManager implements Runnable {
         //NOTE: if it is loaded, we can assume its already in remotelyLoaded
         synchronized(entryMutex) {
             if (!entry.isLoaded()) {
+//                if (this.remotelyLoaded.contains(entry)) {
+//                    PlaylistEntry existing = findSongByAddressAndId(entry.getMacAddress(), entry.getId());
+//                    
+//                }
                 if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
                     this.loadQueue.add(entry);
                 }
