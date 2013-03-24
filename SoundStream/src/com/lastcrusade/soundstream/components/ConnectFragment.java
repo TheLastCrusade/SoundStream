@@ -35,7 +35,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         registerReceivers();
-
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

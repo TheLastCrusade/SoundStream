@@ -3,8 +3,6 @@ package com.lastcrusade.soundstream.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-
 public class Playlist {
     private final static String TAG = Playlist.class.getName();
     private List<SongMetadata> musicList;

@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.soundstream.net.message.IMessage;
 
 /**
