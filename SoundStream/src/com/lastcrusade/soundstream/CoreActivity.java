@@ -101,6 +101,7 @@ public class CoreActivity extends SlidingFragmentActivity{
                 public void onReceiveAction(Context context, Intent intent) {
                     //after the host has been disconnected, pull the guest back to the connect page
                     Transitions.transitionToConnect(CoreActivity.this);
+                    getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
                 }
             })
             .register(this);
