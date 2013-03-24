@@ -148,17 +148,7 @@ public class CustomApp extends Application {
         }
         return musicLibraryService;
     }
-
-    public PlaylistService getPlaylistService() {
-        PlaylistService playlistService = null;
-        try {
-            playlistService = this.playlistServiceLocator.getService();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return playlistService;
-    }
-
+    
     public void notifyUserListUpdate() {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
