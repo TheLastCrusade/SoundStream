@@ -2,8 +2,8 @@ package com.lastcrusade.soundstream.util;
 
 import android.support.v4.app.Fragment;
 
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CoreActivity;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.components.ConnectFragment;
 import com.lastcrusade.soundstream.components.MusicLibraryFragment;
 import com.lastcrusade.soundstream.components.NetworkFragment;
@@ -19,6 +19,12 @@ public class Transitions {
     private final static int MUSIC_LIBRARY = R.string.music_library;
     private final static int NETWORK  = R.string.network;
     private final static int CONNECT = R.string.connect;
+    
+    private final static PlaylistFragment playlistFragment = new PlaylistFragment();
+    private final static MusicLibraryFragment musicLibraryFragment = new MusicLibraryFragment();
+    private final static NetworkFragment networkFragment = new NetworkFragment();
+    private final static ConnectFragment connectFragment = new ConnectFragment();
+
     //Home is where you get sent after connecting to the network - for now
     //this is the playlist
     private final static int HOME = PLAYLIST;
@@ -54,20 +60,22 @@ public class Transitions {
         activity.setTitle(title);
     }
     
-    private static Fragment getFragment(int fragmentName) {
+    private static Fragment getFragment(int fragmentInx) {
         Fragment newFragment = null;
         
-        if(fragmentName==PLAYLIST){
-            newFragment = new PlaylistFragment();
-        }
-        else if(fragmentName==MUSIC_LIBRARY){
-            newFragment = new MusicLibraryFragment();
-        }
-        else if(fragmentName==NETWORK){
-            newFragment = new NetworkFragment();
-        }
-        else if(fragmentName==CONNECT){
-            newFragment = new ConnectFragment();
+        switch (fragmentInx) {
+        case PLAYLIST:
+            newFragment = playlistFragment;
+            break;
+        case MUSIC_LIBRARY:
+            newFragment = musicLibraryFragment;
+            break;
+        case NETWORK:
+            newFragment = networkFragment;
+            break;
+        case CONNECT:
+            newFragment = connectFragment;
+            break;
         }
         return newFragment;
     }
