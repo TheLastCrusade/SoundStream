@@ -15,6 +15,15 @@ import com.lastcrusade.soundstream.model.SongMetadata;
  */
 public abstract class ADataMessage implements IMessage {
 
+    
+    protected void writeBoolean(boolean known, OutputStream output) throws IOException {
+        output.write(known ? 1 : 0);
+    }
+
+    protected boolean readBoolean(InputStream input) throws IOException {
+        return input.read() != 0;
+    }
+
     protected void writeString(String string, OutputStream output) throws IOException {
         byte[] bytes = null;
         

@@ -13,15 +13,30 @@ public class FoundGuest implements Parcelable {
 
     private String name;
     private String address;
+    private boolean known;
 
-    public FoundGuest(String name, String address) {
+    public FoundGuest(String name, String address, boolean known) {
         this.name = name;
         this.address = address;
+        this.known = known;
     }
     
     public FoundGuest(Parcel in) {
         this.name    = in.readString();
         this.address = in.readString();
+        this.known   = in.readInt() != 0;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getName());
+        dest.writeString(getAddress());
+        dest.writeInt(this.known ? 1 : 0);
     }
 
     public String getAddress() {
@@ -40,6 +55,14 @@ public class FoundGuest implements Parcelable {
         this.name = name;
     }
 
+    public boolean isKnown() {
+        return known;
+    }
+    
+    public void setKnown(boolean known) {
+        this.known = known;
+    }
+    
     @Override
     public String toString() {
         return this.getName() + " (" + this.getAddress() + ")";
@@ -52,6 +75,7 @@ public class FoundGuest implements Parcelable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((address == null) ? 0 : address.hashCode());
+        result = prime * result + (known ? 1231 : 1237);
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
@@ -70,22 +94,13 @@ public class FoundGuest implements Parcelable {
                 return false;
         } else if (!address.equals(other.address))
             return false;
+        if (known != other.known)
+            return false;
         if (name == null) {
             if (other.name != null)
                 return false;
         } else if (!name.equals(other.name))
             return false;
         return true;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(getName());
-        dest.writeString(getAddress());
     }
 }

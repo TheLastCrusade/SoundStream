@@ -28,9 +28,10 @@ public class FoundGuestsMessage extends ADataMessage {
     public void deserialize(InputStream input) throws IOException {
         int guestCount = readInteger(input);
         for (int ii = 0; ii < guestCount; ii++) {
-            String name = readString(input);
-            String addr = readString(input);
-            foundGuests.add(new FoundGuest(name, addr));
+            String name   = readString(input);
+            String addr   = readString(input);
+            boolean known = readBoolean(input);
+            foundGuests.add(new FoundGuest(name, addr, known));
         }
     }
 
@@ -38,11 +39,12 @@ public class FoundGuestsMessage extends ADataMessage {
     public void serialize(OutputStream output) throws IOException {
         writeInteger(foundGuests.size(), output);
         for (FoundGuest guest : foundGuests) {
-            writeString(guest.getName(),    output);
-            writeString(guest.getAddress(), output);
+            writeString( guest.getName(),    output);
+            writeString( guest.getAddress(), output);
+            writeBoolean(guest.isKnown(),    output);
         }
     }
-    
+
     public ArrayList<FoundGuest> getFoundGuests() {
         return foundGuests;
     }
