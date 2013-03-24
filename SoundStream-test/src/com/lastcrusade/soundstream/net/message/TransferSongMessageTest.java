@@ -21,8 +21,11 @@ public class TransferSongMessageTest extends SerializationTest<TransferSongMessa
         TransferSongMessage oldMessage = new TransferSongMessage(132452L, file.getName(), bytes);
         TransferSongMessage newMessage = super.testSerializeMessage(oldMessage);
 
+        //compare the song information
         assertEquals(oldMessage.getSongId(),       newMessage.getSongId());
         assertEquals(oldMessage.getSongFileName(), newMessage.getSongFileName());
+
+        //compare the song binary data
         assertTrue(Arrays.equals(oldMessage.getSongData(), newMessage.getSongData()));
     }
 }
