@@ -1,11 +1,16 @@
 package com.lastcrusade.soundstream.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -15,9 +20,6 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
-import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
-import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
@@ -63,7 +65,7 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_TRANSFER_SONG_MESSAGE       = MessagingService.class.getName() + ".action.TransferSongMessage";
     //also uses ADDRESS and SONG_ID
     public static final String EXTRA_SONG_FILE_NAME               = MessagingService.class.getName() + ".extra.SongFileName";
-    public static final String EXTRA_SONG_DATA                    = MessagingService.class.getName() + ".extra.SongData";
+    public static final String EXTRA_SONG_TEMP_FILE               = MessagingService.class.getName() + ".extra.SongTempFile";
 
 
     /**
@@ -240,12 +242,25 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     TransferSongMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
-                    .putExtra(EXTRA_ADDRESS,        fromAddr)
-                    .putExtra(EXTRA_SONG_ID,        message.getSongId())
-                    .putExtra(EXTRA_SONG_FILE_NAME, message.getSongFileName())
-                    .putExtra(EXTRA_SONG_DATA,      message.getSongData())
-                    .send(MessagingService.this);
+                try {
+                    //write the song data to a temporary file
+                    //...we cannot send large file data thru broadcast intents
+                    // and this is faster for even smaller files
+                    File outputFile = createTempFile(message);
+                    FileOutputStream fos = new FileOutputStream(outputFile);
+                    fos.write(message.getSongData());
+                    fos.close();
+                    
+                    new BroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
+                        .putExtra(EXTRA_ADDRESS,        fromAddr)
+                        .putExtra(EXTRA_SONG_ID,        message.getSongId())
+                        .putExtra(EXTRA_SONG_FILE_NAME, message.getSongFileName())
+                        .putExtra(EXTRA_SONG_TEMP_FILE, outputFile.getCanonicalPath())
+                        .send(MessagingService.this);
+                } catch (Exception e) {
+                    Log.wtf(TAG, e);
+                }
+
             }
         });
     }
@@ -308,7 +323,7 @@ public class MessagingService extends Service implements IMessagingService {
             Log.wtf(TAG, e);
         }
     }
-    
+
     @Override
     public void sendLibraryMessageToHost(List<SongMetadata> library) {
         LibraryMessage msg = new LibraryMessage(library);
@@ -419,4 +434,28 @@ public class MessagingService extends Service implements IMessagingService {
             Log.wtf(TAG, e);
         }
     }
+    
+    
+    /**
+     * Helper method to create a temporary file.
+     * 
+     * TODO: Android doesn't really have temporary files...it will proactively clear the cache folder,
+     * but we should be better citizens and clean up after ourself.  This is not an immediate (read: alpha)
+     * concern, because we consume all cache files in PlaylistDataManager (which will clean up after itself)
+     * but before this gets to final, we should make sure all bases are covered.
+     * 
+     * @param message
+     * @return
+     * @throws IOException
+     */
+    private File createTempFile(TransferSongMessage message)
+            throws IOException {
+        File outputDir = MessagingService.this.getCacheDir(); // context being the Activity pointer
+        String filePrefix = UUID.randomUUID().toString().replace("-", "");
+        int inx = message.getSongFileName().lastIndexOf(".");
+        String extension = message.getSongFileName().substring(inx + 1);
+        File outputFile = File.createTempFile(filePrefix, extension, outputDir);
+        return outputFile;
+    }
+
 }

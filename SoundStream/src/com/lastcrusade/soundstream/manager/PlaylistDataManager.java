@@ -1,6 +1,7 @@
 package com.lastcrusade.soundstream.manager;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -131,14 +132,14 @@ public class PlaylistDataManager implements Runnable {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
-                    String fileName = intent.getStringExtra(MessagingService.EXTRA_SONG_FILE_NAME);
-                    byte[] fileData = intent.getByteArrayExtra(MessagingService.EXTRA_SONG_DATA);
+                    String fromAddr     = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                    long   songId       = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                    String fileName     = intent.getStringExtra(MessagingService.EXTRA_SONG_FILE_NAME);
+                    String tempFilePath = intent.getStringExtra(MessagingService.EXTRA_SONG_TEMP_FILE);
                     if (songId == SongMetadata.UNKNOWN_SONG) {
                        Log.wtf(TAG, "TRANSFER_SONG_MESSAGE action received without a valid song id"); 
                     } else {
-                        saveTempFileData(fromAddr, songId, fileName, fileData);
+                        saveTempFileData(fromAddr, songId, fileName, tempFilePath);
                         new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(playlistService);
                     }
                 }
@@ -159,7 +160,7 @@ public class PlaylistDataManager implements Runnable {
         }
     }
 
-    protected void saveTempFileData(String fromAddr, long songId, String fileName, byte[] fileData) {
+    protected void saveTempFileData(String fromAddr, long songId, String fileName, String fileDataPath) {
         PlaylistEntry entry = findSongByAddressAndId(fromAddr, songId);
         if (entry == null) {
             throw new IllegalStateException("Unable to save data for a song entry that doesnt exist");
@@ -167,9 +168,19 @@ public class PlaylistDataManager implements Runnable {
         //build a composite name from the macAddress
         String compositeFileName = String.format("%s_%s", SongMetadataUtils.getUniqueKey(fromAddr, songId), fileName);
         try {
+            //copy the data from the temp file to the permanent file.
+            FileInputStream  fis = new FileInputStream(fileDataPath);
             FileOutputStream fos = this.application.openFileOutput(compositeFileName, Context.MODE_PRIVATE);
-            fos.write(fileData);
+
+            //8k buffer works well.
+            int bufSize = 8192;
+            byte[] buffer = new byte[bufSize];
+            int read;
+            while ((read = fis.read(buffer)) > 0) {
+                fos.write(buffer, 0, read);
+            }
             fos.close();
+            //set the file path in the playlist entry, which allows the file to be played
             String filePath = this.application.getFileStreamPath(compositeFileName).getCanonicalPath();
             entry.setFilePath(filePath);
         } catch (IOException e) {
