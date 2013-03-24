@@ -30,7 +30,19 @@ public class BroadcastIntent extends Intent {
 
     //Overridden to return BroadcastIntent, so we can chain method calls
     @Override
+    public BroadcastIntent putExtra(String name, byte[] value) {
+        return (BroadcastIntent) super.putExtra(name, value);
+    }
+
+    //Overridden to return BroadcastIntent, so we can chain method calls
+    @Override
     public BroadcastIntent putExtra(String name, int value) {
+        return (BroadcastIntent) super.putExtra(name, value);
+    }
+
+    //Overridden to return BroadcastIntent, so we can chain method calls
+    @Override
+    public BroadcastIntent putExtra(String name, long value) {
         return (BroadcastIntent) super.putExtra(name, value);
     }
 

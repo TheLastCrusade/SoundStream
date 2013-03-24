@@ -40,6 +40,7 @@ public class Messenger {
 
     private ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 
+    private byte[] inBytes = new byte[16384];
     /**
      * Serialize a message into the output buffer.  This will append to the output
      * buffer, to stack multiple messages next to each other.  See clearOutputBuffer
@@ -103,13 +104,13 @@ public class Messenger {
         
         boolean processed = false;
         do {
-            //read one byte at a time...we want to make sure we run thru the logic below after each byte
-            // so we don't hold a message in inputBuffer while waiting for the next byte to come in
+            //read a chunk at a time...the buffer size was determined through trial and error, and
+            // could be optimized more.
             //NOTE: this is so input.read can block, and will throw an exception when the connection
             // goes down.  this is the only way we'll get a notification of a downed client
-            int read = input.read();
-            inputBuffer.write(read);
-    
+            int read = input.read(inBytes);
+            inputBuffer.write(inBytes, 0, read);
+
             //if we need to, consume the message length (to make sure we read until we have a complete message)
             if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
                 byte[] bytes = inputBuffer.toByteArray();

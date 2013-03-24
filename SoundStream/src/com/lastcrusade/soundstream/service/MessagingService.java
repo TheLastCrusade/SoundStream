@@ -11,7 +11,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
@@ -23,10 +22,12 @@ import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
-import com.lastcrusade.soundstream.net.message.PlaylistMessage;
 import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
+import com.lastcrusade.soundstream.net.message.PlaylistMessage;
+import com.lastcrusade.soundstream.net.message.RequestSongMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
+import com.lastcrusade.soundstream.net.message.TransferSongMessage;
 import com.lastcrusade.soundstream.net.message.UserListMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
@@ -54,6 +55,16 @@ public class MessagingService extends Service implements IMessagingService {
     
     public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
     public static final String EXTRA_USER_LIST                    = MessagingService.class.getName() + ".extra.UserList";
+
+    public static final String ACTION_REQUEST_SONG_MESSAGE        = MessagingService.class.getName() + ".action.RequestSongMessage";
+    public static final String EXTRA_ADDRESS                      = MessagingService.class.getName() + ".extra.Address";
+    public static final String EXTRA_SONG_ID                      = MessagingService.class.getName() + ".extra.SongId";
+
+    public static final String ACTION_TRANSFER_SONG_MESSAGE       = MessagingService.class.getName() + ".action.TransferSongMessage";
+    //also uses ADDRESS and SONG_ID
+    public static final String EXTRA_SONG_FILE_NAME               = MessagingService.class.getName() + ".extra.SongFileName";
+    public static final String EXTRA_SONG_DATA                    = MessagingService.class.getName() + ".extra.SongData";
+
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -132,6 +143,8 @@ public class MessagingService extends Service implements IMessagingService {
         registerSkipMessageHandler();
         registerPlaylistMessageHandler();
         registerPlayStatusMessageHandler();
+        registerRequestSongMessageHandler();
+        registerTransferSongMessageHandler();
         registerUserListMessageHandler();
     }
 
@@ -207,6 +220,36 @@ public class MessagingService extends Service implements IMessagingService {
 				});
     }
     
+    private void registerRequestSongMessageHandler() {
+        this.messageDispatch.registerHandler(RequestSongMessage.class, new IMessageHandler<RequestSongMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    RequestSongMessage message, String fromAddr) {
+                new BroadcastIntent(ACTION_REQUEST_SONG_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS, fromAddr)
+                    .putExtra(EXTRA_SONG_ID, message.getSongId())
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
+    private void registerTransferSongMessageHandler() {
+        this.messageDispatch.registerHandler(TransferSongMessage.class, new IMessageHandler<TransferSongMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    TransferSongMessage message, String fromAddr) {
+                new BroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS,        fromAddr)
+                    .putExtra(EXTRA_SONG_ID,        message.getSongId())
+                    .putExtra(EXTRA_SONG_FILE_NAME, message.getSongFileName())
+                    .putExtra(EXTRA_SONG_DATA,      message.getSongData())
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
     private void registerUserListMessageHandler(){
         this.messageDispatch.registerHandler(UserListMessage.class, new IMessageHandler<UserListMessage>() {
 
@@ -228,14 +271,22 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     PlaylistMessage message, String fromAddr) {
-                //This is because you can pass an ArrayList of parseables but not a List
-                ArrayList<SongMetadata> remotePlaylist = (ArrayList<SongMetadata>) message.getPlaylist().getSongsToPlay();
 
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remotePlaylist)
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getSongsToPlay())
                     .send(MessagingService.this);
             }
         });
+    }
+
+    private void sendMessageToGuest(String address, IMessage msg) {
+        try {
+            if (this.connectServiceLocator.getService().isGuestConnected(address)) {
+                this.connectServiceLocator.getService().sendMessageToGuest(address, msg);
+            }
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     private void sendMessageToGuests(IMessage msg) {
@@ -319,9 +370,9 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
-    public void sendPlaylistMessage(Playlist playlist){
+    public void sendPlaylistMessage(List<? extends SongMetadata> songsToPlay){
         try {
-            PlaylistMessage playlistMessage = new PlaylistMessage(playlist);
+            PlaylistMessage playlistMessage = new PlaylistMessage(songsToPlay);
             //send the message to the host
             if (this.connectServiceLocator.getService().isHostConnected()) {
                 sendMessageToHost(playlistMessage);
@@ -336,6 +387,22 @@ public class MessagingService extends Service implements IMessagingService {
 
     }
     
+    @Override
+    public void sendRequestSongMessage(String address, long songId) {
+        RequestSongMessage msg = new RequestSongMessage(songId);
+        //send the message to the fans
+        sendMessageToGuest(address, msg);
+    }
+    
+    @Override
+    public void sendTransferSongMessage(String address, long songId,
+            String fileName, byte[] bytes) {
+        TransferSongMessage msg = new TransferSongMessage(songId, fileName, bytes);
+        //send the message to the fans
+        sendMessageToHost(msg);
+        
+    }
+
     //sends the user list out to everyone
     public void sendUserListMessage(UserList userlist){
         UserListMessage ulm = new UserListMessage(userlist);

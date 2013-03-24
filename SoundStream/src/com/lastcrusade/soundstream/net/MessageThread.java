@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.Messenger;
@@ -21,7 +22,7 @@ import com.lastcrusade.soundstream.net.message.Messenger;
  *
  */
 public abstract class MessageThread extends Thread {
-    private final String TAG = MessageThread.class.getName();
+    private final String TAG = MessageThread.class.getSimpleName();
     public static final int MESSAGE_READ = 1;
 
     public static final String EXTRA_ADDRESS = MessageThread.class.getName() + ".extra.Address";
@@ -30,12 +31,19 @@ public abstract class MessageThread extends Thread {
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
  
-    private int   messageNumber = 0;
+    private int     mmInMessageNumber = 1;
+    private int     mmOutMessageNumber = 1;
+
     private Handler mmHandler;
 
     private String mmDisconnectAction;
     //NOTE: Messenger is stateless
     private final Messenger mmMessenger;
+    private MessageThreadWriter mmWriter;
+    private Thread mmWriteThread;
+    protected boolean mmWriteThreadRunning;
+    private Thread mmStoppingThread;
+
     public MessageThread(BluetoothSocket socket, Handler handler, String disconnectAction) {
         super("MessageThread-" + safeSocketName(socket));
         mmSocket  = socket;
@@ -56,6 +64,39 @@ public abstract class MessageThread extends Thread {
         mmDisconnectAction = disconnectAction;
         
         mmMessenger = new Messenger();
+        mmWriter    = new MessageThreadWriter(mmOutStream);
+        mmWriteThreadRunning = true;
+        mmWriteThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    while (mmWriteThreadRunning) {
+                        try {
+                            mmWriter.writeOne();
+                            Thread.sleep(10); //give the system a chance to breath
+                        } catch (IOException e) {
+                            //we've probably closed our socket...quit the thread
+                            mmWriteThreadRunning = false;
+                            //log an error
+                            Log.wtf(TAG, e);
+                        } catch (InterruptedException e) {
+                            //nothing to do
+                        }
+                    }
+                } finally {
+                    if (mmStoppingThread != null) {
+                        synchronized(mmStoppingThread) {
+                            mmStoppingThread.notify();
+                        }
+                    }
+                }
+            }
+        }, this.getName() + " Writer");
+        
+        //start a thread to manage writing...this is because the bluetooth outputstream blocks on writes
+        // which will cause the UI to hang.
+        mmWriteThread.start();
     }
  
     public boolean isRemoteDevice(BluetoothDevice device) {
@@ -85,10 +126,29 @@ public abstract class MessageThread extends Thread {
                 break;
             }
         }
+        stopWriteThread();
         //cancel and notify the handlers that the connection is dead
         cancel();
     }
  
+    private void stopWriteThread() {
+        mmStoppingThread = Thread.currentThread();
+        mmWriteThreadRunning = false;
+        synchronized(mmStoppingThread) {
+            try {
+                //wait for the thread to stop, or for 1 second.  This number may have to be adjusted
+                // as we test with larger and larger files.
+                int waitTimeInMS = 1000;
+                mmStoppingThread.wait(waitTimeInMS);
+            } catch (InterruptedException e) {
+                //fall thru, nothing to do
+            }
+            if (mmWriteThread.isAlive()) {
+                Log.w(TAG, "Write thread is still alive...");
+            }
+        }
+    }
+
     public abstract void onDisconnected();
 
     /**
@@ -98,7 +158,7 @@ public abstract class MessageThread extends Thread {
      * @param remoteAddr
      */
     private void sendMessageToHandler(IMessage message, String remoteAddr) {
-        Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.messageNumber, 0, message);
+        Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.mmInMessageNumber++, 0, message);
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_ADDRESS, remoteAddr);
         androidMsg.setData(bundle);
@@ -106,11 +166,13 @@ public abstract class MessageThread extends Thread {
     }
 
     /* Call this from the main activity to send data to the remote device */
-    public void write(IMessage message) {
+    public synchronized void write(IMessage message) {
+        Log.d(TAG, "MessageThread#write called from " + Thread.currentThread().getName());
         try {
             mmMessenger.serializeMessage(message);
             byte[] bytes = mmMessenger.getOutputBytes();
-            mmOutStream.write(bytes);
+            //enqueue this message
+            mmWriter.enqueue(mmOutMessageNumber++, message.getClass(), bytes);
             mmMessenger.clearOutputBytes();
         } catch (IOException e) {
             e.printStackTrace();

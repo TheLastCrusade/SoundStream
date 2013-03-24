@@ -1,6 +1,7 @@
 package com.lastcrusade.soundstream.components;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.model.Playlist;
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.PlaylistService;
@@ -28,7 +30,6 @@ public class PlaylistFragment extends MusicListFragment{
     private final String TAG = PlaylistFragment.class.getName();
 
     private BroadcastRegistrar registrar;
-    private Playlist mPlaylist;
 
     private ServiceLocator<PlaylistService> playlistServiceServiceLocator;
 
@@ -42,14 +43,13 @@ public class PlaylistFragment extends MusicListFragment{
                 this.getActivity(), PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
         final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
-        mPlayListAdapter = new PlayListAdapter(this.getActivity(), new ArrayList<SongMetadata>(), curApp.getUserList());
+        mPlayListAdapter = new PlayListAdapter(this.getActivity(), Collections.EMPTY_LIST, curApp.getUserList());
         setListAdapter(mPlayListAdapter);
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                mPlaylist = getPlaylistService().getPlaylist();
-                mPlayListAdapter.updateMusic(mPlaylist);
+                updatePlaylist();
             }
         });
 
@@ -86,24 +86,13 @@ public class PlaylistFragment extends MusicListFragment{
         this.registrar.addAction(PlaylistService.ACTION_PLAYLIST_UPDATED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                mPlayListAdapter.updateMusic(mPlaylist);
+                updatePlaylist();
             }
         }).register(this.getActivity());
     }
 
     private void unregisterReceivers() {
         this.registrar.unregister();
-    }
-
-    private Playlist getPlaylist() {
-        Playlist playlist = null;
-
-        try {
-            playlist = playlistServiceServiceLocator.getService().getPlaylist();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return playlist;
     }
 
     protected PlaylistService getPlaylistService() {
@@ -117,24 +106,31 @@ public class PlaylistFragment extends MusicListFragment{
         return playlistService;
     }
 
-    private class PlayListAdapter extends MusicListAdapter {
+    /**
+     * 
+     */
+    private void updatePlaylist() {
+        mPlayListAdapter.updateMusic(getPlaylistService().getPlaylistEntries());
+    }
+
+    private class PlayListAdapter extends MusicListAdapter<PlaylistEntry> {
         public PlayListAdapter(
                 Context mContext,
-                List<SongMetadata> metadataList,
+                List<PlaylistEntry> playlistEntries,
                 UserList users
                 ) {
-            super(mContext, metadataList, users);
-        }
-
-        public void updateMusic(Playlist musicList){
-            super.updateMusic(musicList.getSongsToPlay());
+            super(mContext, playlistEntries, users);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View element = super.getView(position, convertView, parent);
             //This depends on played music being above unplayed music
-            if(position < mPlaylist.getIndex()){
+            PlaylistEntry entry = super.getItem(position);
+            if (!entry.isLoaded()) {
+                //TODO: style the unloaded elements here
+                element.setBackgroundColor(getResources().getColor(R.color.loading));
+            } else if (entry.isPlayed()) {
                 element.setBackgroundColor(getResources().getColor(R.color.used));
             } else {
                 element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
