@@ -25,6 +25,7 @@ public class MultiSelectListDialog<T> {
     private int titleResId;
     private int okButtonResId;
     private List<T> items;
+    private List<T> selected;
 
     public MultiSelectListDialog(Activity activity, int titleResId, int okButtonResId) {
         this.activity = activity;
@@ -58,6 +59,11 @@ public class MultiSelectListDialog<T> {
         return this;
     }
 
+    public MultiSelectListDialog<T> setSelected(List<T> selected) {
+        this.selected = selected;
+        return this;
+    }
+
     public MultiSelectListDialog<T> setOnClickListener(IOnDialogMultiItemClickListener<T> onClickListener) {
         this.onClickListener = onClickListener;
         return this;
@@ -70,18 +76,22 @@ public class MultiSelectListDialog<T> {
         // set title
         alertDialogBuilder.setTitle(this.titleResId);
 
-        String[]  itemNames = new String[items.size()];
-        boolean[] states = new boolean[items.size()];
-        for (int ii = 0; ii < items.size(); ii++) {
-            itemNames[ii] = this.formatter.format(items.get(ii));
-            states[ii] = false;
-        }
-
         //hold the selection, until the positive button is pressed
         //NOTE: this must not be a list, because we are dealing with integer data
         // and List#remove can get confused with integer data (it may attempt to remove
         // the item at position n), instead of with value n.
         final Set<Integer> selectedIndices = new HashSet<Integer>();
+
+        String[]  itemNames = new String[items.size()];
+        boolean[] states = new boolean[items.size()];
+        for (int ii = 0; ii < items.size(); ii++) {
+            T item = items.get(ii);
+            itemNames[ii] = this.formatter.format(item);
+            states   [ii] = this.selected.contains(item);
+            if (states[ii]) {
+                selectedIndices.add(ii);
+            }
+        }
 
         // set dialog message
         alertDialogBuilder
