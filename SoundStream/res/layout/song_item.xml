@@ -84,6 +84,7 @@
         android:paddingRight="4sp"
         android:layout_alignParentRight="true"
         android:visibility="invisible"
+        android:contentDescription="@string/remove_from_playlist"
         android:background="@color/transparent"/>
     
 </RelativeLayout>
