@@ -14,6 +14,7 @@ import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
+import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
@@ -44,12 +45,13 @@ public class CoreActivity extends SlidingFragmentActivity{
         // the activity is created
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
+            getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         }
 
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         setSlidingActionBarEnabled(false);
-        getSlidingMenu().setEnabled(false);
+        
         
         //add the playbar fragment onto the active content view
         getSupportFragmentManager()
@@ -99,6 +101,7 @@ public class CoreActivity extends SlidingFragmentActivity{
                 public void onReceiveAction(Context context, Intent intent) {
                     //after the host has been disconnected, pull the guest back to the connect page
                     Transitions.transitionToConnect(CoreActivity.this);
+                    getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
                 }
             })
             .register(this);
@@ -116,6 +119,6 @@ public class CoreActivity extends SlidingFragmentActivity{
     public void enableSlidingMenu(){
      // enables the icon to act as the up
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSlidingMenu().setEnabled(true);
+        getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
     }
 }
