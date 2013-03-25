@@ -273,21 +273,7 @@ public class ConnectionService extends Service {
     private void handleFindNewGuestsMessage(final String remoteAddr) {
         Toaster.iToast(this, R.string.finding_new_guests);
 
-        //NOTE: we assume that the adapter is nonnull, because the activity will not
-        // get past onCreate on a device w/o Bluetooth...and also, because this method is
-        // called in response to a network message over Bluetooth
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-
-        // look up the message thread that manages the connection to the remote
-        // device
-        BluetoothDevice remoteDevice = adapter.getRemoteDevice(remoteAddr);
-        MessageThread found = null;
-        for (MessageThread thread : this.guests) {
-            if (thread.isRemoteDevice(remoteDevice)) {
-                found = thread;
-                break;
-            }
-        }
+        MessageThread found = findMessageThreadByAddress(remoteAddr);
 
         if (found == null) {
             Log.wtf(TAG, "Unknown remote device: " + remoteAddr);
@@ -296,6 +282,24 @@ public class ConnectionService extends Service {
 
         this.discoveryInitiator = found;
         findNewGuests();
+    }
+
+    /**
+     * @param remoteAddr
+     * @return
+     */
+    private MessageThread findMessageThreadByAddress(String address) {
+        // look up the message thread that manages the connection to the remote
+        // device
+        BluetoothDevice remoteDevice = adapter.getRemoteDevice(address);
+        MessageThread found = null;
+        for (MessageThread thread : this.guests) {
+            if (thread.isRemoteDevice(remoteDevice)) {
+                found = thread;
+                break;
+            }
+        }
+        return found;
     }
 
     /**
@@ -355,6 +359,15 @@ public class ConnectionService extends Service {
         }
     }
 
+    public void sendMessageToGuest(String address, IMessage msg) {
+        MessageThread fan = findMessageThreadByAddress(address);
+        if (fan != null) {
+            fan.write(msg);
+        } else {
+            Toaster.eToast(this, "Fan not connected");
+        }
+    }
+
     public void sendMessageToHost(IMessage msg) {
         if (isHostConnected()) {
             this.host.write(msg);
@@ -375,6 +388,10 @@ public class ConnectionService extends Service {
 
     public boolean isGuestConnected() {
         return !this.guests.isEmpty();
+    }
+
+    public boolean isGuestConnected(String address) {
+        return findMessageThreadByAddress(address) != null;
     }
 
     /**

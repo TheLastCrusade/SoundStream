@@ -16,16 +16,16 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.User;
 import com.lastcrusade.soundstream.model.UserList;
 
-public class MusicListAdapter extends BaseAdapter {
+public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
     private final String TAG = MusicListAdapter.class.getName();
 
     private Context mContext;
-    private List<SongMetadata> metadataList;
+    private List<T> metadataList;
     private UserList users;
     
     public MusicListAdapter(
             Context mContext,
-            List<SongMetadata> metadataList,
+            List<T> metadataList,
             UserList users
             ){
         this.mContext = mContext;
@@ -40,7 +40,7 @@ public class MusicListAdapter extends BaseAdapter {
     }
 
     @Override
-    public SongMetadata getItem(int position) {
+    public T getItem(int position) {
         return metadataList.get(position);
     }
 
@@ -90,7 +90,7 @@ public class MusicListAdapter extends BaseAdapter {
     }
     
     //updates the music shown and notifies the attached view that it needs to redraw
-    public void updateMusic(List<SongMetadata> metadataList){
+    public void updateMusic(List<T> metadataList){
         this.metadataList = metadataList;
         notifyDataSetChanged();
     }

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_uuid">e271f460-d1ad-4ea8-b555-5e59b19c71ff</string>
-    <string name="app_name">SoundStream</string>
+    <string name="app_name">Sound Stream</string>
     
     <string name="enable_bluetooth">Enabling Bluetooth&#x2026;</string>
     <string name="finding_new_guests">Finding new guests&#x2026;</string>

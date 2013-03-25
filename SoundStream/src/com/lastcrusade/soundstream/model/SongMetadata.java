@@ -3,12 +3,15 @@ package com.lastcrusade.soundstream.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
 
 public class SongMetadata implements Parcelable{
 
     //this is REQUIRED for Parcelable to work properly
     public static final Parcelable.Creator<SongMetadata> CREATOR = new DefaultParcelableCreator(SongMetadata.class);
+
+    public static final long UNKNOWN_SONG = -1;
 
     private long id;
 
@@ -18,17 +21,20 @@ public class SongMetadata implements Parcelable{
 
     private String album;
 
+    private long fileSize;
+
     // macAddress of person who added song to playlist
     private String macAddress; 
     
     public SongMetadata() {}
 
-    public SongMetadata(long aId, String aTitle, String aArtist, String aAlbum, String aMacAddress) {
+    public SongMetadata(long aId, String aTitle, String aArtist, String aAlbum, long aFileSize, String aMacAddress) {
     	//be careful setting the song ID
         this.id = aId;
     	this.title = aTitle;
     	this.artist = aArtist;
     	this.album = aAlbum;
+    	this.fileSize = aFileSize;
     	this.macAddress = aMacAddress;
     }
 
@@ -37,6 +43,7 @@ public class SongMetadata implements Parcelable{
         this.title      = in.readString();
         this.artist     = in.readString();
         this.album      = in.readString();
+        this.fileSize   = in.readLong();
         this.macAddress = in.readString();
     }
 
@@ -51,6 +58,7 @@ public class SongMetadata implements Parcelable{
         dest.writeString(this.title);
         dest.writeString(this.artist);
         dest.writeString(this.album);
+        dest.writeLong(this.fileSize);
         dest.writeString(this.macAddress);
     }
     
@@ -91,12 +99,19 @@ public class SongMetadata implements Parcelable{
         this.album = album;
     }
 
+    public long getFileSize() {
+        return fileSize;
+    }
+    
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+    
     public String getMacAddress() {
         return macAddress;
     }
 
     public void setMacAddress(String macAddress) {
         this.macAddress = macAddress;
-    }
-
+    }    
 }

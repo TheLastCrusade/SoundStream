@@ -2,7 +2,7 @@ package com.lastcrusade.soundstream.model;
 
 import android.util.Log;
 
-public class User{
+public class User {
 
     private final static String TAG = User.class.toString();
     //keep track of bluetoothID for display name
