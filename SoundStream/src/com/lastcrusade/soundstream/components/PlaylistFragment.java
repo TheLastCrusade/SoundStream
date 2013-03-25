@@ -104,7 +104,7 @@ public class PlaylistFragment extends MusicListFragment{
                 SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
                 //for now we are just toasting, but eventually this might change to something that 
                 //allows the user to undo the action
-                Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been removed.");
+                Toaster.iToast(getActivity(), getString(R.string.removed_label) + "\"" + entry.getTitle() + "\"");
                 
             }
         })
@@ -160,11 +160,7 @@ public class PlaylistFragment extends MusicListFragment{
             delete.setOnClickListener(new DeleteSongListener(entry));
             delete.setVisibility(View.VISIBLE);
             
-            
-            
             return element;
-            
-            
         }
         
         private class DeleteSongListener implements OnClickListener{
@@ -174,6 +170,9 @@ public class PlaylistFragment extends MusicListFragment{
             }
             @Override
             public void onClick(View v) {
+                if(getPlaylistService().getCurrentSong()!= null && getPlaylistService().getCurrentSong().equals(entry)){
+                    getPlaylistService().skip();
+                }
                 getPlaylistService().removeSong(entry);
                
             }

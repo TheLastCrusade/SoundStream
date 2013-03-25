@@ -23,6 +23,7 @@
     <string name="cur_member_label">Currently Connected Members</string>
     <string name="music_label">Music</string>
     <string name="network_label">Network</string>
+    <string name="removed_label">Removed:</string>
 
     
     <!--  fragment titles -->

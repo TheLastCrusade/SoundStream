@@ -318,7 +318,9 @@ public class PlaylistService extends Service {
         new BroadcastIntent(ACTION_SONG_ADDED)
             .putExtra(EXTRA_SONG, entry)
             .send(this);
+        // send an intent to the fragments that the playlist is updated
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        //send a message to the network that the playlist is updated
         ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
     
@@ -339,5 +341,9 @@ public class PlaylistService extends Service {
 
     public List<PlaylistEntry> getPlaylistEntries() {
         return Collections.unmodifiableList(new ArrayList<PlaylistEntry>(mPlaylist.getSongsToPlay()));
+    }
+    
+    public PlaylistEntry getCurrentSong(){
+        return currentSong;
     }
 }

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import android.util.Log;
+
 /**
  * A data structure for holding the playlist.  It keeps track of two queues of PlaylistEntry
  * objects; the seam between them represents the current play position.
@@ -34,13 +36,20 @@ public class Playlist {
     }
 
     public SongMetadata remove(SongMetadata meta) {
+        boolean success;
         SongMetadata removeMeta = meta;
-        boolean removed = musicList.remove(meta);
-        if (!removed) {
-            removed = playedList.remove(meta);
-            if(!removed){
-                removeMeta = null;
-            }
+        
+        if(musicList.contains(meta)) {
+            success = musicList.remove(meta);
+        } else if(playedList.contains(meta)){
+            success = playedList.remove(meta);
+        } else {
+            success = false; 
+            Log.wtf(TAG, "Asked to remove unknown object");
+        }
+
+        if(!success){
+            removeMeta = null;
         }
         return removeMeta;
     }
