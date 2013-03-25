@@ -1,6 +1,5 @@
 package com.lastcrusade.soundstream.components;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,11 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.model.Playlist;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -38,13 +35,13 @@ public class PlaylistFragment extends MusicListFragment{
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
 
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
-                this.getActivity(), PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
-
-        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
-        mPlayListAdapter = new PlayListAdapter(this.getActivity(), Collections.EMPTY_LIST, curApp.getUserList());
-        setListAdapter(mPlayListAdapter);
+                this.getActivity(),
+                PlaylistService.class,
+                PlaylistService.PlaylistServiceBinder.class
+        );
 
         playlistServiceServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
@@ -52,6 +49,13 @@ public class PlaylistFragment extends MusicListFragment{
                 updatePlaylist();
             }
         });
+
+        mPlayListAdapter = new PlayListAdapter(
+                this.getActivity(),
+                Collections.EMPTY_LIST,
+                curApp.getUserList()
+        );
+        setListAdapter(mPlayListAdapter);
 
         registerReceivers();
     }
