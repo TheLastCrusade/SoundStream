@@ -1,2 +1,2 @@
 # Ignore file used to sign apk's
-keystore
+grail-diary/*
