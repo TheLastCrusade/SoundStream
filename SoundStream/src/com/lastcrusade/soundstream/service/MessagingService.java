@@ -200,8 +200,10 @@ public class MessagingService extends Service implements IMessagingService {
 					public void handleMessage(int messageNo, PlayStatusMessage message,
 							String fromAddr) {
 						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
-							.putExtra(EXTRA_IS_PLAYING, message.getString().equals("Play"))
-							.send(MessagingService.this);
+							.putExtra(
+							        EXTRA_IS_PLAYING,
+							        message.getString().equals(PlayStatusMessage.PLAY_MESSAGE)
+						     ).send(MessagingService.this);
 					}
 				});
     }

@@ -94,7 +94,9 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.pause();
         }
         this.paused = true;
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
+        ((CustomApp)application)
+            .getMessagingService()
+            .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
     }
 
 
@@ -111,7 +113,9 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.setSong(null, null);
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.application);
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+        ((CustomApp)application)
+            .getMessagingService()
+             .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
     }
 
     @Override
