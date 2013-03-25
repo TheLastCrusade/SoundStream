@@ -11,15 +11,15 @@ public class PlayStatusMessageTest extends SerializationTest<PlayStatusMessage> 
 	@Test
 	public void testSerializePlayStatusMessage() throws IOException {
 		PlayStatusMessage preSerializationPlayStatusMsg = new PlayStatusMessage();
-		preSerializationPlayStatusMsg.setString("Play");
+		preSerializationPlayStatusMsg.setString(PlayStatusMessage.PLAY_MESSAGE);
 		PlayStatusMessage postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
 		
 		// PlayStatusMessage possibilities include Play and Pause
-		assertEquals("Play", postSerializationPlayStatusMsg.getString());
+		assertEquals(PlayStatusMessage.PLAY_MESSAGE, postSerializationPlayStatusMsg.getString());
 		
-		preSerializationPlayStatusMsg.setString("Pause");
+		preSerializationPlayStatusMsg.setString(PlayStatusMessage.PAUSE_MESSAGE);
 		postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
-		assertEquals("Pause", postSerializationPlayStatusMsg.getString());
+		assertEquals(PlayStatusMessage.PAUSE_MESSAGE, postSerializationPlayStatusMsg.getString());
 	}
 	
 

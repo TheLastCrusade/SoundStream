@@ -21,6 +21,7 @@ public class PlayStatusMessage extends ADataMessage {
 
     private final String TAG = PlayStatusMessage.class.getName();
     private String string = "";
+    private SongMetadata currentSong = new SongMetadata();
 
     public PlayStatusMessage() {}
 
@@ -31,6 +32,7 @@ public class PlayStatusMessage extends ADataMessage {
     public PlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
         if(playStatusMessage.equals(PLAY_MESSAGE) || playStatusMessage.equals(PAUSE_MESSAGE)) {
             this.setString(playStatusMessage);
+            this.setCurrentSong(currentSong);
 		}
         else {
             Log.wtf(TAG, "Status msg passed not Play or Pause");
@@ -39,18 +41,14 @@ public class PlayStatusMessage extends ADataMessage {
 
     @Override
     public void deserialize(InputStream input) throws IOException {
-        byte[] bytes = new byte[1024];
-        int read = 0;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while((read = input.read(bytes)) > 0) {
-            out.write(bytes, 0, read);
-        }
-        this.setString(out.toString());
+        string = readString(input);
+        currentSong = readSongMetadata(input);
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        output.write(getString().getBytes());
+        writeString(getString(), output);
+        writeSongMetadata(getCurrentSong(), output);
     }
 
     public String getString() {
@@ -59,5 +57,13 @@ public class PlayStatusMessage extends ADataMessage {
 
     public void setString(String string) {
         this.string = string;
+    }
+
+    public SongMetadata getCurrentSong(){
+        return this.currentSong;
+    }
+    
+    public void setCurrentSong(SongMetadata currentSong){
+        this.currentSong = currentSong;
     }
 }
