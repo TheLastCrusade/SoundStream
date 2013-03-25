@@ -23,6 +23,7 @@ local.properties
 .idea/
 
 # Newrelic things
+assets/newrelic.properties
 /local.properties
 /AndroidManifest.xml.bak
 /.nrwork
