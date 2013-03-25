@@ -13,6 +13,7 @@ import android.telephony.TelephonyManager;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.audio.AudioPlayerWithEvents;
 import com.lastcrusade.soundstream.audio.IPlayer;
 import com.lastcrusade.soundstream.audio.RemoteAudioPlayer;
 import com.lastcrusade.soundstream.audio.SingleFileAudioPlayer;
@@ -73,20 +74,23 @@ public class PlaylistService extends Service {
 
     private BroadcastRegistrar    registrar;
     private IPlayer               mThePlayer;
-    private SingleFileAudioPlayer mAudioPlayer;
+    private SingleFileAudioPlayer mAudioPlayer; //We might want to remove this
     private Playlist              mPlaylist;
 
     private Thread                mDataManagerThread;
     private PlaylistDataManager   mDataManager;
 
     private PlaylistEntry currentSong;
+    private boolean localPlayer;
 
     @Override
     public IBinder onBind(Intent intent) {
         //create the local player in a separate variable, and use that
         // as the player until we see a host connected
         this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
-        this.mThePlayer    = mAudioPlayer;
+        //Assume we are local untill we connect to a host
+        localPlayer = true;
+        this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
         this.mPlaylist     = new Playlist();
         
         registerReceivers();
@@ -141,7 +145,8 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                mThePlayer = new RemoteAudioPlayer((CustomApp) getApplication());
+                mThePlayer = new AudioPlayerWithEvents(new RemoteAudioPlayer((CustomApp) getApplication()), context);
+                localPlayer = false;
                 stopDataManager();
             }
         })
@@ -296,7 +301,7 @@ public class PlaylistService extends Service {
     }
 
     private boolean isLocalPlayer() {
-        return this.mThePlayer == this.mAudioPlayer;
+        return localPlayer;
     }
 
     public void addSong(SongMetadata metadata) {
