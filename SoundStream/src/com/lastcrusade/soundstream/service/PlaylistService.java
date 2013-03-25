@@ -325,10 +325,15 @@ public class PlaylistService extends Service {
     public void removeSong(PlaylistEntry entry){
         mPlaylist.remove(entry);
         
+        //broadcast the fact that a song has been removed
         new BroadcastIntent(ACTION_SONG_REMOVED)
             .putExtra(EXTRA_SONG, entry)
             .send(this);
+        
+        //broadcast the fact that the playlist has been updated
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        
+        //send a message to the network with the new playlist
         ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
 

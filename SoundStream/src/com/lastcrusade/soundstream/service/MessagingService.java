@@ -391,6 +391,7 @@ public class MessagingService extends Service implements IMessagingService {
             //send the message to the host
             if (this.connectServiceLocator.getService().isHostConnected()) {
                 sendMessageToHost(playlistMessage);
+                sendMessageToGuests(playlistMessage);
             }
 
             if (this.connectServiceLocator.getService().isGuestConnected()) {

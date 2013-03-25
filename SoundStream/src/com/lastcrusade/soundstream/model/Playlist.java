@@ -37,7 +37,10 @@ public class Playlist {
         SongMetadata removeMeta = meta;
         boolean removed = musicList.remove(meta);
         if (!removed) {
-            removeMeta = null;
+            removed = playedList.remove(meta);
+            if(!removed){
+                removeMeta = null;
+            }
         }
         return removeMeta;
     }
