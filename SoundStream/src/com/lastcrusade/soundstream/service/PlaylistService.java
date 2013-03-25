@@ -249,6 +249,7 @@ public class PlaylistService extends Service {
             if (song == null) {
                 resetPlaylist();
                 song = mPlaylist.getNextAvailableSong();
+                Toaster.iToast(this, getString(R.string.playlist_finished));
             }
             //still no available music..this means we're waiting for data to come in
             //...display a warning, but don't play.
