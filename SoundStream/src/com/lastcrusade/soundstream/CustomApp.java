@@ -148,10 +148,10 @@ public class CustomApp extends Application {
         }
         return musicLibraryService;
     }
-
+    
     public PlaylistService getPlaylistService() {
         PlaylistService playlistService = null;
-        try {
+        try{
             playlistService = this.playlistServiceLocator.getService();
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
