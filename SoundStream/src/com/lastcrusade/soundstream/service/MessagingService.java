@@ -164,6 +164,8 @@ public class MessagingService extends Service implements IMessagingService {
                 // that our current assumptions are met and raise purgatory if not.
                 ArrayList<SongMetadata> remoteLibrary = new ArrayList<SongMetadata>();
                 for (SongMetadata meta : message.getLibrary()) {
+                    //TODO this is a bad check all mac's should come from the 
+                    // host but not all songs will have the hosts mac
                     if (!meta.getMacAddress().equals(fromAddr)) {
                         Log.wtf(TAG, "Song received from " + fromAddr + " with mac address " + meta.getMacAddress() + "\n" + meta.toString());
                         //continue on to the next one
