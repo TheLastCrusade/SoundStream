@@ -75,6 +75,8 @@ public class MusicListAdapter extends BaseAdapter {
         }
 
         ImageButton addButton = (ImageButton) element.findViewById(R.id.btn_add_to_playlist);
+        addButton.setContentDescription(addButton.getContentDescription().toString()
+                + "_" + metadataList.get(position).getTitle().replace(" ", ""));
 
         addButton.setTag(position);
 
