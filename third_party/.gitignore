@@ -1,4 +1,5 @@
 # Ignore file used to sign apk's
 ABSLibrary/
+AndroidViewClient/
 SlidingMenuLibrary/
 newrelic-android-1.332/
