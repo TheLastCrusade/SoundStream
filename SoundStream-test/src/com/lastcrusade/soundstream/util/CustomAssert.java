@@ -9,14 +9,16 @@ public class CustomAssert {
     /**
      * Test to ensure SongMetadata objects are equal.
      * 
-     * @param meta
-     * @param libraryItem
+     * @param expected
+     * @param actual
      */
-    public static void assertSongMetaEquals(SongMetadata meta,
-            SongMetadata libraryItem) {
-        assertEquals(meta.getTitle(), libraryItem.getTitle());
-        assertEquals(meta.getArtist(), libraryItem.getArtist());
-        assertEquals(meta.getAlbum(), libraryItem.getAlbum());
-        assertEquals(meta.getMacAddress(), libraryItem.getMacAddress());
+    public static void assertSongMetaEquals(SongMetadata expected,
+            SongMetadata actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getTitle(), actual.getTitle());
+        assertEquals(expected.getArtist(), actual.getArtist());
+        assertEquals(expected.getAlbum(), actual.getAlbum());
+        assertEquals(expected.getFileSize(), actual.getFileSize());
+        assertEquals(expected.getMacAddress(), actual.getMacAddress());
     }
 }

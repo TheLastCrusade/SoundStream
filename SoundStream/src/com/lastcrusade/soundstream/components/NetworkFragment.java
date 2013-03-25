@@ -1,8 +1,8 @@
 package com.lastcrusade.soundstream.components;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.net.BluetoothDeviceDialogFormatter;
 import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -110,13 +109,21 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
         addMembersButton.setEnabled(true);
         
         //locally initiated device discovery...pop up a dialog for the user
-        List<FoundGuest> devices = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
-        if (devices.isEmpty()) {
+        List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
+        //pull out the known items, so we can preselect them
+        List<FoundGuest> known = new ArrayList<FoundGuest>();
+        for (FoundGuest guest : guests) {
+            if (guest.isKnown()) {
+                known.add(guest);
+            }
+        }
+        if (guests.isEmpty()) {
             Toaster.iToast(this.getActivity(), R.string.no_guests_found);
         } else {
             new MultiSelectListDialog<FoundGuest>(this.getActivity(),
                     R.string.select_guests, R.string.connect)
-                    .setItems(devices)
+                    .setItems(guests)
+                    .setSelected(known)
                     .setOnClickListener(
                             new IOnDialogMultiItemClickListener<FoundGuest>() {
     

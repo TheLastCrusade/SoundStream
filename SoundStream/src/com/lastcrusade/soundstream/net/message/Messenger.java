@@ -40,6 +40,7 @@ public class Messenger {
 
     private ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 
+    private byte[] inBytes = new byte[16384];
     /**
      * Serialize a message into the output buffer.  This will append to the output
      * buffer, to stack multiple messages next to each other.  See clearOutputBuffer
@@ -92,8 +93,8 @@ public class Messenger {
      * Only one received message may be held at a time, so be prepared to call getReceivedMessage if this
      * method returns true.
      * 
-     * This is designed to not block if data is unavailable, but it may block if InputStream blocks on read,
-     *  and doesn't support available properly
+     * This is designed to block until a full message is received, and will throw an exception if the
+     * socket is closed unexpectedly.
      * 
      * @param input
      * @return
@@ -102,27 +103,29 @@ public class Messenger {
     public boolean deserializeMessage(InputStream input) throws IOException {
         
         boolean processed = false;
-        //read all we can...
         do {
+            //read a chunk at a time...the buffer size was determined through trial and error, and
+            // could be optimized more.
             //NOTE: this is so input.read can block, and will throw an exception when the connection
             // goes down.  this is the only way we'll get a notification of a downed client
-            int read = input.read();
-            inputBuffer.write(read);
-        } while (input.available() > 0);
+            int read = input.read(inBytes);
+            inputBuffer.write(inBytes, 0, read);
 
-        //if we need to, consume the message length (to make sure we read until we have a complete message)
-        if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
-            byte[] bytes = inputBuffer.toByteArray();
-            ByteBuffer bb = ByteBuffer.wrap(bytes, 0, SIZE_LEN);
-            //this actually consumes the first 4 bytes (removes it from the stream)
-            inputBuffer.reset();
-            inputBuffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
-            this.messageLength = bb.getInt();
-        }
-        //check to see if we can process this message
-        if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength) {
-            processed = processAndConsumeMessage();
-        }
+            //if we need to, consume the message length (to make sure we read until we have a complete message)
+            if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
+                byte[] bytes = inputBuffer.toByteArray();
+                ByteBuffer bb = ByteBuffer.wrap(bytes, 0, SIZE_LEN);
+                //this actually consumes the first 4 bytes (removes it from the stream)
+                inputBuffer.reset();
+                inputBuffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
+                this.messageLength = bb.getInt();
+            }
+            //check to see if we can process this message
+            if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength) {
+                processed = processAndConsumeMessage();
+            }
+            //loop back around if we havent processed a message yet
+        } while (!processed);
         return processed;
     }
     
@@ -155,15 +158,8 @@ public class Messenger {
                 //otherwise, it's a WTF
                 Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
             }
-        } catch (InstantiationException e) {
-            
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-            
+        } catch (Exception e) {
+            Log.wtf(TAG, e);
         } finally {
             //consume this message either way
             int bufferLen = inputBuffer.size();

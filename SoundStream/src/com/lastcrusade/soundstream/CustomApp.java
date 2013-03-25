@@ -14,6 +14,7 @@ import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBi
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -31,6 +32,7 @@ public class CustomApp extends Application {
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
+    private ServiceLocator<PlaylistService> playlistServiceLocator;
 
     private BroadcastRegistrar registrar;
 
@@ -52,6 +54,9 @@ public class CustomApp extends Application {
         
         musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
                 this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
+        playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
         registerReceivers();
     }
@@ -97,7 +102,7 @@ public class CustomApp extends Application {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     //extract the new user list from the intent
-                    userList = intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST);
+                    userList.copyFrom((UserList) intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST));
                     //tell app to update the user list in all the UI
                     new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
                 }
@@ -144,8 +149,19 @@ public class CustomApp extends Application {
         return musicLibraryService;
     }
     
+    public PlaylistService getPlaylistService() {
+        PlaylistService playlistService = null;
+        try{
+            playlistService = this.playlistServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return playlistService;
+    }
+
     public void notifyUserListUpdate() {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
     }
+
 }

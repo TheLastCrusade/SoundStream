@@ -74,7 +74,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         // add one song, make sure we have 1 good item
         SongMetadata meta = new SongMetadata(1,
                 "Bridge over troubled waters", "The Tacoma Narrows",
-                "Shake Rattle and Roll", "00:11:22:33:44:55");
+                "Shake Rattle and Roll", 135235, "00:11:22:33:44:55");
         service.updateLibrary(Arrays.asList(meta), true);
         List<SongMetadata> library = service.getLibrary();
 
@@ -104,7 +104,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             // add one song, make sure we have 1 good item
             SongMetadata meta = new SongMetadata(1,
                     "Bridge over troubled waters", "The Tacoma Narrows",
-                    "Shake Rattle and Roll", "00:11:22:33:44:55");
+                    "Shake Rattle and Roll", 4623462, "00:11:22:33:44:55");
             service.updateLibrary(Arrays.asList(meta), true);
             List<SongMetadata> library = service.getLibrary();
             assertEquals(1, library.size());
@@ -112,10 +112,10 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
 
             // add two more, make sure we have 3 good songs
             SongMetadata meta2 = new SongMetadata(1, "Frisky Frisco",
-                    "The Golden Gates", "California", "00:11:22:33:44:56");
+                    "The Golden Gates", "California", 6432466, "00:11:22:33:44:56");
             SongMetadata meta3 = new SongMetadata(2, "Crosstown",
                     "Booklyn Bombs", "NYC, The place to be",
-                    "00:11:22:33:44:56");
+                    643266, "00:11:22:33:44:56");
             service.updateLibrary(Arrays.asList(meta2, meta3), true);
             library = service.getLibrary();
             assertEquals(3, library.size());
@@ -152,7 +152,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             // add one song, make sure we have 1 good item
             SongMetadata meta = new SongMetadata(1,
                     "Bridge over troubled waters", "The Tacoma Narrows",
-                    "Shake Rattle and Roll", "00:11:22:33:44:55");
+                    "Shake Rattle and Roll", 32512346, "00:11:22:33:44:55");
             service.updateLibrary(Arrays.asList(meta), true);
             List<SongMetadata> library = service.getLibrary();
             assertEquals(1, library.size());
@@ -161,7 +161,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             // add a metadata with the same id and mac address...this should
             // replace the Bridge over troubled waters metadata.
             SongMetadata meta2 = new SongMetadata(1, "Frisky Frisco",
-                    "The Golden Gates", "California", "00:11:22:33:44:55");
+                    "The Golden Gates", "California", 4326642, "00:11:22:33:44:55");
             service.updateLibrary(Arrays.asList(meta2), true);
             library = service.getLibrary();
             assertEquals(1, library.size());
@@ -193,11 +193,11 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
             // add one song, make sure we have 1 good item
             SongMetadata meta = new SongMetadata(1,
                     "Bridge over troubled waters", "The Tacoma Narrows",
-                    "Shake Rattle and Roll", "00:11:22:33:44:55");
+                    "Shake Rattle and Roll", 4523466, "00:11:22:33:44:55");
             // add a metadata with the same id and mac address...this should
             // replace the Bridge over troubled waters metadata.
             SongMetadata meta2 = new SongMetadata(2, "Frisky Frisco",
-                    "The Golden Gates", "California", "00:11:22:33:44:55");
+                    "The Golden Gates", "California", 6234662, "00:11:22:33:44:55");
             service.updateLibrary(Arrays.asList(meta, meta2), true);
             List<SongMetadata> library = service.getLibrary();
             assertEquals(1, library.size());

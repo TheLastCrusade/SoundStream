@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.soundstream.net.message.IMessage;
 
 /**
@@ -82,7 +81,7 @@ public class MessageThreadMessageDispatch extends Handler {
         IMessageHandler handler   = dispatchMap.get(message.getClass());
         
         if (handler != null) {
-            Log.w(TAG, "Message received: " + messageNo + ", it's a " + message.getClass().getName());
+            Log.w(TAG, "Message received: " + messageNo + ", it's a " + message.getClass().getSimpleName());
             handler.handleMessage(messageNo, message, fromAddr);
         } else if (defaultHandler != null) {
             this.defaultHandler.handleMessage(messageNo, message, fromAddr);

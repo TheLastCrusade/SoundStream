@@ -15,6 +15,15 @@ import com.lastcrusade.soundstream.model.SongMetadata;
  */
 public abstract class ADataMessage implements IMessage {
 
+    
+    protected void writeBoolean(boolean known, OutputStream output) throws IOException {
+        output.write(known ? 1 : 0);
+    }
+
+    protected boolean readBoolean(InputStream input) throws IOException {
+        return input.read() != 0;
+    }
+
     protected void writeString(String string, OutputStream output) throws IOException {
         byte[] bytes = null;
         
@@ -22,22 +31,16 @@ public abstract class ADataMessage implements IMessage {
             writeInteger(0, output);
         }
         else {
-            bytes = string.getBytes();
-            writeInteger(bytes.length, output);
-            output.write(bytes);
+            writeBytes(string.getBytes(), output);
         }
     }
 
     protected String readString(InputStream input) throws IOException {
-        int length = readInteger(input);
-        //TODO: should put an upper bound here, and use a ByteArrayOutputStream to accumulate bytes
-        if(length > 0) {
-	        byte[] buffer = new byte[length];
-	        input.read(buffer, 0, length);
-	        return new String(buffer);
-        }
-        else {
-        	return null;
+        byte[] bytes = readBytes(input);
+        if (bytes != null) {
+            return new String(bytes);
+        } else {
+            return null;
         }
     }
 
@@ -82,19 +85,44 @@ public abstract class ADataMessage implements IMessage {
     }
 
     protected void writeSongMetadata(SongMetadata metadata, OutputStream output) throws IOException{
-        writeLong(metadata.getId(), output);
-        writeString(metadata.getTitle(), output);
-        writeString(metadata.getArtist(), output);
-        writeString(metadata.getAlbum(), output);
+        writeLong(  metadata.getId(),         output);
+        writeString(metadata.getTitle(),      output);
+        writeString(metadata.getArtist(),     output);
+        writeString(metadata.getAlbum(),      output);
+        writeLong(  metadata.getFileSize(),   output);
         writeString(metadata.getMacAddress(), output);
     }
 
     protected SongMetadata readSongMetadata(InputStream input) throws IOException{
-        long id = readLong(input);
+        long id           = readLong(input);
         String title      = readString(input);
         String artist     = readString(input);
         String album      = readString(input);
+        long fileSize     = readLong(input);
         String macAddress = readString(input);
-        return new SongMetadata(id, title, artist, album, macAddress);
+        return new SongMetadata(id, title, artist, album, fileSize, macAddress);
+    }
+
+    protected void writeBytes(byte[] bytes, OutputStream output) throws IOException {
+        if(bytes == null) {
+            writeInteger(0, output);
+        }
+        else {
+            writeInteger(bytes.length, output);
+            output.write(bytes);
+        }
+    }
+
+    protected byte[] readBytes(InputStream input) throws IOException {
+        int length = readInteger(input);
+        //TODO: should put an upper bound here, and use a ByteArrayOutputStream to accumulate bytes
+        if(length > 0) {
+            byte[] buffer = new byte[length];
+            input.read(buffer, 0, length);
+            return buffer;
+        }
+        else {
+            return null;
+        }
     }
 }
