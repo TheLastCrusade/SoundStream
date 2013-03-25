@@ -121,6 +121,8 @@ public class MusicLibraryFragment extends MusicListFragment {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
+                //for now this is just a toast, but later it might change to something that allows
+                //the user to undo the action
                 Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been added.");
                 
             }

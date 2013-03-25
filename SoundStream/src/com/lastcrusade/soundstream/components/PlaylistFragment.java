@@ -102,15 +102,9 @@ public class PlaylistFragment extends MusicListFragment{
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
+                //for now we are just toasting, but eventually this might change to something that 
+                //allows the user to undo the action
                 Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been removed.");
-                
-            }
-        }).addAction(PlaylistService.ACTION_SONG_ADDED, new IBroadcastActionHandler() {
-            
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
-                Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been added.");
                 
             }
         })

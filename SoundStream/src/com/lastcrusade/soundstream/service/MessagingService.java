@@ -435,13 +435,6 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
-    public void sendSongAddedMessage(SongMetadata song){
-        
-    }
-    
-    public void sendSongRemovedMessage(SongMetadata song){
-        
-    }
     
     /**
      * Helper method to create a temporary file.
