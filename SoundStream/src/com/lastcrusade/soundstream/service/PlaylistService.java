@@ -74,7 +74,7 @@ public class PlaylistService extends Service {
 
     private BroadcastRegistrar    registrar;
     private IPlayer               mThePlayer;
-    private SingleFileAudioPlayer mAudioPlayer; //We might want to remove this
+    private SingleFileAudioPlayer mAudioPlayer; //TODO remove this when we add stop to IPlayer
     private Playlist              mPlaylist;
 
     private Thread                mDataManagerThread;
@@ -88,7 +88,7 @@ public class PlaylistService extends Service {
         //create the local player in a separate variable, and use that
         // as the player until we see a host connected
         this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
-        //Assume we are local untill we connect to a host
+        //Assume we are local until we connect to a host
         localPlayer = true;
         this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
         this.mPlaylist     = new Playlist();
@@ -145,7 +145,10 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                mThePlayer = new AudioPlayerWithEvents(new RemoteAudioPlayer((CustomApp) getApplication()), context);
+                mThePlayer = new AudioPlayerWithEvents(
+                        new RemoteAudioPlayer((CustomApp) getApplication()),
+                        context
+                );
                 localPlayer = false;
                 stopDataManager();
             }
@@ -183,7 +186,8 @@ public class PlaylistService extends Service {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                List<SongMetadata> newList = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                List<SongMetadata> newList =
+                        intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
                 mPlaylist.clear();
                 for (SongMetadata metadata : newList) {
                     PlaylistEntry entry = new PlaylistEntry(metadata);
