@@ -54,6 +54,11 @@ public class PlaylistService extends Service {
      * Broadcast action sent when the playlist gets updated
      */
     public static final String ACTION_PLAYLIST_UPDATED = PlaylistService.class + ".action.PlaylistUpdated";
+    
+    public static final String ACTION_SONG_REMOVED     = PlaylistService.class + ".action.SongRemoved";
+    
+    public static final String ACTION_SONG_ADDED     = PlaylistService.class + ".action.SongAdded";
+    
 
     public static final String ACTION_SONG_PLAYING     = PlaylistService.class + ".action.SongPlaying";
     public static final String EXTRA_SONG              = PlaylistService.class + ".extra.Song";
@@ -310,6 +315,19 @@ public class PlaylistService extends Service {
         if (isLocalPlayer()) {
             mDataManager.addToLoadQueue(entry);
         }
+        new BroadcastIntent(ACTION_SONG_ADDED)
+            .putExtra(EXTRA_SONG, entry)
+            .send(this);
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+    }
+    
+    public void removeSong(PlaylistEntry entry){
+        mPlaylist.remove(entry);
+        
+        new BroadcastIntent(ACTION_SONG_REMOVED)
+            .putExtra(EXTRA_SONG, entry)
+            .send(this);
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
