@@ -81,7 +81,7 @@ public class PlaylistService extends Service {
     private PlaylistDataManager   mDataManager;
 
     private PlaylistEntry currentSong;
-    private boolean localPlayer;
+    private boolean isLocalPlayer;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -89,7 +89,7 @@ public class PlaylistService extends Service {
         // as the player until we see a host connected
         this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
         //Assume we are local until we connect to a host
-        localPlayer = true;
+        isLocalPlayer = true;
         this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
         this.mPlaylist     = new Playlist();
         
@@ -149,7 +149,7 @@ public class PlaylistService extends Service {
                         new RemoteAudioPlayer((CustomApp) getApplication()),
                         context
                 );
-                localPlayer = false;
+                isLocalPlayer = false;
                 stopDataManager();
             }
         })
@@ -232,7 +232,7 @@ public class PlaylistService extends Service {
             this.mThePlayer.resume();
         } else {
             boolean play = true;
-            if(isLocalPlayer()) {
+            if(isLocalPlayer) {
                 play = setNextSong();
             }
             //we have stuff to play...play it and send a notification
@@ -247,7 +247,7 @@ public class PlaylistService extends Service {
      * to play locally (e.g. on the host).
      */
     private boolean setNextSong() {
-        if (!isLocalPlayer()) {
+        if (!isLocalPlayer) {
             throw new IllegalStateException("Cannot call setSong when using a remote player");
         }
         boolean songSet = false;
@@ -286,7 +286,7 @@ public class PlaylistService extends Service {
      */
     private void resetPlaylist() {
         mPlaylist.reset();
-        if (isLocalPlayer()) {
+        if (isLocalPlayer) {
             //we may need to re-add entries to the data manager, for remote
             // loading
             for (PlaylistEntry entry : mPlaylist.getSongsToPlay()) {
@@ -304,10 +304,6 @@ public class PlaylistService extends Service {
         this.mThePlayer.skip();
     }
 
-    private boolean isLocalPlayer() {
-        return localPlayer;
-    }
-
     public void addSong(SongMetadata metadata) {
         addSong(new PlaylistEntry(metadata));
     }
@@ -316,7 +312,7 @@ public class PlaylistService extends Service {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
         mPlaylist.add(entry);
-        if (isLocalPlayer()) {
+        if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
         }
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
