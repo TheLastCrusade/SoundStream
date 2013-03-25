@@ -1,8 +1,8 @@
 package com.lastcrusade.soundstream.util;
 
-import static org.junit.Assert.*;
-
 import com.lastcrusade.soundstream.model.SongMetadata;
+
+import static org.junit.Assert.assertEquals;
 
 public class CustomAssert {
 
