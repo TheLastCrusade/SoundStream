@@ -157,7 +157,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     LibraryMessage message, String fromAddr) {
                 new BroadcastIntent(ACTION_LIBRARY_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary())
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary() )
                     .send(MessagingService.this);
             }
         });
@@ -342,9 +342,13 @@ public class MessagingService extends Service implements IMessagingService {
         //send the message to the host
         sendMessageToHost(msg);
     }
-    
+
     public void sendPlayStatusMessage(String playStatusMessage) {
-    	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
+        sendPlayStatusMessage(playStatusMessage, new SongMetadata());
+    }
+
+    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
+        PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage, currentSong);
     	//send the message to the guests
     	sendMessageToGuests(msg);
     }
