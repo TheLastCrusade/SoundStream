@@ -156,24 +156,6 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     LibraryMessage message, String fromAddr) {
-                //sanity check...make sure the mac address is set properly, or
-                // raise a flag if its not
-                //JR, 03/13/13, I didn't want to set it here, because if we ever allow
-                // guests to send on other guests libraries, this would cause issues.  Rather
-                // how we want to handle that, or if that is even a thing, just check
-                // that our current assumptions are met and raise purgatory if not.
-                ArrayList<SongMetadata> remoteLibrary = new ArrayList<SongMetadata>();
-                for (SongMetadata meta : message.getLibrary()) {
-                    //TODO this is a bad check all mac's should come from the 
-                    // host but not all songs will have the hosts mac
-                    if (!meta.getMacAddress().equals(fromAddr)) {
-                        Log.wtf(TAG, "Song received from " + fromAddr + " with mac address " + meta.getMacAddress() + "\n" + meta.toString());
-                        //continue on to the next one
-                    } else {
-                        remoteLibrary.add(meta);
-                    }
-                }
-
                 new BroadcastIntent(ACTION_LIBRARY_MESSAGE)
                     .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remoteLibrary)
                     .send(MessagingService.this);
