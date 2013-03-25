@@ -15,44 +15,49 @@ import android.util.Log;
  * @theJenix believes that PlayStatus should be a boolean. 
  */
 public class PlayStatusMessage extends ADataMessage {
-	
-	private final String TAG = PlayStatusMessage.class.getName();
-	private final String PLAY_MESSAGE = "Play";
-	private final String PAUSE_MESSAGE = "Pause";
-	private String string = "";
-	
-	public PlayStatusMessage() {}
 
-	public PlayStatusMessage(String playStatusMessage) {
-		if(playStatusMessage.equals(PLAY_MESSAGE) || playStatusMessage.equals(PAUSE_MESSAGE)) {
-			this.setString(playStatusMessage);
+    public static final String PLAY_MESSAGE = "Play";
+    public static final String PAUSE_MESSAGE = "Pause";
+
+    private final String TAG = PlayStatusMessage.class.getName();
+    private String string = "";
+
+    public PlayStatusMessage() {}
+
+    public PlayStatusMessage(String playStatusMessage) {
+        this(playStatusMessage, new SongMetadata());
+    }
+
+    public PlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
+        if(playStatusMessage.equals(PLAY_MESSAGE) || playStatusMessage.equals(PAUSE_MESSAGE)) {
+            this.setString(playStatusMessage);
 		}
-		else {
-			Log.wtf(TAG, "Status msg passed not Play or Pause");
-		}
-	}
+        else {
+            Log.wtf(TAG, "Status msg passed not Play or Pause");
+        }
+    }
 
-	@Override
-	public void deserialize(InputStream input) throws IOException {
-		byte[] bytes = new byte[1024];
-		int read = 0;
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		while((read = input.read(bytes)) > 0) {
-			out.write(bytes, 0, read);
-		}
-		this.setString(out.toString());
-	}
+    @Override
+    public void deserialize(InputStream input) throws IOException {
+        byte[] bytes = new byte[1024];
+        int read = 0;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        while((read = input.read(bytes)) > 0) {
+            out.write(bytes, 0, read);
+        }
+        this.setString(out.toString());
+    }
 
-	@Override
-	public void serialize(OutputStream output) throws IOException {
-		output.write(getString().getBytes());
-	}
+    @Override
+    public void serialize(OutputStream output) throws IOException {
+        output.write(getString().getBytes());
+    }
 
-	public String getString() {
-		return string;
-	}
+    public String getString() {
+        return string;
+    }
 
-	public void setString(String string) {
-		this.string = string;
-	}
+    public void setString(String string) {
+        this.string = string;
+    }
 }
