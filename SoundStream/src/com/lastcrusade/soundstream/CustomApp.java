@@ -119,7 +119,7 @@ public class CustomApp extends Application {
         return userList;
     }
     
-    public ConnectionService getConnectionService() {
+    private ConnectionService getConnectionService() {
         ConnectionService connectionService = null;
         try {
             connectionService = this.connectionServiceLocator.getService();
@@ -129,7 +129,7 @@ public class CustomApp extends Application {
         return connectionService;
     }
 
-    public IMessagingService getMessagingService() {
+    private IMessagingService getMessagingService() {
         MessagingService messagingService = null;
         try {
             messagingService = this.messagingServiceLocator.getService();

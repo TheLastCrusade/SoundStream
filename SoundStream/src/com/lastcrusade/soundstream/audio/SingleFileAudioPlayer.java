@@ -2,8 +2,6 @@ package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
 
-import com.lastcrusade.soundstream.util.BroadcastIntent;
-
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -11,7 +9,11 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 
 /**
@@ -32,15 +34,18 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     private boolean paused;
 
-    private CustomApp application;
+    private ServiceLocator<MessagingService> messagingService;
 
-    public SingleFileAudioPlayer(final Context context, CustomApp application) {
+    private Context context;
+
+    public SingleFileAudioPlayer(Context context, ServiceLocator<MessagingService> messagingServiceLocator) {
         this.player = new MediaPlayer();
-        this.application = application;
+        this.context = context;
+        this.messagingService = messagingServiceLocator;
         player.setOnCompletionListener(
                 new OnCompletionListener(){
                     @Override public void onCompletion(MediaPlayer mp) {
-                        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(context);
+                        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(SingleFileAudioPlayer.this.context);
                     }
         });
     }
@@ -57,7 +62,7 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.filePath = filePath;
         new BroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
             .putExtra(PlaylistService.EXTRA_SONG, song)
-            .send(this.application);
+            .send(this.context);
     }
 
     @Override
@@ -78,7 +83,7 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.setDataSource(this.filePath);
             player.prepare();
             player.start();
-            ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
+            this.messagingService.getService().sendPlayStatusMessage("Play");
         } catch (Exception e) {
             Log.wtf(TAG, "Unable to play song: " + this.filePath);
             e.printStackTrace();
@@ -91,7 +96,11 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.pause();
         }
         this.paused = true;
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+        try {
+            this.messagingService.getService().sendPlayStatusMessage("Pause");
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 
 
@@ -107,15 +116,23 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.player.stop();
         this.setSong(null, null);
         //indicate the system is paused
-        new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.application);
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+        new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
+        try {
+            this.messagingService.getService().sendPlayStatusMessage("Pause");
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     @Override
     public void resume() {
         player.start();
         paused = false;
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
+        try {
+            this.messagingService.getService().sendPlayStatusMessage("Play");
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     @Override
@@ -125,7 +142,7 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.stop();
         }
         //send this action to move to the next song
-        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this.application);
+        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this.context);
         paused = false;
     }
 
