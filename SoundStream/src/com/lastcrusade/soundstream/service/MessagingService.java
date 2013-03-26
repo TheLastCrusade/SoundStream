@@ -157,7 +157,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     LibraryMessage message, String fromAddr) {
                 new BroadcastIntent(ACTION_LIBRARY_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary() )
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary())
                     .send(MessagingService.this);
             }
         });
