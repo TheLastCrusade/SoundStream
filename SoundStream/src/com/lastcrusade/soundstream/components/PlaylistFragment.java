@@ -61,7 +61,6 @@ public class PlaylistFragment extends MusicListFragment{
         );
         setListAdapter(mPlayListAdapter);
 
-        mDetector = new GestureDetectorCompat(getActivity(), new SongGestureListener());
         registerReceivers();
     }
 
@@ -69,12 +68,6 @@ public class PlaylistFragment extends MusicListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
-        v.setOnTouchListener(new View.OnTouchListener() {       
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return mDetector.onTouchEvent(event);
-            }
-        });
         return v;
     }
 
@@ -141,6 +134,7 @@ public class PlaylistFragment extends MusicListFragment{
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View element = super.getView(position, convertView, parent);
+            
             //This depends on played music being above unplayed music
             PlaylistEntry entry = super.getItem(position);
             if (!entry.isLoaded()) {
@@ -151,42 +145,46 @@ public class PlaylistFragment extends MusicListFragment{
             } else {
                 element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
             }
+            
+            //add gesture detection on the song element
+            final GestureDetectorCompat songGesture = new GestureDetectorCompat(getActivity(), new PlaylistSongGestureListener(element, entry));
+            element.setOnTouchListener(new View.OnTouchListener() {       
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return songGesture.onTouchEvent(event);
+                }
+
+            });
+            
             return element;
+        }
+        
+      //detect gestures 
+        private class PlaylistSongGestureListener extends SongGestureListener{
+            private PlaylistEntry entry;
+            
+            public PlaylistSongGestureListener(View view, PlaylistEntry entry){
+                super(view);
+                this.entry = entry;
+            }
+            //fling a song to the right to remove it
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                    float velocityY) {
+                // TODO Implement remove this way in another pull request
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+            
+            //bump the song to the top when double tapped
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                getPlaylistService().bumpSong(entry);
+                return true;
+            }       
         }
     }
     
-    //detect gestures 
-    private class SongGestureListener extends GestureDetector.SimpleOnGestureListener{
-
-        //fling a song to the right to remove it
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                float velocityY) {
-            // TODO Auto-generated method stub
-            return super.onFling(e1, e2, velocityX, velocityY);
-        }
-        
-        //bump the song to the top when double tapped
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            boolean tapped = super.onDoubleTap(e);
-            
-            int position = getListView().pointToPosition((int)e.getX(), (int)e.getY());
-            PlaylistEntry entry = (PlaylistEntry)getListAdapter().getItem(position);
-            getPlaylistService().bumpSong(entry);
-            
-            return tapped;
-        }
-        
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            int position = getListView().pointToPosition((int)e.getX(), (int)e.getY());
-            View v = getListView().getChildAt(position);
-            onListItemClick(getListView(), v, position, getListAdapter().getItemId(position));
-            return false;
-        }
-        
-    }
+    
     
  
 
