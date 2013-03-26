@@ -276,6 +276,16 @@ public class MessagingService extends Service implements IMessagingService {
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
                     .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getSongsToPlay())
                     .send(MessagingService.this);
+                
+                //if we are the host and we are receiving the message as the host, we need to
+                //send it back out to all of the guests
+                try {
+                    if( connectServiceLocator.getService().isGuestConnected()){
+                        sendMessageToGuests(message);
+                    }
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, e);
+                }
             }
         });
     }
