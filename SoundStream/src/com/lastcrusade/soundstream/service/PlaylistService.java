@@ -13,6 +13,7 @@ import android.telephony.TelephonyManager;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.audio.AudioPlayerWithEvents;
 import com.lastcrusade.soundstream.audio.IPlayer;
 import com.lastcrusade.soundstream.audio.RemoteAudioPlayer;
 import com.lastcrusade.soundstream.audio.SingleFileAudioPlayer;
@@ -78,20 +79,23 @@ public class PlaylistService extends Service {
 
     private BroadcastRegistrar    registrar;
     private IPlayer               mThePlayer;
-    private SingleFileAudioPlayer mAudioPlayer;
+    private SingleFileAudioPlayer mAudioPlayer; //TODO remove this when we add stop to IPlayer
     private Playlist              mPlaylist;
 
     private Thread                mDataManagerThread;
     private PlaylistDataManager   mDataManager;
 
     private PlaylistEntry currentSong;
+    private boolean isLocalPlayer;
 
     @Override
     public IBinder onBind(Intent intent) {
         //create the local player in a separate variable, and use that
         // as the player until we see a host connected
         this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
-        this.mThePlayer    = mAudioPlayer;
+        //Assume we are local until we connect to a host
+        isLocalPlayer      = true;
+        this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
         this.mPlaylist     = new Playlist();
         
         registerReceivers();
@@ -146,7 +150,11 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                mThePlayer = new RemoteAudioPlayer((CustomApp) getApplication());
+                mThePlayer = new AudioPlayerWithEvents(
+                        new RemoteAudioPlayer((CustomApp) getApplication()),
+                        context
+                );
+                isLocalPlayer = false;
                 stopDataManager();
             }
         })
@@ -189,7 +197,8 @@ public class PlaylistService extends Service {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                List<SongMetadata> newList = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                List<SongMetadata> newList =
+                        intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
                 mPlaylist.clear();
                 for (SongMetadata metadata : newList) {
                     PlaylistEntry entry = new PlaylistEntry(metadata);
@@ -234,7 +243,7 @@ public class PlaylistService extends Service {
             this.mThePlayer.resume();
         } else {
             boolean play = true;
-            if(isLocalPlayer()) {
+            if(isLocalPlayer) {
                 play = setNextSong();
             }
             //we have stuff to play...play it and send a notification
@@ -249,7 +258,7 @@ public class PlaylistService extends Service {
      * to play locally (e.g. on the host).
      */
     private boolean setNextSong() {
-        if (!isLocalPlayer()) {
+        if (!isLocalPlayer) {
             throw new IllegalStateException("Cannot call setSong when using a remote player");
         }
         boolean songSet = false;
@@ -288,7 +297,7 @@ public class PlaylistService extends Service {
      */
     private void resetPlaylist() {
         mPlaylist.reset();
-        if (isLocalPlayer()) {
+        if (isLocalPlayer) {
             //we may need to re-add entries to the data manager, for remote
             // loading
             for (PlaylistEntry entry : mPlaylist.getSongsToPlay()) {
@@ -306,10 +315,6 @@ public class PlaylistService extends Service {
         this.mThePlayer.skip();
     }
 
-    private boolean isLocalPlayer() {
-        return this.mThePlayer == this.mAudioPlayer;
-    }
-
     public void addSong(SongMetadata metadata) {
         addSong(new PlaylistEntry(metadata));
     }
@@ -318,7 +323,7 @@ public class PlaylistService extends Service {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
         mPlaylist.add(entry);
-        if (isLocalPlayer()) {
+        if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
         }
         new BroadcastIntent(ACTION_SONG_ADDED)
