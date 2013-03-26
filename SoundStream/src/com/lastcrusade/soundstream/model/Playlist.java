@@ -90,4 +90,17 @@ public class Playlist {
             entry.setPlayed(false);
         }
     }
+    
+    public void bumpSong(PlaylistEntry entry){
+        if(musicList.contains(entry)){
+            //remove the entry from the queue
+            musicList.remove(entry);
+            //make a new queue
+            Queue<PlaylistEntry> newMusicList = new LinkedList<PlaylistEntry>();
+            newMusicList.add(entry);
+            newMusicList.addAll(musicList);
+            musicList = newMusicList;
+        }
+            
+    }
 }

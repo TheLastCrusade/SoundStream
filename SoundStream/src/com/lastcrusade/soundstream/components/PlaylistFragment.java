@@ -6,8 +6,10 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -132,6 +134,7 @@ public class PlaylistFragment extends MusicListFragment{
     private void updatePlaylist() {
         mPlayListAdapter.updateMusic(getPlaylistService().getPlaylistEntries());
     }
+    
 
     private class PlayListAdapter extends MusicListAdapter<PlaylistEntry> {
         public PlayListAdapter(
@@ -145,6 +148,7 @@ public class PlaylistFragment extends MusicListFragment{
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View element = super.getView(position, convertView, parent);
+            
             //This depends on played music being above unplayed music
             PlaylistEntry entry = super.getItem(position);
             if (!entry.isLoaded()) {
@@ -156,9 +160,21 @@ public class PlaylistFragment extends MusicListFragment{
                 element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
             }
             
+
+            //add gesture detection on the song element
+            final GestureDetectorCompat songGesture = new GestureDetectorCompat(getActivity(), new PlaylistSongGestureListener(element, entry));
+            element.setOnTouchListener(new View.OnTouchListener() {       
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return songGesture.onTouchEvent(event);
+                }
+
+            });
+
             ImageButton delete = (ImageButton)element.findViewById(R.id.btn_remove_from_playlist);
             delete.setOnClickListener(new DeleteSongListener(entry));
             delete.setVisibility(View.VISIBLE);
+
             
             return element;
         }
@@ -177,6 +193,31 @@ public class PlaylistFragment extends MusicListFragment{
                
             }
             
+        }
+        
+
+      //detect gestures 
+        private class PlaylistSongGestureListener extends SongGestureListener{
+            private PlaylistEntry entry;
+            
+            public PlaylistSongGestureListener(View view, PlaylistEntry entry){
+                super(view);
+                this.entry = entry;
+            }
+            //fling a song to the right to remove it
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                    float velocityY) {
+                // TODO Implement remove this way in another pull request
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+            
+            //bump the song to the top when double tapped
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                getPlaylistService().bumpSong(entry);
+                return true;
+            } 
         }
     }
 
