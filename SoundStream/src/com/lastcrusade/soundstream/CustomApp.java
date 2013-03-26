@@ -13,16 +13,15 @@ import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
+import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.Transitions;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getName();
@@ -32,7 +31,7 @@ public class CustomApp extends Application {
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-    private ServiceLocator<PlaylistService> playlistServiceLocator;
+    private ServiceLocator<PlaylistService>     playlistServiceLocator;
 
     private BroadcastRegistrar registrar;
 

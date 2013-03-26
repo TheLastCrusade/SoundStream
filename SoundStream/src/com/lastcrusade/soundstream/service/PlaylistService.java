@@ -161,8 +161,14 @@ public class PlaylistService extends Service {
                 startDataManager();
             }
         })
+        .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                ((CustomApp)getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+            }
+        })
         .addAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
-            
+
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 pause();
