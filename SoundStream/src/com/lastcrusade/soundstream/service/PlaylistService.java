@@ -89,7 +89,7 @@ public class PlaylistService extends Service {
         // as the player until we see a host connected
         this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
         //Assume we are local until we connect to a host
-        isLocalPlayer = true;
+        isLocalPlayer      = true;
         this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
         this.mPlaylist     = new Playlist();
         
