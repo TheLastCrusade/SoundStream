@@ -200,8 +200,10 @@ public class MessagingService extends Service implements IMessagingService {
 					public void handleMessage(int messageNo, PlayStatusMessage message,
 							String fromAddr) {
 						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
-							.putExtra(EXTRA_IS_PLAYING, message.getString().equals("Play"))
-							.send(MessagingService.this);
+							.putExtra(
+							        EXTRA_IS_PLAYING,
+							        message.getString().equals(PlayStatusMessage.PLAY_MESSAGE)
+						     ).send(MessagingService.this);
 					}
 				});
     }
@@ -342,9 +344,13 @@ public class MessagingService extends Service implements IMessagingService {
         //send the message to the host
         sendMessageToHost(msg);
     }
-    
+
     public void sendPlayStatusMessage(String playStatusMessage) {
-    	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
+        sendPlayStatusMessage(playStatusMessage, new SongMetadata());
+    }
+
+    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
+        PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage, currentSong);
     	//send the message to the guests
     	sendMessageToGuests(msg);
     }

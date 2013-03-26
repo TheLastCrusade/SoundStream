@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 
@@ -78,7 +79,9 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.setDataSource(this.filePath);
             player.prepare();
             player.start();
-            ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Play");
+            ((CustomApp)application)
+                .getMessagingService()
+                .sendPlayStatusMessage(PlayStatusMessage.PLAY_MESSAGE);
         } catch (Exception e) {
             Log.wtf(TAG, "Unable to play song: " + this.filePath);
             e.printStackTrace();
@@ -91,7 +94,9 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.pause();
         }
         this.paused = true;
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+        ((CustomApp)application)
+            .getMessagingService()
+            .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
     }
 
 
@@ -108,7 +113,9 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.setSong(null, null);
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.application);
-        ((CustomApp)application).getMessagingService().sendPlayStatusMessage("Pause");
+        ((CustomApp)application)
+            .getMessagingService()
+             .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
     }
 
     @Override
