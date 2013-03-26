@@ -156,24 +156,8 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     LibraryMessage message, String fromAddr) {
-                //sanity check...make sure the mac address is set properly, or
-                // raise a flag if its not
-                //JR, 03/13/13, I didn't want to set it here, because if we ever allow
-                // guests to send on other guests libraries, this would cause issues.  Rather
-                // how we want to handle that, or if that is even a thing, just check
-                // that our current assumptions are met and raise purgatory if not.
-                ArrayList<SongMetadata> remoteLibrary = new ArrayList<SongMetadata>();
-                for (SongMetadata meta : message.getLibrary()) {
-                    if (!meta.getMacAddress().equals(fromAddr)) {
-                        Log.wtf(TAG, "Song received from " + fromAddr + " with mac address " + meta.getMacAddress() + "\n" + meta.toString());
-                        //continue on to the next one
-                    } else {
-                        remoteLibrary.add(meta);
-                    }
-                }
-
                 new BroadcastIntent(ACTION_LIBRARY_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, remoteLibrary)
+                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary())
                     .send(MessagingService.this);
             }
         });
@@ -216,8 +200,10 @@ public class MessagingService extends Service implements IMessagingService {
 					public void handleMessage(int messageNo, PlayStatusMessage message,
 							String fromAddr) {
 						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
-							.putExtra(EXTRA_IS_PLAYING, message.getString().equals("Play"))
-							.send(MessagingService.this);
+							.putExtra(
+							        EXTRA_IS_PLAYING,
+							        message.getString().equals(PlayStatusMessage.PLAY_MESSAGE)
+						     ).send(MessagingService.this);
 					}
 				});
     }
@@ -290,6 +276,16 @@ public class MessagingService extends Service implements IMessagingService {
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
                     .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getSongsToPlay())
                     .send(MessagingService.this);
+                
+                //if we are the host and we are receiving the message as the host, we need to
+                //send it back out to all of the guests
+                try {
+                    if( connectServiceLocator.getService().isGuestConnected()){
+                        sendMessageToGuests(message);
+                    }
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, e);
+                }
             }
         });
     }
@@ -358,9 +354,13 @@ public class MessagingService extends Service implements IMessagingService {
         //send the message to the host
         sendMessageToHost(msg);
     }
-    
+
     public void sendPlayStatusMessage(String playStatusMessage) {
-    	PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage);
+        sendPlayStatusMessage(playStatusMessage, new SongMetadata());
+    }
+
+    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
+        PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage, currentSong);
     	//send the message to the guests
     	sendMessageToGuests(msg);
     }

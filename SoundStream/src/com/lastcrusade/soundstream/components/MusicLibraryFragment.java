@@ -27,6 +27,7 @@ import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
+import com.lastcrusade.soundstream.util.Toaster;
 
 public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getName();
@@ -114,7 +115,19 @@ public class MusicLibraryFragment extends MusicListFragment {
                 //Update library shown when the library service gets an update
                 mMusicAdapter.updateMusicFromLibrary();
             }
-        }).register(this.getActivity());
+        })
+        .addAction(PlaylistService.ACTION_SONG_ADDED, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
+                //for now this is just a toast, but later it might change to something that allows
+                //the user to undo the action
+                Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been added.");
+                
+            }
+        })
+        .register(this.getActivity());
     }
 
     private void unregisterReceivers() {
@@ -137,7 +150,7 @@ public class MusicLibraryFragment extends MusicListFragment {
      * Inner class extends MusicListAdapter to add the add to playlist image button, and click listener
      * 
      */
-    private class MusicAdapter extends MusicListAdapter {
+    private class MusicAdapter extends MusicListAdapter<SongMetadata> {
         public MusicAdapter(
                 Context mContext,
                 List<SongMetadata> metadataList,

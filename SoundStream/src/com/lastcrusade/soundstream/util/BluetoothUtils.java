@@ -18,6 +18,10 @@ public class BluetoothUtils {
     
     /* The number of milliseconds to wait in between calls to isEnabled */
     private static final int ENABLE_CHECK_RETRY_PAUSE_MILLISECONDS = 500;
+    
+    /* The maximum number of seconds to put the device in discoverable mode */
+    private static final int DISCOVERABLE_SECONDS = 30;
+
 
     public static void checkAndEnableBluetooth(Context context, BluetoothAdapter adapter) throws BluetoothNotEnabledException, BluetoothNotSupportedException {
         if (adapter != null) {
@@ -62,11 +66,8 @@ public class BluetoothUtils {
         Intent discoverableIntent = new Intent(
                 BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(
-                BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+                BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVERABLE_SECONDS);
         context.startActivity(discoverableIntent);
-//        new BroadcastIntent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
-//            .putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-//            .send(context);
     }
     
     public static String getLocalBluetoothName() {
