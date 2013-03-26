@@ -6,8 +6,11 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,6 +35,7 @@ public class PlaylistFragment extends MusicListFragment{
 
     private PlayListAdapter mPlayListAdapter;
 
+    private GestureDetectorCompat mDetector;
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -57,6 +61,7 @@ public class PlaylistFragment extends MusicListFragment{
         );
         setListAdapter(mPlayListAdapter);
 
+        mDetector = new GestureDetectorCompat(getActivity(), new SongGestureListener());
         registerReceivers();
     }
 
@@ -64,6 +69,12 @@ public class PlaylistFragment extends MusicListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
+        v.setOnTouchListener(new View.OnTouchListener() {       
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mDetector.onTouchEvent(event);
+            }
+        });
         return v;
     }
 
@@ -116,6 +127,7 @@ public class PlaylistFragment extends MusicListFragment{
     private void updatePlaylist() {
         mPlayListAdapter.updateMusic(getPlaylistService().getPlaylistEntries());
     }
+    
 
     private class PlayListAdapter extends MusicListAdapter<PlaylistEntry> {
         public PlayListAdapter(
@@ -142,5 +154,40 @@ public class PlaylistFragment extends MusicListFragment{
             return element;
         }
     }
+    
+    //detect gestures 
+    private class SongGestureListener extends GestureDetector.SimpleOnGestureListener{
+
+        //fling a song to the right to remove it
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                float velocityY) {
+            // TODO Auto-generated method stub
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+        
+        //bump the song to the top when double tapped
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            boolean tapped = super.onDoubleTap(e);
+            
+            int position = getListView().pointToPosition((int)e.getX(), (int)e.getY());
+            PlaylistEntry entry = (PlaylistEntry)getListAdapter().getItem(position);
+            getPlaylistService().bumpSong(entry);
+            
+            return tapped;
+        }
+        
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            int position = getListView().pointToPosition((int)e.getX(), (int)e.getY());
+            View v = getListView().getChildAt(position);
+            onListItemClick(getListView(), v, position, getListAdapter().getItemId(position));
+            return false;
+        }
+        
+    }
+    
+ 
 
 }

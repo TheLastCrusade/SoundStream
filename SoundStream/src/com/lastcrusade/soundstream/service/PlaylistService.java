@@ -323,4 +323,11 @@ public class PlaylistService extends Service {
     public List<PlaylistEntry> getPlaylistEntries() {
         return Collections.unmodifiableList(new ArrayList<PlaylistEntry>(mPlaylist.getSongsToPlay()));
     }
+    
+    public void bumpSong(PlaylistEntry entry){
+        mPlaylist.bumpSong(entry);
+        
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+    }
 }
