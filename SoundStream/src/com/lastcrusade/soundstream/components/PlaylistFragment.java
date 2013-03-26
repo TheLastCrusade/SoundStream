@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
+import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -21,6 +24,7 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
+import com.lastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show
@@ -92,7 +96,19 @@ public class PlaylistFragment extends MusicListFragment{
             public void onReceiveAction(Context context, Intent intent) {
                 updatePlaylist();
             }
-        }).register(this.getActivity());
+        })
+        .addAction(PlaylistService.ACTION_SONG_REMOVED, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
+                //for now we are just toasting, but eventually this might change to something that 
+                //allows the user to undo the action
+                Toaster.iToast(getActivity(), getString(R.string.removed_label) + "\"" + entry.getTitle() + "\"");
+                
+            }
+        })
+        .register(this.getActivity());
     }
 
     private void unregisterReceivers() {
@@ -139,7 +155,28 @@ public class PlaylistFragment extends MusicListFragment{
             } else {
                 element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
             }
+            
+            ImageButton delete = (ImageButton)element.findViewById(R.id.btn_remove_from_playlist);
+            delete.setOnClickListener(new DeleteSongListener(entry));
+            delete.setVisibility(View.VISIBLE);
+            
             return element;
+        }
+        
+        private class DeleteSongListener implements OnClickListener{
+            private PlaylistEntry entry;
+            public DeleteSongListener(PlaylistEntry entry){
+                this.entry = entry;
+            }
+            @Override
+            public void onClick(View v) {
+                if(getPlaylistService().getCurrentSong()!= null && getPlaylistService().getCurrentSong().equals(entry)){
+                    getPlaylistService().skip();
+                }
+                getPlaylistService().removeSong(entry);
+               
+            }
+            
         }
     }
 

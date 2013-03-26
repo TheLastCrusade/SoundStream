@@ -74,4 +74,17 @@
         android:visibility="invisible"
         android:contentDescription="@string/add_to_playlist"
         android:background="@color/transparent"/>
+    
+     <ImageButton
+        android:id="@+id/btn_remove_from_playlist"
+        android:src="@drawable/content_remove"
+        android:layout_width = "wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:paddingRight="4sp"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:contentDescription="@string/remove_from_playlist"
+        android:background="@color/transparent"/>
+    
 </RelativeLayout>

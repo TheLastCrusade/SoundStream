@@ -54,6 +54,11 @@ public class PlaylistService extends Service {
      * Broadcast action sent when the playlist gets updated
      */
     public static final String ACTION_PLAYLIST_UPDATED = PlaylistService.class + ".action.PlaylistUpdated";
+    
+    public static final String ACTION_SONG_REMOVED     = PlaylistService.class + ".action.SongRemoved";
+    
+    public static final String ACTION_SONG_ADDED     = PlaylistService.class + ".action.SongAdded";
+    
 
     public static final String ACTION_SONG_PLAYING     = PlaylistService.class + ".action.SongPlaying";
     public static final String EXTRA_SONG              = PlaylistService.class + ".extra.Song";
@@ -316,11 +321,35 @@ public class PlaylistService extends Service {
         if (isLocalPlayer()) {
             mDataManager.addToLoadQueue(entry);
         }
+        new BroadcastIntent(ACTION_SONG_ADDED)
+            .putExtra(EXTRA_SONG, entry)
+            .send(this);
+        // send an intent to the fragments that the playlist is updated
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        //send a message to the network that the playlist is updated
+        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+    }
+    
+    public void removeSong(PlaylistEntry entry){
+        mPlaylist.remove(entry);
+        
+        //broadcast the fact that a song has been removed
+        new BroadcastIntent(ACTION_SONG_REMOVED)
+            .putExtra(EXTRA_SONG, entry)
+            .send(this);
+        
+        //broadcast the fact that the playlist has been updated
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        
+        //send a message to the network with the new playlist
         ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
 
     public List<PlaylistEntry> getPlaylistEntries() {
         return Collections.unmodifiableList(new ArrayList<PlaylistEntry>(mPlaylist.getSongsToPlay()));
+    }
+    
+    public PlaylistEntry getCurrentSong(){
+        return currentSong;
     }
 }
