@@ -275,7 +275,7 @@ public class MessagingService extends Service implements IMessagingService {
                     PlaylistMessage message, String fromAddr) {
 
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getSongsToPlay())
+                    .putParcelableArrayListExtra(EXTRA_PLAYLIST_ENTRY, message.getSongsToPlay())
                     .send(MessagingService.this);
                 
                 //if we are the host and we are receiving the message as the host, we need to
