@@ -2,6 +2,7 @@ package com.lastcrusade.soundstream.util;
 
 import static org.junit.Assert.*;
 
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 
 public class CustomAssert {
@@ -20,5 +21,13 @@ public class CustomAssert {
         assertEquals(expected.getAlbum(), actual.getAlbum());
         assertEquals(expected.getFileSize(), actual.getFileSize());
         assertEquals(expected.getMacAddress(), actual.getMacAddress());
+    }
+    
+    public static void assertPlaylistEntry(PlaylistEntry expected,
+            PlaylistEntry actual) {
+        assertSongMetaEquals(expected, actual);
+        assertEquals(expected.isLoaded(), actual.isLoaded());
+        assertEquals(expected.isPlayed(), actual.isPlayed());
+        assertEquals(expected.getFilePath(), actual.getFilePath());
     }
 }

@@ -16,6 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
@@ -52,8 +53,8 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
-    //This also uses EXTRA_SONG_METADATA
     public static final String ACTION_PLAYLIST_UPDATED_MESSAGE = MessagingService.class.getName() + ".action.PlaylistUpdated";
+    public static final String EXTRA_PLAYLIST_ENTRY    = MessagingService.class.getName() + ".extra.PlaylistEntry";
     
     public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
     public static final String EXTRA_USER_LIST                    = MessagingService.class.getName() + ".extra.UserList";
@@ -274,7 +275,7 @@ public class MessagingService extends Service implements IMessagingService {
                     PlaylistMessage message, String fromAddr) {
 
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
-                    .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getSongsToPlay())
+                    .putParcelableArrayListExtra(EXTRA_PLAYLIST_ENTRY, message.getSongsToPlay())
                     .send(MessagingService.this);
                 
                 //if we are the host and we are receiving the message as the host, we need to
@@ -385,7 +386,7 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
-    public void sendPlaylistMessage(List<? extends SongMetadata> songsToPlay){
+    public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay){
         try {
             PlaylistMessage playlistMessage = new PlaylistMessage(songsToPlay);
             //send the message to the host
