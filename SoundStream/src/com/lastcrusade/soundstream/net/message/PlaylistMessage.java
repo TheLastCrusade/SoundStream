@@ -30,8 +30,8 @@ public class PlaylistMessage extends ADataMessage {
 	public void deserialize(InputStream input) throws IOException {
 	    int playlistSize = readInteger(input);
 	    for(int i = 0; i < playlistSize; i++) {
-	        SongMetadata song = readSongMetadata(input);
-	        songsToPlay.add(song);
+	        PlaylistEntry entry = readPlaylistEntry(input);
+	        songsToPlay.add(entry);
         }
 	}
 	
@@ -39,13 +39,13 @@ public class PlaylistMessage extends ADataMessage {
     public void serialize(OutputStream output) throws IOException {
 	    writeInteger(songsToPlay.size(), output);
 		
-	    for(SongMetadata song : songsToPlay) {
-	        writeSongMetadata(song, output);
+	    for(PlaylistEntry entry: songsToPlay) {
+	        writePlaylistEntry(entry, output);
 	    }
 	}
 
     //This is because you can pass an ArrayList of parseables but not a List
-	public ArrayList<SongMetadata> getSongsToPlay() {
+	public ArrayList<PlaylistEntry> getSongsToPlay() {
         return songsToPlay;
     }
 }
