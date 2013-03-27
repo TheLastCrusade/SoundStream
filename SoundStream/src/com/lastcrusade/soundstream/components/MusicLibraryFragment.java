@@ -125,8 +125,11 @@ public class MusicLibraryFragment extends MusicListFragment {
                 SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
                 //for now this is just a toast, but later it might change to something that allows
                 //the user to undo the action
-                Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been added.");
+                //Toaster.iToast(getActivity(), "\"" + entry.getTitle() + "\" has been added.");
                 
+                //commenting out the toast, but leaving this here for now so that if we want to 
+                //go back in and add some kind of pop up menu to undo the addition we have a 
+                //place to do so
             }
         })
         .register(this.getActivity());
