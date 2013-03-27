@@ -113,11 +113,12 @@ public abstract class ADataMessage implements IMessage {
     
     protected PlaylistEntry readPlaylistEntry(InputStream input) throws IOException{
         SongMetadata song = readSongMetadata(input);
-        PlaylistEntry entry = new PlaylistEntry(song);
-        //TODO Change the constructor of PlaylistEntry to take these in
-        entry.setLoaded(readBoolean(input));
-        entry.setPlayed(readBoolean(input));
-        entry.setFilePath(readString(input));
+        PlaylistEntry entry = new PlaylistEntry(
+                song,
+                readBoolean(input),
+                readBoolean(input),
+                readString(input)
+        );
         return entry;
     }
 

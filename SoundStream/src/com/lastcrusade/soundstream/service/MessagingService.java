@@ -16,6 +16,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
@@ -385,7 +386,7 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
-    public void sendPlaylistMessage(List<? extends SongMetadata> songsToPlay){
+    public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay){
         try {
             PlaylistMessage playlistMessage = new PlaylistMessage(songsToPlay);
             //send the message to the host

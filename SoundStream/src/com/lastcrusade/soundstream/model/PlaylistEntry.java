@@ -26,6 +26,13 @@ public class PlaylistEntry extends SongMetadata {
         this.setFileSize(metadata.getFileSize());
         this.setTitle(metadata.getTitle());
     }
+    
+    public PlaylistEntry(SongMetadata metadata, boolean loaded, boolean played, String filePath){
+        this(metadata);
+        this.loaded = loaded;
+        this.played = played;
+        this.filePath = filePath;
+    }
 
     public boolean isLocalFile() {
         //TODO: this should not reference bluetoothutils...instead, we should look at the user list or some

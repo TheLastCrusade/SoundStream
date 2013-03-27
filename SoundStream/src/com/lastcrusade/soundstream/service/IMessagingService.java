@@ -50,7 +50,7 @@ public interface IMessagingService {
      */
     public void sendStringMessage(String message);
 
-    public void sendPlaylistMessage(List<? extends SongMetadata> songsToPlay);
+    public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay);
 
     public void sendPlayStatusMessage(String playStatusMessage);
 
