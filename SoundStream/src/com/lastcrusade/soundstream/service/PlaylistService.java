@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
@@ -21,6 +22,7 @@ import com.lastcrusade.soundstream.manager.PlaylistDataManager;
 import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -88,11 +90,16 @@ public class PlaylistService extends Service {
     private PlaylistEntry currentSong;
     private boolean isLocalPlayer;
 
+    private ServiceLocator<MessagingService> messagingServiceLocator;
+
     @Override
     public IBinder onBind(Intent intent) {
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingServiceBinder.class);
+
         //create the local player in a separate variable, and use that
         // as the player until we see a host connected
-        this.mAudioPlayer  = new SingleFileAudioPlayer(this, (CustomApp)this.getApplication());
+        this.mAudioPlayer  = new SingleFileAudioPlayer(this, messagingServiceLocator);
         //Assume we are local until we connect to a host
         isLocalPlayer      = true;
         this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
@@ -109,6 +116,7 @@ public class PlaylistService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         unregisterReceivers();
+        messagingServiceLocator.unbind();
         return super.onUnbind(intent);
     }
 
@@ -151,7 +159,9 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 mThePlayer = new AudioPlayerWithEvents(
-                        new RemoteAudioPlayer((CustomApp) getApplication()),
+                        new RemoteAudioPlayer(
+                                PlaylistService.this,
+                                messagingServiceLocator),
                         context
                 );
                 isLocalPlayer = false;
@@ -169,7 +179,7 @@ public class PlaylistService extends Service {
         .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                ((CustomApp)getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+                getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
         .addAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
@@ -216,7 +226,7 @@ public class PlaylistService extends Service {
 
     protected void startDataManager() {
         if (mDataManager == null) {
-            mDataManager       = new PlaylistDataManager(PlaylistService.this, (CustomApp) getApplication());
+            mDataManager       = new PlaylistDataManager(PlaylistService.this, messagingServiceLocator);
             mDataManagerThread = new Thread(mDataManager, PlaylistDataManager.class.getSimpleName() + " Thread");
             mDataManagerThread.start();
         }
@@ -331,8 +341,9 @@ public class PlaylistService extends Service {
             .send(this);
         // send an intent to the fragments that the playlist is updated
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+
         //send a message to the network that the playlist is updated
-        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
     
     public void removeSong(PlaylistEntry entry){
@@ -347,18 +358,28 @@ public class PlaylistService extends Service {
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         
         //send a message to the network with the new playlist
-        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
 
     public List<PlaylistEntry> getPlaylistEntries() {
         return Collections.unmodifiableList(new ArrayList<PlaylistEntry>(mPlaylist.getSongsToPlay()));
     }
-    
+
+    private IMessagingService getMessagingService() {
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
+    }
+
     public void bumpSong(PlaylistEntry entry){
         mPlaylist.bumpSong(entry);
         
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-        ((CustomApp)this.getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
     
     public PlaylistEntry getCurrentSong(){
