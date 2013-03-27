@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@color/abs__background_holo_light">
 
     <View
         android:id="@+id/user_color"
@@ -65,7 +66,7 @@
         
     <ImageButton
         android:id="@id/btn_add_to_playlist"
-        android:src="@drawable/add_to_queue"
+        android:src="@drawable/av_add_to_queue"
         android:layout_width = "wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"

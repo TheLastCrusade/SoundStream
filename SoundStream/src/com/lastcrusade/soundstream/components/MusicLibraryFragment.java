@@ -2,6 +2,8 @@ package com.lastcrusade.soundstream.components;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,16 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
@@ -167,19 +169,50 @@ public class MusicLibraryFragment extends MusicListFragment {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SongMetadata meta = getItem((Integer) v.getTag()); //mMusicLibraryService.getLibrary().get((Integer) v.getTag());
+                    SongMetadata meta = getItem((Integer) v.getTag());
                     getPlaylistService().addSong(meta);
+                    
+                    //change the color of the view for a small period of time to indicate that the add 
+                    //button has been pressed
+                    ((View)v.getParent()).setBackgroundColor(getResources().getColor(R.color.abs__holo_blue_light));
+                    Timer colorTimer = new Timer();
+                    colorTimer.schedule(new ColorTimerTask(v),200);
                 }
             });
 
             return v;
-        }
+            }
+        
 
         /**
          * Update the list with music from the library
          */
         private void updateMusicFromLibrary() {
             this.updateMusic(new ArrayList<SongMetadata>(mMusicLibraryService.getLibrary()));
+        }
+        
+        private class ColorTimerTask extends TimerTask{
+            private View view;
+            
+            public ColorTimerTask(View view){
+                this.view = view;
+            }
+            @Override
+            public void run() {
+                //has to run on the UI thread, and the only way to do that
+                //is to encase it in a runnable
+                getActivity().runOnUiThread(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        ((View)view.getParent()).setBackgroundColor(
+                                getResources().getColor(R.color.abs__background_holo_light));
+                        
+                    }
+                });
+                        
+            }
+            
         }
     }
 }
