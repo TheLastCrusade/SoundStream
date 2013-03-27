@@ -108,7 +108,7 @@ public class PlaylistFragment extends MusicListFragment{
                 //allows the user to undo the action
                 //Toaster.iToast(getActivity(), getString(R.string.removed_label) + "\"" + entry.getTitle() + "\"");
                 
-              //commenting out the toast, but leaving this here for now so that if we want to 
+                //commenting out the toast, but leaving this here for now so that if we want to 
                 //go back in and add some kind of pop up menu to undo the removal we have a 
                 //place to do so
             }
