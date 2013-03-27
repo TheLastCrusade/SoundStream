@@ -22,16 +22,8 @@ public class ExternalMusicControlHandler extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //phone state change (incoming phone call
-        if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
-            //pause the song for incoming phone calls
-            String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-            if (state.equals(TelephonyManager.CALL_STATE_RINGING)) {
-                new BroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
-            }
-        }
         //media button or disconnnected headset or ICS (or greater) remote control
-        else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+        if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
             
             KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
             if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)

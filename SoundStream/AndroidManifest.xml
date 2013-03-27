@@ -28,7 +28,6 @@
         <receiver android:name=".components.ExternalMusicControlHandler">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
-                <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
     </application>

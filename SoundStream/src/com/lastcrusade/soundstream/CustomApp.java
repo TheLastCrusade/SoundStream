@@ -91,7 +91,16 @@ public class CustomApp extends Application {
 
             @Override
             public void onAudioFocusChange(int focusChange) {
-                //TODO: duck audio or pause when focus has changed.
+                //TODO: duck audio or pause in other cases where focus has changed.
+                switch (focusChange) {
+                //handle loss of focus, which includes when a phonecall is coming in
+                case AudioManager.AUDIOFOCUS_LOSS:
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+//                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    //NOTE: this calls the playlist service directly, because we want instant action.
+                    getPlaylistService().pause();
+                    break;
+                }
             }
             
         }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -100,6 +109,7 @@ public class CustomApp extends Application {
     @Override
     public void onTerminate() {
         unregisterReceivers();
+        externalControlClient.unregister();
         super.onTerminate();
     }
 
