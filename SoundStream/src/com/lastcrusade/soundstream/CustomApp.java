@@ -2,11 +2,19 @@ package com.lastcrusade.soundstream;
 
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.media.MediaMetadataRetriever;
+import android.media.RemoteControlClient;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.components.ExternalMusicControlHandler;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.ConnectionService;
@@ -22,6 +30,7 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.RemoteControlClientCompat;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getName();
@@ -34,6 +43,8 @@ public class CustomApp extends Application {
     private ServiceLocator<PlaylistService>     playlistServiceLocator;
 
     private BroadcastRegistrar registrar;
+
+    private SoundStreamExternalControlClient externalControlClient;
 
     public CustomApp() {
         super();
@@ -58,8 +69,34 @@ public class CustomApp extends Application {
                 this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
         registerReceivers();
+        
+        registerExternalControlClient();
+        
+        requestAudio();
     }
     
+    private void registerExternalControlClient() {
+        externalControlClient = new SoundStreamExternalControlClient(this);
+    }
+
+    private void unregisterExtranlControlClient() {
+        externalControlClient.unregister();
+    }
+
+    private void requestAudio() {
+        //NOTE: we need to request the audio for the remote controls to work, but
+        // we also want to handle things like audio ducking and pausing here.
+        AudioManager myAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        myAudioManager.requestAudioFocus(new OnAudioFocusChangeListener() {
+
+            @Override
+            public void onAudioFocusChange(int focusChange) {
+                //TODO: duck audio or pause when focus has changed.
+            }
+            
+        }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+    }
+
     @Override
     public void onTerminate() {
         unregisterReceivers();
@@ -107,7 +144,6 @@ public class CustomApp extends Application {
                 }
             })
             .register(this);
-        
     }
  
     private void unregisterReceivers() {
