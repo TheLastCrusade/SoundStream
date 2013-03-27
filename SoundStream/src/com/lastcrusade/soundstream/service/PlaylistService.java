@@ -32,6 +32,34 @@ import com.lastcrusade.soundstream.util.Toaster;
  */
 public class PlaylistService extends Service {
 
+
+    /**
+     * Broadcast action used to toggle playing and pausing the current song.
+     * 
+     * This will control the playlist service and music control.
+     * 
+     */
+    public static final String ACTION_PLAY_PAUSE = PlaylistService.class
+            .getName() + ".action.PlayPause";
+
+    /**
+     * Broadcast action used to pause the current song.
+     * 
+     * This will control the playlist service and music control.
+     * 
+     */
+    public static final String ACTION_PAUSE = PlaylistService.class
+            .getName() + ".action.Pause";
+    
+    /**
+     * Broadcast action used to skip the current song.
+     * 
+     * This will control the playlist service and music control.
+     * 
+     */
+    public static final String ACTION_SKIP = PlaylistService.class
+            .getName() + ".action.Skip";
+
     /**
      * Broadcast action sent when the Audio Player service is paused.
      */
@@ -118,17 +146,7 @@ public class PlaylistService extends Service {
      */
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED, new IBroadcastActionHandler() {
-            
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                //pause the song for incoming phone calls
-                String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-                if (state.equals(TelephonyManager.CALL_STATE_RINGING)) {
-                    pause();
-                }
-            }
-        })
+        this.registrar
         .addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
 
             @Override
@@ -209,6 +227,31 @@ public class PlaylistService extends Service {
                     mPlaylist.add(entry);
                 }
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+            }
+        })
+        .addAction(PlaylistService.ACTION_PAUSE, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                pause();
+            }
+        })
+        .addAction(PlaylistService.ACTION_PLAY_PAUSE, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                if (mThePlayer.isPaused()) {
+                    play();
+                } else {
+                    pause();
+                }
+            }
+        })
+        .addAction(PlaylistService.ACTION_SKIP, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                skip();
             }
         })
         .register(this);
