@@ -106,8 +106,11 @@ public class PlaylistFragment extends MusicListFragment{
                 SongMetadata entry = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
                 //for now we are just toasting, but eventually this might change to something that 
                 //allows the user to undo the action
-                Toaster.iToast(getActivity(), getString(R.string.removed_label) + "\"" + entry.getTitle() + "\"");
+                //Toaster.iToast(getActivity(), getString(R.string.removed_label) + "\"" + entry.getTitle() + "\"");
                 
+                //commenting out the toast, but leaving this here for now so that if we want to 
+                //go back in and add some kind of pop up menu to undo the removal we have a 
+                //place to do so
             }
         })
         .register(this.getActivity());
