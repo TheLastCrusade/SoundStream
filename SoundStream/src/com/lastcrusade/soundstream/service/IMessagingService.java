@@ -50,6 +50,10 @@ public interface IMessagingService {
      */
     public void sendStringMessage(String message);
 
+    public void sendAddToPlaylistMessage(SongMetadata song);
+    
+    public void sendRemoveFromPlaylistMessage(SongMetadata entry);
+
     public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay);
 
     public void sendPlayStatusMessage(String playStatusMessage);
@@ -61,4 +65,5 @@ public interface IMessagingService {
     public void sendTransferSongMessage(String address, long songId, String fileName, byte[] bytes);
 
     public void sendUserListMessage(UserList userlist);
+
 }

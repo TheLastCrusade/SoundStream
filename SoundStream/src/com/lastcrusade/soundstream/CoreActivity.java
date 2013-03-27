@@ -64,11 +64,6 @@ public class CoreActivity extends SlidingFragmentActivity{
         
         //setTitle(getString(R.string.playlist));
 
-        //Add user to user list
-        CustomApp curApp = ((CustomApp)getApplication());
-        
-        //TODO: Move this to something like connect activity or the connection fragment
-        curApp.getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
         //Log.i("Core", " " + curApp.getUserList().getUserByMACAddress(BluetoothUtils.getLocalBluetoothMAC()));
         
         registerReceivers();

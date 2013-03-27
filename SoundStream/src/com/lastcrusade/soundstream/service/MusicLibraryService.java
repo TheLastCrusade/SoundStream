@@ -258,6 +258,15 @@ public class MusicLibraryService extends Service {
         }
     }
 
+    public SongMetadata lookupSongByAddressAndId(String address, long songId) {
+        synchronized(metadataMutex) {
+            //TODO: remove use of bluetoothutils...replace with reference to userlist or some other way
+            // of getting "my" address
+            String key = SongMetadataUtils.getUniqueKey(address, songId);
+            Integer inx = metadataMap.get(key);
+            return inx != null ? metadataList.get(inx) : null;
+        }
+    }
     private SongMetadata lookupMySongById(long songId) {
         synchronized(metadataMutex) {
             //TODO: remove use of bluetoothutils...replace with reference to userlist or some other way

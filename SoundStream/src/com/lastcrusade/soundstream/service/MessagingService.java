@@ -3,14 +3,12 @@ package com.lastcrusade.soundstream.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -21,12 +19,14 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.lastcrusade.soundstream.net.message.AddToPlaylistMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
 import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.net.message.PlaylistMessage;
+import com.lastcrusade.soundstream.net.message.RemoveFromPlaylistMessage;
 import com.lastcrusade.soundstream.net.message.RequestSongMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
@@ -67,6 +67,9 @@ public class MessagingService extends Service implements IMessagingService {
     //also uses ADDRESS and SONG_ID
     public static final String EXTRA_SONG_FILE_NAME               = MessagingService.class.getName() + ".extra.SongFileName";
     public static final String EXTRA_SONG_TEMP_FILE               = MessagingService.class.getName() + ".extra.SongTempFile";
+
+    public static final String ACTION_ADD_TO_PLAYLIST_MESSAGE      = MessagingService.class.getName() + ".action.AddToPlaylistMessage";
+    public static final String ACTION_REMOVE_FROM_PLAYLIST_MESSAGE = MessagingService.class.getName() + ".action.RemoveFromPlaylistMessage";
 
 
     /**
@@ -144,6 +147,8 @@ public class MessagingService extends Service implements IMessagingService {
         registerPauseMessageHandler();
         registerPlayMessageHandler();
         registerSkipMessageHandler();
+        registerAddToPlaylistMessageHandler();
+        registerRemoveFromPlaylistMessageHandler();
         registerPlaylistMessageHandler();
         registerPlayStatusMessageHandler();
         registerRequestSongMessageHandler();
@@ -266,6 +271,36 @@ public class MessagingService extends Service implements IMessagingService {
         });
     }
 
+    private void registerAddToPlaylistMessageHandler() {
+        this.messageDispatch.registerHandler(AddToPlaylistMessage.class,
+                new IMessageHandler<AddToPlaylistMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    AddToPlaylistMessage message, String fromAddr) {
+
+                new BroadcastIntent(ACTION_ADD_TO_PLAYLIST_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS, message.getMacAddress())
+                    .putExtra(EXTRA_SONG_ID, message.getId())
+                    .send(MessagingService.this);
+            }
+        });
+    }
+    private void registerRemoveFromPlaylistMessageHandler() {
+        this.messageDispatch.registerHandler(RemoveFromPlaylistMessage.class,
+                new IMessageHandler<RemoveFromPlaylistMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    RemoveFromPlaylistMessage message, String fromAddr) {
+
+                new BroadcastIntent(ACTION_REMOVE_FROM_PLAYLIST_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS, message.getMacAddress())
+                    .putExtra(EXTRA_SONG_ID, message.getId())
+                    .send(MessagingService.this);
+            }
+        });
+    }
     private void registerPlaylistMessageHandler() {
         this.messageDispatch.registerHandler(PlaylistMessage.class,
                 new IMessageHandler<PlaylistMessage>() {
@@ -386,6 +421,19 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
     
+    @Override
+    public void sendAddToPlaylistMessage(SongMetadata song) {
+        AddToPlaylistMessage msg = new AddToPlaylistMessage(song.getMacAddress(), song.getId());
+        sendMessageToHost(msg);
+    }
+    
+    @Override
+    public void sendRemoveFromPlaylistMessage(SongMetadata song) {
+        RemoveFromPlaylistMessage msg = new RemoveFromPlaylistMessage(song.getMacAddress(), song.getId());
+        sendMessageToHost(msg);
+    }
+    
+
     public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay){
         try {
             PlaylistMessage playlistMessage = new PlaylistMessage(songsToPlay);
