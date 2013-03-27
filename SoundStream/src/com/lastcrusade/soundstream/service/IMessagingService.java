@@ -54,6 +54,8 @@ public interface IMessagingService {
 
     public void sendPlayStatusMessage(String playStatusMessage);
 
+    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong);
+
     public void sendRequestSongMessage(String address, long songId);
 
     public void sendTransferSongMessage(String address, long songId, String fileName, byte[] bytes);

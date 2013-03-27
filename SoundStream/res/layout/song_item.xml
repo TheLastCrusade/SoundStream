@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:descendantFocusability="blocksDescendants" >
+    android:orientation="horizontal">
 
     <View
         android:id="@+id/user_color"
@@ -74,4 +73,17 @@
         android:visibility="invisible"
         android:contentDescription="@string/add_to_playlist"
         android:background="@color/transparent"/>
+    
+     <ImageButton
+        android:id="@+id/btn_remove_from_playlist"
+        android:src="@drawable/content_remove"
+        android:layout_width = "wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:paddingRight="4sp"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"
+        android:contentDescription="@string/remove_from_playlist"
+        android:background="@color/transparent"/>
+    
 </RelativeLayout>

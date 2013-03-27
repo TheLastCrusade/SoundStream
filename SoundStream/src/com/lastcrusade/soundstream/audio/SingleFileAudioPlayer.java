@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -83,7 +83,9 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.setDataSource(this.filePath);
             player.prepare();
             player.start();
-            this.messagingService.getService().sendPlayStatusMessage("Play");
+            this.messagingService
+                .getService()
+                .sendPlayStatusMessage(PlayStatusMessage.PLAY_MESSAGE);
         } catch (Exception e) {
             Log.wtf(TAG, "Unable to play song: " + this.filePath);
             e.printStackTrace();
@@ -96,8 +98,11 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.pause();
         }
         this.paused = true;
+
         try {
-            this.messagingService.getService().sendPlayStatusMessage("Pause");
+            this.messagingService
+                .getService()
+                .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -118,7 +123,9 @@ public class SingleFileAudioPlayer implements IPlayer {
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
         try {
-            this.messagingService.getService().sendPlayStatusMessage("Pause");
+            this.messagingService
+                .getService()
+                .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }

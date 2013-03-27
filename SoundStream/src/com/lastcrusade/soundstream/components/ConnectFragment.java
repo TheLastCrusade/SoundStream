@@ -3,6 +3,7 @@ package com.lastcrusade.soundstream.components;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +73,12 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             public void onClick(View v) {
                 connectButton.setEnabled(false);
                 getConnectionService().broadcastGuest(getActivity());
+                Handler h = new Handler();
+                h.postDelayed(new Runnable(){
+                    public void run(){
+                         connectButton.setEnabled(true);
+                    }
+                }, 30 * 1000); //30 seconds (same as discovery time)
             }
         });
 
