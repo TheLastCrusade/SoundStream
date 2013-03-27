@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.lastcrusade.soundstream.model.Playlist;
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 
 public class PlaylistMessage extends ADataMessage {
     private final String TAG = PlaylistMessage.class.getName();
 	
-    private ArrayList<SongMetadata> songsToPlay = new ArrayList<SongMetadata>();
+    private ArrayList<PlaylistEntry> songsToPlay = new ArrayList<PlaylistEntry>();
 
     /**
      * Default constructor, required for Messenger.  All other users should use
@@ -21,8 +22,8 @@ public class PlaylistMessage extends ADataMessage {
      */
     public PlaylistMessage() {}
 
-    public PlaylistMessage(List<? extends SongMetadata> songsToPlay) {
-        this.songsToPlay = new ArrayList<SongMetadata>(songsToPlay);
+    public PlaylistMessage(List<? extends PlaylistEntry> songsToPlay) {
+        this.songsToPlay = new ArrayList<PlaylistEntry>(songsToPlay);
     }
 	
 	@Override
