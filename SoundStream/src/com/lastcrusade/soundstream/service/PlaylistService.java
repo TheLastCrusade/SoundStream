@@ -197,15 +197,13 @@ public class PlaylistService extends Service {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                List<SongMetadata> newList =
+                List<PlaylistEntry> newList =
                         intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
                 mPlaylist.clear();
-                for (SongMetadata metadata : newList) {
-                    PlaylistEntry entry = new PlaylistEntry(metadata);
+                for (PlaylistEntry entry : newList) {
                     //for the UI, assume that the song is "loaded" when displayed on the remote guest
                     //TODO: this should actually reflect the real status on the host, which requires
                     // modifying the message to send PlaylistEntry objects
-                    entry.setLoaded(mDataManager == null);
                     mPlaylist.add(entry);
                 }
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);

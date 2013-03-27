@@ -53,8 +53,8 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_LIBRARY_MESSAGE = MessagingService.class.getName() + ".action.LibraryMessage";
     public static final String EXTRA_SONG_METADATA    = MessagingService.class.getName() + ".extra.SongMetadata";
 
-    //This also uses EXTRA_SONG_METADATA
     public static final String ACTION_PLAYLIST_UPDATED_MESSAGE = MessagingService.class.getName() + ".action.PlaylistUpdated";
+    public static final String EXTRA_PLAYLIST_ENTRY    = MessagingService.class.getName() + ".extra.PlaylistEntry";
     
     public static final String ACTION_NEW_CONNECTED_USERS_MESSAGE = MessagingService.class.getName() + ".action.UserListMessage";
     public static final String EXTRA_USER_LIST                    = MessagingService.class.getName() + ".extra.UserList";
