@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,6 +20,9 @@ import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -29,14 +33,21 @@ import com.lastcrusade.soundstream.util.UserListAdapter;
  * This fragment handles the ability for members to add new members to 
  * the network and to view the currently connected members
  */
-public class NetworkFragment extends SherlockFragment implements ITitleable{
+public class NetworkFragment extends SherlockFragment implements ITitleable {
+    
+    private static String TAG = NetworkFragment.class.getSimpleName();
+    
     private BroadcastRegistrar broadcastRegistrar;
     private Button addMembersButton;
     private UserListAdapter adapter;
+    private ServiceLocator<ConnectionService> connectionServiceLocator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        connectionServiceLocator = new ServiceLocator<ConnectionService>(
+                this.getActivity(), ConnectionService.class, ConnectionServiceBinder.class);
+        
         registerReceivers();
     }
     
@@ -66,14 +77,20 @@ public class NetworkFragment extends SherlockFragment implements ITitleable{
     @Override
     public void onDestroy() {
         unregisterReceivers();
+        this.connectionServiceLocator.unbind();
         super.onDestroy();
     }
 
     private ConnectionService getConnectionService() {
-        CustomApp app = (CustomApp) getActivity().getApplication();
-        return app.getConnectionService();
+        ConnectionService connectionService = null;
+        try {
+            connectionService = this.connectionServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return connectionService;
     }
-    
+
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
