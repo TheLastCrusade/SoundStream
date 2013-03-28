@@ -225,7 +225,11 @@ public class PlaylistService extends Service {
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                addSong(song);
+                if (song != null) {
+                    addSong(song);
+                } else {
+                    Log.wtf(TAG, "Song with mac address " + macAddress + " and id " + songId + " not found.");
+                }
             }
         })
         .addAction(MessagingService.ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
