@@ -109,7 +109,11 @@ public class Messenger {
             //NOTE: this is so input.read can block, and will throw an exception when the connection
             // goes down.  this is the only way we'll get a notification of a downed client
             int read = input.read(inBytes);
-            inputBuffer.write(inBytes, 0, read);
+            if (read > 0) {
+                inputBuffer.write(inBytes, 0, read);
+            } else {
+                inputBuffer.write(inBytes);
+            }
 
             //if we need to, consume the message length (to make sure we read until we have a complete message)
             if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
