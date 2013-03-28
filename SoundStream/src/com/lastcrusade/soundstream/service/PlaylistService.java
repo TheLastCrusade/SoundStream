@@ -299,6 +299,8 @@ public class PlaylistService extends Service {
                 if (entry != null) {
                     entry.setLoaded(loaded);
                     entry.setPlayed(played);
+                    // send an intent to the fragments that the playlist is updated
+                    new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
                 } else {
                     Log.e(TAG, "Attempting to bump a song that is not in our playlist: " + song);
                 }
@@ -398,6 +400,8 @@ public class PlaylistService extends Service {
                 mDataManager.addToLoadQueue(entry);
             }
         }
+        //send a message to the guests with the new playlist
+        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
 
     public void pause() {
