@@ -20,6 +20,7 @@ import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.soundstream.net.message.AddToPlaylistMessage;
+import com.lastcrusade.soundstream.net.message.BumpSongOnPlaylistMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.LibraryMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
@@ -29,6 +30,7 @@ import com.lastcrusade.soundstream.net.message.PlaylistMessage;
 import com.lastcrusade.soundstream.net.message.RemoveFromPlaylistMessage;
 import com.lastcrusade.soundstream.net.message.RequestSongMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
+import com.lastcrusade.soundstream.net.message.SongStatusMessage;
 import com.lastcrusade.soundstream.net.message.StringMessage;
 import com.lastcrusade.soundstream.net.message.TransferSongMessage;
 import com.lastcrusade.soundstream.net.message.UserListMessage;
@@ -70,7 +72,11 @@ public class MessagingService extends Service implements IMessagingService {
 
     public static final String ACTION_ADD_TO_PLAYLIST_MESSAGE      = MessagingService.class.getName() + ".action.AddToPlaylistMessage";
     public static final String ACTION_REMOVE_FROM_PLAYLIST_MESSAGE = MessagingService.class.getName() + ".action.RemoveFromPlaylistMessage";
+    public static final String ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE= MessagingService.class.getName() + ".action.BumpSongOnPlaylistMessage";
 
+    public static final String ACTION_SONG_STATUS_MESSAGE          = MessagingService.class.getName() + ".action.SongStatusMessage";
+    public static final String EXTRA_LOADED                        = MessagingService.class.getName() + ".extra.Loaded";
+    public static final String EXTRA_PLAYED                        = MessagingService.class.getName() + ".extra.Played";
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -148,9 +154,11 @@ public class MessagingService extends Service implements IMessagingService {
         registerPlayMessageHandler();
         registerSkipMessageHandler();
         registerAddToPlaylistMessageHandler();
+        registerBumpSongOnPlaylistMessageHandler();
         registerRemoveFromPlaylistMessageHandler();
         registerPlaylistMessageHandler();
         registerPlayStatusMessageHandler();
+        registerSongStatusMessageHandler();
         registerRequestSongMessageHandler();
         registerTransferSongMessageHandler();
         registerUserListMessageHandler();
@@ -214,6 +222,22 @@ public class MessagingService extends Service implements IMessagingService {
 				});
     }
     
+    private void registerSongStatusMessageHandler() {
+        this.messageDispatch.registerHandler(SongStatusMessage.class, new IMessageHandler<SongStatusMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    SongStatusMessage message, String fromAddr) {
+                new BroadcastIntent(ACTION_SONG_STATUS_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS, message.getMacAddress())
+                    .putExtra(EXTRA_SONG_ID, message.getId())
+                    .putExtra(EXTRA_LOADED,  message.isLoaded())
+                    .putExtra(EXTRA_PLAYED,  message.isPlayed())
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
     private void registerRequestSongMessageHandler() {
         this.messageDispatch.registerHandler(RequestSongMessage.class, new IMessageHandler<RequestSongMessage>() {
 
@@ -286,6 +310,23 @@ public class MessagingService extends Service implements IMessagingService {
             }
         });
     }
+    
+    private void registerBumpSongOnPlaylistMessageHandler() {
+        this.messageDispatch.registerHandler(BumpSongOnPlaylistMessage.class,
+                new IMessageHandler<BumpSongOnPlaylistMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    BumpSongOnPlaylistMessage message, String fromAddr) {
+
+                new BroadcastIntent(ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS, message.getMacAddress())
+                    .putExtra(EXTRA_SONG_ID, message.getId())
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
     private void registerRemoveFromPlaylistMessageHandler() {
         this.messageDispatch.registerHandler(RemoveFromPlaylistMessage.class,
                 new IMessageHandler<RemoveFromPlaylistMessage>() {
@@ -424,12 +465,21 @@ public class MessagingService extends Service implements IMessagingService {
     @Override
     public void sendAddToPlaylistMessage(SongMetadata song) {
         AddToPlaylistMessage msg = new AddToPlaylistMessage(song.getMacAddress(), song.getId());
+        //send the message to the host
         sendMessageToHost(msg);
     }
     
     @Override
+    public void sendBumpSongOnPlaylistMessage(SongMetadata song) {
+        BumpSongOnPlaylistMessage msg = new BumpSongOnPlaylistMessage(song.getMacAddress(), song.getId());
+        //send the message to the guests
+        sendMessageToHost(msg);
+    }
+
+    @Override
     public void sendRemoveFromPlaylistMessage(SongMetadata song) {
         RemoveFromPlaylistMessage msg = new RemoveFromPlaylistMessage(song.getMacAddress(), song.getId());
+        //send the message to the host
         sendMessageToHost(msg);
     }
     
@@ -437,11 +487,7 @@ public class MessagingService extends Service implements IMessagingService {
     public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay){
         try {
             PlaylistMessage playlistMessage = new PlaylistMessage(songsToPlay);
-            //send the message to the host
-            if (this.connectServiceLocator.getService().isHostConnected()) {
-                sendMessageToHost(playlistMessage);
-            }
-
+            //send the message to guests only
             if (this.connectServiceLocator.getService().isGuestConnected()) {
                 sendMessageToGuests(playlistMessage);
             }
@@ -452,9 +498,17 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     @Override
+    public void sendSongStatusMessage(PlaylistEntry song) {
+        SongStatusMessage msg = new SongStatusMessage(song.getMacAddress(),
+                song.getId(), song.isLoaded(), song.isPlayed());
+        //send the message to the guests
+        sendMessageToGuests(msg);
+    }
+
+    @Override
     public void sendRequestSongMessage(String address, long songId) {
         RequestSongMessage msg = new RequestSongMessage(songId);
-        //send the message to the fans
+        //send the message to the guests
         sendMessageToGuest(address, msg);
     }
     

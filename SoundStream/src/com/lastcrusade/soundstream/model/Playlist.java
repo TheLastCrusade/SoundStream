@@ -1,13 +1,14 @@
 package com.lastcrusade.soundstream.model;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import com.lastcrusade.soundstream.util.SongMetadataUtils;
-
 import android.util.Log;
+
+import com.lastcrusade.soundstream.util.SongMetadataUtils;
 
 /**
  * A data structure for holding the playlist.  It keeps track of two queues of PlaylistEntry
@@ -20,8 +21,8 @@ public class Playlist {
     
     private final static String TAG = Playlist.class.getName();
     
-    private Queue<PlaylistEntry> playedList;
-    private Queue<PlaylistEntry> musicList;
+    private Deque<PlaylistEntry> playedList;
+    private Deque<PlaylistEntry> musicList;
 
     public Playlist() {
         playedList = new LinkedList<PlaylistEntry>();
@@ -37,20 +38,18 @@ public class Playlist {
         musicList.clear();
     }
 
-    public SongMetadata remove(SongMetadata meta) {
+    public PlaylistEntry findEntryForSong(SongMetadata song) {
         PlaylistEntry found = null;
         for (PlaylistEntry entry : getSongsToPlay()) {
-            if (SongMetadataUtils.isTheSameSong(entry, meta)) {
+            if (SongMetadataUtils.isTheSameSong(entry, song)) {
                 found = entry;
                 break;
             }
         }
-        if (found != null) {
-            found = remove(found);
-        }
+
         return found;
     }
-    
+
     public PlaylistEntry remove(PlaylistEntry entry) {
         boolean success;
         PlaylistEntry removeEntry = entry;
@@ -111,12 +110,7 @@ public class Playlist {
         if(musicList.contains(entry)){
             //remove the entry from the queue
             musicList.remove(entry);
-            //make a new queue
-            Queue<PlaylistEntry> newMusicList = new LinkedList<PlaylistEntry>();
-            newMusicList.add(entry);
-            newMusicList.addAll(musicList);
-            musicList = newMusicList;
+            musicList.push(entry);
         }
-            
     }
 }
