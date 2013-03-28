@@ -1,12 +1,10 @@
 package com.lastcrusade.soundstream.components;
 
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,10 +13,14 @@ import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.service.ConnectionService;
+import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -34,10 +36,20 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     private BroadcastRegistrar broadcastRegistrar;
     private Button connectButton;
+
+    private ServiceLocator<ConnectionService> connectionServiceLocator;
+
+    private ServiceLocator<MessagingService> messagingServiceLocator;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        connectionServiceLocator = new ServiceLocator<ConnectionService>(
+                this.getActivity(), ConnectionService.class, ConnectionServiceBinder.class);
+        
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this.getActivity(), MessagingService.class, MessagingServiceBinder.class);
+        
         registerReceivers();
     }
 
@@ -76,17 +88,30 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     @Override
     public void onDestroy() {
         unregisterReceivers();
+        
+        this.connectionServiceLocator.unbind();
+        this.messagingServiceLocator.unbind();
         super.onDestroy();
     }
     
     private ConnectionService getConnectionService() {
-        CustomApp app = (CustomApp) getActivity().getApplication();
-        return app.getConnectionService();
+        ConnectionService connectionService = null;
+        try {
+            connectionService = this.connectionServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return connectionService;
     }
-    
+
     private IMessagingService getMessagingService() {
-        CustomApp app = (CustomApp) getActivity().getApplication();
-        return app.getMessagingService();
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
     }
     
     private void registerReceivers() {

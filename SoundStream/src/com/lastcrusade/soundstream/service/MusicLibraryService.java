@@ -22,6 +22,7 @@ import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
@@ -58,6 +59,8 @@ public class MusicLibraryService extends Service {
 
     private String myMacAddress;
 
+    private ServiceLocator<MessagingService> messagingServiceLocator;
+
     public class MusicLibraryServiceBinder extends Binder implements
         ILocalBinder<MusicLibraryService> {
         public MusicLibraryService getService() {
@@ -78,6 +81,9 @@ public class MusicLibraryService extends Service {
         
         //update the library with the local songs
         updateLibrary(metadataList, false);
+
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingServiceBinder.class);
 
         registerReceivers();
     }
@@ -202,8 +208,8 @@ public class MusicLibraryService extends Service {
     private void notifyLibraryUpdated() {
         new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
         //send the updated library to all the guests out there
-        if (((CustomApp)getApplication()).getMessagingService() != null) {
-            ((CustomApp)getApplication()).getMessagingService().sendLibraryMessageToGuests(getLibrary());
+        if (getMessagingService() != null) {
+            getMessagingService().sendLibraryMessageToGuests(getLibrary());
         }
     }
 
@@ -283,7 +289,7 @@ public class MusicLibraryService extends Service {
             String filePath   = msw.getSongFilePath(song);
             File   songFile   = new File(filePath);
             byte[] bytes      = loadFile(songFile);
-            ((CustomApp)getApplication()).getMessagingService().sendTransferSongMessage(fromAddr, songId, songFile.getName(), bytes);
+            getMessagingService().sendTransferSongMessage(fromAddr, songId, songFile.getName(), bytes);
         } catch (SongNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -296,5 +302,15 @@ public class MusicLibraryService extends Service {
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes);
         return bytes;
+    }
+    
+    private IMessagingService getMessagingService() {
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
     }
 }

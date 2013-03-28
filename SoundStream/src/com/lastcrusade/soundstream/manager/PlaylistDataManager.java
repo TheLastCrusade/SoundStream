@@ -19,8 +19,11 @@ import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -30,8 +33,8 @@ public class PlaylistDataManager implements Runnable {
 
     private static final String TAG = PlaylistDataManager.class.getName();
 
-    private PlaylistService playlistService;
-    private CustomApp application;
+    private Context context;
+    private ServiceLocator<MessagingService> messagingServiceLocator;
     private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
     private Set<PlaylistEntry> remotelyLoaded = new HashSet<PlaylistEntry>();
     private Thread stoppingThread;
@@ -44,9 +47,9 @@ public class PlaylistDataManager implements Runnable {
     
     private final Object entryMutex = new Object();
 
-    public PlaylistDataManager(PlaylistService playlistService, CustomApp application) {
-        this.playlistService = playlistService;
-        this.application     = application;
+    public PlaylistDataManager(Context context, ServiceLocator<MessagingService> messagingServiceLocator) {
+        this.context                 = context;
+        this.messagingServiceLocator = messagingServiceLocator;
     }
 
     @Override
@@ -140,11 +143,11 @@ public class PlaylistDataManager implements Runnable {
                        Log.wtf(TAG, "TRANSFER_SONG_MESSAGE action received without a valid song id"); 
                     } else {
                         saveTempFileData(fromAddr, songId, fileName, tempFilePath);
-                        new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(playlistService);
+                        new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                     }
                 }
             })
-            .register(this.playlistService);
+            .register(this.context);
     }
 
     private void unregisterReceivers() {
@@ -155,7 +158,7 @@ public class PlaylistDataManager implements Runnable {
         for (PlaylistEntry entry : entries) {
             Log.i(TAG, "Deleting data for entry " + entry);
             File file = new File(entry.getFilePath());
-            this.application.deleteFile(file.getName());
+            this.context.deleteFile(file.getName());
             entry.setFilePath(null);
         }
     }
@@ -170,7 +173,7 @@ public class PlaylistDataManager implements Runnable {
         try {
             //copy the data from the temp file to the permanent file.
             FileInputStream  fis = new FileInputStream(fileDataPath);
-            FileOutputStream fos = this.application.openFileOutput(compositeFileName, Context.MODE_PRIVATE);
+            FileOutputStream fos = this.context.openFileOutput(compositeFileName, Context.MODE_PRIVATE);
 
             //8k buffer works well.
             int bufSize = 8192;
@@ -181,7 +184,7 @@ public class PlaylistDataManager implements Runnable {
             }
             fos.close();
             //set the file path in the playlist entry, which allows the file to be played
-            String filePath = this.application.getFileStreamPath(compositeFileName).getCanonicalPath();
+            String filePath = this.context.getFileStreamPath(compositeFileName).getCanonicalPath();
             entry.setFilePath(filePath);
             
             //NOTE: THIS IS A HACK.  This ultimately belongs down in MessagingService, where the temp file is
@@ -189,7 +192,7 @@ public class PlaylistDataManager implements Runnable {
             new File(fileDataPath).delete();
 
         } catch (IOException e) {
-            this.application.deleteFile(compositeFileName);
+            this.context.deleteFile(compositeFileName);
             //TODO: set flag to indicate file is broken
         }
     }
@@ -225,7 +228,7 @@ public class PlaylistDataManager implements Runnable {
     }
     
     private void loadLocal(PlaylistEntry entry) {
-        MediaStoreWrapper msw = new  MediaStoreWrapper(this.playlistService);
+        MediaStoreWrapper msw = new  MediaStoreWrapper(this.context);
         try {
             String filePath = msw.getSongFilePath(entry);
             entry.setFilePath(filePath);
@@ -235,7 +238,7 @@ public class PlaylistDataManager implements Runnable {
     }
     
     private void loadRemote(PlaylistEntry entry) {
-        this.application.getMessagingService().sendRequestSongMessage(entry.getMacAddress(), entry.getId());
+        getMessagingService().sendRequestSongMessage(entry.getMacAddress(), entry.getId());
     }
 
     public void stopLoading() {
@@ -251,5 +254,15 @@ public class PlaylistDataManager implements Runnable {
                 //fall thru, nothing to do
             }
         }
+    }
+
+    private IMessagingService getMessagingService() {
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
     }
 }
