@@ -14,16 +14,8 @@ public class PlaylistEntry extends SongMetadata {
     private String  filePath = null;
 
     //required for Parcelable to work
-    public static final Parcelable.Creator<PlaylistEntry> CREATOR = new Parcelable.Creator<PlaylistEntry>() {
-        public PlaylistEntry createFromParcel(Parcel in){
-            return new PlaylistEntry(in);
-        }
+    public static final Parcelable.Creator<PlaylistEntry> CREATOR = new DefaultParcelableCreator(PlaylistEntry.class);
 
-        @Override
-        public PlaylistEntry[] newArray(int size) {
-            return new PlaylistEntry[size];
-        }
-    };
     public PlaylistEntry() {
     }
     
