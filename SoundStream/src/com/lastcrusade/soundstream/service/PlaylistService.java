@@ -226,8 +226,13 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
                 
+                //NOTE: only remove if its not the currently playing song.
+                //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                removeSong(song);
+                if (currentSong == null || !SongMetadataUtils.isTheSameSong(song, currentSong)) {
+                    removeSong(song);
+                }
+                ((CustomApp)getApplication()).getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
         .addAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
@@ -370,7 +375,11 @@ public class PlaylistService extends Service {
         ((CustomApp)this.getApplication()).getMessagingService().sendAddToPlaylistMessage(entry);
     }
     
-    public void removeSong(SongMetadata entry){
+    public void removeSong(SongMetadata entry) {
+        removeSong(entry, true);
+    }
+
+    private void removeSong(SongMetadata entry, boolean notify){
         mPlaylist.remove(entry);
         
         //broadcast the fact that a song has been removed
@@ -380,9 +389,10 @@ public class PlaylistService extends Service {
         
         //broadcast the fact that the playlist has been updated
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-        
-        //send a message to the network with the new playlist
-        ((CustomApp)this.getApplication()).getMessagingService().sendRemoveFromPlaylistMessage(entry);
+        if (notify) {
+            //send a message to the network with the new playlist
+            ((CustomApp)this.getApplication()).getMessagingService().sendRemoveFromPlaylistMessage(entry);
+        }
     }
 
     public List<PlaylistEntry> getPlaylistEntries() {

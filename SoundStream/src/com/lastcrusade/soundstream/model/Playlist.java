@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import com.lastcrusade.soundstream.util.SongMetadataUtils;
+
 import android.util.Log;
 
 /**
@@ -36,22 +38,36 @@ public class Playlist {
     }
 
     public SongMetadata remove(SongMetadata meta) {
+        PlaylistEntry found = null;
+        for (PlaylistEntry entry : getSongsToPlay()) {
+            if (SongMetadataUtils.isTheSameSong(entry, meta)) {
+                found = entry;
+                break;
+            }
+        }
+        if (found != null) {
+            found = remove(found);
+        }
+        return found;
+    }
+    
+    public PlaylistEntry remove(PlaylistEntry entry) {
         boolean success;
-        SongMetadata removeMeta = meta;
-        
-        if(musicList.contains(meta)) {
-            success = musicList.remove(meta);
-        } else if(playedList.contains(meta)){
-            success = playedList.remove(meta);
+        PlaylistEntry removeEntry = entry;
+
+        if(musicList.contains(entry)) {
+            success = musicList.remove(entry);
+        } else if(playedList.contains(entry)){
+            success = playedList.remove(entry);
         } else {
             success = false; 
             Log.wtf(TAG, "Asked to remove unknown object");
         }
 
         if(!success){
-            removeMeta = null;
+            removeEntry = null;
         }
-        return removeMeta;
+        return removeEntry;
     }
 
     public List<PlaylistEntry> getSongsToPlay() {
