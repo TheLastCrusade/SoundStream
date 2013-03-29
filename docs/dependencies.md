@@ -51,5 +51,15 @@ Time to deal with the errors
 10. change the extends FragmentActivity to extends SherlockFragmentActivity (Note: If we use more later, you will need to go change them to their Sherlock versions, but for now this is all we are using)
 11. Import `com.actionbarsherlock.app.SherlockFragmentActivity`
 
+###Updating Android Support Jar
+Because we use new Android Gesture Detection, we need to have the most recent version of the android support library in ABSLibrary.
+
+1. Go to the SDK Manager and make sure that you have the most recent android support library
+2. Navigate to the android-sdk folder on your computer
+3. Go into extras/android/support/v4
+4. Copy the android support v4 jar
+5. Navigate to third_party/ABSLibrary/libs
+6. Paste the copied jar to replace the existing one
+
 ###Finished!
 Everything should be set up just fine now :]
