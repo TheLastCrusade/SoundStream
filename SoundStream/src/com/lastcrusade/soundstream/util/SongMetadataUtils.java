@@ -1,5 +1,6 @@
 package com.lastcrusade.soundstream.util;
 
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 
 public class SongMetadataUtils {
@@ -18,5 +19,10 @@ public class SongMetadataUtils {
     
     public static String getUniqueKey(String songSourceAddress, long songId) {
         return songSourceAddress.replace(":", "") + "_" + songId;
+    }
+
+    public static boolean isTheSameSong(SongMetadata lhs, SongMetadata rhs) {
+        return lhs.getMacAddress().equals(rhs.getMacAddress()) &&
+               lhs.getId() == rhs.getId();
     }
 }

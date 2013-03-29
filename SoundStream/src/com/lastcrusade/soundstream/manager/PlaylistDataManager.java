@@ -62,6 +62,7 @@ public class PlaylistDataManager implements Runnable {
                 // to request new files.
                 clearOldLoadedFiles();
 
+                boolean loaded = false;
                 //next, see if we can start loading any additional files
                 while (!loadQueue.isEmpty() &&
                         loadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
@@ -69,6 +70,7 @@ public class PlaylistDataManager implements Runnable {
                     if (entry.isLocalFile()) {
                         //if its local, just load the file path and remove the entry
                         loadLocal(entry);
+                        loaded = true;
                     } else {
                         //for remote entries, we need to request the remote file, and also
                         // keep track of the bytes requested, and the remote entries, so we
@@ -78,7 +80,9 @@ public class PlaylistDataManager implements Runnable {
                         remotelyLoaded.add(entry);
                     }
                 }
-                
+                if (loaded) {
+                    new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
+                }
                 pauseForNextRun();
             }
         } finally {

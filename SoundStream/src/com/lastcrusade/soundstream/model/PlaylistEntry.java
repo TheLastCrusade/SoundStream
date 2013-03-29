@@ -1,6 +1,10 @@
 package com.lastcrusade.soundstream.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.lastcrusade.soundstream.util.BluetoothUtils;
+import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 
 public class PlaylistEntry extends SongMetadata {
@@ -8,6 +12,9 @@ public class PlaylistEntry extends SongMetadata {
     private boolean loaded   = false;
     private boolean played   = false;
     private String  filePath = null;
+
+    //required for Parcelable to work
+    public static final Parcelable.Creator<PlaylistEntry> CREATOR = new DefaultParcelableCreator(PlaylistEntry.class);
 
     public PlaylistEntry() {
     }
@@ -25,6 +32,22 @@ public class PlaylistEntry extends SongMetadata {
         this.setMacAddress(metadata.getMacAddress());
         this.setFileSize(metadata.getFileSize());
         this.setTitle(metadata.getTitle());
+    }
+    
+    public PlaylistEntry(SongMetadata metadata, boolean loaded, boolean played, String filePath){
+        this(metadata);
+        this.loaded = loaded;
+        this.played = played;
+        this.filePath = filePath;
+    }
+
+    public PlaylistEntry(Parcel in){
+        super(in);
+        boolean[] state = new boolean[2];
+        in.readBooleanArray(state);
+        this.loaded = state[0];
+        this.played = state[1];
+        this.filePath = in.readString();
     }
 
     public boolean isLocalFile() {
@@ -69,5 +92,15 @@ public class PlaylistEntry extends SongMetadata {
             return false;
         }
         return SongMetadataUtils.getUniqueKey(this).equals(SongMetadataUtils.getUniqueKey((PlaylistEntry)o));
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        boolean [] state = new boolean[2];
+        state[0] = this.loaded;
+        state[1] = this.played;
+        dest.writeBooleanArray(state);
+        dest.writeString(this.filePath);
     }
 }
