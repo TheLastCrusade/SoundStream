@@ -222,7 +222,7 @@ public class MessagingService extends Service implements IMessagingService {
 						             message.getMacAddress())
 						    .putExtra(
 						             EXTRA_SONG_ID,
-						             message.getMacAddress())
+						             message.getId())
 						    .send(MessagingService.this);
 					}
 				});
