@@ -25,4 +25,13 @@ public class SongMetadataUtils {
         return lhs.getMacAddress().equals(rhs.getMacAddress()) &&
                lhs.getId() == rhs.getId();
     }
+    
+    public static String getUniqueKey(PlaylistEntry song) {
+        return getUniqueKey(song.getMacAddress(), song.getId(), song.getCount());
+    }
+    
+    public static String getUniqueKey(String songSourceAddress, long songId, int count) {
+        return songSourceAddress.replace(":", "") + "_" + songId + "_" + count;
+    }
+
 }
