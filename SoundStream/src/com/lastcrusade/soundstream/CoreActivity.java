@@ -4,13 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
 import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -47,11 +45,17 @@ public class CoreActivity extends SlidingFragmentActivity{
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
             getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+            setSlidingActionBarEnabled(false);
+        }
+        else{
+            //if we're not entering for the first time, we want to make sure that 
+            //we still have access to the sliding menu
+            enableSlidingMenu();
         }
 
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
-        setSlidingActionBarEnabled(false);
+        
         
         
         //add the playbar fragment onto the active content view
