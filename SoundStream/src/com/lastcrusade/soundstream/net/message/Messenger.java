@@ -106,7 +106,8 @@ public class Messenger {
      * 
      * @param input
      * @return
-     * @throws IOException
+     * @throws Exception If the message class does not exist, or is not defined properly, or
+     * if the stream closes prematurely.
      */
     public boolean deserializeMessage(InputStream input) throws Exception {
         
