@@ -222,7 +222,8 @@ public class PlaylistService extends Service {
                     Log.wtf(TAG, "Received AddToPlaylistMessage on guest...these messages are only for hosts");
                 }
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 if (song != null) {
@@ -240,7 +241,8 @@ public class PlaylistService extends Service {
                     Log.wtf(TAG, "Received BumpSongOnPlaylist on guest...these messages are only for hosts");
                 }
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 PlaylistEntry entry = mPlaylist.findEntryForSong(song);
@@ -259,12 +261,13 @@ public class PlaylistService extends Service {
                     Log.wtf(TAG, "Received AddToPlaylistMessage on guest...these messages are only for hosts");
                 }
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
                 
                 //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                if (currentSong == null || !SongMetadataUtils.isTheSameSong(song, currentSong)) {
+                if (isCurrentSong(song)) {
                     removeSong(song);
                 }
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
@@ -306,7 +309,7 @@ public class PlaylistService extends Service {
                     // send an intent to the fragments that the playlist is updated
                     new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
                 } else {
-                    Log.e(TAG, "Attempting to bump a song that is not in our playlist: " + song);
+                    Log.e(TAG, "Attempting to update information about a song that is not in our playlist: " + song);
                 }
             }
         })
@@ -332,7 +335,14 @@ public class PlaylistService extends Service {
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
-  
+
+    private boolean isCurrentSong(SongMetadata song) {
+        //currentSong == null before play is started, and for a brief moment between songs
+        // (It's nulled out when the ACTION_SONG_FINISHED method is called,
+        // and repopulated in setSong)
+        return currentSong != null && SongMetadataUtils.isTheSameSong(song, currentSong);
+    }
+
     public boolean isPlaying() {
         return this.mThePlayer.isPlaying();
     }

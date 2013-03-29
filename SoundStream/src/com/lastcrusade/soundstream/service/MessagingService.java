@@ -472,7 +472,7 @@ public class MessagingService extends Service implements IMessagingService {
     @Override
     public void sendBumpSongOnPlaylistMessage(SongMetadata song) {
         BumpSongOnPlaylistMessage msg = new BumpSongOnPlaylistMessage(song.getMacAddress(), song.getId());
-        //send the message to the guests
+        //send the message to the host
         sendMessageToHost(msg);
     }
 
