@@ -216,7 +216,7 @@ public class MessagingService extends Service implements IMessagingService {
 						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
 							.putExtra(
 							        EXTRA_IS_PLAYING,
-							        message.getString().equals(PlayStatusMessage.PLAY_MESSAGE)
+							        message.getIsPlaying()
 						     ).send(MessagingService.this);
 					}
 				});
@@ -432,12 +432,9 @@ public class MessagingService extends Service implements IMessagingService {
         sendMessageToHost(msg);
     }
 
-    public void sendPlayStatusMessage(String playStatusMessage) {
-        sendPlayStatusMessage(playStatusMessage, new SongMetadata());
-    }
-
-    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
-        PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage, currentSong);
+    public void sendPlayStatusMessage(PlaylistEntry currentSong, boolean isPlaying) {
+        PlayStatusMessage msg =
+                new PlayStatusMessage(currentSong.getMacAddress(), currentSong.getId(), isPlaying);
     	//send the message to the guests
     	sendMessageToGuests(msg);
     }
@@ -463,21 +460,21 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     @Override
-    public void sendAddToPlaylistMessage(SongMetadata song) {
+    public void sendAddToPlaylistMessage(PlaylistEntry song) {
         AddToPlaylistMessage msg = new AddToPlaylistMessage(song.getMacAddress(), song.getId());
         //send the message to the host
         sendMessageToHost(msg);
     }
     
     @Override
-    public void sendBumpSongOnPlaylistMessage(SongMetadata song) {
+    public void sendBumpSongOnPlaylistMessage(PlaylistEntry song) {
         BumpSongOnPlaylistMessage msg = new BumpSongOnPlaylistMessage(song.getMacAddress(), song.getId());
         //send the message to the host
         sendMessageToHost(msg);
     }
 
     @Override
-    public void sendRemoveFromPlaylistMessage(SongMetadata song) {
+    public void sendRemoveFromPlaylistMessage(PlaylistEntry song) {
         RemoveFromPlaylistMessage msg = new RemoveFromPlaylistMessage(song.getMacAddress(), song.getId());
         //send the message to the host
         sendMessageToHost(msg);
