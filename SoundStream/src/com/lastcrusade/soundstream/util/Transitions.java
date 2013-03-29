@@ -53,7 +53,7 @@ public class Transitions {
         Fragment fragment = getFragment(fragmentName);
         
         activity.getSupportFragmentManager().beginTransaction()
-            .replace(R.id.content_frame, fragment)
+            .replace(R.id.content, fragment)
             .addToBackStack(null).commit();
         activity.showContent();
         String title = activity.getResources().getString(((ITitleable)fragment).getTitle());
