@@ -156,14 +156,10 @@ public class PlaybarFragment extends Fragment {
                                                               SongMetadata.UNKNOWN_SONG);
                     
                     SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                    if(songTitle != null){
-                        if(song != null){
+                    if(songTitle != null && song != null){
                             songTitle.setText(song.getTitle());
-                        } else {
-                            Log.w(TAG, "song was null");
-                        }
                     } else {
-                        Log.w(TAG, "song title was null");
+                        Log.w(TAG, "songTitle or song were null");
                     }
                 }
             })
