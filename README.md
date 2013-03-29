@@ -1,3 +1,3 @@
-# fanClub
+# SoundStream
 
-**fanClub** is an open-source Android app that provides a platform to crowdsource music playlist creation among friends.
+**SoundStream** is an open-source Android app that provides a platform to crowdsource music playlist creation among friends.
