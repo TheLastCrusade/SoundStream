@@ -28,7 +28,7 @@ public class Messenger {
 
     private static final String TAG = Messenger.class.getName();
 
-    //package protected, so they can be accessed from the 
+    //package protected, so they can be accessed from the unit test
     
     static final int SIZE_LEN = 4;
     static final int VERSION_LEN = 4;
