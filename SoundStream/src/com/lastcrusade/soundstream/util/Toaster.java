@@ -34,5 +34,13 @@ public class Toaster {
         Log.e(Thread.currentThread().getStackTrace()[methodDepth].toString(), s);
         toastWorker(context, s);
     }
+    
+    public static void eToast(Context context, int resId) {
+    	eToast(context, context.getString(resId));
+    }
+    
+    public static void eToast(Context context, int resId, Object... formatArgs) {
+    	eToast(context, context.getString(resId, formatArgs));
+    }
 
 }

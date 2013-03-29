@@ -4,4 +4,12 @@
     <string name="no_available_songs">No songs are available to play</string>
     <string name="playlist_finished">Playlist finished looping back to beginning</string>
     
+    <!-- ConnectionService toast error messages -->
+    <string name="enable_bt_fail">Unable to enable Bluetooth adapter</string>
+    <string name="no_bt_support">Device may not support Bluetooth</string>
+    <string name="no_guests_connected">No guests connected</string>
+    <string name="guest_not_connected">Guest not connected</string>
+    <string name="no_host_connected">Not connected to host</string>
+    <string name="connect_thread_fail">Unable to create ConnectThread to connect to server</string>
+    
 </resources>
