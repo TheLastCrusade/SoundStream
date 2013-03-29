@@ -102,11 +102,11 @@ public class ConnectionService extends Service {
         try {
             BluetoothUtils.checkAndEnableBluetooth(this, adapter);
         } catch (BluetoothNotEnabledException e) {
-            Toaster.iToast(this, "Unable to enable bluetooth adapter");
+            Toaster.iToast(this, "@error_strings/enable_bt_fail");
             e.printStackTrace();
             return;
         } catch (BluetoothNotSupportedException e) {
-            Toaster.eToast(this, "Device may not support bluetooth");
+            Toaster.eToast(this, "@error_strings/no_bt_support");
             e.printStackTrace();
         }
         
@@ -341,8 +341,7 @@ public class ConnectionService extends Service {
             sendMessageToHost(new FindNewGuestsMessage());
         } else {
             if (adapter == null) {
-                Toaster.iToast(this,
-                        "Device may not support bluetooth");
+                Toaster.iToast(this, "@error_strings/no_bt_support");
             } else {
                 adapter.startDiscovery();
             }
@@ -355,7 +354,7 @@ public class ConnectionService extends Service {
                 guest.write(msg);
             }
         } else {
-            Toaster.eToast(this, "No Guests connected");
+            Toaster.eToast(this, "@error_strings/no_guests_connected");
         }
     }
 
@@ -364,7 +363,7 @@ public class ConnectionService extends Service {
         if (fan != null) {
             fan.write(msg);
         } else {
-            Toaster.eToast(this, "Fan not connected");
+            Toaster.eToast(this, "@error_strings/guest_not_connected");
         }
     }
 
@@ -372,7 +371,7 @@ public class ConnectionService extends Service {
         if (isHostConnected()) {
             this.host.write(msg);
         } else {
-            Toaster.eToast(this, "Not connected to host");
+            Toaster.eToast(this, "@error_strings/no_host_connected");
         }
     }
 
@@ -435,8 +434,7 @@ public class ConnectionService extends Service {
             connectThread.execute();
         } catch (IOException e) {
             e.printStackTrace();
-            Toaster.iToast(this,
-                    "Unable to create ConnectThread to connect to server");
+            Toaster.iToast(this, "@error_string/connect_thread_fail");
         }
     }
 
@@ -451,7 +449,7 @@ public class ConnectionService extends Service {
 
         try {
             if (adapter == null) {
-                Toaster.eToast(this, "Unable to enable bluetooth adapter");
+                Toaster.eToast(this, "@error_strings/enable_bt_fail");
             } else {
                 AcceptThread thread = new AcceptThread(this, adapter) {
 
