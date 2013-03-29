@@ -14,7 +14,7 @@ import com.lastcrusade.soundstream.net.message.UserListMessage;
 public class UserListMessageTest extends SerializationTest<UserListMessage> {
 		
 	@Test
-	public void testSerializeUserListMessage() throws IOException {
+	public void testSerializeUserListMessage() throws Exception {
 		UserList userList = new UserList();
 		populateTestUserList(userList);
 		

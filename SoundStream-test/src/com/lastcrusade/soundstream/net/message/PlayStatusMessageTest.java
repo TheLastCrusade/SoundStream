@@ -12,7 +12,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 public class PlayStatusMessageTest extends SerializationTest<PlayStatusMessage> {
 	
     @Test
-    public void testSerializePlayStatusMessage() throws IOException {
+    public void testSerializePlayStatusMessage() throws Exception {
         PlayStatusMessage preSerializationPlayStatusMsg = new PlayStatusMessage();
 
         preSerializationPlayStatusMsg.setString(PlayStatusMessage.PLAY_MESSAGE);

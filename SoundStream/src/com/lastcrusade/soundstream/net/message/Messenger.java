@@ -28,10 +28,14 @@ public class Messenger {
 
     private static final String TAG = Messenger.class.getName();
 
-    private static final int SIZE_LEN = 4;
+    //package protected, so they can be accessed from the 
+    
+    static final int SIZE_LEN = 4;
+    static final int VERSION_LEN = 4;
 
-    //TODO: add messenger version into the message protocol (see serialize/deserializeMessage)
-    private static final int MESSENGER_VERSION = 1;
+    static final int MESSENGER_VERSION = 1;
+
+
     private IMessage receivedMessage;
 
     private int messageLength;
@@ -51,17 +55,21 @@ public class Messenger {
      */
     public void serializeMessage(IMessage message) throws IOException {
         int start = outputBuffer.size();
-        outputBuffer.write(new byte[4]);
+        outputBuffer.write(new byte[SIZE_LEN]);
+        outputBuffer.write(new byte[VERSION_LEN]);
         outputBuffer.write(message.getClass().getCanonicalName().getBytes());
         outputBuffer.write(END_OF_CLASS_CHAR);
 
         message.serialize(outputBuffer);
+
         //write the length to the first 4 bytes of this message
         byte[] bytes = outputBuffer.toByteArray();
-        ByteBuffer bb = ByteBuffer.wrap(bytes, start, 4);
-        int len = outputBuffer.size() - start - 4;
+        ByteBuffer bb = ByteBuffer.wrap(bytes, start, SIZE_LEN + VERSION_LEN);
+        //the message length includes everything but SIZE_LEN bytes of the message
+        int len = outputBuffer.size() - start - SIZE_LEN;
         bb.putInt(len);
-        
+        bb.putInt(MESSENGER_VERSION);
+
         outputBuffer.reset();
         outputBuffer.write(bytes);
     }
@@ -100,7 +108,7 @@ public class Messenger {
      * @return
      * @throws IOException
      */
-    public boolean deserializeMessage(InputStream input) throws IOException {
+    public boolean deserializeMessage(InputStream input) throws Exception {
         
         boolean processed = false;
         do {
@@ -140,16 +148,25 @@ public class Messenger {
      * TODO: this needs better error handling.
      * 
      * @return True if a message was processed, false if not
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+     * @throws IOException 
      */
-    private boolean processAndConsumeMessage() {
+    private boolean processAndConsumeMessage() throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
         boolean processed = false;
         //REVIEW: character encoding issues may arise, but since we're controlling the class names
         // we should be able to decide how to handle these
         byte[] bytes = inputBuffer.toByteArray();
         try {
-            int nameEnd;
-            for (nameEnd = 0; nameEnd < bytes.length && bytes[nameEnd] != END_OF_CLASS_CHAR; nameEnd++) {}
-            String messageName = new String(bytes, 0, nameEnd);
+            int start = 0;
+            ByteBuffer bb = ByteBuffer.wrap(bytes, 0, VERSION_LEN);
+            int messengerVersion = bb.getInt();
+            //TODO: actually do something with the messengerVersion
+            start += VERSION_LEN;
+            int nameEnd = start;
+            for (; nameEnd < bytes.length && bytes[nameEnd] != END_OF_CLASS_CHAR; nameEnd++) {}
+            String messageName = new String(bytes, start, nameEnd - start);
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes, nameEnd + 1, this.messageLength - (nameEnd + 1));
 
             Object obj = Class.forName(messageName).newInstance();
@@ -162,8 +179,6 @@ public class Messenger {
                 //otherwise, it's a WTF
                 Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
             }
-        } catch (Exception e) {
-            Log.wtf(TAG, e);
         } finally {
             //consume this message either way
             int bufferLen = inputBuffer.size();
