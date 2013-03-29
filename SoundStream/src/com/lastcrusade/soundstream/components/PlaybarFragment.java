@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -28,6 +31,7 @@ public class PlaybarFragment extends Fragment {
     private BroadcastRegistrar registrar;
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
+    private ServiceLocator<MusicLibraryService> musicLibraryLocator;
     ImageButton playPause;
 
     private TextView songTitle;
@@ -37,6 +41,8 @@ public class PlaybarFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
+        this.musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
+                this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
         registerReceivers();
     }
     
@@ -44,6 +50,7 @@ public class PlaybarFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         playlistServiceLocator.unbind();
+        musicLibraryLocator.unbind();
         unregisterReceivers();
     }
 
@@ -140,8 +147,35 @@ public class PlaybarFragment extends Fragment {
                     setPlayImage();
                 }
             })
+            .addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                    long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                              SongMetadata.UNKNOWN_SONG);
+                    
+                    SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
+                    if(songTitle != null && song != null){
+                            songTitle.setText(song.getTitle());
+                    } else {
+                        Log.w(TAG, "songTitle or song were null");
+                    }
+                }
+            })
             .register(this.getActivity());
     }
+    
+    public MusicLibraryService getMusicLibraryService() {
+        MusicLibraryService musicLibraryService = null;
+        try {
+            musicLibraryService = this.musicLibraryLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return musicLibraryService;
+    }
+
 
     private void unregisterReceivers() {
         this.registrar.unregister();
