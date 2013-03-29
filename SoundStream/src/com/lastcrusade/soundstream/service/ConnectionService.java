@@ -102,11 +102,11 @@ public class ConnectionService extends Service {
         try {
             BluetoothUtils.checkAndEnableBluetooth(this, adapter);
         } catch (BluetoothNotEnabledException e) {
-            Toaster.iToast(this, "@error_strings/enable_bt_fail");
+            Toaster.iToast(this, R.string.enable_bt_fail);
             e.printStackTrace();
             return;
         } catch (BluetoothNotSupportedException e) {
-            Toaster.eToast(this, "@error_strings/no_bt_support");
+            Toaster.eToast(this, R.string.no_bt_support);
             e.printStackTrace();
         }
         
@@ -341,7 +341,7 @@ public class ConnectionService extends Service {
             sendMessageToHost(new FindNewGuestsMessage());
         } else {
             if (adapter == null) {
-                Toaster.iToast(this, "@error_strings/no_bt_support");
+                Toaster.iToast(this, R.string.no_bt_support);
             } else {
                 adapter.startDiscovery();
             }
@@ -354,7 +354,7 @@ public class ConnectionService extends Service {
                 guest.write(msg);
             }
         } else {
-            Toaster.eToast(this, "@error_strings/no_guests_connected");
+            Toaster.eToast(this, R.string.no_guests_connected);
         }
     }
 
@@ -363,7 +363,7 @@ public class ConnectionService extends Service {
         if (fan != null) {
             fan.write(msg);
         } else {
-            Toaster.eToast(this, "@error_strings/guest_not_connected");
+            Toaster.eToast(this, R.string.guest_not_connected);
         }
     }
 
@@ -371,7 +371,7 @@ public class ConnectionService extends Service {
         if (isHostConnected()) {
             this.host.write(msg);
         } else {
-            Toaster.eToast(this, "@error_strings/no_host_connected");
+            Toaster.eToast(this, R.string.no_host_connected);
         }
     }
 
@@ -434,7 +434,7 @@ public class ConnectionService extends Service {
             connectThread.execute();
         } catch (IOException e) {
             e.printStackTrace();
-            Toaster.iToast(this, "@error_string/connect_thread_fail");
+            Toaster.iToast(this, R.string.connect_thread_fail);
         }
     }
 
@@ -449,7 +449,7 @@ public class ConnectionService extends Service {
 
         try {
             if (adapter == null) {
-                Toaster.eToast(this, "@error_strings/enable_bt_fail");
+                Toaster.eToast(this, R.string.enable_bt_fail);
             } else {
                 AcceptThread thread = new AcceptThread(this, adapter) {
 
