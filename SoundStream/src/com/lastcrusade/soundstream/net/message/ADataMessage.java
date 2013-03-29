@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 
 /**
@@ -101,6 +102,24 @@ public abstract class ADataMessage implements IMessage {
         long fileSize     = readLong(input);
         String macAddress = readString(input);
         return new SongMetadata(id, title, artist, album, fileSize, macAddress);
+    }
+    
+    protected void writePlaylistEntry(PlaylistEntry entrydata, OutputStream output) throws IOException{
+        writeSongMetadata(entrydata, output);
+        writeBoolean(     entrydata.isLoaded(),    output);
+        writeBoolean(     entrydata.isPlayed(),    output);
+        writeString(      entrydata.getFilePath(), output);
+    }
+    
+    protected PlaylistEntry readPlaylistEntry(InputStream input) throws IOException{
+        SongMetadata song = readSongMetadata(input);
+        PlaylistEntry entry = new PlaylistEntry(
+                song,
+                readBoolean(input),
+                readBoolean(input),
+                readString(input)
+        );
+        return entry;
     }
 
     protected void writeBytes(byte[] bytes, OutputStream output) throws IOException {

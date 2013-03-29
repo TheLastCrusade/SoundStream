@@ -2,7 +2,9 @@ package com.lastcrusade.soundstream.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Service;
 import android.content.Context;
@@ -12,7 +14,6 @@ import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.audio.AudioPlayerWithEvents;
 import com.lastcrusade.soundstream.audio.IPlayer;
@@ -22,10 +23,13 @@ import com.lastcrusade.soundstream.manager.PlaylistDataManager;
 import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
+import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.SongMetadataUtils;
 import com.lastcrusade.soundstream.util.Toaster;
 
 /**
@@ -118,6 +122,7 @@ public class PlaylistService extends Service {
     private PlaylistEntry currentSong;
     private boolean isLocalPlayer;
 
+    private ServiceLocator<MusicLibraryService> musicLibraryLocator;
     private ServiceLocator<MessagingService> messagingServiceLocator;
 
     @Override
@@ -133,6 +138,9 @@ public class PlaylistService extends Service {
         this.mThePlayer    = new AudioPlayerWithEvents(this.mAudioPlayer, this);
         this.mPlaylist     = new Playlist();
         
+        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
         registerReceivers();
         
         //start the data manager by default...it is disabled when
@@ -163,6 +171,8 @@ public class PlaylistService extends Service {
                 //want to set the flag until after the song has been played
                 if (currentSong != null) {
                     currentSong.setPlayed(true);
+                    getMessagingService()
+                        .sendSongStatusMessage(currentSong);
                     currentSong = null;
                 }
                 // automatically play the next song, but only if we're not paused
@@ -221,22 +231,103 @@ public class PlaylistService extends Service {
                 skip();
             }
         })
+        .addAction(MessagingService.ACTION_ADD_TO_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                if (!isLocalPlayer) {
+                    Log.wtf(TAG, "Received AddToPlaylistMessage on guest...these messages are only for hosts");
+                }
+                String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
+                
+                SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
+                if (song != null) {
+                    addSong(song);
+                } else {
+                    Log.wtf(TAG, "Song with mac address " + macAddress + " and id " + songId + " not found.");
+                }
+            }
+        })
+        .addAction(MessagingService.ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                if (!isLocalPlayer) {
+                    Log.wtf(TAG, "Received BumpSongOnPlaylist on guest...these messages are only for hosts");
+                }
+                String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
+                
+                SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
+                PlaylistEntry entry = mPlaylist.findEntryForSong(song);
+                if (entry != null) {
+                    bumpSong(entry);
+                } else {
+                    Log.e(TAG, "Attempting to bump a song that is not in our playlist: " + song);
+                }
+            }
+        })
+        .addAction(MessagingService.ACTION_REMOVE_FROM_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                if (!isLocalPlayer) {
+                    Log.wtf(TAG, "Received AddToPlaylistMessage on guest...these messages are only for hosts");
+                }
+                String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
+                
+                //NOTE: only remove if its not the currently playing song.
+                //TODO: may need a better message back to the remote fan
+                SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
+                if (isCurrentSong(song)) {
+                    removeSong(song);
+                }
+                getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+            }
+        })
         .addAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                List<SongMetadata> newList =
-                        intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
+                if (isLocalPlayer) {
+                    Log.wtf(TAG, "Received PlaylistUpdateMessage as host...these messages are only for guests");
+                }
+                List<PlaylistEntry> newList =
+                        intent.getParcelableArrayListExtra(MessagingService.EXTRA_PLAYLIST_ENTRY);
                 mPlaylist.clear();
-                for (SongMetadata metadata : newList) {
-                    PlaylistEntry entry = new PlaylistEntry(metadata);
-                    //for the UI, assume that the song is "loaded" when displayed on the remote guest
-                    //TODO: this should actually reflect the real status on the host, which requires
-                    // modifying the message to send PlaylistEntry objects
-                    entry.setLoaded(mDataManager == null);
+                for (PlaylistEntry entry : newList) {
                     mPlaylist.add(entry);
                 }
                 new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+            }
+        })
+        .addAction(MessagingService.ACTION_SONG_STATUS_MESSAGE, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                if (isLocalPlayer) {
+                    Log.wtf(TAG, "Received SongStatusMessage as host...these messages are only for guests");
+                }
+                String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                boolean loaded    = intent.getBooleanExtra(MessagingService.EXTRA_LOADED, false);
+                boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
+
+                SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
+                PlaylistEntry entry = mPlaylist.findEntryForSong(song);
+                if (entry != null) {
+                    entry.setLoaded(loaded);
+                    entry.setPlayed(played);
+                    // send an intent to the fragments that the playlist is updated
+                    new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                } else {
+                    Log.e(TAG, "Attempting to update information about a song that is not in our playlist: " + song);
+                }
             }
         })
         .addAction(PlaylistService.ACTION_PAUSE, new IBroadcastActionHandler() {
@@ -286,7 +377,14 @@ public class PlaylistService extends Service {
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
-  
+
+    private boolean isCurrentSong(SongMetadata song) {
+        //currentSong == null before play is started, and for a brief moment between songs
+        // (It's nulled out when the ACTION_SONG_FINISHED method is called,
+        // and repopulated in setSong)
+        return currentSong != null && SongMetadataUtils.isTheSameSong(song, currentSong);
+    }
+
     public boolean isPlaying() {
         return this.mThePlayer.isPlaying();
     }
@@ -358,6 +456,8 @@ public class PlaylistService extends Service {
                 mDataManager.addToLoadQueue(entry);
             }
         }
+        //send a message to the guests with the new playlist
+        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
     }
 
     public void pause() {
@@ -385,23 +485,37 @@ public class PlaylistService extends Service {
         // send an intent to the fragments that the playlist is updated
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
 
-        //send a message to the network that the playlist is updated
-        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        if (isLocalPlayer) {
+            //send a message to the guests with the new playlist
+            getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        } else {
+            //send a message to the host to add this song
+            getMessagingService().sendAddToPlaylistMessage(entry);
+        }
     }
     
-    public void removeSong(PlaylistEntry entry){
-        mPlaylist.remove(entry);
-        
-        //broadcast the fact that a song has been removed
-        new BroadcastIntent(ACTION_SONG_REMOVED)
-            .putExtra(EXTRA_SONG, entry)
-            .send(this);
-        
-        //broadcast the fact that the playlist has been updated
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-        
-        //send a message to the network with the new playlist
-        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+    public void removeSong(SongMetadata song) {
+        PlaylistEntry entry = mPlaylist.findEntryForSong(song);
+        if (entry != null) {
+            mPlaylist.remove(entry);
+            //broadcast the fact that a song has been removed
+            new BroadcastIntent(ACTION_SONG_REMOVED)
+                .putExtra(EXTRA_SONG, entry)
+                .send(this);
+            
+            //broadcast the fact that the playlist has been updated
+            new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+    
+            if (isLocalPlayer) {
+                //send a message to the guests with the new playlist
+                getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+            } else {
+                //send a message to the host to remove this song
+                getMessagingService().sendRemoveFromPlaylistMessage(entry);
+            }
+        } else {
+            Log.e(TAG, "Attempting to remove a song that is not in our playlist: " + song);
+        }
     }
 
     public List<PlaylistEntry> getPlaylistEntries() {
@@ -422,10 +536,28 @@ public class PlaylistService extends Service {
         mPlaylist.bumpSong(entry);
         
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-        getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        
+        if (isLocalPlayer) {
+            //send a message to the guests with the new playlist
+            getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+        } else {
+            //send a message to the host to remove this song
+            getMessagingService().sendBumpSongOnPlaylistMessage(entry);
+        }
     }
     
     public PlaylistEntry getCurrentSong(){
         return currentSong;
     }
+    
+    public MusicLibraryService getMusicLibraryService() {
+        MusicLibraryService musicLibraryService = null;
+        try {
+            musicLibraryService = this.musicLibraryLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return musicLibraryService;
+    }
+
 }
