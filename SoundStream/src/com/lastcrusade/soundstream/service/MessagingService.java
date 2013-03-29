@@ -216,8 +216,14 @@ public class MessagingService extends Service implements IMessagingService {
 						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
 							.putExtra(
 							        EXTRA_IS_PLAYING,
-							        message.getIsPlaying()
-						     ).send(MessagingService.this);
+							        message.getIsPlaying())
+							.putExtra(
+						             EXTRA_ADDRESS,
+						             message.getMacAddress())
+						    .putExtra(
+						             EXTRA_SONG_ID,
+						             message.getMacAddress())
+						    .send(MessagingService.this);
 					}
 				});
     }
