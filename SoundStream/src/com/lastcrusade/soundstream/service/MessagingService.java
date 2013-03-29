@@ -216,7 +216,7 @@ public class MessagingService extends Service implements IMessagingService {
 						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
 							.putExtra(
 							        EXTRA_IS_PLAYING,
-							        message.getIsPlaying())
+							        message.isPlaying())
 							.putExtra(
 						             EXTRA_ADDRESS,
 						             message.getMacAddress())

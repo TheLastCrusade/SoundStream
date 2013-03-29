@@ -7,31 +7,31 @@ import java.io.OutputStream;
 public class PlayStatusMessage extends APlaylistEntryMessage {
 
     private final String TAG = PlayStatusMessage.class.getSimpleName();
-    private boolean isPlaying;
+    private boolean playing;
 
     public PlayStatusMessage() {}
 
-    public PlayStatusMessage(String macAddress, long id, boolean isPlaying) {
+    public PlayStatusMessage(String macAddress, long id, boolean playing) {
         super(macAddress, id);
-        this.isPlaying = isPlaying;
+        this.playing = playing;
     }
 
     public void deserialize(InputStream input) throws IOException {
         super.deserialize(input);
-        isPlaying = readBoolean(input);
+        playing = readBoolean(input);
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
         super.serialize(output);
-        writeBoolean(isPlaying, output);
+        writeBoolean(playing, output);
     }
     
-    public boolean getIsPlaying(){
-        return isPlaying;
+    public boolean isPlaying(){
+        return playing;
     }
     
-    public void setIsPlaying(boolean isPlaying){
-        this.isPlaying = isPlaying;
+    public void setPlaying(boolean isPlaying){
+        this.playing = isPlaying;
     }
 }

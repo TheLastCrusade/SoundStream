@@ -58,7 +58,7 @@ public class SingleFileAudioPlayer implements IPlayer {
      */
     public void setSong(PlaylistEntry song) {
         this.entry = song;
-        //TODO this is sending a playlist entry not a SongMetadata
+        //This is sending a playlist entry not a SongMetadata
         new BroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
             .putExtra(PlaylistService.EXTRA_SONG, this.entry)
             .send(this.context);
@@ -70,25 +70,37 @@ public class SingleFileAudioPlayer implements IPlayer {
     }
 
     public void play() {
+        if (isValidPath()) {
+            try {
+                if (player.isPlaying()) {
+                    player.stop();
+                }
+                this.paused = false;
+                player.reset();
+                player.setDataSource(entry.getFilePath());
+                player.prepare();
+                player.start();
+                this.messagingService.getService().sendPlayStatusMessage(
+                        this.entry, true);
+            } catch (Exception e) {
+                Log.wtf(TAG, "Unable to play song: " + entry.getFilePath());
+            }
+        } else {
+            Log.w(TAG, "File Path was not valid");
+        }
+    }
+
+    private boolean isValidPath() {
+        boolean isValid = false;
         try {
             //This will fail and throw and Exception if the filepath is bad
-            new File((new File(entry.getFilePath()).getParentFile().list())[0])
-                    .exists();
-            if (player.isPlaying()) {
-                player.stop();
-            }
-            this.paused = false;
-            player.reset();
-            player.setDataSource(entry.getFilePath());
-            player.prepare();
-            player.start();
-            this.messagingService
-                .getService()
-                .sendPlayStatusMessage(this.entry, true);
+            new File((new File(entry.getFilePath()).getParentFile().list())[0]).exists();
+            isValid = true;
         } catch (Exception e) {
-            Log.wtf(TAG, "Unable to play song: " + entry.getFilePath());
+            isValid = false;
             e.printStackTrace();
         }
+        return isValid;
     }
 
     @Override
@@ -119,6 +131,7 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.paused = false;
         this.player.stop();
         this.setSong(null);
+        //TODO revisit the decision to treat stop the same as pause
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
         try {
