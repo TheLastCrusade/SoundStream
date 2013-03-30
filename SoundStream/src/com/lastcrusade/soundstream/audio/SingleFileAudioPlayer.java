@@ -1,13 +1,13 @@
 package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.MessagingService;
@@ -80,7 +80,10 @@ public class SingleFileAudioPlayer implements IPlayer {
             }
             this.paused = false;
             player.reset();
-            player.setDataSource(this.filePath);
+            //changed to use the underlying file descriptor, because this doesnt want to work on a Samsung Galaxy S3
+//            player.setDataSource(this.filePath);
+            FileInputStream fis = new FileInputStream(this.filePath);
+            player.setDataSource(fis.getFD());
             player.prepare();
             player.start();
             this.messagingService

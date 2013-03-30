@@ -6,15 +6,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
-
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.Messenger;
-import com.lastcrusade.soundstream.net.message.StringMessage;
 
 /**
  * Doesn't inherit from SerializationTest and is separate from its generalized
@@ -29,7 +26,7 @@ public class MessengerTest {
     public void testDeserializeMessage() throws IOException {
         
         //test the simple case (one message within the stream)
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(new File(""));
         //build up a TestMessage object
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String className   = StringMessage.class.getCanonicalName();
@@ -54,7 +51,7 @@ public class MessengerTest {
     public void testDeserializeMessageMultiple() throws IOException {
 
         //test multiple complete messages in one stream
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(new File(""));
         //build up a TestMessage object
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String className   = StringMessage.class.getCanonicalName();
@@ -91,15 +88,15 @@ public class MessengerTest {
     @Test
     public void testSerializeMessage() throws IOException {
         
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(new File(""));
         
         StringMessage message = new StringMessage();
         String testMessage = "This is a test of the messaging system";
         message.setString(testMessage);
         messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
+        InputStream is = simulateSendAndReceive(messenger);
         
-        Messenger rcvMessenger = new Messenger();
+        Messenger rcvMessenger = new Messenger(new File(""));
         //attempt to deserialize the second message
         assertTrue(rcvMessenger.deserializeMessage(is));
         
@@ -117,7 +114,7 @@ public class MessengerTest {
     public void testSerializeMessageMultiple() throws IOException {
         
         //next test 2 messages in the stream, to make sure the messages are consumed properly
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(new File(""));
         
         StringMessage message = new StringMessage();
         String testMessage = "This is a test of the messaging system";
@@ -127,9 +124,9 @@ public class MessengerTest {
         message = new StringMessage();
         message.setString(testMessage2);
         messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
+        InputStream is = simulateSendAndReceive(messenger);
         
-        Messenger rcvMessenger = new Messenger();
+        Messenger rcvMessenger = new Messenger(new File(""));
         //attempt to deserialize the second message
         assertTrue(rcvMessenger.deserializeMessage(is));
         
@@ -152,8 +149,10 @@ public class MessengerTest {
     }
     
     private InputStream simulateSendAndReceive(
-            byte[] outputBytes) {
-        return new ByteArrayInputStream(outputBytes);
+            Messenger messenger) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        messenger.writeToOutputStream(baos);
+        return new ByteArrayInputStream(baos.toByteArray());
     }
     
     /**

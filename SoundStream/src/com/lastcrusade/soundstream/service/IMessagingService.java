@@ -66,10 +66,7 @@ public interface IMessagingService {
 
     public void sendRequestSongMessage(String address, long songId);
 
-    public void sendTransferSongMessage(String address, long songId, String fileName, byte[] bytes);
+    public void sendTransferSongMessage(String address, long songId, String fileName, String filePath);
 
     public void sendUserListMessage(UserList userlist);
-
-
-
 }

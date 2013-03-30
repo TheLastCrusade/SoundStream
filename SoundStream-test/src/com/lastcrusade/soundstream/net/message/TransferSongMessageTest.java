@@ -13,13 +13,13 @@ import org.junit.Test;
 public class TransferSongMessageTest extends SerializationTest<TransferSongMessage> {
     
     @Test
-    public void testSerializePlayMessage() throws IOException {
+    public void testSerializePlayMessage() throws Exception {
         File file = new File("./assets/Jesse_normal_trimmed.wav");
         FileInputStream fis = new FileInputStream(file);
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes);
         long songId = 132452L;
-        TransferSongMessage oldMessage = new TransferSongMessage(songId, file.getName(), bytes);
+        TransferSongMessage oldMessage = new TransferSongMessage(songId, file.getName(), file.getCanonicalPath());
         TransferSongMessage newMessage = super.testSerializeMessage(oldMessage);
 
         //compare the song information

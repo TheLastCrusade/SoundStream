@@ -32,7 +32,7 @@ public abstract class AcceptThread extends AsyncTask<Void, Void, BluetoothSocket
         try {
             // MY_UUID is the app's UUID string, also used by the client code
             //TODO: for scaling to large number of users, we may have to use different UUIDs
-            mmServerSocket = adapter.listenUsingRfcommWithServiceRecord(
+            mmServerSocket = adapter.listenUsingInsecureRfcommWithServiceRecord(
                     HOST_NAME,
                     UUID.fromString(context.getString(R.string.app_uuid)));
         } catch (IOException e) {

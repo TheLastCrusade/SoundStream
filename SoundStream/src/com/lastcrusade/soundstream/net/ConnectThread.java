@@ -32,7 +32,7 @@ public abstract class ConnectThread extends AsyncTask<Void, Void, BluetoothSocke
         // MY_UUID is the app's UUID string, also used by the server code
         UUID uuid = UUID.fromString(mmContext.getString(R.string.app_uuid));
         try {
-            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+            mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) {
             //if for some reason the socket cannot be created, throw an exception
             throw new UnableToCreateSocketException(e);
