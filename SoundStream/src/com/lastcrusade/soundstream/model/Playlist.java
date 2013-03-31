@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import android.util.Log;
 
@@ -38,16 +37,48 @@ public class Playlist {
         musicList.clear();
     }
 
-    public PlaylistEntry findEntryForSong(SongMetadata song) {
+    public PlaylistEntry findEntryForSong(PlaylistEntry song) {
         PlaylistEntry found = null;
         for (PlaylistEntry entry : getSongsToPlay()) {
-            if (SongMetadataUtils.isTheSameSong(entry, song)) {
+            if (SongMetadataUtils.isTheSameEntry(entry, song)) {
                 found = entry;
                 break;
             }
         }
 
         return found;
+    }
+    
+    public PlaylistEntry findEntryByAddressIDandCount(String macAddress, long id, int count){
+        PlaylistEntry found = null;
+        for(PlaylistEntry entry: getSongsToPlay()){
+            if(entry.getMacAddress().equals(macAddress) && entry.getId() == id && entry.getCount() == count){
+                found = entry;
+                break;
+            }
+        }
+        return found;
+    }
+    
+    /**
+     *Counts the number of times the given song occurs in the playlist
+     *
+     * @param song
+     * @return
+     */
+    public int countSongOccurence(PlaylistEntry song){
+        PlaylistEntry found = null;
+        for(PlaylistEntry entry: getSongsToPlay()){
+            if(SongMetadataUtils.isTheSameSongByTitle(entry, song)){
+                found = entry;
+            }
+        }
+        if(found != null){
+            return found.getCount();
+        }
+        else{
+            return 0;
+        }
     }
 
     public PlaylistEntry remove(PlaylistEntry entry) {

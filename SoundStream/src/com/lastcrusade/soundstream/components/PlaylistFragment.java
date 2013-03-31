@@ -26,7 +26,6 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
-import com.lastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show

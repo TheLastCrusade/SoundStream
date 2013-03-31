@@ -12,9 +12,9 @@ public class SongStatusMessage extends APlaylistEntryMessage {
     SongStatusMessage() {
     }
 
-    public SongStatusMessage(String macAddress, long songId, boolean loaded,
+    public SongStatusMessage(String macAddress, long songId, int count, boolean loaded,
             boolean played) {
-        super(macAddress, songId);
+        super(macAddress, songId, count);
         this.loaded = loaded;
         this.played = played;
     }

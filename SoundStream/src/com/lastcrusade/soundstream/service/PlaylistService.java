@@ -241,6 +241,7 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
+                //int count = 
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 if (song != null) {
@@ -260,9 +261,11 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
+                int count         = intent.getIntExtra(    MessagingService.EXTRA_COUNT, 0);
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryForSong(song);
+                
+                PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, songId, count);
                 if (entry != null) {
                     bumpSong(entry);
                 } else {
@@ -280,12 +283,14 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
+                int count         = intent.getIntExtra(    MessagingService.EXTRA_COUNT, 0);
                 
                 //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                if (isCurrentSong(song)) {
-                    removeSong(song);
+                PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, songId, count);
+                if (!isCurrentSong(entry)) {
+                    removeSong(entry);
                 }
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
@@ -315,11 +320,12 @@ public class PlaylistService extends Service {
                 }
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                int    songCount  = intent.getIntExtra(MessagingService.EXTRA_COUNT, 0);
                 boolean loaded    = intent.getBooleanExtra(MessagingService.EXTRA_LOADED, false);
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryForSong(song);
+                PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, songId, songCount);
                 if (entry != null) {
                     entry.setLoaded(loaded);
                     entry.setPlayed(played);
@@ -378,11 +384,11 @@ public class PlaylistService extends Service {
         this.registrar.unregister();
     }
 
-    private boolean isCurrentSong(SongMetadata song) {
+    private boolean isCurrentSong(PlaylistEntry song) {
         //currentSong == null before play is started, and for a brief moment between songs
         // (It's nulled out when the ACTION_SONG_FINISHED method is called,
         // and repopulated in setSong)
-        return currentSong != null && SongMetadataUtils.isTheSameSong(song, currentSong);
+        return currentSong != null && SongMetadataUtils.isTheSameEntry(song, currentSong);
     }
 
     public boolean isPlaying() {
@@ -475,6 +481,9 @@ public class PlaylistService extends Service {
     public void addSong(PlaylistEntry entry) {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
+        int count = mPlaylist.countSongOccurence(entry);
+        entry.setCount(count+1);
+        
         mPlaylist.add(entry);
         if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
@@ -494,8 +503,8 @@ public class PlaylistService extends Service {
         }
     }
     
-    public void removeSong(SongMetadata song) {
-        PlaylistEntry entry = mPlaylist.findEntryForSong(song);
+    public void removeSong(PlaylistEntry entry) {
+        //PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, id, count);
         if (entry != null) {
             mPlaylist.remove(entry);
             //broadcast the fact that a song has been removed
@@ -514,7 +523,7 @@ public class PlaylistService extends Service {
                 getMessagingService().sendRemoveFromPlaylistMessage(entry);
             }
         } else {
-            Log.e(TAG, "Attempting to remove a song that is not in our playlist: " + song);
+            Log.e(TAG, "Attempting to remove a song that is not in our playlist: " + entry);
         }
     }
 

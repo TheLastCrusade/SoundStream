@@ -109,6 +109,7 @@ public abstract class ADataMessage implements IMessage {
         writeBoolean(     entrydata.isLoaded(),    output);
         writeBoolean(     entrydata.isPlayed(),    output);
         writeString(      entrydata.getFilePath(), output);
+        writeInteger(     entrydata.getCount(),    output);
     }
     
     protected PlaylistEntry readPlaylistEntry(InputStream input) throws IOException{
@@ -117,7 +118,8 @@ public abstract class ADataMessage implements IMessage {
                 song,
                 readBoolean(input),
                 readBoolean(input),
-                readString(input)
+                readString(input),
+                readInteger(input)
         );
         return entry;
     }
