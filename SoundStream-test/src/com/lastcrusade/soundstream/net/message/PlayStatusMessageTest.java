@@ -1,9 +1,6 @@
 package com.lastcrusade.soundstream.net.message;
 
-import static com.lastcrusade.soundstream.util.CustomAssert.assertSongMetaEquals;
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -15,20 +12,21 @@ public class PlayStatusMessageTest extends SerializationTest<PlayStatusMessage> 
     public void testSerializePlayStatusMessage() throws Exception {
         PlayStatusMessage preSerializationPlayStatusMsg = new PlayStatusMessage();
 
-        preSerializationPlayStatusMsg.setString(PlayStatusMessage.PLAY_MESSAGE);
-        preSerializationPlayStatusMsg.setCurrentSong(getSomeSongMetadata());
-        PlayStatusMessage postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
-		
-        // Testing play with song
-        assertEquals(PlayStatusMessage.PLAY_MESSAGE, postSerializationPlayStatusMsg.getString());
-        assertSongMetaEquals(getSomeSongMetadata(), postSerializationPlayStatusMsg.getCurrentSong());
-
-        // Testing pause with song
-        preSerializationPlayStatusMsg.setString(PlayStatusMessage.PAUSE_MESSAGE);
-	    preSerializationPlayStatusMsg.setCurrentSong(getSomeSongMetadata());
-	    postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
-	    assertEquals(PlayStatusMessage.PAUSE_MESSAGE, postSerializationPlayStatusMsg.getString());
-	    assertSongMetaEquals(getSomeSongMetadata(), postSerializationPlayStatusMsg.getCurrentSong());
+//        preSerializationPlayStatusMsg.setString(PlayStatusMessage.PLAY_MESSAGE);
+//        preSerializationPlayStatusMsg.setCurrentSong(getSomeSongMetadata());
+//        PlayStatusMessage postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
+//		
+//        // Testing play with song
+//        assertEquals(PlayStatusMessage.PLAY_MESSAGE, postSerializationPlayStatusMsg.getString());
+//        assertSongMetaEquals(getSomeSongMetadata(), postSerializationPlayStatusMsg.getCurrentSong());
+//
+//        // Testing pause with song
+//        preSerializationPlayStatusMsg.setString(PlayStatusMessage.PAUSE_MESSAGE);
+//	    preSerializationPlayStatusMsg.setCurrentSong(getSomeSongMetadata());
+//	    postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
+//	    assertEquals(PlayStatusMessage.PAUSE_MESSAGE, postSerializationPlayStatusMsg.getString());
+//	    assertSongMetaEquals(getSomeSongMetadata(), postSerializationPlayStatusMsg.getCurrentSong());
+        fail("Need to reimplement");
 	}
 	
 	private SongMetadata getSomeSongMetadata(){

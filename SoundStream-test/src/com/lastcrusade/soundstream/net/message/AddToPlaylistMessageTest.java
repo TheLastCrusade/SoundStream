@@ -6,13 +6,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-public class AddToPlaylistMessageTest extends SerializationTest<AddToPlaylistMessage>{
+public class AddToPlaylistMessageTest
+extends APlaylistEntrySerializationTest<AddToPlaylistMessage>{
 
     @Test
-    public void testSerializeSongStatusMessage() throws Exception {
-        AddToPlaylistMessage preSer  = new AddToPlaylistMessage("Test", 1234);
-        AddToPlaylistMessage postSer = super.testSerializeMessage(preSer);
-        assertEquals(preSer.getMacAddress(), postSer.getMacAddress());
-        assertEquals(preSer.getId(),         postSer.getId());
+    public void testSerializeAddToPlaylistMessage() throws Exception {
+        super.testSerializeMessage(
+                new AddToPlaylistMessage("Test", 1234));
     }
 }
