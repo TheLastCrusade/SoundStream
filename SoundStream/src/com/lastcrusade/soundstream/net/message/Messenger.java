@@ -215,6 +215,16 @@ public class Messenger {
     }
 
     /**
+     * True if we're reading in a file message and we're waiting for the file data, false
+     * if we're currently processing file data.
+     * @return
+     */
+    private boolean isWaitingForFile() {
+        return this.fileBytesLeft <= 0 && inputBuffer.size() >= SIZE_LEN;
+    }
+
+
+    /**
      * Read the next set of bytes from the input stream.
      * 
      * NOTE: This will block until data is available, and may throw
@@ -266,7 +276,7 @@ public class Messenger {
      * @throws IOException
      */
     private boolean readAndConsumeFile() throws IOException {
-        if (this.fileBytesLeft <= 0 && inputBuffer.size() >= SIZE_LEN) {
+        if (isWaitingForFile()) {
             this.fileBytesLeft = readAndConsumeLength();
             //write the file data to a temporary file...this is so we don't need to hold the data
             // in memory, and instead can just pass around a file path
