@@ -58,11 +58,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         
         
         
-        //add the playbar fragment onto the active content view
-        getSupportFragmentManager()
-            .beginTransaction()
-            .replace(R.id.playbar, new PlaybarFragment())
-            .commit();
+        
         
         
         
