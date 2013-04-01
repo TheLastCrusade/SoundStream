@@ -96,6 +96,7 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String ACTION_SONG_STATUS_MESSAGE          = MessagingService.class.getName() + ".action.SongStatusMessage";
     public static final String EXTRA_LOADED                        = MessagingService.class.getName() + ".extra.Loaded";
     public static final String EXTRA_PLAYED                        = MessagingService.class.getName() + ".extra.Played";
+    public static final String EXTRA_ENTRY_ID                         = MessagingService.class.getName() + ".extra.EntryId";  
 
     /**
      * A default handler for command messages (messages that do not have any data).  These messages
@@ -226,25 +227,20 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     private void registerPlayStatusMessageHandler() {
-    	this.messageDispatch.registerHandler(PlayStatusMessage.class,
-    			new IMessageHandler<PlayStatusMessage>() {
-					
-					@Override
-					public void handleMessage(int messageNo, PlayStatusMessage message,
-							String fromAddr) {
-						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
-							.putExtra(
-							        EXTRA_IS_PLAYING,
-							        message.isPlaying())
-							.putExtra(
-						             EXTRA_ADDRESS,
-						             message.getMacAddress())
-						    .putExtra(
-						             EXTRA_SONG_ID,
-						             message.getId())
-						    .send(MessagingService.this);
-					}
-				});
+        this.messageDispatch.registerHandler(PlayStatusMessage.class,
+                new IMessageHandler<PlayStatusMessage>() {
+
+                    @Override
+                    public void handleMessage(int messageNo,
+                            PlayStatusMessage message, String fromAddr) {
+                        new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
+                                .putExtra(EXTRA_IS_PLAYING, message.isPlaying())
+                                .putExtra(EXTRA_ADDRESS,
+                                        message.getMacAddress())
+                                .putExtra(EXTRA_SONG_ID, message.getId())
+                                .send(MessagingService.this);
+                    }
+                });
     }
     
     private void registerSongStatusMessageHandler() {
@@ -256,6 +252,7 @@ public class MessagingService extends Service implements IMessagingService {
                 new BroadcastIntent(ACTION_SONG_STATUS_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
+                    .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
                     .putExtra(EXTRA_LOADED,  message.isLoaded())
                     .putExtra(EXTRA_PLAYED,  message.isPlayed())
                     .send(MessagingService.this);
@@ -347,6 +344,7 @@ public class MessagingService extends Service implements IMessagingService {
                 new BroadcastIntent(ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
+                    .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
                     .send(MessagingService.this);
             }
         });
@@ -363,6 +361,7 @@ public class MessagingService extends Service implements IMessagingService {
                 new BroadcastIntent(ACTION_REMOVE_FROM_PLAYLIST_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
+                    .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
                     .send(MessagingService.this);
             }
         });
@@ -459,7 +458,7 @@ public class MessagingService extends Service implements IMessagingService {
 
     public void sendPlayStatusMessage(PlaylistEntry currentSong, boolean isPlaying) {
         PlayStatusMessage msg =
-                new PlayStatusMessage(currentSong.getMacAddress(), currentSong.getId(), isPlaying);
+                new PlayStatusMessage(currentSong.getMacAddress(), currentSong.getId(), currentSong.getEntryId(), isPlaying);
     	//send the message to the guests
     	sendMessageToGuests(msg);
     }
@@ -486,21 +485,21 @@ public class MessagingService extends Service implements IMessagingService {
     
     @Override
     public void sendAddToPlaylistMessage(PlaylistEntry song) {
-        AddToPlaylistMessage msg = new AddToPlaylistMessage(song.getMacAddress(), song.getId());
+        AddToPlaylistMessage msg = new AddToPlaylistMessage(song.getMacAddress(), song.getId(), song.getEntryId());
         //send the message to the host
         sendMessageToHost(msg);
     }
     
     @Override
     public void sendBumpSongOnPlaylistMessage(PlaylistEntry song) {
-        BumpSongOnPlaylistMessage msg = new BumpSongOnPlaylistMessage(song.getMacAddress(), song.getId());
+        BumpSongOnPlaylistMessage msg = new BumpSongOnPlaylistMessage(song.getMacAddress(), song.getId(), song.getEntryId());
         //send the message to the host
         sendMessageToHost(msg);
     }
 
     @Override
     public void sendRemoveFromPlaylistMessage(PlaylistEntry song) {
-        RemoveFromPlaylistMessage msg = new RemoveFromPlaylistMessage(song.getMacAddress(), song.getId());
+        RemoveFromPlaylistMessage msg = new RemoveFromPlaylistMessage(song.getMacAddress(), song.getId(), song.getEntryId());
         //send the message to the host
         sendMessageToHost(msg);
     }
@@ -522,7 +521,7 @@ public class MessagingService extends Service implements IMessagingService {
     @Override
     public void sendSongStatusMessage(PlaylistEntry song) {
         SongStatusMessage msg = new SongStatusMessage(song.getMacAddress(),
-                song.getId(), song.isLoaded(), song.isPlayed());
+                song.getId(), song.getEntryId(), song.isLoaded(), song.isPlayed());
         //send the message to the guests
         sendMessageToGuests(msg);
     }

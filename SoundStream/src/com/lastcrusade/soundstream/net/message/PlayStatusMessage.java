@@ -30,8 +30,8 @@ public class PlayStatusMessage extends APlaylistEntryMessage {
 
     public PlayStatusMessage() {}
 
-    public PlayStatusMessage(String macAddress, long id, boolean playing) {
-        super(macAddress, id);
+    public PlayStatusMessage(String macAddress, long id, int entryId, boolean playing) {
+        super(macAddress, id, entryId);
         this.playing = playing;
     }
 
