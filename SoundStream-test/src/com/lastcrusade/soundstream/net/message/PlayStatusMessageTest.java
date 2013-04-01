@@ -1,6 +1,6 @@
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
