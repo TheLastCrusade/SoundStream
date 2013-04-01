@@ -265,14 +265,6 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     TransferSongMessage message, String fromAddr) {
                 try {
-                    //write the song data to a temporary file
-                    //...we cannot send large file data thru broadcast intents
-                    // and this is faster for even smaller files
-//                    File outputFile = createTempFile(message);
-//                    FileOutputStream fos = new FileOutputStream(outputFile);
-//                    fos.write(message.getSongData());
-//                    fos.close();
-                    
                     new BroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
                         .putExtra(EXTRA_ADDRESS,        fromAddr)
                         .putExtra(EXTRA_SONG_ID,        message.getSongId())
