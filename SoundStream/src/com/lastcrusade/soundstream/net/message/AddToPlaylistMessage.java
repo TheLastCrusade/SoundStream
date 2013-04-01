@@ -6,7 +6,7 @@ public class AddToPlaylistMessage extends APlaylistEntryMessage {
     AddToPlaylistMessage() {
     }
 
-    public AddToPlaylistMessage(String macAddress, long id, int count) {
-        super(macAddress, id, count);
+    public AddToPlaylistMessage(String macAddress, long id, int entryId) {
+        super(macAddress, id, entryId);
     }
 }

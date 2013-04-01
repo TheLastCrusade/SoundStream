@@ -35,12 +35,12 @@ public class PlaylistEntry extends SongMetadata {
         this.setTitle(metadata.getTitle());
     }
     
-    public PlaylistEntry(SongMetadata metadata, boolean loaded, boolean played, String filePath, int count){
+    public PlaylistEntry(SongMetadata metadata, boolean loaded, boolean played, String filePath, int entryId){
         this(metadata);
         this.loaded = loaded;
         this.played = played;
         this.filePath = filePath;
-        this.entryId = count;
+        this.entryId = entryId;
     }
 
     public PlaylistEntry(Parcel in){
