@@ -74,6 +74,12 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     }
     
     @Override
+    public void onResume(){
+        super.onResume();
+        getActivity().setTitle(getTitle());
+    }
+    
+    @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceivers();
