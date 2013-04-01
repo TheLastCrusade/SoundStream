@@ -51,24 +51,25 @@ public class Messenger {
     private ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 
     /**
-     * Used for the incoming buffer, to avoid frequent writes to the file
+     * Min size in bytes to read in before flushing to file.
+     * Used for the incoming buffer, to avoid frequent writes to disk
      * 
      */
-    private static final int MIN_READ_IN = 102400;
+    private static final int MIN_BYTES_READ_IN = 102400;
     
     /**
-     * Maximum size to read from a socket at a time.
+     * Maximum size in bytes to read from a socket at a time.
      * 
      */
-    private static final int MAX_READ_SIZE = 1024;
-    private byte[] inBytes = new byte[MAX_READ_SIZE];
+    private static final int MAX_READ_SIZE_BYTES = 1024;
+    private byte[] inBytes = new byte[MAX_READ_SIZE_BYTES];
 
     /**
-     * Maximum size to write to a socket at a time.
+     * Maximum size in bytes to write to a socket at a time.
      * 
      */
-    private static final int MAX_WRITE_SIZE = 1024;
-    private byte[] outBytes = new byte[MAX_WRITE_SIZE];
+    private static final int MAX_WRITE_SIZE_BYTES = 1024;
+    private byte[] outBytes = new byte[MAX_WRITE_SIZE_BYTES];
 
     private File tempFolder;
 
@@ -79,9 +80,21 @@ public class Messenger {
     private FileInputStream outFileStream;
 
     private String outFilePath;
+
+    private boolean canLog;
     
     public Messenger(File tempFolder) {
         this.tempFolder = tempFolder;
+        
+        //test to see if we can log (i.e. if the logger exists on the classpath)
+        //...this is required because we run unit tests using the android junit runner, which will remove
+        // android classes, such as Log, from the classpath.
+        try {
+            Log.v(TAG, "Creating messenger");
+            this.canLog = true;
+        } catch (NoClassDefFoundError e) {
+            this.canLog = false;
+        }
     }
     
     /**
@@ -165,7 +178,9 @@ public class Messenger {
                 if (isWaitingForNewMessage()) {
                     this.messageLength = readAndConsumeLength();
                     this.receivedMessage = null;
-//                    Log.i(TAG, "Receiving " + this.messageLength + " byte message");
+                    if (this.canLog) {
+                        Log.i(TAG, "Receiving " + this.messageLength + " byte message");
+                    }
                 }
                 //check to see if we can process this message
                 if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength && this.receivedMessage == null) {
@@ -177,13 +192,15 @@ public class Messenger {
                     processed = readAndConsumeFile();
                     readingFile = !processed;
                 }
+                if (this.canLog) {
+                    Log.d(TAG, "Residual buffer data: " + inputBuffer.size() + " bytes left in buffer");
+                }
             }
             
             //if we don't have a message processed, attempt to read new data and loop back around
             if (!processed) {
                 readNext(input);
             }
-//            Log.d(TAG, "Residual buffer data: " + inputBuffer.size() + " bytes left in buffer");
             //loop back around if we havent processed a message yet
         } while (!processed);
         return processed;
@@ -278,7 +295,7 @@ public class Messenger {
 
     private boolean isInFileBufferFilled() {
         int available = inputBuffer.size();
-        return available > 0 && available >= Math.min(MIN_READ_IN, this.fileBytesLeft);
+        return available > 0 && available >= Math.min(MIN_BYTES_READ_IN, this.fileBytesLeft);
     }
 
     /**
@@ -325,7 +342,9 @@ public class Messenger {
      * @throws IOException
      */
     private void writeInFileData(byte[] bytes, int read) throws IOException {
-        Log.d(TAG, "Writing " + read + " bytes to incoming file");
+        if (this.canLog) {
+            Log.d(TAG, "Writing " + read + " bytes to incoming file");
+        }
         this.inFileStream.write(bytes, 0, read);
         this.fileBytesLeft -= read;
     }
@@ -366,7 +385,9 @@ public class Messenger {
                 processed = true;
             } else {
                 //otherwise, it's a WTF
-                Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
+                if (this.canLog) {
+                    Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
+                }
             }
         } finally {
             //consume this message either way

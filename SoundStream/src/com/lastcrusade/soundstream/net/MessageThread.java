@@ -64,8 +64,6 @@ public abstract class MessageThread extends Thread {
         
         mmDisconnectAction = disconnectAction;
         
-//        this.messenger = new Messenger(context.getCacheDir()); // context being the Activity pointer
-
         mmMessenger = new Messenger(context.getCacheDir());
         mmWriter    = new MessageThreadWriter(mmMessenger, mmOutStream);
         mmWriteThreadRunning = true;
