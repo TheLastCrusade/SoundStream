@@ -20,6 +20,8 @@ public class Playlist {
     
     private final static String TAG = Playlist.class.getName();
     
+    private static int lastEntryId;
+    
     private Deque<PlaylistEntry> playedList;
     private Deque<PlaylistEntry> musicList;
 
@@ -29,6 +31,7 @@ public class Playlist {
     }
 
     public void add(PlaylistEntry entry) {
+        entry.setEntryId(++lastEntryId);
         musicList.add(entry);
     }
 
@@ -49,36 +52,15 @@ public class Playlist {
         return found;
     }
     
-    public PlaylistEntry findEntryBySongandCount(SongMetadata song, int count){
+    public PlaylistEntry findEntryBySongandCount(SongMetadata song, int entryId){
         PlaylistEntry found = null;
         for(PlaylistEntry entry: getSongsToPlay()){
-            if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getCount() == count){
+            if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getEntryId() == entryId){
                 found = entry;
                 break;
             }
         }
         return found;
-    }
-    
-    /**
-     *Counts the number of times the given song occurs in the playlist
-     *
-     * @param song
-     * @return
-     */
-    public int countSongOccurence(PlaylistEntry song){
-        PlaylistEntry found = null;
-        for(PlaylistEntry entry: getSongsToPlay()){
-            if(SongMetadataUtils.isTheSameSongByTitle(entry, song)){
-                found = entry;
-            }
-        }
-        if(found != null){
-            return found.getCount();
-        }
-        else{
-            return 0;
-        }
     }
 
     public PlaylistEntry remove(PlaylistEntry entry) {

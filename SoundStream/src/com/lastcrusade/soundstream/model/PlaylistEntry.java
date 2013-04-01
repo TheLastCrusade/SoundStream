@@ -13,7 +13,7 @@ public class PlaylistEntry extends SongMetadata {
     private boolean played   = false;
     private String  filePath = null;
     //used to keep track of whether this song exists in the playlist multiple times
-    private int count = 0;
+    private int entryId = 0;
     //required for Parcelable to work
     public static final Parcelable.Creator<PlaylistEntry> CREATOR = new DefaultParcelableCreator(PlaylistEntry.class);
 
@@ -40,7 +40,7 @@ public class PlaylistEntry extends SongMetadata {
         this.loaded = loaded;
         this.played = played;
         this.filePath = filePath;
-        this.count = count;
+        this.entryId = count;
     }
 
     public PlaylistEntry(Parcel in){
@@ -50,7 +50,7 @@ public class PlaylistEntry extends SongMetadata {
         this.loaded = state[0];
         this.played = state[1];
         this.filePath = in.readString();
-        this.count = in.readInt();
+        this.entryId = in.readInt();
     }
 
     public boolean isLocalFile() {
@@ -84,12 +84,12 @@ public class PlaylistEntry extends SongMetadata {
         this.setLoaded(filePath != null);
     }
     
-    public void setCount(int count){
-        this.count=count;
+    public void setEntryId(int entryId){
+        this.entryId = entryId;
     }
     
-    public int getCount(){
-        return count;
+    public int getEntryId(){
+        return entryId;
     }
     
     @Override
@@ -113,6 +113,6 @@ public class PlaylistEntry extends SongMetadata {
         state[1] = this.played;
         dest.writeBooleanArray(state);
         dest.writeString(this.filePath);
-        dest.writeInt(count);
+        dest.writeInt(entryId);
     }
 }

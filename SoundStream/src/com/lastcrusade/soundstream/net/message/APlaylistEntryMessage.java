@@ -9,29 +9,29 @@ public abstract class APlaylistEntryMessage extends ADataMessage {
     private String macAddress;
     private long id; // TODO: when we deal with duplicates, we may change this
                      // to index in the music library list or something
-    private int count;
+    private int entryId;
     
     APlaylistEntryMessage() {
     }
 
-    public APlaylistEntryMessage(String macAddress, long id, int count) {
+    public APlaylistEntryMessage(String macAddress, long id, int entryId) {
         this.macAddress = macAddress;
         this.id = id;
-        this.count = count;
+        this.entryId = entryId;
     }
 
     @Override
     public void deserialize(InputStream input) throws IOException {
         this.macAddress = readString(input);
         this.id = readLong(input);
-        this.count = readInteger(input);
+        this.entryId = readInteger(input);
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
         writeString(this.macAddress, output);
         writeLong(this.id, output);
-        writeInteger(this.count, output);
+        writeInteger(this.entryId, output);
     }
 
     public long getId() {
@@ -42,7 +42,7 @@ public abstract class APlaylistEntryMessage extends ADataMessage {
         return macAddress;
     }
     
-    public int getCount(){
-        return count;
+    public int getEntryId(){
+        return entryId;
     }
 }

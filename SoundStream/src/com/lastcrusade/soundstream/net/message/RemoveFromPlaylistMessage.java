@@ -6,7 +6,7 @@ public class RemoveFromPlaylistMessage extends APlaylistEntryMessage {
     RemoveFromPlaylistMessage() {
     }
 
-    public RemoveFromPlaylistMessage(String macAddress, long id, int count) {
-        super(macAddress, id, count);
+    public RemoveFromPlaylistMessage(String macAddress, long id, int entryId) {
+        super(macAddress, id, entryId);
     }
 }

@@ -28,7 +28,7 @@ public class SongMetadataUtils {
     
     /**
      * Checks to see if the two playlist entries are identical - same mac address,
-     * id, and count
+     * id, and entry id
      * 
      * @param lhs
      * @param rhs
@@ -36,26 +36,15 @@ public class SongMetadataUtils {
      */
     public static boolean isTheSameEntry(PlaylistEntry lhs, PlaylistEntry rhs) {
         return lhs.getMacAddress().equals(rhs.getMacAddress()) &&
-               lhs.getId() == rhs.getId() && lhs.getCount() == rhs.getCount();
-    }
-    
-    /**
-     * Checks to see if the song is the same by artist, album, and title 
-     * @param lhs
-     * @param rhs
-     * @return
-     */
-    public static boolean isTheSameSongByTitle(PlaylistEntry lhs, PlaylistEntry rhs) {
-        return lhs.getTitle().equals(rhs.getTitle()) &&
-                lhs.getAlbum().equals(rhs.getAlbum()) && lhs.getArtist().equals(rhs.getArtist());
+               lhs.getId() == rhs.getId() && lhs.getEntryId() == rhs.getEntryId();
     }
     
     public static String getUniqueKey(PlaylistEntry song) {
-        return getUniqueKey(song.getMacAddress(), song.getId(), song.getCount());
+        return getUniqueKey(song.getMacAddress(), song.getId(), song.getEntryId());
     }
     
-    public static String getUniqueKey(String songSourceAddress, long songId, int count) {
-        return songSourceAddress.replace(":", "") + "_" + songId + "_" + count;
+    public static String getUniqueKey(String songSourceAddress, long songId, int entryId) {
+        return songSourceAddress.replace(":", "") + "_" + songId + "_" + entryId;
     }
 
 }
