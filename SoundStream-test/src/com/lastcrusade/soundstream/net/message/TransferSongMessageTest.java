@@ -13,7 +13,7 @@ import org.junit.Test;
 public class TransferSongMessageTest extends SerializationTest<TransferSongMessage> {
     
     @Test
-    public void testSerializePlayMessage() throws IOException {
+    public void testSerializePlayMessage() throws Exception {
         File file = new File("./assets/Jesse_normal_trimmed.wav");
         FileInputStream fis = new FileInputStream(file);
         byte[] bytes = new byte[fis.available()];
