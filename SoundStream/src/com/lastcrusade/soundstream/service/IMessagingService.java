@@ -56,13 +56,11 @@ public interface IMessagingService {
 
     public void sendRemoveFromPlaylistMessage(PlaylistEntry song);
 
+    public void sendPlayStatusMessage(PlaylistEntry currentSong, boolean isPlaying);
+
     public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay);
 
     public void sendSongStatusMessage(PlaylistEntry currentSong);
-
-    public void sendPlayStatusMessage(String playStatusMessage);
-
-    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong);
 
     public void sendRequestSongMessage(String address, long songId);
 

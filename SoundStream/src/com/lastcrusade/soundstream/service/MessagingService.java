@@ -215,10 +215,10 @@ public class MessagingService extends Service implements IMessagingService {
                     public void handleMessage(int messageNo,
                             PlayStatusMessage message, String fromAddr) {
                         new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
-                                .putExtra(
-                                        EXTRA_IS_PLAYING,
-                                        message.getString().equals(
-                                                PlayStatusMessage.PLAY_MESSAGE))
+                                .putExtra(EXTRA_IS_PLAYING, message.isPlaying())
+                                .putExtra(EXTRA_ADDRESS,
+                                        message.getMacAddress())
+                                .putExtra(EXTRA_SONG_ID, message.getId())
                                 .send(MessagingService.this);
                     }
                 });
@@ -437,12 +437,9 @@ public class MessagingService extends Service implements IMessagingService {
         sendMessageToHost(msg);
     }
 
-    public void sendPlayStatusMessage(String playStatusMessage) {
-        sendPlayStatusMessage(playStatusMessage, new SongMetadata());
-    }
-
-    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
-        PlayStatusMessage msg = new PlayStatusMessage(playStatusMessage, currentSong);
+    public void sendPlayStatusMessage(PlaylistEntry currentSong, boolean isPlaying) {
+        PlayStatusMessage msg =
+                new PlayStatusMessage(currentSong.getMacAddress(), currentSong.getId(), currentSong.getEntryId(), isPlaying);
     	//send the message to the guests
     	sendMessageToGuests(msg);
     }
