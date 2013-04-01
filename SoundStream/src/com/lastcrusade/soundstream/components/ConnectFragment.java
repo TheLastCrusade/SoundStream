@@ -23,7 +23,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,6 +82,9 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             public void onClick(View v) {
                 Transitions.transitionToNetwork((CoreActivity)getActivity());
                 ((CoreActivity)getActivity()).enableSlidingMenu();
+                
+                //add the playbar fragment onto the active content view
+                ((CoreActivity)getActivity()).showPlaybar();
             }
         });
         
@@ -144,6 +146,9 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         //switch 
                         Transitions.transitionToHome((CoreActivity)getActivity());
                         ((CoreActivity)getActivity()).enableSlidingMenu();
+                        
+                      //add the playbar fragment onto the active content view
+                        ((CoreActivity)getActivity()).showPlaybar();
                     }
                 })
              .addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
