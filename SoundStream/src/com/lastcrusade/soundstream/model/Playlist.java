@@ -40,7 +40,7 @@ public class Playlist {
         musicList.clear();
     }
     
-    public PlaylistEntry findEntryBySongandId(SongMetadata song, int entryId){
+    public PlaylistEntry findEntryBySongAndId(SongMetadata song, int entryId){
         PlaylistEntry found = null;
         for(PlaylistEntry entry: getSongsToPlay()){
             if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getEntryId() == entryId){

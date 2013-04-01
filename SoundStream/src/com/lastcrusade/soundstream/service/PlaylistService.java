@@ -260,7 +260,7 @@ public class PlaylistService extends Service {
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 
-                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
+                PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
                 if (entry != null) {
                     bumpSong(entry);
                 } else {
@@ -283,7 +283,7 @@ public class PlaylistService extends Service {
                 //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
+                PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
                 if (!isCurrentEntry(entry)) {
                     removeSong(entry);
                 }
@@ -320,7 +320,7 @@ public class PlaylistService extends Service {
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
+                PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
                 if (entry != null) {
                     entry.setLoaded(loaded);
                     entry.setPlayed(played);
