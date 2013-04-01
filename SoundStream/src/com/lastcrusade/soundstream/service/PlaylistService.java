@@ -115,7 +115,7 @@ public class PlaylistService extends Service {
     private Thread                mDataManagerThread;
     private PlaylistDataManager   mDataManager;
 
-    private PlaylistEntry currentSong;
+    private PlaylistEntry currentEntry;
     private boolean isLocalPlayer;
 
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
@@ -165,11 +165,11 @@ public class PlaylistService extends Service {
             public void onReceiveAction(Context context, Intent intent) {
                 //NOTE: this is an indicator that the song data can be deleted...therefore, we don't
                 //want to set the flag until after the song has been played
-                if (currentSong != null) {
-                    currentSong.setPlayed(true);
+                if (currentEntry != null) {
+                    currentEntry.setPlayed(true);
                     getMessagingService()
-                        .sendSongStatusMessage(currentSong);
-                    currentSong = null;
+                        .sendSongStatusMessage(currentEntry);
+                    currentEntry = null;
                 }
                 // automatically play the next song, but only if we're not paused
                 if (!mThePlayer.isPaused()) {
@@ -256,7 +256,7 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
-                int entryId         = intent.getIntExtra(    MessagingService.EXTRA_ENTRY_ID, 0);
+                int entryId         = intent.getIntExtra( MessagingService.EXTRA_ENTRY_ID, 0);
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 
@@ -278,13 +278,13 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
-                int entryId         = intent.getIntExtra(    MessagingService.EXTRA_ENTRY_ID, 0);
+                int entryId         = intent.getIntExtra( MessagingService.EXTRA_ENTRY_ID, 0);
                 
                 //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
-                if (!isCurrentSong(entry)) {
+                if (!isCurrentEntry(entry)) {
                     removeSong(entry);
                 }
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
@@ -315,12 +315,12 @@ public class PlaylistService extends Service {
                 }
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
-                int    songCount  = intent.getIntExtra(MessagingService.EXTRA_ENTRY_ID, 0);
+                int    entryId    = intent.getIntExtra(   MessagingService.EXTRA_ENTRY_ID, 0);
                 boolean loaded    = intent.getBooleanExtra(MessagingService.EXTRA_LOADED, false);
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, songCount);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
                 if (entry != null) {
                     entry.setLoaded(loaded);
                     entry.setPlayed(played);
@@ -379,11 +379,11 @@ public class PlaylistService extends Service {
         this.registrar.unregister();
     }
 
-    private boolean isCurrentSong(PlaylistEntry song) {
+    private boolean isCurrentEntry(PlaylistEntry entry) {
         //currentSong == null before play is started, and for a brief moment between songs
         // (It's nulled out when the ACTION_SONG_FINISHED method is called,
         // and repopulated in setSong)
-        return currentSong != null && SongMetadataUtils.isTheSameEntry(song, currentSong);
+        return currentEntry != null && SongMetadataUtils.isTheSameEntry(entry, currentEntry);
     }
 
     public boolean isPlaying() {
@@ -433,7 +433,7 @@ public class PlaylistService extends Service {
                 Toaster.iToast(this, getString(R.string.no_available_songs));
             } else {
                 //we have a song available to play...play it!
-                this.currentSong = song;
+                this.currentEntry = song;
                 this.mAudioPlayer.setSong(song);
                 //the song has been set...indicate this in the return value
                 songSet = true;
@@ -549,8 +549,8 @@ public class PlaylistService extends Service {
         }
     }
     
-    public PlaylistEntry getCurrentSong(){
-        return currentSong;
+    public PlaylistEntry getCurrentEntry(){
+        return currentEntry;
     }
     
     public MusicLibraryService getMusicLibraryService() {

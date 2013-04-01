@@ -188,7 +188,7 @@ public class PlaylistFragment extends MusicListFragment{
             }
             @Override
             public void onClick(View v) {
-                if(getPlaylistService().getCurrentSong()!= null && getPlaylistService().getCurrentSong().equals(entry)){
+                if(getPlaylistService().getCurrentEntry()!= null && getPlaylistService().getCurrentEntry().equals(entry)){
                     getPlaylistService().skip();
                 }
                 getPlaylistService().removeSong(entry);
