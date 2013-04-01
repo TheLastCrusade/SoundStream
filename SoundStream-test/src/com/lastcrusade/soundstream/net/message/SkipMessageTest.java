@@ -13,7 +13,7 @@ import com.lastcrusade.soundstream.net.message.SkipMessage;
 public class SkipMessageTest extends SerializationTest<SkipMessage> {
     
     @Test
-    public void testSerializeSkipMessage() throws IOException {
+    public void testSerializeSkipMessage() throws Exception {
         SkipMessage oldMessage = new SkipMessage();
         SkipMessage newMessage = super.testSerializeMessage(oldMessage);
         
