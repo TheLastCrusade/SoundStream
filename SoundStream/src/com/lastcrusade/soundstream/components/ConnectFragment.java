@@ -80,6 +80,12 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+        getActivity().setTitle(getTitle());
+    }
+    
+    @Override
     public void onDestroy() {
         unregisterReceivers();
         

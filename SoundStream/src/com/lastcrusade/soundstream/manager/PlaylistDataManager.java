@@ -173,7 +173,7 @@ public class PlaylistDataManager implements Runnable {
             throw new IllegalStateException("Unable to save data for a song entry that doesnt exist");
         }
         //build a composite name from the macAddress
-        String compositeFileName = String.format("%s_%s", SongMetadataUtils.getUniqueKey(fromAddr, songId), fileName);
+        String compositeFileName = String.format("%s_%s", SongMetadataUtils.getUniqueKey(entry.getMacAddress(), entry.getId()), fileName);
         try {
             //copy the data from the temp file to the permanent file.
             FileInputStream  fis = new FileInputStream(fileDataPath);

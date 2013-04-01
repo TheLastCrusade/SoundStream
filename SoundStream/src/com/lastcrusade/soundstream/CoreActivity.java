@@ -64,13 +64,6 @@ public class CoreActivity extends SlidingFragmentActivity{
             .replace(R.id.playbar, new PlaybarFragment())
             .commit();
         
-        
-        
-        
-        //setTitle(getString(R.string.playlist));
-
-        //Log.i("Core", " " + curApp.getUserList().getUserByMACAddress(BluetoothUtils.getLocalBluetoothMAC()));
-        
         registerReceivers();
     }
 
