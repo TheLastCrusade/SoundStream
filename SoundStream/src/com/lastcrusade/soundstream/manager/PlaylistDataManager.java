@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
@@ -146,7 +145,9 @@ public class PlaylistDataManager implements Runnable {
                     if (songId == SongMetadata.UNKNOWN_SONG) {
                        Log.wtf(TAG, "TRANSFER_SONG_MESSAGE action received without a valid song id"); 
                     } else {
-                        saveTempFileData(fromAddr, songId, fileName, tempFilePath);
+                        PlaylistEntry entry = findSongByAddressAndId(fromAddr, songId);
+                        saveTempFileData(entry, fileName, tempFilePath);
+                        getMessagingService().sendSongStatusMessage(entry);
                         new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                     }
                 }
@@ -167,13 +168,12 @@ public class PlaylistDataManager implements Runnable {
         }
     }
 
-    protected void saveTempFileData(String fromAddr, long songId, String fileName, String fileDataPath) {
-        PlaylistEntry entry = findSongByAddressAndId(fromAddr, songId);
+    protected void saveTempFileData(PlaylistEntry entry, String fileName, String fileDataPath) {
         if (entry == null) {
             throw new IllegalStateException("Unable to save data for a song entry that doesnt exist");
         }
         //build a composite name from the macAddress
-        String compositeFileName = String.format("%s_%s", SongMetadataUtils.getUniqueKey(fromAddr, songId), fileName);
+        String compositeFileName = String.format("%s_%s", SongMetadataUtils.getUniqueKey(entry.getMacAddress(), entry.getId()), fileName);
         try {
             //copy the data from the temp file to the permanent file.
             FileInputStream  fis = new FileInputStream(fileDataPath);
@@ -238,6 +238,7 @@ public class PlaylistDataManager implements Runnable {
         try {
             String filePath = msw.getSongFilePath(entry);
             entry.setFilePath(filePath);
+            getMessagingService().sendSongStatusMessage(entry);
         } catch (SongNotFoundException e) {
             e.printStackTrace();
         }

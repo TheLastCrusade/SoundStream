@@ -1,69 +1,37 @@
 package com.lastcrusade.soundstream.net.message;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
+public class PlayStatusMessage extends APlaylistEntryMessage {
 
-import android.util.Log;
-
-
-/**
- * TODO: Potential refactor
- * @theJenix believes that PlayStatus should be a boolean. 
- */
-public class PlayStatusMessage extends ADataMessage {
-
-    public static final String PLAY_MESSAGE = "Play";
-    public static final String PAUSE_MESSAGE = "Pause";
-
-    private final String TAG = PlayStatusMessage.class.getName();
-    private String string = "";
-    private SongMetadata currentSong = new SongMetadata();
+    private final String TAG = PlayStatusMessage.class.getSimpleName();
+    private boolean playing;
 
     public PlayStatusMessage() {}
 
-    public PlayStatusMessage(String playStatusMessage) {
-        this(playStatusMessage, new SongMetadata());
+    public PlayStatusMessage(String macAddress, long id, boolean playing) {
+        super(macAddress, id);
+        this.playing = playing;
     }
 
-    public PlayStatusMessage(String playStatusMessage, SongMetadata currentSong) {
-        if(playStatusMessage.equals(PLAY_MESSAGE) || playStatusMessage.equals(PAUSE_MESSAGE)) {
-            this.setString(playStatusMessage);
-            this.setCurrentSong(currentSong);
-		}
-        else {
-            Log.wtf(TAG, "Status msg passed not Play or Pause");
-        }
-    }
-
-    @Override
     public void deserialize(InputStream input) throws IOException {
-        string = readString(input);
-        currentSong = readSongMetadata(input);
+        super.deserialize(input);
+        playing = readBoolean(input);
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        writeString(getString(), output);
-        writeSongMetadata(getCurrentSong(), output);
-    }
-
-    public String getString() {
-        return string;
-    }
-
-    public void setString(String string) {
-        this.string = string;
-    }
-
-    public SongMetadata getCurrentSong(){
-        return this.currentSong;
+        super.serialize(output);
+        writeBoolean(playing, output);
     }
     
-    public void setCurrentSong(SongMetadata currentSong){
-        this.currentSong = currentSong;
+    public boolean isPlaying(){
+        return playing;
+    }
+    
+    public void setPlaying(boolean isPlaying){
+        this.playing = isPlaying;
     }
 }

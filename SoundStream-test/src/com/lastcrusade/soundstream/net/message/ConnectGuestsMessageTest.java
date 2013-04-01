@@ -13,7 +13,7 @@ import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
 public class ConnectGuestsMessageTest extends SerializationTest<ConnectGuestsMessage> {
 
     @Test
-    public void testSerializeFoundGuestsMessage() throws IOException {
+    public void testSerializeFoundGuestsMessage() throws Exception {
         //NOTE: no fields to check, and the base class will ensure we create the right class.
         List<String> addresses = new ArrayList<String>();
         addresses.add("00:11:22:33:44:55:66");

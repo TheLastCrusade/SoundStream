@@ -8,8 +8,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -29,7 +28,7 @@ public class SingleFileAudioPlayer implements IPlayer {
     public static final String ACTION_SONG_FINISHED = SingleFileAudioPlayer.class.getName() + ".action.SongFinished";
 
     private static final String TAG = SingleFileAudioPlayer.class.getName();
-    private String filePath;
+    private PlaylistEntry entry;
     private MediaPlayer player;
 
     private boolean paused;
@@ -58,10 +57,11 @@ public class SingleFileAudioPlayer implements IPlayer {
      * @param filePath
      * @param song
      */
-    public void setSong(String filePath, SongMetadata song) {
-        this.filePath = filePath;
+    public void setSong(PlaylistEntry song) {
+        this.entry = song;
+        //This is sending a playlist entry not a SongMetadata
         new BroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
-            .putExtra(PlaylistService.EXTRA_SONG, song)
+            .putExtra(PlaylistService.EXTRA_SONG, this.entry)
             .send(this.context);
     }
 
@@ -71,28 +71,37 @@ public class SingleFileAudioPlayer implements IPlayer {
     }
 
     public void play() {
+        if (isValidPath()) {
+            try {
+                if (player.isPlaying()) {
+                    player.stop();
+                }
+                this.paused = false;
+                player.reset();
+                player.setDataSource(entry.getFilePath());
+                player.prepare();
+                player.start();
+                this.messagingService.getService().sendPlayStatusMessage(
+                        this.entry, true);
+            } catch (Exception e) {
+                Log.wtf(TAG, "Unable to play song: " + entry.getFilePath());
+            }
+        } else {
+            Log.w(TAG, "File Path was not valid");
+        }
+    }
+
+    private boolean isValidPath() {
+        boolean isValid = false;
         try {
             //This will fail and throw and Exception if the filepath is bad
-            new File((new File(this.filePath).getParentFile().list())[0])
-                    .exists();
-            if (player.isPlaying()) {
-                player.stop();
-            }
-            this.paused = false;
-            player.reset();
-            //changed to use the underlying file descriptor, because this doesnt want to work on a Samsung Galaxy S3
-//            player.setDataSource(this.filePath);
-            FileInputStream fis = new FileInputStream(this.filePath);
-            player.setDataSource(fis.getFD());
-            player.prepare();
-            player.start();
-            this.messagingService
-                .getService()
-                .sendPlayStatusMessage(PlayStatusMessage.PLAY_MESSAGE);
+            new File((new File(entry.getFilePath()).getParentFile().list())[0]).exists();
+            isValid = true;
         } catch (Exception e) {
-            Log.wtf(TAG, "Unable to play song: " + this.filePath);
+            isValid = false;
             e.printStackTrace();
         }
+        return isValid;
     }
 
     @Override
@@ -105,7 +114,7 @@ public class SingleFileAudioPlayer implements IPlayer {
         try {
             this.messagingService
                 .getService()
-                .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
+                .sendPlayStatusMessage(this.entry, false);
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -122,13 +131,14 @@ public class SingleFileAudioPlayer implements IPlayer {
     public void stop() {
         this.paused = false;
         this.player.stop();
-        this.setSong(null, null);
+        this.setSong(null);
+        //TODO revisit the decision to treat stop the same as pause
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
         try {
             this.messagingService
                 .getService()
-                .sendPlayStatusMessage(PlayStatusMessage.PAUSE_MESSAGE);
+                .sendPlayStatusMessage(this.entry, false);
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -139,7 +149,7 @@ public class SingleFileAudioPlayer implements IPlayer {
         player.start();
         paused = false;
         try {
-            this.messagingService.getService().sendPlayStatusMessage("Play");
+            this.messagingService.getService().sendPlayStatusMessage(this.entry, true);
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }

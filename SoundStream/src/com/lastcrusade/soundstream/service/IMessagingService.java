@@ -50,19 +50,17 @@ public interface IMessagingService {
      */
     public void sendStringMessage(String message);
 
-    public void sendAddToPlaylistMessage(SongMetadata song);
+    public void sendAddToPlaylistMessage(PlaylistEntry song);
     
-    public void sendBumpSongOnPlaylistMessage(SongMetadata song);
+    public void sendBumpSongOnPlaylistMessage(PlaylistEntry song);
 
-    public void sendRemoveFromPlaylistMessage(SongMetadata song);
+    public void sendRemoveFromPlaylistMessage(PlaylistEntry song);
+
+    public void sendPlayStatusMessage(PlaylistEntry currentSong, boolean isPlaying);
 
     public void sendPlaylistMessage(List<? extends PlaylistEntry> songsToPlay);
 
     public void sendSongStatusMessage(PlaylistEntry currentSong);
-
-    public void sendPlayStatusMessage(String playStatusMessage);
-
-    public void sendPlayStatusMessage(String playStatusMessage, SongMetadata currentSong);
 
     public void sendRequestSongMessage(String address, long songId);
 

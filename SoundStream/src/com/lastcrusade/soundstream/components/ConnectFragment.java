@@ -1,5 +1,6 @@
 package com.lastcrusade.soundstream.components;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -71,20 +72,19 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
             @Override
             public void onClick(View v) {
-                connectButton.setEnabled(false);
                 getConnectionService().broadcastGuest(getActivity());
-                Handler h = new Handler();
-                h.postDelayed(new Runnable(){
-                    public void run(){
-                         connectButton.setEnabled(true);
-                    }
-                }, 30 * 1000); //30 seconds (same as discovery time)
             }
         });
 
         return v;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        getActivity().setTitle(getTitle());
+    }
+    
     @Override
     public void onDestroy() {
         unregisterReceivers();
@@ -127,6 +127,28 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         ((CoreActivity)getActivity()).enableSlidingMenu();
                     }
                 })
+             .addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    int mode = intent.getIntExtra(
+                            BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
+                    switch(mode){
+                    case BluetoothAdapter.SCAN_MODE_NONE: 
+                        connectButton.setEnabled(true);
+                        break;
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                        connectButton.setEnabled(true);
+                        break;
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                        connectButton.setEnabled(false);
+                        break;
+                    default:
+                        Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                        break;
+                    }
+                }
+            })
             .register(this.getActivity());
     }
 

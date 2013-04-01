@@ -9,7 +9,7 @@ import org.junit.Test;
 public class RemoveFromPlaylistMessageTest extends SerializationTest<RemoveFromPlaylistMessage>{
 
     @Test
-    public void testSerializeSongStatusMessage() throws IOException {
+    public void testSerializeSongStatusMessage() throws Exception {
         RemoveFromPlaylistMessage preSer  = new RemoveFromPlaylistMessage("Test", 1234);
         RemoveFromPlaylistMessage postSer = super.testSerializeMessage(preSer);
         assertEquals(preSer.getMacAddress(), postSer.getMacAddress());
