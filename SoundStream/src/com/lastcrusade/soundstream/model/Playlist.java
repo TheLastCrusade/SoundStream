@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import android.util.Log;
 
@@ -40,6 +39,8 @@ public class Playlist {
     
     private final static String TAG = Playlist.class.getName();
     
+    private static int lastEntryId;
+    
     private Deque<PlaylistEntry> playedList;
     private Deque<PlaylistEntry> musicList;
 
@@ -49,6 +50,7 @@ public class Playlist {
     }
 
     public void add(PlaylistEntry entry) {
+        entry.setEntryId(++lastEntryId);
         musicList.add(entry);
     }
 
@@ -56,16 +58,15 @@ public class Playlist {
         playedList.clear();
         musicList.clear();
     }
-
-    public PlaylistEntry findEntryForSong(SongMetadata song) {
+    
+    public PlaylistEntry findEntryBySongAndId(SongMetadata song, int entryId){
         PlaylistEntry found = null;
-        for (PlaylistEntry entry : getSongsToPlay()) {
-            if (SongMetadataUtils.isTheSameSong(entry, song)) {
+        for(PlaylistEntry entry: getSongsToPlay()){
+            if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getEntryId() == entryId){
                 found = entry;
                 break;
             }
         }
-
         return found;
     }
 

@@ -54,7 +54,7 @@ public class PlaylistDataManager implements Runnable {
     private Context context;
     private ServiceLocator<MessagingService> messagingServiceLocator;
     private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
-    private Set<PlaylistEntry> remotelyLoaded = new HashSet<PlaylistEntry>();
+    private Queue<PlaylistEntry> remotelyLoaded = new LinkedList<PlaylistEntry>();
     private Thread stoppingThread;
     private boolean running;
     private BroadcastRegistrar registrar;
@@ -235,15 +235,11 @@ public class PlaylistDataManager implements Runnable {
         //NOTE: if it is loaded, we can assume its already in remotelyLoaded
         synchronized(entryMutex) {
             if (!entry.isLoaded()) {
-//                if (this.remotelyLoaded.contains(entry)) {
-//                    PlaylistEntry existing = findSongByAddressAndId(entry.getMacAddress(), entry.getId());
-//                    
-//                }
                 if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
                     this.loadQueue.add(entry);
                 }
             } else {
-                if (!remotelyLoaded.contains(entry)) {
+                if (!remotelyLoaded.contains(entry) && !entry.isLocalFile()) {
                     Log.wtf(TAG, "Entry " + entry + " loaded but not managed.  WTF");
                 }
             }
