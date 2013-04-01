@@ -127,16 +127,19 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 public void onReceiveAction(Context context, Intent intent) {
                     int mode = intent.getIntExtra(
                             BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
-
-                    if(mode == BluetoothAdapter.SCAN_MODE_NONE ||
-                            mode == BluetoothAdapter.SCAN_MODE_CONNECTABLE){
-                        Log.d(TAG, "Button Enabled");
+                    switch(mode){
+                    case BluetoothAdapter.SCAN_MODE_NONE: 
                         connectButton.setEnabled(true);
-                    } else if(mode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
-                        Log.d(TAG, "Button disabled");
+                        break;
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                        connectButton.setEnabled(true);
+                        break;
+                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
                         connectButton.setEnabled(false);
-                    } else {
+                        break;
+                    default:
                         Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                        break;
                     }
                 }
             })
