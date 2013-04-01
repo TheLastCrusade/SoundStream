@@ -1,13 +1,13 @@
 package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.MessagingService;
@@ -73,6 +73,7 @@ public class SingleFileAudioPlayer implements IPlayer {
     public void play() {
         try {
             //This will fail and throw and Exception if the filepath is bad
+            Log.i(TAG, filePath);
             new File((new File(this.filePath).getParentFile().list())[0])
                     .exists();
             if (player.isPlaying()) {
@@ -80,7 +81,10 @@ public class SingleFileAudioPlayer implements IPlayer {
             }
             this.paused = false;
             player.reset();
-            player.setDataSource(this.filePath);
+            //player.setDataSource(this.filePath);
+            //player.setDataSource(this.filePath);
+            FileInputStream fis = new FileInputStream(this.filePath);
+            player.setDataSource(fis.getFD());
             player.prepare();
             player.start();
             this.messagingService
