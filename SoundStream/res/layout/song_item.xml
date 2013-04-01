@@ -87,9 +87,11 @@
         android:id="@id/btn_add_to_playlist"
         android:src="@drawable/av_add_to_queue"
         android:layout_width = "wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
+        android:paddingRight = "16sp"
+        android:paddingLeft = "16sp" 
         android:visibility="invisible"
         android:contentDescription="@string/add_to_playlist"
         android:background="@color/transparent"/>
@@ -100,8 +102,9 @@
         android:layout_width = "wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:paddingRight="4sp"
         android:layout_alignParentRight="true"
+        android:paddingRight = "16sp"
+        android:paddingLeft = "16sp" 
         android:visibility="invisible"
         android:contentDescription="@string/remove_from_playlist"
         android:background="@color/transparent"/>
