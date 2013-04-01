@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+    Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+    
+    This file is part of SoundStream.
+    
+    SoundStream is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    SoundStream is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -68,9 +87,11 @@
         android:id="@id/btn_add_to_playlist"
         android:src="@drawable/av_add_to_queue"
         android:layout_width = "wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
+        android:paddingRight = "16sp"
+        android:paddingLeft = "16sp" 
         android:visibility="invisible"
         android:contentDescription="@string/add_to_playlist"
         android:background="@color/transparent"/>
@@ -81,8 +102,9 @@
         android:layout_width = "wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:paddingRight="4sp"
         android:layout_alignParentRight="true"
+        android:paddingRight = "16sp"
+        android:paddingLeft = "16sp" 
         android:visibility="invisible"
         android:contentDescription="@string/remove_from_playlist"
         android:background="@color/transparent"/>

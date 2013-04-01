@@ -1,3 +1,21 @@
+<!-- 
+    Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+    
+    This file is part of SoundStream.
+    
+    SoundStream is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    SoundStream is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -36,6 +54,7 @@
             android:layout_marginLeft="20sp"
             android:text="@string/playlist"
             android:textColor="@color/white"
+            android:textSize="18sp" 
             android:clickable="true"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/playlist_icon"
@@ -43,12 +62,13 @@
         
         <Button 
             android:id="@+id/music_library_btn"
-            android:layout_width="wrap_content"
+            android:layout_width= "wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/playlist_btn"
             android:layout_marginLeft="20sp"
             android:text="@string/music_library"
             android:textColor="@color/white"
+            android:textSize="18sp" 
             android:clickable="true"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/music_library_icon"
@@ -90,6 +110,7 @@
             android:layout_below="@+id/network_line"
             android:text="@string/network"
             android:textColor="@color/white"
+            android:textSize="18sp" 
             android:clickable="true"
             android:layout_marginLeft="20sp"
             android:background="@color/transparent"

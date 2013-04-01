@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream.components;
 
 import java.util.Collections;
@@ -26,7 +45,6 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
-import com.lastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show
@@ -189,7 +207,7 @@ public class PlaylistFragment extends MusicListFragment{
             }
             @Override
             public void onClick(View v) {
-                if(getPlaylistService().getCurrentSong()!= null && getPlaylistService().getCurrentSong().equals(entry)){
+                if(getPlaylistService().getCurrentEntry()!= null && getPlaylistService().getCurrentEntry().equals(entry)){
                     getPlaylistService().skip();
                 }
                 getPlaylistService().removeSong(entry);

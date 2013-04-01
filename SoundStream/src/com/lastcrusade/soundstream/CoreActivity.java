@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream;
 
 import android.content.Context;
@@ -21,7 +40,7 @@ public class CoreActivity extends SlidingFragmentActivity{
     private final String TAG = CoreActivity.class.getName();
 
     private Fragment menu;
-
+    private PlaybarFragment playbar;
     private BroadcastRegistrar registrar;
         
     public void onCreate(Bundle savedInstanceState){
@@ -46,6 +65,8 @@ public class CoreActivity extends SlidingFragmentActivity{
             Transitions.transitionToConnect(this);
             getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
             setSlidingActionBarEnabled(false);
+            
+            playbar = new PlaybarFragment();
         }
         else{
             //if we're not entering for the first time, we want to make sure that 
@@ -58,11 +79,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         
         
         
-        //add the playbar fragment onto the active content view
-        getSupportFragmentManager()
-            .beginTransaction()
-            .replace(R.id.playbar, new PlaybarFragment())
-            .commit();
+        
         
         registerReceivers();
     }
@@ -113,5 +130,12 @@ public class CoreActivity extends SlidingFragmentActivity{
      // enables the icon to act as the up
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+    }
+    
+    public void showPlaybar(){
+        getSupportFragmentManager()
+        .beginTransaction()
+        .replace(R.id.playbar, playbar)
+        .commit();
     }
 }

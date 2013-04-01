@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream.manager;
 
 import java.io.File;
@@ -35,7 +54,7 @@ public class PlaylistDataManager implements Runnable {
     private Context context;
     private ServiceLocator<MessagingService> messagingServiceLocator;
     private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
-    private Set<PlaylistEntry> remotelyLoaded = new HashSet<PlaylistEntry>();
+    private Queue<PlaylistEntry> remotelyLoaded = new LinkedList<PlaylistEntry>();
     private Thread stoppingThread;
     private boolean running;
     private BroadcastRegistrar registrar;
@@ -216,17 +235,13 @@ public class PlaylistDataManager implements Runnable {
         //NOTE: if it is loaded, we can assume its already in remotelyLoaded
         synchronized(entryMutex) {
             if (!entry.isLoaded()) {
-//                if (this.remotelyLoaded.contains(entry)) {
-//                    PlaylistEntry existing = findSongByAddressAndId(entry.getMacAddress(), entry.getId());
-//                    
-//                }
                 if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
                     this.loadQueue.add(entry);
                 } else {
                     Log.d(TAG, "Adding a song that's already loaded: " + entry.toString());
                 }
             } else {
-                if (!remotelyLoaded.contains(entry)) {
+                if (!remotelyLoaded.contains(entry) && !entry.isLocalFile()) {
                     Log.wtf(TAG, "Entry " + entry + " loaded but not managed.  WTF");
                 }
             }
