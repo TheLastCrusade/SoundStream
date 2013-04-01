@@ -433,7 +433,7 @@ public class PlaylistService extends Service {
             } else {
                 //we have a song available to play...play it!
                 this.currentSong = song;
-                this.mAudioPlayer.setSong(song.getFilePath(), song);
+                this.mAudioPlayer.setSong(song);
                 //the song has been set...indicate this in the return value
                 songSet = true;
             }

@@ -16,7 +16,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 public class PlaylistMessageTest extends SerializationTest<PlaylistMessage> {
 
     @Test
-    public void testSerializePlaylistMessage() throws IOException {
+    public void testSerializePlaylistMessage() throws Exception {
         List<PlaylistEntry> songsToPlay = populateTestPlaylist();
 
         PlaylistMessage preSerializationPlaylistMessage = new PlaylistMessage(

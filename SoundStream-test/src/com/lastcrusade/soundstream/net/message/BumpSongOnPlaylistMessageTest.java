@@ -9,7 +9,7 @@ import org.junit.Test;
 public class BumpSongOnPlaylistMessageTest extends SerializationTest<BumpSongOnPlaylistMessage>{
 
     @Test
-    public void testSerializeSongStatusMessage() throws IOException {
+    public void testSerializeSongStatusMessage() throws Exception {
         BumpSongOnPlaylistMessage preSer  = new BumpSongOnPlaylistMessage("Test", 1234);
         BumpSongOnPlaylistMessage postSer = super.testSerializeMessage(preSer);
         assertEquals(preSer.getMacAddress(), postSer.getMacAddress());
