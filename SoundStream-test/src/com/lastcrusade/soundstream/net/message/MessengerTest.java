@@ -45,7 +45,7 @@ public class MessengerTest {
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
     
     @Test
-    public void testDeserializeMessage() throws IOException {
+    public void testDeserializeMessage() throws Exception {
         
         //test the simple case (one message within the stream)
         Messenger messenger = new Messenger();
@@ -70,7 +70,7 @@ public class MessengerTest {
     }
     
     @Test
-    public void testDeserializeMessageMultiple() throws IOException {
+    public void testDeserializeMessageMultiple() throws Exception {
 
         //test multiple complete messages in one stream
         Messenger messenger = new Messenger();
@@ -108,7 +108,7 @@ public class MessengerTest {
     }
     
     @Test
-    public void testSerializeMessage() throws IOException {
+    public void testSerializeMessage() throws Exception {
         
         Messenger messenger = new Messenger();
         
@@ -133,7 +133,7 @@ public class MessengerTest {
     }
 
     @Test
-    public void testSerializeMessageMultiple() throws IOException {
+    public void testSerializeMessageMultiple() throws Exception {
         
         //next test 2 messages in the stream, to make sure the messages are consumed properly
         Messenger messenger = new Messenger();
@@ -187,14 +187,16 @@ public class MessengerTest {
             String testMessage, ByteArrayOutputStream baos) throws IOException {
         //only write the length bytes the first time through
         int start = baos.size();
-        baos.write(new byte[4]);
+        baos.write(new byte[Messenger.SIZE_LEN]);
+        baos.write(new byte[Messenger.VERSION_LEN]);
         baos.write(className.getBytes());
         baos.write('\n');
         baos.write(testMessage.getBytes());
         byte[] bytes = baos.toByteArray();
-        ByteBuffer bb = ByteBuffer.wrap(bytes, start, 4);
-        int len = baos.size() - start - 4;
+        ByteBuffer bb = ByteBuffer.wrap(bytes, start, Messenger.SIZE_LEN + Messenger.VERSION_LEN);
+        int len = baos.size() - start - Messenger.SIZE_LEN;
         bb.putInt(len);
+        bb.putInt(Messenger.MESSENGER_VERSION);
         
         baos.reset();
         baos.write(bytes);

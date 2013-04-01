@@ -32,7 +32,7 @@ import com.lastcrusade.soundstream.net.message.PauseMessage;
 public class PauseMessageTest extends SerializationTest<PauseMessage> {
     
     @Test
-    public void testSerializePlayMessage() throws IOException {
+    public void testSerializePlayMessage() throws Exception {
         PauseMessage oldMessage = new PauseMessage();
         PauseMessage newMessage = super.testSerializeMessage(oldMessage);
         

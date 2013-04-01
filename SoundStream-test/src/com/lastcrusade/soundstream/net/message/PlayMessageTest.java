@@ -33,7 +33,7 @@ import com.lastcrusade.soundstream.net.message.PlayMessage;
 public class PlayMessageTest extends SerializationTest<PlayMessage> {
     
     @Test
-    public void testSerializePlayMessage() throws IOException {
+    public void testSerializePlayMessage() throws Exception {
         PlayMessage oldMessage = new PlayMessage();
         PlayMessage newMessage = super.testSerializeMessage(oldMessage);
         

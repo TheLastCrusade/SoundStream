@@ -31,7 +31,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 public class SongStatusMessageTest extends SerializationTest<SongStatusMessage> {
     
     @Test
-    public void testSerializeSongStatusMessage() throws IOException {
+    public void testSerializeSongStatusMessage() throws Exception {
         SongMetadata song = getSomeSongMetadata();
         for (int ii = 0; ii < 1; ii++) {
             for (int jj = 0; ii < 1; ii++) {

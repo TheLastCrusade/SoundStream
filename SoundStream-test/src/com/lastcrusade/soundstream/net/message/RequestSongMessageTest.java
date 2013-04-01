@@ -28,7 +28,7 @@ import org.junit.Test;
 public class RequestSongMessageTest extends SerializationTest<RequestSongMessage> {
     
     @Test
-    public void testSerializePlayMessage() throws IOException {
+    public void testSerializePlayMessage() throws Exception {
         long songId = 8675309L;
         RequestSongMessage oldMessage = new RequestSongMessage(songId);
         RequestSongMessage newMessage = super.testSerializeMessage(oldMessage);

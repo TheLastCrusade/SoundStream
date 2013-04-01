@@ -33,7 +33,7 @@ import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 public class FoundGuestsMessageTest extends SerializationTest<FoundGuestsMessage> {
 
     @Test
-    public void testSerializeFoundGuestsMessage() throws IOException {
+    public void testSerializeFoundGuestsMessage() throws Exception {
         //NOTE: no fields to check, and the base class will ensure we create the right class.
         List<FoundGuest> foundGuests = new ArrayList<FoundGuest>();
         foundGuests.add(new FoundGuest("Test1", "00:11:22:33:44:55:66", true));

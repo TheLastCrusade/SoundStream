@@ -28,7 +28,7 @@ import org.junit.Test;
 public class AddToPlaylistMessageTest extends SerializationTest<AddToPlaylistMessage>{
 
     @Test
-    public void testSerializeSongStatusMessage() throws IOException {
+    public void testSerializeSongStatusMessage() throws Exception {
         AddToPlaylistMessage preSer  = new AddToPlaylistMessage("Test", 1234);
         AddToPlaylistMessage postSer = super.testSerializeMessage(preSer);
         assertEquals(preSer.getMacAddress(), postSer.getMacAddress());

@@ -34,7 +34,7 @@ import com.lastcrusade.soundstream.net.message.LibraryMessage;
 public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	
 	@Test
-	public void testSerializeLibraryMessage() throws IOException {
+	public void testSerializeLibraryMessage() throws Exception {
 		List<SongMetadata> library = populateTestLibrary();
 		
 		LibraryMessage preSerializationLibraryMessage = new LibraryMessage(library);

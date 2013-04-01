@@ -36,7 +36,7 @@ import com.lastcrusade.soundstream.net.message.Messenger;
 
 public class SerializationTest<T extends IMessage> {
     
-    public T testSerializeMessage(T message) throws IOException {
+    public T testSerializeMessage(T message) throws Exception {
         Messenger messenger = new Messenger();
         
         messenger.serializeMessage(message);
@@ -56,7 +56,7 @@ public class SerializationTest<T extends IMessage> {
         return (T)rcvMessage;
     }
     
-    public T testDeserializeMessage(T message) throws IOException {
+    public T testDeserializeMessage(T message) throws Exception {
         Messenger messenger = new Messenger();
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
