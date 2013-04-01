@@ -425,9 +425,7 @@ public class Messenger {
     private File createRandomTempFile()
             throws IOException {
         String filePrefix = UUID.randomUUID().toString().replace("-", "");
-//        int inx = message.getSongFileName().lastIndexOf(".");
-//        String extension = message.getSongFileName().substring(inx + 1);
-        String extension = "dat";
+        String extension = ".dat";
         File outputFile = File.createTempFile(filePrefix, extension, tempFolder);
         return outputFile;
     }
