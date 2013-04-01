@@ -1,10 +1,28 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream.model;
 
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import android.util.Log;
 
@@ -21,6 +39,8 @@ public class Playlist {
     
     private final static String TAG = Playlist.class.getName();
     
+    private static int lastEntryId;
+    
     private Deque<PlaylistEntry> playedList;
     private Deque<PlaylistEntry> musicList;
 
@@ -30,6 +50,7 @@ public class Playlist {
     }
 
     public void add(PlaylistEntry entry) {
+        entry.setEntryId(++lastEntryId);
         musicList.add(entry);
     }
 
@@ -37,16 +58,15 @@ public class Playlist {
         playedList.clear();
         musicList.clear();
     }
-
-    public PlaylistEntry findEntryForSong(SongMetadata song) {
+    
+    public PlaylistEntry findEntryBySongAndId(SongMetadata song, int entryId){
         PlaylistEntry found = null;
-        for (PlaylistEntry entry : getSongsToPlay()) {
-            if (SongMetadataUtils.isTheSameSong(entry, song)) {
+        for(PlaylistEntry entry: getSongsToPlay()){
+            if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getEntryId() == entryId){
                 found = entry;
                 break;
             }
         }
-
         return found;
     }
 

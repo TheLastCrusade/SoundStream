@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream.components;
 
 import android.content.Context;
@@ -20,6 +39,7 @@ import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServi
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -32,8 +52,8 @@ public class PlaybarFragment extends Fragment {
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-    ImageButton playPause;
-
+    private ImageButton playPause;
+    private boolean boundToPlaylistService;
     private TextView songTitle;
 
     @Override
@@ -41,6 +61,15 @@ public class PlaybarFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
+        this.playlistServiceLocator.setOnBindListener(new IOnBindListener() {
+
+            @Override
+            public void onServiceBound() {
+               boundToPlaylistService = true;
+               updateView();
+            }
+            
+        });
         this.musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
                 this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
         registerReceivers();
@@ -61,20 +90,22 @@ public class PlaybarFragment extends Fragment {
         
         songTitle = (TextView) view.findViewById(R.id.text_now_playing);
         playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
-
+        
+        if(boundToPlaylistService){
+            updateView();
+        }
+        
         playPause.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    PlaylistService service = playlistServiceLocator.getService();
+                PlaylistService service = getPlaylistService();
+                if (service != null) {
                     if (service.isPlaying()) {
                         service.pause();
                     } else {
                         service.play();
                     }
                     smartSetPlayPauseImage(service);
-                }catch (ServiceNotBoundException e) {
-                    Log.wtf(TAG, e);
                 }
             }
 
@@ -85,11 +116,9 @@ public class PlaybarFragment extends Fragment {
     
                 @Override
                 public void onClick(View v) {
-                    try {
-                        PlaylistService service = playlistServiceLocator.getService();
+                    PlaylistService service = getPlaylistService();
+                    if(service != null){
                         service.skip();
-                    } catch (ServiceNotBoundException e) {
-                        Log.wtf(TAG, e);
                     }
                 }
             });
@@ -106,7 +135,7 @@ public class PlaybarFragment extends Fragment {
     }
 
     private void smartSetPlayPauseImage(PlaylistService service){
-        if(service.isPlaying()){
+        if(service != null && service.isPlaying()){
             setPauseImage();
         } else {
             setPlayImage();
@@ -166,7 +195,7 @@ public class PlaybarFragment extends Fragment {
             .register(this.getActivity());
     }
     
-    public MusicLibraryService getMusicLibraryService() {
+    private MusicLibraryService getMusicLibraryService() {
         MusicLibraryService musicLibraryService = null;
         try {
             musicLibraryService = this.musicLibraryLocator.getService();
@@ -179,6 +208,27 @@ public class PlaybarFragment extends Fragment {
 
     private void unregisterReceivers() {
         this.registrar.unregister();
+    }
+    
+    private PlaylistService getPlaylistService() {
+        PlaylistService playlistService = null;
+        try {
+            playlistService = this.playlistServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return playlistService;
+    }
+    
+    /**
+     * Updates the song title and the play button
+     */
+    private void updateView(){
+        if(songTitle != null && getPlaylistService() != null 
+                && getPlaylistService().getCurrentSong() != null){
+            songTitle.setText(getPlaylistService().getCurrentSong().getTitle());
+            smartSetPlayPauseImage(getPlaylistService());
+        }
     }
 
 }

@@ -56,3 +56,12 @@ do
 		cat ../docs/copyrightJava.txt $i > $i.new && mv $i.new $i
 	fi
 done
+
+# Edge case: monkeyTest.py
+for i in ../monkeyTest.py
+do
+	if ! grep -q Copyright\ 2013\ The\ Last\ Crusade\ ContactLastCrusade@gmail.com $i
+	then
+		cat ../docs/copyrightPy.txt $i > $i.new && mv $i.new $i
+	fi
+done

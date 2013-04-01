@@ -1,6 +1,26 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream.audio;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -8,6 +28,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.model.PlaylistEntry;
+import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -77,7 +98,10 @@ public class SingleFileAudioPlayer implements IPlayer {
                 }
                 this.paused = false;
                 player.reset();
-                player.setDataSource(entry.getFilePath());
+                //changed to use the underlying file descriptor, because this doesnt want to work on a Samsung Galaxy S3
+                // see http://stackoverflow.com/questions/1972027/android-playing-mp3-from-byte
+                FileInputStream fis = new FileInputStream(entry.getFilePath());
+                player.setDataSource(fis.getFD());
                 player.prepare();
                 player.start();
                 this.messagingService.getService().sendPlayStatusMessage(
