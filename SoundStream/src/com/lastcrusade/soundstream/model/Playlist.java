@@ -49,10 +49,10 @@ public class Playlist {
         return found;
     }
     
-    public PlaylistEntry findEntryByAddressIDandCount(String macAddress, long id, int count){
+    public PlaylistEntry findEntryBySongandCount(SongMetadata song, int count){
         PlaylistEntry found = null;
         for(PlaylistEntry entry: getSongsToPlay()){
-            if(entry.getMacAddress().equals(macAddress) && entry.getId() == id && entry.getCount() == count){
+            if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getCount() == count){
                 found = entry;
                 break;
             }

@@ -265,7 +265,7 @@ public class PlaylistService extends Service {
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 
-                PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, songId, count);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandCount(song, count);
                 if (entry != null) {
                     bumpSong(entry);
                 } else {
@@ -288,7 +288,7 @@ public class PlaylistService extends Service {
                 //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, songId, count);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandCount(song, count);
                 if (!isCurrentSong(entry)) {
                     removeSong(entry);
                 }
@@ -325,7 +325,7 @@ public class PlaylistService extends Service {
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryByAddressIDandCount(macAddress, songId, songCount);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandCount(song, songCount);
                 if (entry != null) {
                     entry.setLoaded(loaded);
                     entry.setPlayed(played);
@@ -459,6 +459,7 @@ public class PlaylistService extends Service {
             // loading
             for (PlaylistEntry entry : mPlaylist.getSongsToPlay()) {
                 //add all of the entries to the load queue
+                Log.i(TAG, entry + " is loaded? " + entry.isLoaded());
                 mDataManager.addToLoadQueue(entry);
             }
         }
@@ -486,6 +487,7 @@ public class PlaylistService extends Service {
         
         mPlaylist.add(entry);
         if (isLocalPlayer) {
+            //entry.setLoaded(true);
             mDataManager.addToLoadQueue(entry);
         }
         new BroadcastIntent(ACTION_SONG_ADDED)

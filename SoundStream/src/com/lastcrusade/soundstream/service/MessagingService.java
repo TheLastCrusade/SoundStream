@@ -208,19 +208,20 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     private void registerPlayStatusMessageHandler() {
-    	this.messageDispatch.registerHandler(PlayStatusMessage.class,
-    			new IMessageHandler<PlayStatusMessage>() {
-					
-					@Override
-					public void handleMessage(int messageNo, PlayStatusMessage message,
-							String fromAddr) {
-						new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
-							.putExtra(
-							        EXTRA_IS_PLAYING,
-							        message.getString().equals(PlayStatusMessage.PLAY_MESSAGE)
-						     ).send(MessagingService.this);
-					}
-				});
+        this.messageDispatch.registerHandler(PlayStatusMessage.class,
+                new IMessageHandler<PlayStatusMessage>() {
+
+                    @Override
+                    public void handleMessage(int messageNo,
+                            PlayStatusMessage message, String fromAddr) {
+                        new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
+                                .putExtra(
+                                        EXTRA_IS_PLAYING,
+                                        message.getString().equals(
+                                                PlayStatusMessage.PLAY_MESSAGE))
+                                .send(MessagingService.this);
+                    }
+                });
     }
     
     private void registerSongStatusMessageHandler() {
@@ -232,6 +233,7 @@ public class MessagingService extends Service implements IMessagingService {
                 new BroadcastIntent(ACTION_SONG_STATUS_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
+                    .putExtra(EXTRA_COUNT, message.getCount())
                     .putExtra(EXTRA_LOADED,  message.isLoaded())
                     .putExtra(EXTRA_PLAYED,  message.isPlayed())
                     .send(MessagingService.this);
