@@ -19,10 +19,11 @@ public abstract class MusicListFragment extends SherlockListFragment implements 
     }
 
     @Override
-    public abstract int getTitle();
-    
-    @Override
     public void onResume(){
         super.onResume();
+        getActivity().setTitle(getTitle());
     }
+    
+    @Override
+    public abstract int getTitle();
 }
