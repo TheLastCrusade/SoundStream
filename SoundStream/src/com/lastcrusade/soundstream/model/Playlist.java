@@ -39,18 +39,6 @@ public class Playlist {
         playedList.clear();
         musicList.clear();
     }
-
-    public PlaylistEntry findEntryForSong(PlaylistEntry song) {
-        PlaylistEntry found = null;
-        for (PlaylistEntry entry : getSongsToPlay()) {
-            if (SongMetadataUtils.isTheSameEntry(entry, song)) {
-                found = entry;
-                break;
-            }
-        }
-
-        return found;
-    }
     
     public PlaylistEntry findEntryBySongandId(SongMetadata song, int entryId){
         PlaylistEntry found = null;
