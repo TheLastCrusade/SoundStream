@@ -1,5 +1,6 @@
 package com.lastcrusade.soundstream.components;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -71,14 +72,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
             @Override
             public void onClick(View v) {
-                connectButton.setEnabled(false);
                 getConnectionService().broadcastGuest(getActivity());
-                Handler h = new Handler();
-                h.postDelayed(new Runnable(){
-                    public void run(){
-                         connectButton.setEnabled(true);
-                    }
-                }, 30 * 1000); //30 seconds (same as discovery time)
             }
         });
 
@@ -127,6 +121,25 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         ((CoreActivity)getActivity()).enableSlidingMenu();
                     }
                 })
+             .addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    int mode = intent.getIntExtra(
+                            BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
+
+                    if(mode == BluetoothAdapter.SCAN_MODE_NONE ||
+                            mode == BluetoothAdapter.SCAN_MODE_CONNECTABLE){
+                        Log.d(TAG, "Button Enabled");
+                        connectButton.setEnabled(true);
+                    } else if(mode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+                        Log.d(TAG, "Button disabled");
+                        connectButton.setEnabled(false);
+                    } else {
+                        Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                    }
+                }
+            })
             .register(this.getActivity());
     }
 
