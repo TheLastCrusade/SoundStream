@@ -256,11 +256,11 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
-                int count         = intent.getIntExtra(    MessagingService.EXTRA_ENTRY_ID, 0);
+                int entryId         = intent.getIntExtra(    MessagingService.EXTRA_ENTRY_ID, 0);
                 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 
-                PlaylistEntry entry = mPlaylist.findEntryBySongandCount(song, count);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
                 if (entry != null) {
                     bumpSong(entry);
                 } else {
@@ -278,12 +278,12 @@ public class PlaylistService extends Service {
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
-                int count         = intent.getIntExtra(    MessagingService.EXTRA_ENTRY_ID, 0);
+                int entryId         = intent.getIntExtra(    MessagingService.EXTRA_ENTRY_ID, 0);
                 
                 //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryBySongandCount(song, count);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, entryId);
                 if (!isCurrentSong(entry)) {
                     removeSong(entry);
                 }
@@ -320,7 +320,7 @@ public class PlaylistService extends Service {
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryBySongandCount(song, songCount);
+                PlaylistEntry entry = mPlaylist.findEntryBySongandId(song, songCount);
                 if (entry != null) {
                     entry.setLoaded(loaded);
                     entry.setPlayed(played);
@@ -477,9 +477,6 @@ public class PlaylistService extends Service {
     public void addSong(PlaylistEntry entry) {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
-        
-        // count the number of times the song occurs in the playlist before
-        // so that we can correctly identify this song
         
         mPlaylist.add(entry);
         if (isLocalPlayer) {
