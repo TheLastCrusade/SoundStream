@@ -40,7 +40,7 @@ public class CoreActivity extends SlidingFragmentActivity{
     private final String TAG = CoreActivity.class.getName();
 
     private Fragment menu;
-
+    private PlaybarFragment playbar;
     private BroadcastRegistrar registrar;
         
     public void onCreate(Bundle savedInstanceState){
@@ -65,6 +65,8 @@ public class CoreActivity extends SlidingFragmentActivity{
             Transitions.transitionToConnect(this);
             getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
             setSlidingActionBarEnabled(false);
+            
+            playbar = new PlaybarFragment();
         }
         else{
             //if we're not entering for the first time, we want to make sure that 
@@ -77,11 +79,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         
         
         
-        //add the playbar fragment onto the active content view
-        getSupportFragmentManager()
-            .beginTransaction()
-            .replace(R.id.playbar, new PlaybarFragment())
-            .commit();
+        
         
         registerReceivers();
     }
@@ -132,5 +130,12 @@ public class CoreActivity extends SlidingFragmentActivity{
      // enables the icon to act as the up
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+    }
+    
+    public void showPlaybar(){
+        getSupportFragmentManager()
+        .beginTransaction()
+        .replace(R.id.playbar, playbar)
+        .commit();
     }
 }
