@@ -236,6 +236,7 @@ public class PlaylistDataManager implements Runnable {
         try {
             String filePath = msw.getSongFilePath(entry);
             entry.setFilePath(filePath);
+            getMessagingService().sendSongStatusMessage(entry);
         } catch (SongNotFoundException e) {
             e.printStackTrace();
         }
