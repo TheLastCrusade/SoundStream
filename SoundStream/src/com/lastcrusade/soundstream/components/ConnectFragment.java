@@ -65,10 +65,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 ((CoreActivity)getActivity()).enableSlidingMenu();
                 
                 //add the playbar fragment onto the active content view
-                getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.playbar, new PlaybarFragment())
-                    .commit();
+                ((CoreActivity)getActivity()).showPlaybar();
             }
         });
         
@@ -126,10 +123,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         ((CoreActivity)getActivity()).enableSlidingMenu();
                         
                       //add the playbar fragment onto the active content view
-                        getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.playbar, new PlaybarFragment())
-                            .commit();
+                        ((CoreActivity)getActivity()).showPlaybar();
                     }
                 })
              .addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
