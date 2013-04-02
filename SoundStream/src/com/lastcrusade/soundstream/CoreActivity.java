@@ -109,8 +109,6 @@ public class CoreActivity extends SlidingFragmentActivity{
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    //after the host has been disconnected, pull the guest back to the connect page
-                    Transitions.transitionToConnect(CoreActivity.this);
                     getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
                 }
             })
@@ -138,4 +136,6 @@ public class CoreActivity extends SlidingFragmentActivity{
         .replace(R.id.playbar, playbar)
         .commit();
     }
+
+    //TODO: LizzieJohn make a hidePlaybar method
 }

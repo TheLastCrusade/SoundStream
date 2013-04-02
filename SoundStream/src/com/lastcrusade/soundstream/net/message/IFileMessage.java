@@ -19,24 +19,22 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.assertEquals;
+import java.io.File;
 
 /**
- * Generic baseclass for APlaylistEntryMessage tests.
+ * A file message is used to transmit a file across the wire.  These
+ * are handled specially, as we want to avoid loading the whole file
+ * into memory and passing it around through the app.  Instead
+ * we want to read and write from a file at the lowest possible level,
+ * and let senders/receivers specify the file or use the file
+ * as they need.
  * 
  * @author Jesse Rosalia
  *
- * @param <T>
  */
-public class APlaylistEntrySerializationTest<T extends APlaylistEntryMessage>
-    extends SerializationTest<T> {
+public interface IFileMessage extends IMessage {
 
-    public T testSerializeMessage(T preSer) throws Exception {
-        T postSer = super.testSerializeMessage(preSer);
-        //check the standard information in APlaylistEntryMessage
-        assertEquals(preSer.getMacAddress(), postSer.getMacAddress());
-        assertEquals(preSer.getId(),         postSer.getId());
-        //return the new message object
-        return postSer;
-    }
+    public String getFilePath();
+
+    public void setFilePath(String filePath);
 }

@@ -237,6 +237,8 @@ public class PlaylistDataManager implements Runnable {
             if (!entry.isLoaded()) {
                 if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
                     this.loadQueue.add(entry);
+                } else {
+                    Log.d(TAG, "Adding a song that's already loaded: " + entry.toString());
                 }
             } else {
                 if (!remotelyLoaded.contains(entry) && !entry.isLocalFile()) {

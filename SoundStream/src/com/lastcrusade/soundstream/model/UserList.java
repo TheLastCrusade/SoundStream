@@ -166,4 +166,9 @@ public class UserList implements Parcelable{
         }
         
     }
+
+    public void clear() {
+        this.connectedUsers.clear();
+        this.userColors.clear();
+    }
 }
