@@ -45,6 +45,7 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
+import com.lastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show
@@ -88,6 +89,7 @@ public class PlaylistFragment extends MusicListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
+       
         return v;
     }
 
@@ -198,6 +200,17 @@ public class PlaylistFragment extends MusicListFragment{
 
             
             return element;
+        }
+        
+        /* (non-Javadoc)
+         * @see com.lastcrusade.soundstream.util.MusicListAdapter#updateMusic(java.util.List)
+         */
+        @Override
+        public void updateMusic(List<PlaylistEntry> metadataList) {
+            super.updateMusic(metadataList);
+            if(metadataList.size() == 0){
+                Toaster.iToast(getActivity(),R.string.no_songs_in_playlist);
+            }
         }
         
         private class DeleteSongListener implements OnClickListener{
