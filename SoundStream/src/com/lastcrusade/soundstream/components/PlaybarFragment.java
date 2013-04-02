@@ -225,8 +225,8 @@ public class PlaybarFragment extends Fragment {
      */
     private void updateView(){
         if(songTitle != null && getPlaylistService() != null 
-                && getPlaylistService().getCurrentSong() != null){
-            songTitle.setText(getPlaylistService().getCurrentSong().getTitle());
+                && getPlaylistService().getCurrentEntry() != null){
+            songTitle.setText(getPlaylistService().getCurrentEntry().getTitle());
             smartSetPlayPauseImage(getPlaylistService());
         }
     }
