@@ -44,6 +44,7 @@ import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -180,7 +181,20 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 try {
                     playlistServiceLocator.getService().clearPlaylist();
                 } catch (ServiceNotBoundException e) {
-                    Log.wtf(TAG,"Service not bound");
+                    Log.wtf(TAG,"PlaylistService not bound");
+                }
+            }
+        });
+
+        musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
+                this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
+        musicLibraryServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                try {
+                    musicLibraryServiceLocator.getService().clearExternalMusic();
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, "MusicLibraryService not bound");
                 }
             }
         });
