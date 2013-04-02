@@ -497,6 +497,7 @@ public class PlaylistService extends Service {
 
     public void clearPlaylist() {
         mPlaylist.clear();
+        currentEntry = null;
         new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
