@@ -216,7 +216,9 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                mThePlayer = mAudioPlayer;
+                mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
+                isLocalPlayer = true;
+                currentEntry = null;
                 startDataManager();
             }
         })
