@@ -19,14 +19,19 @@
 
 package com.lastcrusade.soundstream.net;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.net.message.IFileMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
+import com.lastcrusade.soundstream.net.message.Messenger;
 import com.lastcrusade.soundstream.net.message.TransferSongMessage;
 
 /**
@@ -42,10 +47,9 @@ public class MessageThreadWriter {
     private static String TAG = MessageThreadWriter.class.getSimpleName();
 
     class QueueEntry {
-        private byte[] bytes;
         private int messageNo;
         private int score;
-        public Class<?> type;
+        public IMessage message;
     }
 
     PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>(11, new Comparator<QueueEntry>() {
@@ -57,39 +61,29 @@ public class MessageThreadWriter {
     });
 
     private OutputStream outStream;
+
+    private Messenger messenger;
     
-    public MessageThreadWriter(OutputStream outStream) {
+    public MessageThreadWriter(Messenger messenger, OutputStream outStream) {
         this.outStream = outStream;
+        this.messenger = messenger;
     }
 
-    public void enqueue(int messageNo, Class<?> messageType, byte[] bytes) {
+    public void enqueue(int messageNo, IMessage message) {
         QueueEntry qe = new QueueEntry();
-        qe.bytes     = bytes;
         qe.messageNo = messageNo;
-        qe.score     = messageNo * (TransferSongMessage.class.isAssignableFrom(messageType) ? 100 : 1);
-        qe.type      = messageType;
+        qe.score     = messageNo * (TransferSongMessage.class.isAssignableFrom(message.getClass()) ? 100 : 1);
+        qe.message   = message;
         queue.add(qe);
     }
 
     public void writeOne() throws IOException {
-        int maxWriteSize = 8192;
         QueueEntry qe = queue.poll();
         if (qe != null) {
-            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.type.getSimpleName() + ", " + qe.bytes.length + " bytes in length");
-            //TODO: this may or may not be needed...for now it does not appear it is, but I'd like to leave this in until I
-            // finish with all of the transfer song debugging -- Jesse Rosalia, 03/24/13
-//            int written = 0;
-//            for (int bufPos = 0; bufPos < qe.bytes.length; bufPos += written) {
-//                int writeSize = Math.min(qe.bytes.length - bufPos, maxWriteSize);
-//                Log.d(TAG, "Writing " + writeSize + " bytes...");
-//                this.outStream.write(qe.bytes, bufPos, writeSize);
-//                written = writeSize;
-//                try {
-//                    Thread.sleep(10);
-//                } catch (InterruptedException e) {
-//                }
-//            }
-            outStream.write(qe.bytes);
+            int len = messenger.serializeMessage(qe.message);
+            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.message.getClass().getSimpleName() + ", " + len + " bytes in length");
+            messenger.writeToOutputStream(outStream);
+            messenger.reset();
             Log.i(TAG, "Message " + qe.messageNo + " finished writing");
         }
     }
