@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lastcrusade.soundstream.model;
 
 import android.os.Parcel;
@@ -12,7 +31,8 @@ public class PlaylistEntry extends SongMetadata {
     private boolean loaded   = false;
     private boolean played   = false;
     private String  filePath = null;
-
+    //used to keep track of whether this song exists in the playlist multiple times
+    private int entryId = 0;
     //required for Parcelable to work
     public static final Parcelable.Creator<PlaylistEntry> CREATOR = new DefaultParcelableCreator(PlaylistEntry.class);
 
@@ -34,11 +54,12 @@ public class PlaylistEntry extends SongMetadata {
         this.setTitle(metadata.getTitle());
     }
     
-    public PlaylistEntry(SongMetadata metadata, boolean loaded, boolean played, String filePath){
+    public PlaylistEntry(SongMetadata metadata, boolean loaded, boolean played, String filePath, int entryId){
         this(metadata);
         this.loaded = loaded;
         this.played = played;
         this.filePath = filePath;
+        this.entryId = entryId;
     }
 
     public PlaylistEntry(Parcel in){
@@ -48,6 +69,7 @@ public class PlaylistEntry extends SongMetadata {
         this.loaded = state[0];
         this.played = state[1];
         this.filePath = in.readString();
+        this.entryId = in.readInt();
     }
 
     public boolean isLocalFile() {
@@ -81,6 +103,14 @@ public class PlaylistEntry extends SongMetadata {
         this.setLoaded(filePath != null);
     }
     
+    public void setEntryId(int entryId){
+        this.entryId = entryId;
+    }
+    
+    public int getEntryId(){
+        return entryId;
+    }
+    
     @Override
     public int hashCode() {
         return SongMetadataUtils.getUniqueKey(this).hashCode();
@@ -102,5 +132,6 @@ public class PlaylistEntry extends SongMetadata {
         state[1] = this.played;
         dest.writeBooleanArray(state);
         dest.writeString(this.filePath);
+        dest.writeInt(entryId);
     }
 }

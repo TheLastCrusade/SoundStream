@@ -17,22 +17,26 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.lastcrusade.soundstream.net.message;
 
-import android.bluetooth.BluetoothDevice;
-
-import com.lastcrusade.soundstream.components.IDialogFormatter;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Formatter for BluetoothDevice objects, to display the device correctly in the dialog
+ * Generic baseclass for APlaylistEntryMessage tests.
  * 
  * @author Jesse Rosalia
  *
+ * @param <T>
  */
-public class BluetoothDeviceDialogFormatter implements IDialogFormatter<BluetoothDevice> {
+public class APlaylistEntrySerializationTest<T extends APlaylistEntryMessage>
+    extends SerializationTest<T> {
 
-    @Override
-    public String format(BluetoothDevice device) {
-        return device.getName() + " (" + device.getAddress() + ")";
+    public T testSerializeMessage(T preSer) throws Exception {
+        T postSer = super.testSerializeMessage(preSer);
+        //check the standard information in APlaylistEntryMessage
+        assertEquals(preSer.getMacAddress(), postSer.getMacAddress());
+        assertEquals(preSer.getId(),         postSer.getId());
+        //return the new message object
+        return postSer;
     }
 }
