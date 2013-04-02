@@ -281,19 +281,11 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     TransferSongMessage message, String fromAddr) {
                 try {
-                    //write the song data to a temporary file
-                    //...we cannot send large file data thru broadcast intents
-                    // and this is faster for even smaller files
-                    File outputFile = createTempFile(message);
-                    FileOutputStream fos = new FileOutputStream(outputFile);
-                    fos.write(message.getSongData());
-                    fos.close();
-                    
                     new BroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
                         .putExtra(EXTRA_ADDRESS,        fromAddr)
                         .putExtra(EXTRA_SONG_ID,        message.getSongId())
                         .putExtra(EXTRA_SONG_FILE_NAME, message.getSongFileName())
-                        .putExtra(EXTRA_SONG_TEMP_FILE, outputFile.getCanonicalPath())
+                        .putExtra(EXTRA_SONG_TEMP_FILE, message.getFilePath())
                         .send(MessagingService.this);
                 } catch (Exception e) {
                     Log.wtf(TAG, e);
@@ -535,8 +527,8 @@ public class MessagingService extends Service implements IMessagingService {
     
     @Override
     public void sendTransferSongMessage(String address, long songId,
-            String fileName, byte[] bytes) {
-        TransferSongMessage msg = new TransferSongMessage(songId, fileName, bytes);
+            String fileName, String filePath) {
+        TransferSongMessage msg = new TransferSongMessage(songId, fileName, filePath);
         //send the message to the fans
         sendMessageToHost(msg);
         
@@ -558,28 +550,4 @@ public class MessagingService extends Service implements IMessagingService {
             Log.wtf(TAG, e);
         }
     }
-    
-    
-    /**
-     * Helper method to create a temporary file.
-     * 
-     * TODO: Android doesn't really have temporary files...it will proactively clear the cache folder,
-     * but we should be better citizens and clean up after ourself.  This is not an immediate (read: alpha)
-     * concern, because we consume all cache files in PlaylistDataManager (which will clean up after itself)
-     * but before this gets to final, we should make sure all bases are covered.
-     * 
-     * @param message
-     * @return
-     * @throws IOException
-     */
-    private File createTempFile(TransferSongMessage message)
-            throws IOException {
-        File outputDir = MessagingService.this.getCacheDir(); // context being the Activity pointer
-        String filePrefix = UUID.randomUUID().toString().replace("-", "");
-        int inx = message.getSongFileName().lastIndexOf(".");
-        String extension = message.getSongFileName().substring(inx + 1);
-        File outputFile = File.createTempFile(filePrefix, extension, outputDir);
-        return outputFile;
-    }
-
 }

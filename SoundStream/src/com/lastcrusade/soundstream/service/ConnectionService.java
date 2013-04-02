@@ -331,7 +331,7 @@ public class ConnectionService extends Service {
         Log.w(TAG, "Connected to server");
 
         //create the message thread, which will be responsible for reading and writing messages
-        MessageThread newMessageThread = new MessageThread(socket, this.messageDispatch, ACTION_GUEST_DISCONNECTED) {
+        MessageThread newMessageThread = new MessageThread(this, socket, this.messageDispatch, ACTION_GUEST_DISCONNECTED) {
 
             @Override
             public void onDisconnected() {
@@ -502,7 +502,7 @@ public class ConnectionService extends Service {
         BluetoothUtils.disableDiscovery(this);
 
         //create the message thread for handling this connection
-        this.host = new MessageThread(socket, this.messageDispatch, ACTION_HOST_DISCONNECTED) {
+        this.host = new MessageThread(this, socket, this.messageDispatch, ACTION_HOST_DISCONNECTED) {
 
             @Override
             public void onDisconnected() {
