@@ -19,18 +19,24 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
+/**
+ * Generic baseclass for APlaylistEntryMessage tests.
+ * 
+ * @author Jesse Rosalia
+ *
+ * @param <T>
+ */
+public class APlaylistEntrySerializationTest<T extends APlaylistEntryMessage>
+    extends SerializationTest<T> {
 
-import org.junit.Test;
-
-public class BumpSongOnPlaylistMessageTest
-extends APlaylistEntrySerializationTest<BumpSongOnPlaylistMessage>{
-
-    @Test
-    public void testSerializeBumpSongOnPlaylistMessage() throws Exception {
-        super.testSerializeMessage(
-                new BumpSongOnPlaylistMessage("Test", 1234));
+    public T testSerializeMessage(T preSer) throws Exception {
+        T postSer = super.testSerializeMessage(preSer);
+        //check the standard information in APlaylistEntryMessage
+        assertEquals(preSer.getMacAddress(), postSer.getMacAddress());
+        assertEquals(preSer.getId(),         postSer.getId());
+        //return the new message object
+        return postSer;
     }
 }
