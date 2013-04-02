@@ -405,7 +405,9 @@ public class ConnectionService extends Service {
     }
 
     public void disconnectHost() {
-        host.cancel();
+        if (host != null) {
+            host.cancel();
+        }
     }
 
     public boolean isGuestConnected() {

@@ -136,8 +136,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(getActivity())
-                        .setMessage(R.string.dialog_disconnect)
-                        .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
+                        .setMessage(R.string.dialog_disband)
+                        .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 disband();
                             }
@@ -219,6 +219,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     setDisconnectDisbandVisibility(disconnect, disband);
                 }
             })
+            .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    //after the host has been disconnected, wipe everything and start fresh
+                    disconnect();
+                }
+            })
             .register(this.getActivity());
     }
 
@@ -265,6 +272,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
 
     private void disband() {
+        getConnectionService().disconnectAllGuests();
+        disconnect();
     }
 
     /**
