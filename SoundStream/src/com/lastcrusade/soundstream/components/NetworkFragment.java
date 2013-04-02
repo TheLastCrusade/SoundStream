@@ -221,6 +221,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    Log.i(TAG, "Host Disconnected");
                     //after the host has been disconnected, wipe everything and start fresh
                     cleanUpAfterDisconnect();
                 }
