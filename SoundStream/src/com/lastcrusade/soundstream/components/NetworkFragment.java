@@ -68,8 +68,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private Button addMembersButton, disconnect, disband;
     private UserListAdapter adapter;
     private ServiceLocator<ConnectionService> connectionServiceLocator;
-    private ServiceLocator<PlaylistService> playlistServiceLocator;
-    private ServiceLocator<MusicLibraryService> musicLibraryServiceLocator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -242,8 +240,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
 
     private void cleanUpAfterDisconnect() {
-        playlistServiceLocator = new ServiceLocator<PlaylistService>(
+        final ServiceLocator<PlaylistService> playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
+
         playlistServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
@@ -257,8 +256,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
-        musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
+        final ServiceLocator<MusicLibraryService> musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
                 this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
         musicLibraryServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
