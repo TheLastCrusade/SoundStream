@@ -224,7 +224,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     //after the host has been disconnected, wipe everything and start fresh
-                    disconnect();
+                    cleanUpAfterDisconnect();
                 }
             })
             .register(this.getActivity());
@@ -235,8 +235,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
 
     private void disconnect() {
+        //Disconnect from the host
         getConnectionService().disconnectHost();
+        //Reset all variables
+        cleanUpAfterDisconnect();
+    }
 
+    private void cleanUpAfterDisconnect() {
         playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
         playlistServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
@@ -269,12 +274,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
         ((CustomApp)getActivity().getApplication()).clearExternalUsers();
 
+        //Send the user to a page where they can start a network or join a different network
         Transitions.transitionToConnect((CoreActivity) getActivity());
     }
 
     private void disband() {
         getConnectionService().disconnectAllGuests();
-        disconnect();
+        cleanUpAfterDisconnect();
     }
 
     /**
