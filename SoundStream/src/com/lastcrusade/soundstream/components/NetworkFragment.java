@@ -65,7 +65,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private static String TAG = NetworkFragment.class.getSimpleName();
     
     private BroadcastRegistrar broadcastRegistrar;
-    private Button addMembersButton;
+    private Button addMembersButton, disconnect, disband;
     private UserListAdapter adapter;
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<PlaylistService> playlistServiceLocator;
@@ -76,7 +76,14 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         super.onCreate(savedInstanceState);
         connectionServiceLocator = new ServiceLocator<ConnectionService>(
                 this.getActivity(), ConnectionService.class, ConnectionServiceBinder.class);
-        
+
+        connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                setDisconnectDisbandVisibility(disconnect, disband);
+            }
+        });
+
         registerReceivers();
     }
     
@@ -101,7 +108,11 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         this.adapter = new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList(), false );
         users.setAdapter(this.adapter);
 
-        Button disconnect = (Button)v.findViewById(R.id.disconnect_btn);
+        disconnect = (Button)v.findViewById(R.id.disconnect_btn);
+        disband = (Button)v.findViewById(R.id.disband_btn);
+
+        setDisconnectDisbandVisibility(disconnect, disband);
+
         disconnect.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,7 +120,26 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setMessage(R.string.dialog_disconnect)
                         .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                Log.i(TAG, "Disconnecting...");
                                 disconnect();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+            }
+        });
+        disband.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(R.string.dialog_disconnect)
+                        .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                disband();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -122,7 +152,21 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         });
         return v;
     }
-    
+
+    private void setDisconnectDisbandVisibility(Button disconnect, Button disband) {
+        if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
+            disconnect.setVisibility(View.INVISIBLE);
+            disband.setVisibility(View.VISIBLE);
+        } else if (getConnectionService() != null && getConnectionService().isHostConnected()) {
+            disconnect.setVisibility(View.VISIBLE);
+            disband.setVisibility(View.INVISIBLE);
+        } else {
+            //if no one is connected, hide both buttons
+            disconnect.setVisibility(View.INVISIBLE);
+            disband.setVisibility(View.INVISIBLE);
+        }
+    }
+
     @Override
     public void onResume(){
         super.onResume();
@@ -161,6 +205,18 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     adapter.notifyDataSetChanged();
+                }
+            })
+            .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    setDisconnectDisbandVisibility(disconnect, disband);
+                }
+            })
+            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    setDisconnectDisbandVisibility(disconnect, disband);
                 }
             })
             .register(this.getActivity());
@@ -206,6 +262,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         ((CustomApp)getActivity().getApplication()).clearExternalUsers();
 
         Transitions.transitionToConnect((CoreActivity) getActivity());
+    }
+
+    private void disband() {
     }
 
     /**

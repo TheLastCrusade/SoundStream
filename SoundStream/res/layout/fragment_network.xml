@@ -56,4 +56,16 @@
         android:layout_marginBottom="10sp"
         android:text="@string/disconnect"
         android:textColor="@color/white"/>
+    <Button
+        android:id="@+id/disband_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/red"
+        android:visibility="invisible"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_marginBottom="10sp"
+        android:text="@string/disband"
+        android:textColor="@color/white"/>
 </RelativeLayout>
