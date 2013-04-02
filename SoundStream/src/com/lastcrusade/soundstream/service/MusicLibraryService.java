@@ -307,8 +307,7 @@ public class MusicLibraryService extends Service {
             SongMetadata song = lookupMySongById(songId);
             String filePath   = msw.getSongFilePath(song);
             File   songFile   = new File(filePath);
-            byte[] bytes      = loadFile(songFile);
-            getMessagingService().sendTransferSongMessage(fromAddr, songId, songFile.getName(), bytes);
+            getMessagingService().sendTransferSongMessage(fromAddr, songId, songFile.getName(), songFile.getCanonicalPath());
         } catch (SongNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

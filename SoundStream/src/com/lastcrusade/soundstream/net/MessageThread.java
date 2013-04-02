@@ -25,6 +25,7 @@ import java.io.OutputStream;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -63,7 +64,7 @@ public abstract class MessageThread extends Thread {
     protected boolean mmWriteThreadRunning;
     private Thread mmStoppingThread;
 
-    public MessageThread(BluetoothSocket socket, Handler handler, String disconnectAction) {
+    public MessageThread(Context context, BluetoothSocket socket, Handler handler, String disconnectAction) {
         super("MessageThread-" + safeSocketName(socket));
         mmSocket  = socket;
         mmHandler = handler;
@@ -82,8 +83,8 @@ public abstract class MessageThread extends Thread {
         
         mmDisconnectAction = disconnectAction;
         
-        mmMessenger = new Messenger();
-        mmWriter    = new MessageThreadWriter(mmOutStream);
+        mmMessenger = new Messenger(context.getCacheDir());
+        mmWriter    = new MessageThreadWriter(mmMessenger, mmOutStream);
         mmWriteThreadRunning = true;
         mmWriteThread = new Thread(new Runnable() {
 
@@ -187,15 +188,8 @@ public abstract class MessageThread extends Thread {
     /* Call this from the main activity to send data to the remote device */
     public synchronized void write(IMessage message) {
         Log.d(TAG, "MessageThread#write called from " + Thread.currentThread().getName());
-        try {
-            mmMessenger.serializeMessage(message);
-            byte[] bytes = mmMessenger.getOutputBytes();
-            //enqueue this message
-            mmWriter.enqueue(mmOutMessageNumber++, message.getClass(), bytes);
-            mmMessenger.clearOutputBytes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //enqueue this message
+        mmWriter.enqueue(mmOutMessageNumber++, message);
     }
  
     /* Call this from the main activity to shutdown the connection */

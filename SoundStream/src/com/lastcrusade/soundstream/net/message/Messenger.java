@@ -21,9 +21,15 @@ package com.lastcrusade.soundstream.net.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 import android.util.Log;
 
@@ -63,7 +69,55 @@ public class Messenger {
 
     private ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 
-    private byte[] inBytes = new byte[16384];
+    /**
+     * Min size in bytes to read in before flushing to file.
+     * Used for the incoming buffer, to avoid frequent writes to disk
+     * 
+     */
+    private static final int MIN_BYTES_READ_IN = 102400;
+    
+    /**
+     * Maximum size in bytes to read from a socket at a time.
+     * 
+     */
+    private static final int MAX_READ_SIZE_BYTES = 1024;
+    private byte[] inBytes = new byte[MAX_READ_SIZE_BYTES];
+
+    /**
+     * Maximum size in bytes to write to a socket at a time.
+     * 
+     */
+    private static final int MAX_WRITE_SIZE_BYTES = 1024;
+    private byte[] outBytes = new byte[MAX_WRITE_SIZE_BYTES];
+
+    private File tempFolder;
+
+    private int fileBytesLeft;
+
+    private FileOutputStream inFileStream;
+
+    private FileInputStream outFileStream;
+
+    private String outFilePath;
+
+    private boolean canLog;
+
+    private boolean readingFile;
+    
+    public Messenger(File tempFolder) {
+        this.tempFolder = tempFolder;
+        this.readingFile = false;
+        //test to see if we can log (i.e. if the logger exists on the classpath)
+        //...this is required because we run unit tests using the android junit runner, which will remove
+        // android classes, such as Log, from the classpath.
+        try {
+            Log.v(TAG, "Creating messenger");
+            this.canLog = true;
+        } catch (NoClassDefFoundError e) {
+            this.canLog = false;
+        }
+    }
+    
     /**
      * Serialize a message into the output buffer.  This will append to the output
      * buffer, to stack multiple messages next to each other.  See clearOutputBuffer
@@ -72,45 +126,51 @@ public class Messenger {
      * @param message
      * @throws IOException
      */
-    public void serializeMessage(IMessage message) throws IOException {
+    public int serializeMessage(IMessage message) throws IOException {
+
+        //serialize the message into a separate buffer
+        ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream();
+        message.serialize(messageBuffer);
+        
+        //build the output message
+        byte[] classBytes = message.getClass().getCanonicalName().getBytes();
         int start = outputBuffer.size();
-        outputBuffer.write(new byte[SIZE_LEN]);
-        outputBuffer.write(new byte[VERSION_LEN]);
-        outputBuffer.write(message.getClass().getCanonicalName().getBytes());
+        //write the length
+        writeLength(outputBuffer, messageBuffer.size() + classBytes.length + VERSION_LEN + 1);
+        writeVersion(outputBuffer);
+        //write the class name and end of class char
+        // (this is used to reconstruct the message on the remote side)
+        outputBuffer.write(classBytes);
         outputBuffer.write(END_OF_CLASS_CHAR);
+        //write the message
+        outputBuffer.write(messageBuffer.toByteArray());
 
-        message.serialize(outputBuffer);
+        //if this is a file message, open the file and prepare it for the write operation
+        if (isFileMessage(message)) {
+            this.outFilePath   = ((IFileMessage)message).getFilePath();
+            openOutFile();
+        }
+        
+        //return the whole message size...note this isnt written until
+        // writeToOutputStream is called.
+        return (outputBuffer.size() - start) + (this.outFileStream != null ? this.outFileStream.available() : 0);
+    }
 
-        //write the length to the first 4 bytes of this message
-        byte[] bytes = outputBuffer.toByteArray();
-        ByteBuffer bb = ByteBuffer.wrap(bytes, start, SIZE_LEN + VERSION_LEN);
-        //the message length includes everything but SIZE_LEN bytes of the message
-        int len = outputBuffer.size() - start - SIZE_LEN;
-        bb.putInt(len);
-        bb.putInt(MESSENGER_VERSION);
-
-        outputBuffer.reset();
-        outputBuffer.write(bytes);
+    /**
+     * @param message
+     * @return
+     */
+    private boolean isFileMessage(IMessage message) {
+        return message instanceof IFileMessage;
     }
 
     /**
      * Clear the output buffer of all messages.
      * 
      */
-    public void clearOutputBytes() {
+    public void reset() {
         outputBuffer.reset();
-    }
-
-    /**
-     * Get the output bytes for this messenger.  This should contain all of the serialized messages
-     * since the last time the messenger was cleared.
-     * 
-     * NOTE: this method will not clear the messenger itself.
-     * 
-     * @return
-     */
-    public byte[] getOutputBytes() {
-        return outputBuffer.toByteArray();
+        closeOutFile();
     }
 
     /**
@@ -129,38 +189,197 @@ public class Messenger {
      * if the stream closes prematurely.
      */
     public boolean deserializeMessage(InputStream input) throws Exception {
-        
         boolean processed = false;
         do {
-            //read a chunk at a time...the buffer size was determined through trial and error, and
-            // could be optimized more.
-            //NOTE: this is so input.read can block, and will throw an exception when the connection
-            // goes down.  this is the only way we'll get a notification of a downed client
-            int read = input.read(inBytes);
-            if (read > 0) {
-                inputBuffer.write(inBytes, 0, read);
-            } else {
-                inputBuffer.write(inBytes);
+            //always check to see if we have more message data waiting...this is so we can process
+            // grouped/batched messages without having to wait on the call to readNext
+            if (inputBuffer.size() > 0) {
+                //if we need to, consume the message length (to make sure we read until we have a complete message)
+                if (isWaitingForNewMessage()) {
+                    this.messageLength = readAndConsumeLength();
+                    this.receivedMessage = null;
+                    this.readingFile = false;
+                    if (this.canLog) {
+                        Log.i(TAG, "Receiving " + this.messageLength + " byte message");
+                    }
+                }
+                //check to see if we can process this message
+                if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength && !this.readingFile) {
+                    processed = processAndConsumeMessage();
+                    //we want to attempt to read a file if the message is processed and it is a file message
+                    readingFile = processed && isFileMessage(this.receivedMessage);
+                }
+                if (readingFile) {
+                    processed = readAndConsumeFile();
+                    readingFile = !processed;
+                }
+                if (this.canLog) {
+                    Log.d(TAG, "Residual buffer data: " + inputBuffer.size() + " bytes left in buffer");
+                }
             }
-
-            //if we need to, consume the message length (to make sure we read until we have a complete message)
-            if (this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN) {
-                byte[] bytes = inputBuffer.toByteArray();
-                ByteBuffer bb = ByteBuffer.wrap(bytes, 0, SIZE_LEN);
-                //this actually consumes the first 4 bytes (removes it from the stream)
-                inputBuffer.reset();
-                inputBuffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
-                this.messageLength = bb.getInt();
-            }
-            //check to see if we can process this message
-            if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength) {
-                processed = processAndConsumeMessage();
+            
+            //if we don't have a message processed, attempt to read new data and loop back around
+            if (!processed) {
+                readNext(input);
             }
             //loop back around if we havent processed a message yet
         } while (!processed);
         return processed;
     }
+
+    /**
+     * True if we're waiting for a new message, false if we're currently processing a message.
+     * @return
+     */
+    private boolean isWaitingForNewMessage() {
+        return this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN && this.readingFile == false;
+    }
+
+    /**
+     * True if we're reading in a file message and we're waiting for the file data, false
+     * if we're currently processing file data.
+     * @return
+     */
+    private boolean isWaitingForFile() {
+        return this.fileBytesLeft <= 0 && inputBuffer.size() >= SIZE_LEN;
+    }
+
+
+    /**
+     * Read the next set of bytes from the input stream.
+     * 
+     * NOTE: This will block until data is available, and may throw
+     * an exception if the stream is closed while reading.
+     * 
+     * @param input
+     * @throws IOException
+     */
+    private void readNext(InputStream input) throws IOException {
+        //read a chunk at a time...the buffer size was determined through trial and error, and
+        // could be optimized more.
+        //NOTE: this is so input.read can block, and will throw an exception when the connection
+        // goes down.  this is the only way we'll get a notification of a downed client
+        int read = input.read(inBytes);
+        if (read > 0) {
+            inputBuffer.write(inBytes, 0, read);
+        } else {
+            inputBuffer.write(inBytes);
+        }
+    }
+
+    /**
+     * Read the first 4 bytes off of the input buffer, and remove those bytes
+     * from the buffer.
+     * 
+     * NOTE: This assumes that there is at least 4 bytes (SIZE_LEN bytes) in
+     * the buffer.
+     * 
+     * @return
+     */
+    private int readAndConsumeLength() {
+        byte[] bytes = inputBuffer.toByteArray();
+        ByteBuffer bb = ByteBuffer.wrap(bytes, 0, SIZE_LEN);
+        //this actually consumes the first 4 bytes (removes it from the stream)
+        inputBuffer.reset();
+        inputBuffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
+        return bb.getInt();
+    }
+        
     
+    /**
+     * Read and consume an incoming file.  This may be
+     * read in parts if it is a large file.
+     * 
+     * fileLength will keep track of the number of bytes
+     * left to read...when it == 0, the file is read completely
+     * 
+     * @return
+     * @throws IOException
+     */
+    private boolean readAndConsumeFile() throws IOException {
+        if (isWaitingForFile()) {
+            this.fileBytesLeft = readAndConsumeLength();
+            //write the file data to a temporary file...this is so we don't need to hold the data
+            // in memory, and instead can just pass around a file path
+            openRandomInFile();
+        }
+        
+        boolean readComplete = isInFileComplete();
+        int available = inputBuffer.size();
+        if (!readComplete && isInFileBufferFilled()) {
+            byte[] bytes = inputBuffer.toByteArray();
+            int read = Math.min(available,  this.fileBytesLeft);
+            writeInFileData(bytes, read);
+            available -= read;
+            inputBuffer.reset();
+            if (available > 0) {
+                inputBuffer.write(bytes, read, available);
+            }
+            readComplete = isInFileComplete();
+        }
+        
+        if (readComplete) {
+            closeInFile();
+        }
+        return readComplete;
+    }
+
+    private boolean isInFileBufferFilled() {
+        int available = inputBuffer.size();
+        return available > 0 && available >= Math.min(MIN_BYTES_READ_IN, this.fileBytesLeft);
+    }
+
+    /**
+     * Open a random file and initialize the incoming file stream.
+     * 
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    private void openRandomInFile() throws IOException, FileNotFoundException {
+        File outFile = createRandomTempFile();
+        ((IFileMessage)this.receivedMessage).setFilePath(outFile.getCanonicalPath());
+        this.inFileStream = new FileOutputStream(outFile);
+    }
+
+    /**
+     * Close the incoming file stream.
+     * 
+     * @throws IOException
+     */
+    private void closeInFile() {
+        try {
+            this.inFileStream.close();
+        } catch (Exception e) {
+            //don't care, we're closing
+        } finally {
+            this.inFileStream = null;
+        }
+    }
+
+    /**
+     * Test to see if the incoming file is fully loaded
+     * @return
+     */
+    private boolean isInFileComplete() {
+        return this.inFileStream != null && this.fileBytesLeft == 0;
+    }
+    
+    /**
+     * Write bytes to the incoming file stream, and decrement
+     * the fileBytesLeft variable.
+     * 
+     * @param bytes
+     * @param read
+     * @throws IOException
+     */
+    private void writeInFileData(byte[] bytes, int read) throws IOException {
+        if (this.canLog) {
+            Log.d(TAG, "Writing " + read + " bytes to incoming file");
+        }
+        this.inFileStream.write(bytes, 0, read);
+        this.fileBytesLeft -= read;
+    }
+
     /**
      * Process and consume one message contained in the input buffer.  This will modify the contents of the
      * input buffer when successful and when an error is occurred (the message in error is thrown away).
@@ -197,7 +416,9 @@ public class Messenger {
                 processed = true;
             } else {
                 //otherwise, it's a WTF
-                Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
+                if (this.canLog) {
+                    Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
+                }
             }
         } finally {
             //consume this message either way
@@ -216,5 +437,92 @@ public class Messenger {
      */
     public IMessage getReceivedMessage() {
         return receivedMessage;
+    }
+    
+    
+    
+    /**
+     * Helper method to create a temporary file.
+     * 
+     * TODO: Android doesn't really have temporary files...it will proactively clear the cache folder,
+     * but we should be better citizens and clean up after ourself.  This is not an immediate (read: alpha)
+     * concern, because we consume all cache files in PlaylistDataManager (which will clean up after itself)
+     * but before this gets to final, we should make sure all bases are covered.
+     * 
+     * @param message
+     * @return
+     * @throws IOException
+     */
+    private File createRandomTempFile()
+            throws IOException {
+        String filePrefix = UUID.randomUUID().toString().replace("-", "");
+        String extension = ".dat";
+        File outputFile = File.createTempFile(filePrefix, extension, tempFolder);
+        return outputFile;
+    }
+
+    public void writeToOutputStream(OutputStream outStream) throws IOException {
+        // TODO: this may or may not be needed...for now it does not appear it
+        // is, but I'd like to leave this in until I finish with all of the
+        // transfer song debugging -- Jesse Rosalia, 03/24/13
+        // int written = 0;
+        // for (int bufPos = 0; bufPos < qe.bytes.length; bufPos += written) {
+        //      int writeSize = Math.min(qe.bytes.length - bufPos, maxWriteSize);
+        //      Log.d(TAG, "Writing " + writeSize + " bytes...");
+        //      this.outStream.write(qe.bytes, bufPos, writeSize);
+        //      written = writeSize;
+        //      try {
+        //          Thread.sleep(10);
+        //      } catch (InterruptedException e) {
+        // }
+        outStream.write(outputBuffer.toByteArray());
+        if (!isOutFileFinished()) {
+            writeLength(outStream, this.outFileStream.available());
+            int read;
+            while ((read = this.outFileStream.read(outBytes)) > 0) {
+                outStream.write(outBytes, 0, read);
+            }
+            openOutFile();
+//            this.outFileStream.reset();
+        }
+    }
+
+    private void closeOutFile() {
+        try {
+            this.outFileStream.close();
+        } catch (Exception e) {
+            //dont care, we're closing
+        } finally {
+            this.outFileStream = null;
+            this.outFilePath = null;
+        }
+    }
+
+    private boolean isOutFileFinished() throws IOException {
+        return this.outFileStream == null || this.outFileStream.available() <= 0;
+    }
+
+    private void openOutFile() throws FileNotFoundException {
+        this.outFileStream = new FileInputStream(this.outFilePath);
+    }
+
+    /**
+     * @param outStream
+     * @param len
+     * @throws IOException
+     */
+    private void writeLength(OutputStream outStream, int len)
+            throws IOException {
+        byte[] bytes = new byte[4];
+        ByteBuffer bb = ByteBuffer.wrap(bytes, 0, 4);
+        bb.putInt(len);
+        outStream.write(bytes);
+    }
+    private void writeVersion(OutputStream outStream)
+            throws IOException {
+        byte[] bytes = new byte[4];
+        ByteBuffer bb = ByteBuffer.wrap(bytes, 0, 4);
+        bb.putInt(MESSENGER_VERSION);
+        outStream.write(bytes);
     }
 }

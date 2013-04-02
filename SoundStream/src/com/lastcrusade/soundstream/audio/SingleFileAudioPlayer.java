@@ -98,8 +98,9 @@ public class SingleFileAudioPlayer implements IPlayer {
                 }
                 this.paused = false;
                 player.reset();
-                //changed to use the underlying file descriptor, because this doesnt want to work on a Samsung Galaxy S3
-                // see http://stackoverflow.com/questions/1972027/android-playing-mp3-from-byte
+                //changed to use the underlying file descriptor, because this doesnt want
+                // to work on a Samsung Galaxy S3 and other phones
+                //(see http://stackoverflow.com/questions/1972027/android-playing-mp3-from-byte)
                 FileInputStream fis = new FileInputStream(entry.getFilePath());
                 player.setDataSource(fis.getFD());
                 player.prepare();
