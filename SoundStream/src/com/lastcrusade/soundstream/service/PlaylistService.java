@@ -342,7 +342,7 @@ public class PlaylistService extends Service {
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                if (song == null) {
+                if (song != null) {
                     PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
                     if (entry != null) {
                         entry.setLoaded(loaded);
