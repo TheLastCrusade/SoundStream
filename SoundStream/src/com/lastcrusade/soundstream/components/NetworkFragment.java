@@ -199,6 +199,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
+        ((CustomApp)getActivity().getApplication()).clearExternalUsers();
+
         Transitions.transitionToConnect((CoreActivity) getActivity());
     }
 

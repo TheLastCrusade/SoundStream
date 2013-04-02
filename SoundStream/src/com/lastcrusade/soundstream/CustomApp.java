@@ -122,7 +122,7 @@ public class CustomApp extends Application {
             @Override
             public void onServiceBound() {
                 //TODO: Move this to something like connect activity or the connection fragment
-                getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
+                addSelfToUserList();
             }
         });
         messagingServiceLocator = new ServiceLocator<MessagingService>(
@@ -186,8 +186,10 @@ public class CustomApp extends Application {
         return userList;
     }
 
-    public void setUserList(UserList userList) {
-        this.userList = userList;
+    public void clearExternalUsers() {
+        this.userList.clear();
+        addSelfToUserList();
+        new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
     }
 
     private ConnectionService getConnectionService() {
@@ -233,5 +235,9 @@ public class CustomApp extends Application {
     public void notifyUserListUpdate() {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
+    }
+
+    public void addSelfToUserList() {
+        getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
     }
 }
