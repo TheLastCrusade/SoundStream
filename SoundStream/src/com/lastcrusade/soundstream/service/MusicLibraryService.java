@@ -170,6 +170,11 @@ public class MusicLibraryService extends Service {
     }
 
     public List<SongMetadata> getMyLibrary() {
+        //unmodifiable copy, for safety
+        return Collections.unmodifiableList(getMyModifiableLibrary());
+    }
+
+    private List<SongMetadata> getMyModifiableLibrary() {
         synchronized(metadataMutex) {
             List<SongMetadata> myLibrary = new ArrayList<SongMetadata>();
             //look thru the library, and pull out songs with "my" mac address
@@ -178,8 +183,7 @@ public class MusicLibraryService extends Service {
                     myLibrary.add(meta);
                 }
             }
-            //unmodifiable copy, for safety
-            return Collections.unmodifiableList(myLibrary);
+            return myLibrary;
         }
     }
 
@@ -334,7 +338,7 @@ public class MusicLibraryService extends Service {
     }
 
     public void clearExternalMusic() {
-        metadataList = getMyLibrary();
+        metadataList = getMyModifiableLibrary();
         new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
     }
 }

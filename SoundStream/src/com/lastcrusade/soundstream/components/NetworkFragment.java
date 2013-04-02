@@ -183,6 +183,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 } catch (ServiceNotBoundException e) {
                     Log.wtf(TAG,"PlaylistService not bound");
                 }
+                //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                playlistServiceLocator.unbind();
             }
         });
 
@@ -196,6 +198,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 } catch (ServiceNotBoundException e) {
                     Log.wtf(TAG, "MusicLibraryService not bound");
                 }
+                //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                musicLibraryServiceLocator.unbind();
             }
         });
 
