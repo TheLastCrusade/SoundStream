@@ -56,4 +56,9 @@
 	<string name="remove_from_playlist">Remove From Playlist</string>
     <string name="song_item_division">-</string>
     <string name="no_songs_in_playlist">There are no songs in your playlist! Quick, go add some from the music library!</string>
+
+    <!-- about things -->
+    <string name="meet_label">Meet The Crusaders</string>
+    <string name="beginning_label">How We Began</string>
+    <string name="thanks_label">Special Thanks</string>
 </resources>
