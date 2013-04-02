@@ -57,6 +57,7 @@ public class Playlist {
     public void clear() {
         playedList.clear();
         musicList.clear();
+        lastEntryId = 0;
     }
     
     public PlaylistEntry findEntryBySongAndId(SongMetadata song, int entryId){
