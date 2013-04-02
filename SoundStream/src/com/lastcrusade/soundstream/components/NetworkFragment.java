@@ -80,7 +80,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                setDisconnectDisbandVisibility(disconnect, disband);
+                setDisconnectDisbandVisibility();
             }
         });
 
@@ -111,7 +111,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         disconnect = (Button)v.findViewById(R.id.disconnect_btn);
         disband = (Button)v.findViewById(R.id.disband_btn);
 
-        setDisconnectDisbandVisibility(disconnect, disband);
+        //TODO react to changing state
+        setDisconnectDisbandVisibility();
 
         disconnect.setOnClickListener(new OnClickListener() {
             @Override
@@ -153,7 +154,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         return v;
     }
 
-    private void setDisconnectDisbandVisibility(Button disconnect, Button disband) {
+    private void setDisconnectDisbandVisibility() {
         if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
             disconnect.setVisibility(View.INVISIBLE);
             disband.setVisibility(View.VISIBLE);
@@ -210,13 +211,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    setDisconnectDisbandVisibility(disconnect, disband);
+                    setDisconnectDisbandVisibility();
                 }
             })
             .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    setDisconnectDisbandVisibility(disconnect, disband);
+                    setDisconnectDisbandVisibility();
                 }
             })
             .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
