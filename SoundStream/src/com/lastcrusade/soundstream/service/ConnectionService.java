@@ -385,6 +385,10 @@ public class ConnectionService extends Service {
         }
     }
 
+    public void disconnectHost() {
+        host.cancel();
+    }
+
     public boolean isGuestConnected() {
         return !this.guests.isEmpty();
     }

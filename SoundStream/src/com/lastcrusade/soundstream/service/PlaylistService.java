@@ -2,9 +2,7 @@ package com.lastcrusade.soundstream.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.app.Service;
 import android.content.Context;
@@ -12,7 +10,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.R;
@@ -24,9 +21,8 @@ import com.lastcrusade.soundstream.manager.PlaylistDataManager;
 import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -466,6 +462,10 @@ public class PlaylistService extends Service {
         }
         //send a message to the guests with the new playlist
         getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+    }
+
+    public void clearPlaylist() {
+        mPlaylist.clear();
     }
 
     public void pause() {

@@ -313,4 +313,8 @@ public class MusicLibraryService extends Service {
         }
         return messagingService;
     }
+
+    public void clearExternalMusic() {
+        metadataList = getMyLibrary();
+    }
 }

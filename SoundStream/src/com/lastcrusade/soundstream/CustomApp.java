@@ -2,37 +2,26 @@ package com.lastcrusade.soundstream;
 
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.media.MediaMetadataRetriever;
-import android.media.RemoteControlClient;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.components.ExternalMusicControlHandler;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.RemoteControlClientCompat;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getName();
@@ -57,26 +46,8 @@ public class CustomApp extends Application {
         super.onCreate();
         
         userList = new UserList();
-        
-        connectionServiceLocator = new ServiceLocator<ConnectionService>(
-                this, ConnectionService.class, ConnectionServiceBinder.class);
-        
-        connectionServiceLocator.setOnBindListener(new IOnBindListener() {
 
-            @Override
-            public void onServiceBound() {
-                //TODO: Move this to something like connect activity or the connection fragment
-                getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
-            }
-        });
-        messagingServiceLocator = new ServiceLocator<MessagingService>(
-                this, MessagingService.class, MessagingServiceBinder.class);
-        
-        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
-                this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
-
-        playlistServiceLocator = new ServiceLocator<PlaylistService>(
-                this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
+        createServiceLocators();
 
         registerReceivers();
         
@@ -121,6 +92,28 @@ public class CustomApp extends Application {
         unregisterReceivers();
         externalControlClient.unregister();
         super.onTerminate();
+    }
+
+    public void createServiceLocators() {
+        connectionServiceLocator = new ServiceLocator<ConnectionService>(
+                this, ConnectionService.class, ConnectionService.ConnectionServiceBinder.class);
+
+        connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+
+            @Override
+            public void onServiceBound() {
+                //TODO: Move this to something like connect activity or the connection fragment
+                getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
+            }
+        });
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
+
+        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryService.MusicLibraryServiceBinder.class);
+
+        playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
     }
 
     private void registerReceivers() {
@@ -173,7 +166,11 @@ public class CustomApp extends Application {
     public UserList getUserList(){
         return userList;
     }
-    
+
+    public void setUserList(UserList userList) {
+        this.userList = userList;
+    }
+
     private ConnectionService getConnectionService() {
         ConnectionService connectionService = null;
         try {
@@ -218,5 +215,4 @@ public class CustomApp extends Application {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
     }
-
 }
