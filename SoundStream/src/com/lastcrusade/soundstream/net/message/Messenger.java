@@ -101,10 +101,12 @@ public class Messenger {
     private String outFilePath;
 
     private boolean canLog;
+
+    private boolean readingFile;
     
     public Messenger(File tempFolder) {
         this.tempFolder = tempFolder;
-        
+        this.readingFile = false;
         //test to see if we can log (i.e. if the logger exists on the classpath)
         //...this is required because we run unit tests using the android junit runner, which will remove
         // android classes, such as Log, from the classpath.
@@ -188,7 +190,6 @@ public class Messenger {
      */
     public boolean deserializeMessage(InputStream input) throws Exception {
         boolean processed = false;
-        boolean readingFile = false;
         do {
             //always check to see if we have more message data waiting...this is so we can process
             // grouped/batched messages without having to wait on the call to readNext
@@ -197,12 +198,13 @@ public class Messenger {
                 if (isWaitingForNewMessage()) {
                     this.messageLength = readAndConsumeLength();
                     this.receivedMessage = null;
+                    this.readingFile = false;
                     if (this.canLog) {
                         Log.i(TAG, "Receiving " + this.messageLength + " byte message");
                     }
                 }
                 //check to see if we can process this message
-                if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength && this.receivedMessage == null) {
+                if (this.messageLength > 0 && inputBuffer.size() >= this.messageLength && !this.readingFile) {
                     processed = processAndConsumeMessage();
                     //we want to attempt to read a file if the message is processed and it is a file message
                     readingFile = processed && isFileMessage(this.receivedMessage);
@@ -230,7 +232,7 @@ public class Messenger {
      * @return
      */
     private boolean isWaitingForNewMessage() {
-        return this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN && this.inFileStream == null;
+        return this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN && this.readingFile == false;
     }
 
     /**
