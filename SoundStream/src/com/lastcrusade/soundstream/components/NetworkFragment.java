@@ -249,11 +249,11 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             public void onServiceBound() {
                 try {
                     playlistServiceLocator.getService().clearPlaylist();
+                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                    playlistServiceLocator.unbind();
                 } catch (ServiceNotBoundException e) {
                     Log.wtf(TAG,"PlaylistService not bound");
                 }
-                //this is the only place where we bind and use the service, so we unbind as soon as we are done
-                playlistServiceLocator.unbind();
             }
         });
 
@@ -264,16 +264,16 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             public void onServiceBound() {
                 try {
                     musicLibraryServiceLocator.getService().clearExternalMusic();
+                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                    musicLibraryServiceLocator.unbind();
                 } catch (ServiceNotBoundException e) {
                     Log.wtf(TAG, "MusicLibraryService not bound");
                 }
-                //this is the only place where we bind and use the service, so we unbind as soon as we are done
-                musicLibraryServiceLocator.unbind();
             }
         });
 
         ((CustomApp)getActivity().getApplication()).clearExternalUsers();
-
+        
         //Send the user to a page where they can start a network or join a different network
         Transitions.transitionToConnect((CoreActivity) getActivity());
     }

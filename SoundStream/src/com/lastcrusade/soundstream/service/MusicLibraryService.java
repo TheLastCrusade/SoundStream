@@ -337,8 +337,10 @@ public class MusicLibraryService extends Service {
     }
 
     public void clearExternalMusic() {
-        metadataList = getMyModifiableLibrary();
-        updateLibrary(metadataList, false);
+        synchronized (metadataMutex) {
+            metadataList = getMyModifiableLibrary();
+            metadataMap.clear();
+        }
         new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
     }
 }
