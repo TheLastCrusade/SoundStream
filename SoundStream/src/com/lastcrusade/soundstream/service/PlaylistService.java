@@ -216,7 +216,9 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                mThePlayer = mAudioPlayer;
+                mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
+                isLocalPlayer = true;
+                currentEntry = null;
                 startDataManager();
             }
         })
@@ -340,14 +342,18 @@ public class PlaylistService extends Service {
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
-                if (entry != null) {
-                    entry.setLoaded(loaded);
-                    entry.setPlayed(played);
-                    // send an intent to the fragments that the playlist is updated
-                    new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                if (song != null) {
+                    PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
+                    if (entry != null) {
+                        entry.setLoaded(loaded);
+                        entry.setPlayed(played);
+                        // send an intent to the fragments that the playlist is updated
+                        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                    } else {
+                        Log.e(TAG, "Attempting to update information about a song that is not in our playlist: " + song);
+                    }
                 } else {
-                    Log.e(TAG, "Attempting to update information about a song that is not in our playlist: " + song);
+                    Log.e(TAG, "MusicLibraryService cannot find song");
                 }
             }
         })
@@ -487,6 +493,12 @@ public class PlaylistService extends Service {
         }
         //send a message to the guests with the new playlist
         getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+    }
+
+    public void clearPlaylist() {
+        mPlaylist.clear();
+        currentEntry = null;
+        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
     public void pause() {

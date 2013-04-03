@@ -59,7 +59,12 @@ public class UserColors {
             }
         }
     }
-    
+
+    public void clear() {
+        for (ColorEntry entry : colors) {
+            entry.setTaken(false);
+        }
+    }
     
     //defines an entry in the color pallet - needed because we want to keep track
     //of what colors are currently being used, and when someone leaves the app the color
