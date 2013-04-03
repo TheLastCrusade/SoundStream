@@ -76,11 +76,7 @@ public class CoreActivity extends SlidingFragmentActivity{
 
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
-        
-        
-        
-        
-        
+
         registerReceivers();
     }
 
@@ -136,6 +132,11 @@ public class CoreActivity extends SlidingFragmentActivity{
         .replace(R.id.playbar, playbar)
         .commit();
     }
-
-    //TODO: LizzieJohn make a hidePlaybar method
+    
+    public void hidePlaybar(){
+        getSupportFragmentManager()
+        .beginTransaction()
+        .remove(playbar)
+        .commit();
+    }
 }

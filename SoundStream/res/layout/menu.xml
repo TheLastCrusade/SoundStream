@@ -48,7 +48,7 @@
         
         <Button 
             android:id="@+id/playlist_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/music_line"
             android:layout_marginLeft="20sp"
@@ -58,11 +58,12 @@
             android:clickable="true"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/playlist_icon"
-            android:drawablePadding="6sp"/>
+            android:drawablePadding="6sp"
+            android:gravity="left|center_vertical"/>
         
         <Button 
             android:id="@+id/music_library_btn"
-            android:layout_width= "wrap_content"
+            android:layout_width= "match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/playlist_btn"
             android:layout_marginLeft="20sp"
@@ -73,6 +74,7 @@
             android:background="@color/transparent"
             android:drawableLeft="@drawable/music_library_icon"
             android:drawablePadding="6sp"
+            android:gravity="left|center_vertical"
             />
     </RelativeLayout>
     
@@ -105,7 +107,7 @@
         
          <Button 
             android:id="@+id/network_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/network_line"
             android:text="@string/network"
@@ -116,6 +118,7 @@
             android:background="@color/transparent"
             android:drawableLeft="@drawable/network_icon"
             android:drawablePadding="6sp"
+            android:gravity="left|center_vertical"
             />
     </RelativeLayout>
     

@@ -46,10 +46,11 @@ public class Transitions {
 
     //Home is where you get sent after connecting to the network - for now
     //this is the playlist
-    private final static int HOME = PLAYLIST;
+    private final static int HOME = MUSIC_LIBRARY;
     
     public static void transitionToHome(CoreActivity activity){
         switchFragment(HOME, activity);
+        activity.showMenu();
     }
     
     public static void transitionToPlaylist(CoreActivity activity){
