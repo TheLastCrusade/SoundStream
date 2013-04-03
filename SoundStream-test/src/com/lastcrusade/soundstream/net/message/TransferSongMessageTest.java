@@ -46,6 +46,6 @@ public class TransferSongMessageTest extends SerializationTest<TransferSongMessa
         assertEquals(oldMessage.getSongFileName(), newMessage.getSongFileName());
 
         //compare the song binary data
-        assertTrue(Arrays.equals(oldMessage.getSongData(), newMessage.getSongData()));
+        assertEquals(oldMessage.getFilePath(), newMessage.getFilePath());
     }
 }

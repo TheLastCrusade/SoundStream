@@ -31,6 +31,6 @@ extends APlaylistEntrySerializationTest<BumpSongOnPlaylistMessage>{
     @Test
     public void testSerializeBumpSongOnPlaylistMessage() throws Exception {
         super.testSerializeMessage(
-                new BumpSongOnPlaylistMessage("Test", 1234));
+                new BumpSongOnPlaylistMessage("Test", 1234, 1));
     }
 }
