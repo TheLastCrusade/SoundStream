@@ -214,7 +214,7 @@ public class PlaylistFragment extends MusicListFragment{
             private PlaylistEntry entry;
             private View view;
             private final int SWIPE_MIN_DISTANCE = 100;
-            private int lastX;
+            
             public PlaylistSongGestureListener(View view, PlaylistEntry entry){
                 super(view);
                 this.view = view;
@@ -236,27 +236,20 @@ public class PlaylistFragment extends MusicListFragment{
                     }
                     getPlaylistService().removeSong(entry);
                     
-                    animateView(dx);
+                    animateDragging((int)e2.getX());
                
                     swipe=true;
                 }
-                
-                Log.i("Swipe Removal", "distance " + dx);
                     
                 return swipe;
             }
             
-            /* (non-Javadoc)
-            * @see android.view.GestureDetector.SimpleOnGestureListener#onScroll(android.view.MotionEvent, android.view.MotionEvent, float, float)
-            */
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
                 
                 int dx = (int)(e2.getX() - e1.getX());
-                animateView(dx);
-                
-                lastX=(int)e2.getX();
+                animateDragging(dx);
                 
                 return super.onScroll(e1, e2, distanceX, distanceY);
             
@@ -271,7 +264,7 @@ public class PlaylistFragment extends MusicListFragment{
                 return true;
             } 
             
-            private void animateView(int amount){
+            private void animateDragging(int amount){
                 TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
                 trans.initialize(view.getWidth(), view.getHeight(), 
                         ((View)view.getParent()).getWidth(), ((View)view.getParent()).getHeight());
