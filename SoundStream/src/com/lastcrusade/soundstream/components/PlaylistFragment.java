@@ -32,7 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.view.animation.TranslateAnimation;
 
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
@@ -194,9 +194,9 @@ public class PlaylistFragment extends MusicListFragment{
 
             });
 
-            ImageButton delete = (ImageButton)element.findViewById(R.id.btn_remove_from_playlist);
-            delete.setOnClickListener(new DeleteSongListener(entry));
-            delete.setVisibility(View.VISIBLE);
+           // ImageButton delete = (ImageButton)element.findViewById(R.id.btn_remove_from_playlist);
+            //delete.setOnClickListener(new DeleteSongListener(entry));
+            //delete.setVisibility(View.VISIBLE);
 
             
             return element;
@@ -233,18 +233,57 @@ public class PlaylistFragment extends MusicListFragment{
       //detect gestures 
         private class PlaylistSongGestureListener extends SongGestureListener{
             private PlaylistEntry entry;
-            
+            private View view;
+            private final int SWIPE_MIN_DISTANCE = 100;
+            private int lastX;
             public PlaylistSongGestureListener(View view, PlaylistEntry entry){
                 super(view);
+                this.view = view;
                 this.entry = entry;
+                
             }
             //fling a song to the right to remove it
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                     float velocityY) {
-                // TODO Implement remove this way in another pull request
-                return super.onFling(e1, e2, velocityX, velocityY);
+                boolean swipe = false;
+                // get the different between the two points so that we do not confuse
+                // a press with a fling
+                int dx = (int)(e2.getX() - e1.getX());
+                if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
+                    if(getPlaylistService().getCurrentEntry()!= null && 
+                            getPlaylistService().getCurrentEntry().equals(entry)){
+                        getPlaylistService().skip();
+                    }
+                    getPlaylistService().removeSong(entry);
+                    
+                    animateView(dx);
+               
+                    swipe=true;
+                }
+                
+                Log.i("Swipe Removal", "distance " + dx);
+                    
+                return swipe;
             }
+            
+            /* (non-Javadoc)
+            * @see android.view.GestureDetector.SimpleOnGestureListener#onScroll(android.view.MotionEvent, android.view.MotionEvent, float, float)
+            */
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                float distanceX, float distanceY) {
+                
+                int dx = (int)(e2.getX() - e1.getX());
+                animateView(dx);
+                
+                lastX=(int)e2.getX();
+                
+                return super.onScroll(e1, e2, distanceX, distanceY);
+            
+            }
+            
+            
             
             //bump the song to the top when double tapped
             @Override
@@ -252,6 +291,13 @@ public class PlaylistFragment extends MusicListFragment{
                 getPlaylistService().bumpSong(entry);
                 return true;
             } 
+            
+            private void animateView(int amount){
+                TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
+                trans.initialize(view.getWidth(), view.getHeight(), 
+                        ((View)view.getParent()).getWidth(), ((View)view.getParent()).getHeight());
+                view.startAnimation(trans);
+            }
         }
     }
 
