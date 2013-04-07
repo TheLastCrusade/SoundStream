@@ -194,10 +194,6 @@ public class PlaylistFragment extends MusicListFragment{
 
             });
 
-           // ImageButton delete = (ImageButton)element.findViewById(R.id.btn_remove_from_playlist);
-            //delete.setOnClickListener(new DeleteSongListener(entry));
-            //delete.setVisibility(View.VISIBLE);
-
             
             return element;
         }
@@ -213,23 +209,6 @@ public class PlaylistFragment extends MusicListFragment{
             }
         }
         
-        private class DeleteSongListener implements OnClickListener{
-            private PlaylistEntry entry;
-            public DeleteSongListener(PlaylistEntry entry){
-                this.entry = entry;
-            }
-            @Override
-            public void onClick(View v) {
-                if(getPlaylistService().getCurrentEntry()!= null && getPlaylistService().getCurrentEntry().equals(entry)){
-                    getPlaylistService().skip();
-                }
-                getPlaylistService().removeSong(entry);
-               
-            }
-            
-        }
-        
-
       //detect gestures 
         private class PlaylistSongGestureListener extends SongGestureListener{
             private PlaylistEntry entry;
