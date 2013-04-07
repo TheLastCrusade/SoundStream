@@ -255,8 +255,6 @@ public class PlaylistFragment extends MusicListFragment{
             
             }
             
-            
-            
             //bump the song to the top when double tapped
             @Override
             public boolean onDoubleTap(MotionEvent e) {
