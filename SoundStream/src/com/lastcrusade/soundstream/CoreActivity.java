@@ -77,10 +77,6 @@ public class CoreActivity extends SlidingFragmentActivity{
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
         
-        
-        
-        
-        
         registerReceivers();
     }
 
