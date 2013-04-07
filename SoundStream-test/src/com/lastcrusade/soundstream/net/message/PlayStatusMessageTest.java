@@ -19,16 +19,16 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
+public class PlayStatusMessageTest
+extends APlaylistEntrySerializationTest<PlayStatusMessage>{
 
-public class PlayStatusMessageTest extends SerializationTest<PlayStatusMessage> {
-	
     @Test
-    public void testSerializePlayStatusMessage() throws Exception {
-        fail();
-	}
+    public void testSerializeRemoveFromPlaylistMessage() throws Exception {
+        super.testSerializeMessage(
+                new PlayStatusMessage("01:02:03:04:05", 4321L, 1, true));
+        super.testSerializeMessage(
+                new PlayStatusMessage("01:02:03:04:05", 1L, 200, false));
+    }
 }
