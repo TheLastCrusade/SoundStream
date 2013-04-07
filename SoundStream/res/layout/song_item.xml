@@ -30,7 +30,7 @@
         android:layout_height="match_parent"
         android:minHeight="@dimen/song_height"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="4sp" >
+        android:layout_marginRight="8sp" >
     </View>
 
     <TextView

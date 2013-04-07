@@ -155,7 +155,7 @@
 	        android:layout_marginLeft="20sp"
 	        android:layout_marginRight="20sp"
 	        android:textColor="@color/white"
-        >
+	        android:divider="@color/transparent" >
     	</ListView>
     </RelativeLayout>
 </RelativeLayout>
