@@ -92,6 +92,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
+                Log.i(TAG, "UserListService bound");
                 NetworkFragment.this.adapter = new UserListAdapter(
                         getActivity(), getUserListFromService(), true);
             }
@@ -353,6 +354,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         UserListService userService = getUserListService();
         if(userService != null){
             activeUsers = userService.getUserList();
+            Log.i(TAG, "Active Users: " + activeUsers);
         }
         return activeUsers;
     }
@@ -360,7 +362,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private UserListService getUserListService(){
         UserListService userService = null;
         try{
-            userListServiceLocator.getService();
+            userService = userListServiceLocator.getService();
         } catch (ServiceNotBoundException e) {
             Log.w(TAG, "UserListService not bound");
         }
