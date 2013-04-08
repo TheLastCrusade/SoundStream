@@ -42,6 +42,7 @@ import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
@@ -54,13 +55,13 @@ public class PlaylistFragment extends MusicListFragment{
     private BroadcastRegistrar registrar;
 
     private ServiceLocator<PlaylistService> playlistServiceServiceLocator;
+    private ServiceLocator<UserListService> userListServiceLocator;
 
     private PlayListAdapter mPlayListAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        final CustomApp curApp = (CustomApp) this.getActivity().getApplication();
 
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(),
@@ -75,10 +76,13 @@ public class PlaylistFragment extends MusicListFragment{
             }
         });
 
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
+
         mPlayListAdapter = new PlayListAdapter(
                 this.getActivity(),
                 Collections.EMPTY_LIST,
-                curApp.getUserList()
+                getUserListFromService()
         );
         setListAdapter(mPlayListAdapter);
 
@@ -157,7 +161,16 @@ public class PlaylistFragment extends MusicListFragment{
     private void updatePlaylist() {
         mPlayListAdapter.updateMusic(getPlaylistService().getPlaylistEntries());
     }
-    
+
+    private UserList getUserListFromService(){
+        UserList activeUsers = new UserList();
+        try {
+            activeUsers = userListServiceLocator.getService().getUserList();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return activeUsers;
+    }
 
     private class PlayListAdapter extends MusicListAdapter<PlaylistEntry> {
         public PlayListAdapter(
