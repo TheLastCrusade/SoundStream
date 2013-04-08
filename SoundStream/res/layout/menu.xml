@@ -59,11 +59,8 @@
             android:background="@color/transparent"
             android:drawableLeft="@drawable/playlist_icon"
             android:drawablePadding="6sp"
-<<<<<<< HEAD
-            android:gravity="left|center_vertical"/>
-=======
+            android:gravity="left|center_vertical"
             android:contentDescription="@string/playlist"/>
->>>>>>> initial ui test work
         
         <Button 
             android:id="@+id/music_library_btn"
@@ -78,12 +75,8 @@
             android:background="@color/transparent"
             android:drawableLeft="@drawable/music_library_icon"
             android:drawablePadding="6sp"
-<<<<<<< HEAD
             android:gravity="left|center_vertical"
-            />
-=======
             android:contentDescription="@string/music_library"/>
->>>>>>> initial ui test work
     </RelativeLayout>
     
     <!-- Network Things -->
