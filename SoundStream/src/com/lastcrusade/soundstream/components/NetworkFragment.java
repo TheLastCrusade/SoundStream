@@ -201,7 +201,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         try {
             connectionService = this.connectionServiceLocator.getService();
         } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
+            //TODO Make this a real error
+            Log.v(TAG, e.toString());
         }
         return connectionService;
     }

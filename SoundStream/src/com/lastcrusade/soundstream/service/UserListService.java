@@ -54,13 +54,13 @@ public class UserListService extends Service {
     @Override
     public void onCreate() {
         Log.i(TAG, "Userlist Service create");
+        super.onCreate();
         userList = new UserList();
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
 
         registerReceivers();
-        super.onCreate();
     }
     
     @Override
