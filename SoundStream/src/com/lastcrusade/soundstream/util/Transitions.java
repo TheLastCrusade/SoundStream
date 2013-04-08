@@ -44,12 +44,12 @@ public class Transitions {
     private final static NetworkFragment networkFragment = new NetworkFragment();
     private final static ConnectFragment connectFragment = new ConnectFragment();
 
-    //Home is where you get sent after connecting to the network - for now
-    //this is the playlist
-    private final static int HOME = PLAYLIST;
+    //Home is where you get sent after connecting to the network
+    private final static int HOME = MUSIC_LIBRARY;
     
     public static void transitionToHome(CoreActivity activity){
         switchFragment(HOME, activity);
+        activity.showMenu();
     }
     
     public static void transitionToPlaylist(CoreActivity activity){
