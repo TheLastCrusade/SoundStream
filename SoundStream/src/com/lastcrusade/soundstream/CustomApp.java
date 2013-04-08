@@ -37,6 +37,7 @@ import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -51,6 +52,7 @@ public class CustomApp extends Application {
     private ServiceLocator<MessagingService>    messagingServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
     private ServiceLocator<PlaylistService>     playlistServiceLocator;
+    private ServiceLocator<UserListService>     userListServiceLocator;
 
     private BroadcastRegistrar registrar;
 
@@ -133,29 +135,14 @@ public class CustomApp extends Application {
 
         playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
+
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this, UserListService.class, UserListService.UserListServiceBinder.class);
     }
 
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_GUEST_NAME);
-                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
-                    userList.addUser(bluetoothID, macAddress);
-                    notifyUserListUpdate();
-                }
-            })
-            .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
-                
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
-                    userList.removeUser(macAddress);
-                    notifyUserListUpdate();
-                }
-            })
             .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
 
                 @Override
@@ -163,16 +150,6 @@ public class CustomApp extends Application {
                     //send the library to the connected host
                     List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
                     getMessagingService().sendLibraryMessageToHost(metadata);
-                }
-            })
-            .addAction(MessagingService.ACTION_NEW_CONNECTED_USERS_MESSAGE, new IBroadcastActionHandler() {
-                
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    //extract the new user list from the intent
-                    userList.copyFrom((UserList) intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST));
-                    //tell app to update the user list in all the UI
-                    new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
                 }
             })
             .register(this);
@@ -230,11 +207,6 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return playlistService;
-    }
-
-    public void notifyUserListUpdate() {
-        new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
-        getMessagingService().sendUserListMessage(userList);
     }
 
     public void addSelfToUserList() {
