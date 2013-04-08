@@ -46,8 +46,6 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getName();
     
-    private UserList userList;
-    
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
@@ -66,8 +64,6 @@ public class CustomApp extends Application {
     public void onCreate() {
         super.onCreate();
         
-        userList = new UserList();
-
         createServiceLocators();
 
         registerReceivers();
@@ -119,14 +115,6 @@ public class CustomApp extends Application {
         connectionServiceLocator = new ServiceLocator<ConnectionService>(
                 this, ConnectionService.class, ConnectionService.ConnectionServiceBinder.class);
 
-        connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
-
-            @Override
-            public void onServiceBound() {
-                //TODO: Move this to something like connect activity or the connection fragment
-                addSelfToUserList();
-            }
-        });
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
 
@@ -157,16 +145,6 @@ public class CustomApp extends Application {
  
     private void unregisterReceivers() {
         this.registrar.unregister();
-    }
-
-    public UserList getUserList(){
-        return userList;
-    }
-
-    public void clearExternalUsers() {
-        this.userList.clear();
-        addSelfToUserList();
-        new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(CustomApp.this);
     }
 
     private ConnectionService getConnectionService() {
@@ -207,9 +185,5 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return playlistService;
-    }
-
-    public void addSelfToUserList() {
-        getUserList().addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
     }
 }
