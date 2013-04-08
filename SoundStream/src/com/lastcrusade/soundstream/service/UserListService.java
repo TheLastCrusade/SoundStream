@@ -106,12 +106,12 @@ public class UserListService extends Service {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
     }
 
-    public void notifyUserListUpdate() {
+    private void notifyUserListUpdate() {
         new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
     }
 
-    public void addSelfToUserList() {
+    private void addSelfToUserList() {
         userList.addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
     }
 
@@ -128,6 +128,10 @@ public class UserListService extends Service {
             Log.wtf(TAG, e);
         }
         return messagingService;
+    }
+
+    public UserList getUserList(){
+        return userList;
     }
 
 }

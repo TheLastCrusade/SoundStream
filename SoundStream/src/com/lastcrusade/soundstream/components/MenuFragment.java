@@ -22,6 +22,7 @@ package com.lastcrusade.soundstream.components;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,6 +35,9 @@ import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -42,12 +46,17 @@ import com.lastcrusade.soundstream.util.UserListAdapter;
 
 
 public class MenuFragment extends SherlockFragment implements ITitleable {
+    private static final String TAG = MenuFragment.class.getSimpleName();
     private BroadcastRegistrar registrar;
     private ListView userView;
+
+    private ServiceLocator<UserListService> userListServiceLocator;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
         registerReceivers();
     }
  
@@ -86,8 +95,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
         });
         
         userView = (ListView)v.findViewById(R.id.connected_users); 
-        userView.setAdapter(new UserListAdapter(getActivity(), 
-                ((CustomApp)getActivity().getApplication()).getUserList(),true ));
+        userView.setAdapter(new UserListAdapter(getActivity(), getUserListFromService(), true));
         
         return v;
     }
@@ -120,14 +128,22 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                ((UserListAdapter)userView.getAdapter()).updateUsers(
-                        ((CustomApp)getActivity().getApplication()).getUserList()
-                        );
+                ((UserListAdapter)userView.getAdapter()).updateUsers(getUserListFromService());
             }
         }).register(this.getActivity());
     }
 
     private void unregisterReceivers() {
         this.registrar.unregister();
+    }
+    
+    private UserList getUserListFromService(){
+        UserList activeUsers = new UserList();
+        try {
+            activeUsers = userListServiceLocator.getService().getUserList();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return activeUsers;
     }
 }
