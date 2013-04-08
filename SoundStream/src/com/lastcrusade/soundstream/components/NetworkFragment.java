@@ -50,6 +50,7 @@ import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
+import com.lastcrusade.soundstream.service.UserListService.UserListServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -86,7 +87,16 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         });
 
         userListServiceLocator = new ServiceLocator<UserListService>(
-                this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
+                this.getActivity(), UserListService.class, UserListServiceBinder.class);
+        Log.i(TAG, "Setting listener");
+        userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                Log.i(TAG, "Userlist Service bound in NetworkFragment");
+                NetworkFragment.this.adapter = new UserListAdapter(
+                        getActivity(), getUserListFromService(), true);
+            }
+        });
 
         registerReceivers();
     }
@@ -109,7 +119,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         
         ListView users = (ListView)v.findViewById(R.id.connected_users);
         
-        this.adapter = new UserListAdapter(getActivity(), getUserListFromService(), false );
+        NetworkFragment.this.adapter = new UserListAdapter(getActivity(), new UserList(), false );
         users.setAdapter(this.adapter);
 
         disconnect = (Button)v.findViewById(R.id.disconnect_btn);

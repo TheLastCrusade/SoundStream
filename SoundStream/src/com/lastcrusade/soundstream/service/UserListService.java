@@ -42,22 +42,30 @@ public class UserListService extends Service {
      * Class for clients to access. Because we know this service always runs in
      * the same process as its clients, we don't need to deal with IPC.
      */
-    public class UserListServiceBinder extends Binder implements
-            ILocalBinder<UserListService> {
+    public class UserListServiceBinder extends Binder implements ILocalBinder<UserListService> {
         public UserListService getService() {
             return UserListService.this;
         }
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Service#onCreate()
+     */
     @Override
-    public IBinder onBind(Intent intent) {
+    public void onCreate() {
+        Log.i(TAG, "Userlist Service create");
         userList = new UserList();
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
 
         registerReceivers();
-
+        super.onCreate();
+    }
+    
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.i(TAG, "Userlist Service bound");
         return new UserListServiceBinder();
     }
 

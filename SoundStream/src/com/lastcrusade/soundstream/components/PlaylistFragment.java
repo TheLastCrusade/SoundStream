@@ -107,6 +107,7 @@ public class PlaylistFragment extends MusicListFragment{
     public void onDestroy() {
         super.onDestroy();
         playlistServiceServiceLocator.unbind();
+        userListServiceLocator.unbind();
         unregisterReceivers();
     }
 

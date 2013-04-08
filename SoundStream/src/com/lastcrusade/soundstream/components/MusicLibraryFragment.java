@@ -126,9 +126,10 @@ public class MusicLibraryFragment extends MusicListFragment {
         // Unbind from the MusicLibrary service
         if (boundToService) {
             this.getActivity().unbindService(musicLibraryConn);
-            this.getActivity().unbindService(playlistServiceLocator);
             boundToService = false;
         }
+        playlistServiceLocator.unbind();
+        userListServiceLocator.unbind();
         unregisterReceivers();
     }
 
