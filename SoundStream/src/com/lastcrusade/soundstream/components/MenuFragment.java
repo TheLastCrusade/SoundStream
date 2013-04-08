@@ -136,7 +136,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
-    
+
     private UserList getUserListFromService(){
         UserList activeUsers = new UserList();
         try {
