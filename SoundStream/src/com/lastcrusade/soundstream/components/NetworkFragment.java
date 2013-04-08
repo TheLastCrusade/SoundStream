@@ -88,7 +88,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListServiceBinder.class);
-        Log.i(TAG, "Setting listener");
+
         userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {

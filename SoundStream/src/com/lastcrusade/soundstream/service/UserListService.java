@@ -53,7 +53,6 @@ public class UserListService extends Service {
      */
     @Override
     public void onCreate() {
-        Log.i(TAG, "Userlist Service create");
         super.onCreate();
         userList = new UserList();
 
@@ -65,7 +64,6 @@ public class UserListService extends Service {
     
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(TAG, "Userlist Service bound");
         return new UserListServiceBinder();
     }
 
