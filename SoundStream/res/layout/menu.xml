@@ -58,7 +58,8 @@
             android:clickable="true"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/playlist_icon"
-            android:drawablePadding="6sp"/>
+            android:drawablePadding="6sp"
+            android:contentDescription="@string/playlist"/>
         
         <Button 
             android:id="@+id/music_library_btn"
@@ -73,7 +74,7 @@
             android:background="@color/transparent"
             android:drawableLeft="@drawable/music_library_icon"
             android:drawablePadding="6sp"
-            />
+            android:contentDescription="@string/music_library"/>
     </RelativeLayout>
     
     <!-- Network Things -->
@@ -116,7 +117,7 @@
             android:background="@color/transparent"
             android:drawableLeft="@drawable/network_icon"
             android:drawablePadding="6sp"
-            />
+            android:contentDescription="@string/network"/>
     </RelativeLayout>
     
     <!-- Connected Members -->
