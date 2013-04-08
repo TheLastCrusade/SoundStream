@@ -109,6 +109,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        userListServiceLocator.unbind();
         unregisterReceivers();
     }
     
