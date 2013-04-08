@@ -20,15 +20,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="4sp"
-    android:paddingRight="4sp"
     android:orientation="horizontal"
-    android:background="@color/gray">
+    android:background="@color/playbar" >
 
+    <View 
+        android:layout_height="2sp"
+        android:layout_width="match_parent"
+        android:background="@color/light_gray"
+        android:alpha=".5"/>
    <!-- singleLine is deprecated, but it appears to be
         the only way to get the fading to work correctly.
         All of the advise found online suggests to just
         use the deprecated method -->
+    <!--focusable and scrolling attributes make the song
+    	title scroll when clicked. There appears to be no
+    	default way to set the speed - revisit later.   -->
+    	
     <TextView
         android:id="@+id/text_now_playing"
         android:layout_width="wrap_content"
@@ -36,16 +43,25 @@
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@+id/btn_play_pause"
-        android:padding="4sp"
+        android:paddingLeft="16sp"
+        android:paddingTop="12sp"
+    	android:paddingBottom="12sp"
         android:text="@string/now_playing"
+        android:textColor="@color/abs__primary_text_holo_light"
         android:singleLine="true"
         android:ellipsize="marquee"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:scrollHorizontally="true"
+        android:marqueeRepeatLimit="1"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:clickable="true"/>
 
      <ImageButton
          android:id="@+id/btn_play_pause"
          android:src="@drawable/av_play"
-         android:padding="4sp"
+         android:paddingRight="6sp"
+         android:paddingLeft="12sp"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_toLeftOf="@+id/btn_skip"
@@ -55,7 +71,8 @@
      <ImageButton
          android:id="@+id/btn_skip"
          android:src="@drawable/av_next"
-         android:padding="4sp"
+         android:paddingLeft="6sp"
+         android:paddingRight="12sp"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_alignParentRight="true"
