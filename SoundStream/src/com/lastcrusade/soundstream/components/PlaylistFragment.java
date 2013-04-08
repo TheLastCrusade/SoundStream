@@ -226,10 +226,10 @@ public class PlaylistFragment extends MusicListFragment{
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
                     float velocityY) {
                 boolean swipe = false;
-                // get the different between the two points so that we do not confuse
-                // a press with a fling
-                int dx = (int)(e2.getX() - e1.getX());
-                if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
+                // Fling is what the gesture detector detects
+                // Swipe is our internal vocabulary for a 
+                // horizontal left to right fling
+                if(isSwipe(e1, e2, velocityX, velocityY)){
                     if(getPlaylistService().getCurrentEntry()!= null && 
                             getPlaylistService().getCurrentEntry().equals(entry)){
                         getPlaylistService().skip();
@@ -244,11 +244,12 @@ public class PlaylistFragment extends MusicListFragment{
                 return swipe;
             }
             
+            //allows the view to be moved horizontally
             @Override
             public boolean onScroll(MotionEvent e1, MotionEvent e2,
                 float distanceX, float distanceY) {
                 
-                int dx = (int)(e2.getX() - e1.getX());
+                float dx = e2.getX() - e1.getX();
                 animateDragging(dx);
                 
                 return super.onScroll(e1, e2, distanceX, distanceY);
@@ -262,11 +263,36 @@ public class PlaylistFragment extends MusicListFragment{
                 return true;
             } 
             
-            private void animateDragging(int amount){
+            /**
+             * Animates the current view by moving it to the right by the given 
+             * amount
+             * 
+             * @param amount
+             */
+            private void animateDragging(float amount){
                 TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
                 trans.initialize(view.getWidth(), view.getHeight(), 
                         ((View)view.getParent()).getWidth(), ((View)view.getParent()).getHeight());
                 view.startAnimation(trans);
+            }
+            
+            /**
+             * Checks to see if the fling motion described by these inputs matches
+             * our definition of a left to right swipe
+             * 
+             * @param e1
+             * @param e2
+             * @param velocityX
+             * @param velocityY
+             * @return
+             */
+            private boolean isSwipe(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
+                float dx = e2.getX() - e1.getX();
+                
+                if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
+                    return true;
+                }
+                return false;
             }
         }
     }
