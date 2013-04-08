@@ -21,6 +21,12 @@ package com.lastcrusade.soundstream.util;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 
@@ -48,5 +54,42 @@ public class CustomAssert {
         assertEquals(expected.isLoaded(), actual.isLoaded());
         assertEquals(expected.isPlayed(), actual.isPlayed());
         assertEquals(expected.getFilePath(), actual.getFilePath());
+    }
+
+    /**
+     * Verifies file's SHA1 checksum
+     */
+    public static void verifyChecksum(String fileOne, String fileTwo){
+        String fileHash1 = null;
+        String fileHash2 = null;
+        try {
+            fileHash1 = findSha1(fileOne);
+            fileHash2 = findSha1(fileTwo);
+            assertEquals(fileHash1, fileHash2);
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    private static String findSha1(String file)
+            throws NoSuchAlgorithmException, FileNotFoundException, IOException {
+        MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+        byte[] data = new byte[1024];
+        FileInputStream fis = new FileInputStream(file);
+
+        int read = 0;
+        while ((read = fis.read(data)) != -1) {
+            sha1.update(data, 0, read);
+        };
+        byte[] hashBytes = sha1.digest();
+
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < hashBytes.length; i++) {
+          sb.append(Integer.toString((hashBytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+
+        String fileHash = sb.toString();
+        fis.close();
+        return fileHash;
     }
 }
