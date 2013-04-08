@@ -25,8 +25,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
@@ -37,12 +39,12 @@ import com.lastcrusade.soundstream.net.message.Messenger;
 public class SerializationTest<T extends IMessage> {
     
     public T testSerializeMessage(T message) throws Exception {
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(getTempFolder());
         
         messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger.getOutputBytes());
+        InputStream is = simulateSendAndReceive(messenger);
         
-        Messenger rcvMessenger = new Messenger();
+        Messenger rcvMessenger = new Messenger(getTempFolder());
         //attempt to deserialize the second message
         assertTrue(rcvMessenger.deserializeMessage(is));
         
@@ -57,7 +59,7 @@ public class SerializationTest<T extends IMessage> {
     }
     
     public T testDeserializeMessage(T message) throws Exception {
-        Messenger messenger = new Messenger();
+        Messenger messenger = new Messenger(getTempFolder());
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -76,8 +78,10 @@ public class SerializationTest<T extends IMessage> {
     }
     
     private InputStream simulateSendAndReceive(
-            byte[] outputBytes) {
-        return new ByteArrayInputStream(outputBytes);
+            Messenger messenger) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        messenger.writeToOutputStream(baos);
+        return new ByteArrayInputStream(baos.toByteArray());
     }
     
     /**
@@ -103,6 +107,12 @@ public class SerializationTest<T extends IMessage> {
         
         baos.reset();
         baos.write(bytes);
+    }
+    
+    private File getTempFolder(){
+        URL location = BumpSongOnPlaylistMessage.class.getProtectionDomain().getCodeSource().getLocation();
+        File tempFolder = new File(location.getFile());
+        return tempFolder;
     }
 
 }
