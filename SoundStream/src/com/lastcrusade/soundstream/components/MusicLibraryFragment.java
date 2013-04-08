@@ -45,6 +45,7 @@ import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
@@ -55,6 +56,7 @@ public class MusicLibraryFragment extends MusicListFragment {
     private BroadcastRegistrar registrar;
 
     private ServiceLocator<PlaylistService> playlistServiceLocator;
+    private ServiceLocator<UserListService> userListServiceLocator;
 
     private MusicLibraryService mMusicLibraryService;
     private boolean boundToService = false; //Since you cannot instantly bind, set a boolean
@@ -91,21 +93,33 @@ public class MusicLibraryFragment extends MusicListFragment {
         playlistServiceLocator = new ServiceLocator<PlaylistService>(MusicLibraryFragment.this.getActivity(),
                 PlaylistService.class, PlaylistServiceBinder.class);
 
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
+
         if(boundToService == false){
             Intent intentML = new Intent(this.getActivity(), MusicLibraryService.class);
             this.getActivity().bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
         }
         
         
-        UserList users = ((CustomApp) this.getActivity().getApplication()).getUserList();
+        UserList users = getUserListFromService();
         //make a new music list adapter and give it an empty list of songs to use until the service is connected
         mMusicAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
         setListAdapter(mMusicAdapter);
         
         registerReceivers();
     }
-    
-        
+
+    private UserList getUserListFromService(){
+        UserList activeUsers = new UserList();
+        try {
+            activeUsers = userListServiceLocator.getService().getUserList();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return activeUsers;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
