@@ -31,6 +31,6 @@ extends APlaylistEntrySerializationTest<AddToPlaylistMessage>{
     @Test
     public void testSerializeAddToPlaylistMessage() throws Exception {
         super.testSerializeMessage(
-                new AddToPlaylistMessage("Test", 1234));
+                new AddToPlaylistMessage("Test", 1234, 3));
     }
 }
