@@ -95,6 +95,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 Log.i(TAG, "UserListService bound");
                 NetworkFragment.this.adapter = new UserListAdapter(
                         getActivity(), getUserListFromService(), true);
+                NetworkFragment.this.adapter.notifyDataSetChanged();
             }
         });
 

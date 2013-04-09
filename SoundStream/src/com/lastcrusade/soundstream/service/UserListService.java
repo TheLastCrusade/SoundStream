@@ -54,7 +54,9 @@ public class UserListService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         userList = new UserList();
+        addSelfToUserList();
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
