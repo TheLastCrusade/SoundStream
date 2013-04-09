@@ -118,6 +118,14 @@ public class PlaylistFragment extends MusicListFragment{
             public void onReceiveAction(Context context, Intent intent) {
                 updatePlaylist();
             }
+        }).addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                //when the playlist starts playing a song, we want to make sure that we are
+                // showing the correct song being played, so we tell the adapter to update
+                // the playlist to force a redraw of the views
+                updatePlaylist();
+            }
         })
         .addAction(PlaylistService.ACTION_SONG_REMOVED, new IBroadcastActionHandler() {
             
@@ -174,13 +182,23 @@ public class PlaylistFragment extends MusicListFragment{
             
             //This depends on played music being above unplayed music
             PlaylistEntry entry = super.getItem(position);
+            
             if (!entry.isLoaded()) {
-                //TODO: style the unloaded elements here
                 element.setBackgroundColor(getResources().getColor(R.color.loading));
-            } else if (entry.isPlayed()) {
+                element.findViewById(R.id.now_playing).setVisibility(View.INVISIBLE);
+            } 
+            else if (entry.isPlayed()) {
                 element.setBackgroundColor(getResources().getColor(R.color.used));
-            } else {
+                element.findViewById(R.id.now_playing).setVisibility(View.INVISIBLE);
+            } 
+            else {
                 element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
+                if(entry.equals(getPlaylistService().getCurrentEntry())){
+                    element.findViewById(R.id.now_playing).setVisibility(View.VISIBLE);
+                }
+                else{
+                    element.findViewById(R.id.now_playing).setVisibility(View.INVISIBLE);
+                }
             }
             
 
