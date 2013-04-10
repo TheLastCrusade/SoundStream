@@ -108,5 +108,17 @@
         android:visibility="invisible"
         android:contentDescription="@string/remove_from_playlist"
         android:background="@color/transparent"/>
+     
+     <ImageView 
+        android:id="@+id/now_playing"
+        android:layout_width = "wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight = "16sp"
+        android:paddingLeft = "16sp" 
+        android:src="@drawable/speaker"
+        android:visibility="invisible"
+         />
     
 </RelativeLayout>
