@@ -83,7 +83,7 @@ public class UserListService extends Service {
                 String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_GUEST_NAME);
                 String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                 userList.addUser(bluetoothID, macAddress);
-                Log.i(TAG, "Guest Disconnected");
+                notifyUserListUpdate();
             }
         })
         .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
