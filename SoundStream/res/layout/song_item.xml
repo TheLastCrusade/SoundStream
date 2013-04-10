@@ -95,18 +95,26 @@
         android:visibility="invisible"
         android:contentDescription="@string/add_to_playlist"
         />
-    
-     <ImageButton
-        android:id="@+id/btn_remove_from_playlist"
-        android:src="@drawable/content_remove"
+     
+     <ImageView 
+        android:id="@+id/now_playing"
         android:layout_width = "wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:paddingRight = "16dp"
         android:paddingLeft = "16dp" 
-        android:visibility="invisible"
-        android:contentDescription="@string/remove_from_playlist"
-        android:background="@color/transparent"/>
-    
+        android:src="@drawable/speaker"
+        android:visibility="invisible" />
+     
+     <ProgressBar 
+         android:id="@+id/progress"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:paddingRight="16dp"
+         android:layout_alignParentRight="true"
+         android:layout_centerVertical="true"
+         style="@style/Widget.Sherlock.Light.ProgressBar"
+         android:visibility="invisible" />
+     
 </RelativeLayout>
