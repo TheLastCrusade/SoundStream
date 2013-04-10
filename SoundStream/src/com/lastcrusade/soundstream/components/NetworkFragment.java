@@ -356,7 +356,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         if(userService != null){
             return userService.getUserList();
         } else {
-            Log.i(TAG, "UserListService null returning empty userlist");
+            Log.i(TAG, "UserListService null, returning empty userlist");
         }
         return activeUsers;
     }

@@ -31,6 +31,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -44,6 +45,7 @@ import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServi
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -52,85 +54,60 @@ import com.lastcrusade.soundstream.util.MusicListAdapter;
 import com.lastcrusade.soundstream.util.Toaster;
 
 public class MusicLibraryFragment extends MusicListFragment {
-    private final String TAG = MusicLibraryFragment.class.getName();
+    private final String TAG = MusicLibraryFragment.class.getSimpleName();
     private BroadcastRegistrar registrar;
 
     private ServiceLocator<PlaylistService> playlistServiceLocator;
     private ServiceLocator<UserListService> userListServiceLocator;
-
-    private MusicLibraryService mMusicLibraryService;
-    private boolean boundToService = false; //Since you cannot instantly bind, set a boolean
-                                    // after its safe to call methods
+    private ServiceLocator<MusicLibraryService> musicLibraryServiceLocator;
     
     private MusicAdapter mMusicAdapter;
-
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection musicLibraryConn = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                IBinder service) {
-            MusicLibraryServiceBinder binder = (MusicLibraryServiceBinder) service;
-            
-            mMusicLibraryService = binder.getService();
-            boundToService = true;
-            
-            //update displayed music
-            mMusicAdapter.updateMusicFromLibrary();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            boundToService = false;
-        }
-    };
-
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        //make a new music list adapter and give it an empty list of songs and empty list of users to use until the service is connected
+        mMusicAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , new UserList());
 
         playlistServiceLocator = new ServiceLocator<PlaylistService>(MusicLibraryFragment.this.getActivity(),
                 PlaylistService.class, PlaylistServiceBinder.class);
 
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
+        userListServiceLocator.setOnBindListener(new IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                mMusicAdapter.updateUsers(getUserListFromService());
+            }
+        });
 
-        if(boundToService == false){
-            Intent intentML = new Intent(this.getActivity(), MusicLibraryService.class);
-            this.getActivity().bindService(intentML, musicLibraryConn, Context.BIND_AUTO_CREATE);
-        }
-        
-        
-        UserList users = getUserListFromService();
-        //make a new music list adapter and give it an empty list of songs to use until the service is connected
-        mMusicAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , users);
-        setListAdapter(mMusicAdapter);
-        
+        musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
+                this.getActivity(), MusicLibraryService.class, MusicLibraryService.MusicLibraryServiceBinder.class);
+        musicLibraryServiceLocator.setOnBindListener(new IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                mMusicAdapter.updateMusicFromLibrary();
+            }
+        });
+
         registerReceivers();
-    }
-
-    private UserList getUserListFromService(){
-        UserList activeUsers = new UserList();
-        try {
-            activeUsers = userListServiceLocator.getService().getUserList();
-        } catch (ServiceNotBoundException e) {
-            Log.w(TAG, "UserListService not bound");
-        }
-        return activeUsers;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Unbind from the MusicLibrary service
-        if (boundToService) {
-            this.getActivity().unbindService(musicLibraryConn);
-            boundToService = false;
-        }
         playlistServiceLocator.unbind();
         userListServiceLocator.unbind();
+        musicLibraryServiceLocator.unbind();
         unregisterReceivers();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        setListAdapter(mMusicAdapter);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -172,7 +149,6 @@ public class MusicLibraryFragment extends MusicListFragment {
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
-    
 
     protected PlaylistService getPlaylistService() {
         PlaylistService playlistService = null;
@@ -184,6 +160,49 @@ public class MusicLibraryFragment extends MusicListFragment {
         }
         return playlistService;
     }
+
+    protected MusicLibraryService getMusicLibraryService() {
+        MusicLibraryService musicLibraryService = null;
+        try {
+            musicLibraryService = this.musicLibraryServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "MusicLibraryService not bound");
+        }
+        return musicLibraryService;
+    }
+    private ArrayList<SongMetadata> getMusicLibraryFromService(){
+        ArrayList<SongMetadata> library = new ArrayList<SongMetadata>();
+        MusicLibraryService musicLibraryService = getMusicLibraryService();
+        if(musicLibraryService != null){
+            library = new ArrayList<SongMetadata>(musicLibraryService.getLibrary());
+        } else {
+            Log.i(TAG, "MusicLibarysService null, returning empty library");
+        }
+        return library;
+    }
+
+
+    private UserList getUserListFromService(){
+        UserList activeUsers = new UserList();
+        UserListService userService = getUserListService();
+        if(userService != null){
+            return userService.getUserList();
+        } else {
+            Log.i(TAG, "UserListService null, returning empty userlist");
+        }
+        return activeUsers;
+    }
+
+    private UserListService getUserListService(){
+        UserListService userService = null;
+        try{
+            userService = userListServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return userService;
+    }
+
 
     /**
      * Inner class extends MusicListAdapter to add the add to playlist image button, and click listener
@@ -225,7 +244,7 @@ public class MusicLibraryFragment extends MusicListFragment {
          * Update the list with music from the library
          */
         private void updateMusicFromLibrary() {
-            this.updateMusic(new ArrayList<SongMetadata>(mMusicLibraryService.getLibrary()));
+            this.updateMusic(getMusicLibraryFromService());
         }
         
         private class ColorTimerTask extends TimerTask{
