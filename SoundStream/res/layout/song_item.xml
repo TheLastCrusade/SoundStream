@@ -105,6 +105,16 @@
         android:paddingRight = "16sp"
         android:paddingLeft = "16sp" 
         android:src="@drawable/speaker"
-        android:visibility="invisible"
-         />
+        android:visibility="invisible" />
+     
+     <ProgressBar 
+         android:id="@+id/progress"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:paddingRight="16sp"
+         android:layout_alignParentRight="true"
+         android:layout_centerVertical="true"
+         style="@style/Widget.Sherlock.Light.ProgressBar"
+         android:visibility="invisible" />
+     
 </RelativeLayout>

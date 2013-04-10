@@ -184,7 +184,9 @@ public class PlaylistFragment extends MusicListFragment{
             PlaylistEntry entry = super.getItem(position);
             
             if (!entry.isLoaded()) {
-                element.setBackgroundColor(getResources().getColor(R.color.loading));
+                //TODO: style the unloaded elements here
+                element.setBackgroundColor(getResources().getColor(R.color.abs__bright_foreground_disabled_holo_light));
+                element.findViewById(R.id.progress).setVisibility(View.VISIBLE);
                 element.findViewById(R.id.now_playing).setVisibility(View.INVISIBLE);
             } 
             else if (entry.isPlayed()) {
@@ -193,6 +195,7 @@ public class PlaylistFragment extends MusicListFragment{
             } 
             else {
                 element.setBackgroundColor(getResources().getColor(com.actionbarsherlock.R.color.abs__background_holo_light));
+                element.findViewById(R.id.progress).setVisibility(View.INVISIBLE);
                 if(entry.equals(getPlaylistService().getCurrentEntry())){
                     element.findViewById(R.id.now_playing).setVisibility(View.VISIBLE);
                 }
