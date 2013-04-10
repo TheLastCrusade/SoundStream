@@ -41,6 +41,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
@@ -63,6 +64,12 @@ public class PlaylistFragment extends MusicListFragment{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
+        mPlayListAdapter = new PlayListAdapter(
+                this.getActivity(),
+                Collections.<PlaylistEntry> emptyList(),
+                new UserList()
+        );
+
         playlistServiceServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(),
                 PlaylistService.class,
@@ -78,13 +85,12 @@ public class PlaylistFragment extends MusicListFragment{
 
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
-
-        mPlayListAdapter = new PlayListAdapter(
-                this.getActivity(),
-                Collections.EMPTY_LIST,
-                getUserListFromService()
-        );
-        setListAdapter(mPlayListAdapter);
+        userListServiceLocator.setOnBindListener(new IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                mPlayListAdapter.updateUsers(getUserListFromService());
+            }
+        });
 
         registerReceivers();
     }
@@ -93,7 +99,7 @@ public class PlaylistFragment extends MusicListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
-       
+        setListAdapter(mPlayListAdapter);
         return v;
     }
 

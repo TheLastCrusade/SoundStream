@@ -167,16 +167,27 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
 
     private void setDisconnectDisbandVisibility() {
+        //TODO @bryan sills clean this code up
         if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
-            disconnect.setVisibility(View.INVISIBLE);
-            disband.setVisibility(View.VISIBLE);
+            if(disconnect != null){
+                disconnect.setVisibility(View.INVISIBLE);
+            }
+            if(disband != null){
+                disband.setVisibility(View.VISIBLE);
+            }
         } else if (getConnectionService() != null && getConnectionService().isHostConnected()) {
-            disconnect.setVisibility(View.VISIBLE);
+            if(disconnect != null){
+                disconnect.setVisibility(View.VISIBLE);
+            }
             disband.setVisibility(View.INVISIBLE);
         } else {
             //if no one is connected, hide both buttons
-            disconnect.setVisibility(View.INVISIBLE);
-            disband.setVisibility(View.INVISIBLE);
+            if(disconnect != null){
+                disconnect.setVisibility(View.INVISIBLE);
+            }
+            if(disband != null){
+                disband.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
