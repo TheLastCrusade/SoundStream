@@ -16,23 +16,103 @@
     You should have received a copy of the GNU General Public License
     along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
     
-    <Button
-        android:id="@+id/btn_create"
-        android:text="@string/create_network"
+    <RelativeLayout
+        android:id="@+id/create"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clickable="true" >
+        
+        <ImageView
+	        android:contentDescription="@string/create_network"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:src="@drawable/host"
         />
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:layout_alignParentBottom="true">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:alpha=".5"
+                android:background="@color/gray" />
+
+            <TextView 
+	            android:text="@string/create_network"
+	            android:textSize="18sp"
+	            android:padding="6dp"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_above="@+id/divider" />
+            <View
+                android:id="@id/divider" 
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/gray"/>
+            
+        </RelativeLayout>
+	    
+    </RelativeLayout>
     
-    <Button 
-        android:id="@+id/btn_connect"
-        android:text="@string/connect"
+    <View
+        android:id="@+id/mid_divider" 
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_create"
-        />    
-</RelativeLayout>
+        android:layout_height="3dp"
+        android:background="@color/gray"/>
+    
+    <RelativeLayout
+        android:id="@+id/join"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clickable="true" >
+        
+        <ImageView
+            android:contentDescription="@string/join_network"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/guest"
+        />
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:layout_alignParentBottom="true">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:alpha=".5"
+                android:background="@color/gray" />
+
+            <TextView 
+                android:text="@string/join_network"
+                android:textSize="18sp"
+                android:padding="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/join_divider" />
+            <View
+                android:id="@id/join_divider" 
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/gray"/>
+            
+        </RelativeLayout>
+        
+    </RelativeLayout> 
+      
+</LinearLayout>
