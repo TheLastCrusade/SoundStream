@@ -110,25 +110,25 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
         
         return v;
     }
-    
+
     @Override
     public void onResume(){
         super.onResume();
         getActivity().setTitle(getTitle());
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         userListServiceLocator.unbind();
         unregisterReceivers();
     }
-    
+
     @Override
     public int getTitle() {
         return R.string.app_name_no_spaces;
     }
-    
+
     /**
      * Register intent receivers to control this service
      *
@@ -136,7 +136,6 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar.addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
-
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
