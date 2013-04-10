@@ -44,8 +44,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_alignParentBottom="true"
-                android:alpha=".5"
-                android:background="@color/gray" />
+                android:alpha=".15"
+                android:background="@color/accent_blue" />
 
             <TextView 
 	            android:text="@string/create_network"
@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/gray"/>
+                android:background="@color/accent_blue" />
             
         </RelativeLayout>
 	    
@@ -69,7 +69,7 @@
         android:id="@+id/mid_divider" 
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="@color/gray"/>
+        android:background="@color/gray" />
     
     <RelativeLayout
         android:id="@+id/join"
@@ -94,8 +94,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_alignParentBottom="true"
-                android:alpha=".5"
-                android:background="@color/gray" />
+                android:alpha=".15"
+                android:background="@color/accent_blue" />
 
             <TextView 
                 android:text="@string/join_network"
@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/gray"/>
+                android:background="@color/accent_blue"/>
             
         </RelativeLayout>
         
