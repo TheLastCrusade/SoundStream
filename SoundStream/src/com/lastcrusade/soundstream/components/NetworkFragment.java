@@ -86,6 +86,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
+        NetworkFragment.this.adapter = new UserListAdapter(getActivity(), new UserList(), false );
+
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListServiceBinder.class);
 
@@ -93,9 +95,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onServiceBound() {
                 Log.i(TAG, "UserListService bound");
-                NetworkFragment.this.adapter = new UserListAdapter(
-                        getActivity(), getUserListFromService(), true);
-                NetworkFragment.this.adapter.notifyDataSetChanged();
+                NetworkFragment.this.adapter.updateUsers(getUserListFromService());
             }
         });
 
@@ -117,14 +117,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 getConnectionService().findNewGuests();
             }
         });
-        
-        ListView users = (ListView)v.findViewById(R.id.connected_users);
-        
-        NetworkFragment.this.adapter = new UserListAdapter(getActivity(), new UserList(), false );
-        users.setAdapter(this.adapter);
 
         disconnect = (Button)v.findViewById(R.id.disconnect_btn);
         disband = (Button)v.findViewById(R.id.disband_btn);
+
+        ListView users = (ListView) v.findViewById(R.id.connected_users);
+        users.setAdapter(this.adapter);
 
         //TODO react to changing state
         setDisconnectDisbandVisibility();
@@ -186,6 +184,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     @Override
     public void onResume(){
         super.onResume();
+        if(this.adapter != null){
+            this.adapter.notifyDataSetChanged();
+        }
         getActivity().setTitle(getTitle());
     }
     
@@ -354,8 +355,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         UserList activeUsers = new UserList();
         UserListService userService = getUserListService();
         if(userService != null){
-            activeUsers = userService.getUserList();
-            Log.i(TAG, "Active Users: " + activeUsers);
+            return userService.getUserList();
+        } else {
+            Log.i(TAG, "UserListService null returning empty userlist");
         }
         return activeUsers;
     }
