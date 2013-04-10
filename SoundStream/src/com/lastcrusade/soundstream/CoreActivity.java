@@ -59,24 +59,30 @@ public class CoreActivity extends SlidingFragmentActivity{
             .replace(R.id.menu_frame, menu)
             .commit();
         
+        playbar = new PlaybarFragment();
+        getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.playbar, playbar)
+            .commit();
+        
         //We want to start off at the connect page if this is the first time
         // the activity is created
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
             getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
             setSlidingActionBarEnabled(false);
-            
-            playbar = new PlaybarFragment();
+            hidePlaybar();
         }
         else{
             //if we're not entering for the first time, we want to make sure that 
             //we still have access to the sliding menu
             enableSlidingMenu();
+            showPlaybar();
         }
 
         // setup the sliding bar
         getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
-        
+
         registerReceivers();
     }
 
@@ -129,9 +135,14 @@ public class CoreActivity extends SlidingFragmentActivity{
     public void showPlaybar(){
         getSupportFragmentManager()
         .beginTransaction()
-        .replace(R.id.playbar, playbar)
+        .show(playbar)
         .commit();
     }
-
-    //TODO: LizzieJohn make a hidePlaybar method
+    
+    public void hidePlaybar(){
+        getSupportFragmentManager()
+        .beginTransaction()
+        .hide(playbar)
+        .commit();
+    }
 }

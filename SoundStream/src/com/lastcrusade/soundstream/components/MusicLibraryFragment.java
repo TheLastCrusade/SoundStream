@@ -221,7 +221,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             View v = super.getView(position, convertView, parent);
             ImageButton imageButton = (ImageButton) v.findViewById(R.id.btn_add_to_playlist);
             imageButton.setVisibility(View.VISIBLE);
-
+            imageButton.setBackgroundColor(getResources().getColor(R.color.transparent));
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -230,7 +230,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                     
                     //change the color of the view for a small period of time to indicate that the add 
                     //button has been pressed
-                    ((View)v.getParent()).setBackgroundColor(getResources().getColor(R.color.abs__holo_blue_light));
+                    v.setBackgroundColor(getResources().getColor(R.color.abs__holo_blue_light));
                     Timer colorTimer = new Timer();
                     colorTimer.schedule(new ColorTimerTask(v),200);
                 }
@@ -261,7 +261,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                     
                     @Override
                     public void run() {
-                        ((View)view.getParent()).setBackgroundColor(
+                        view.setBackgroundColor(
                                 getResources().getColor(R.color.abs__background_holo_light));
                         
                     }

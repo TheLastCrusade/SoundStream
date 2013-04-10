@@ -29,6 +29,6 @@ extends APlaylistEntrySerializationTest<RemoveFromPlaylistMessage>{
     @Test
     public void testSerializeRemoveFromPlaylistMessage() throws Exception {
         super.testSerializeMessage(
-                new RemoveFromPlaylistMessage("Test", 1234));
+                new RemoveFromPlaylistMessage("Test", 1234, 2));
     }
 }

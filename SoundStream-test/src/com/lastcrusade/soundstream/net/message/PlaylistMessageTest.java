@@ -55,17 +55,17 @@ public class PlaylistMessageTest extends SerializationTest<PlaylistMessage> {
                 new PlaylistEntry(
                         new SongMetadata(69, "Driver that Had a Dick on His Shoulder",
                         "Aziz Ansari", "Dangerously Delicious", 2345, "David"),
-                        true, true, "/some/such/path"),
+                        true, true, "/some/such/path", 0),
                 new PlaylistEntry(
                         new SongMetadata(1, "Lady with the Puppies", null,
                         "Dangerously Delicious", 23462346, "David"),
-                        true, false, "/some/other/path"),
+                        true, false, "/some/other/path", 1),
                 new PlaylistEntry(new SongMetadata(23, "Toronto Customs Lady", "Aziz Ansari",
                         null, 3423462, "David"),
-                        false, false, ""),
+                        false, false, "", 2),
                 new PlaylistEntry(new SongMetadata(42, "Motley Crue Tour vs. Aziz Tour", "Aziz Ansari",
                         "Dangerously Delicious", 2346236, null),
-                        false, true, "./")
+                        false, true, "./", 3)
         ));
         return library;
     }
