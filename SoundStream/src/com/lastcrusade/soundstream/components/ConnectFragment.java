@@ -77,6 +77,8 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_connect, container, false);
+        ((CoreActivity)getActivity()).hidePlaybar();
+        
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
         if(rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90){
             ((LinearLayout)v).setOrientation(LinearLayout.HORIZONTAL);
@@ -89,7 +91,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             ((LinearLayout)v).setOrientation(LinearLayout.VERTICAL);
             v.findViewById(R.id.join).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1));
             v.findViewById(R.id.create).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1));
-            v.findViewById(R.id.mid_divider).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,3));
+            v.findViewById(R.id.mid_divider).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0));
 
         }
         View create = v.findViewById(R.id.create);
