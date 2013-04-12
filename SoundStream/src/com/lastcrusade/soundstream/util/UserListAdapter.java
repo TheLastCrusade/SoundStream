@@ -20,6 +20,7 @@
 package com.lastcrusade.soundstream.util;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import com.lastcrusade.soundstream.model.User;
 import com.lastcrusade.soundstream.model.UserList;
 
 public class UserListAdapter extends BaseAdapter {
+    private static final String TAG = UserListAdapter.class.getSimpleName();
 
     private Context mContext;
     private UserList users;

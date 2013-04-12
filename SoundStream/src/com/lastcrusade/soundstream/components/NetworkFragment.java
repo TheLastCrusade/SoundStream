@@ -49,6 +49,8 @@ import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.UserListService;
+import com.lastcrusade.soundstream.service.UserListService.UserListServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -67,7 +69,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private BroadcastRegistrar broadcastRegistrar;
     private Button addMembersButton, disconnect, disband;
     private UserListAdapter adapter;
+
     private ServiceLocator<ConnectionService> connectionServiceLocator;
+    private ServiceLocator<UserListService>   userListServiceLocator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +83,18 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onServiceBound() {
                 setDisconnectDisbandVisibility();
+            }
+        });
+
+        adapter = new UserListAdapter(getActivity(), new UserList(), false);
+
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this.getActivity(), UserListService.class, UserListServiceBinder.class);
+
+        userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                NetworkFragment.this.adapter.updateUsers(getUserListFromService());
             }
         });
 
@@ -100,14 +116,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 getConnectionService().findNewGuests();
             }
         });
-        
-        ListView users = (ListView)v.findViewById(R.id.connected_users);
-        
-        this.adapter = new UserListAdapter(getActivity(), ((CustomApp)getActivity().getApplication()).getUserList(), false );
-        users.setAdapter(this.adapter);
 
         disconnect = (Button)v.findViewById(R.id.disconnect_btn);
         disband = (Button)v.findViewById(R.id.disband_btn);
+
+        ListView users = (ListView) v.findViewById(R.id.connected_users);
+        users.setAdapter(this.adapter);
 
         //TODO react to changing state
         setDisconnectDisbandVisibility();
@@ -153,22 +167,36 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
 
     private void setDisconnectDisbandVisibility() {
+        //TODO @bryan sills clean this code up
         if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
-            disconnect.setVisibility(View.INVISIBLE);
-            disband.setVisibility(View.VISIBLE);
+            if(disconnect != null){
+                disconnect.setVisibility(View.INVISIBLE);
+            }
+            if(disband != null){
+                disband.setVisibility(View.VISIBLE);
+            }
         } else if (getConnectionService() != null && getConnectionService().isHostConnected()) {
-            disconnect.setVisibility(View.VISIBLE);
+            if(disconnect != null){
+                disconnect.setVisibility(View.VISIBLE);
+            }
             disband.setVisibility(View.INVISIBLE);
         } else {
             //if no one is connected, hide both buttons
-            disconnect.setVisibility(View.INVISIBLE);
-            disband.setVisibility(View.INVISIBLE);
+            if(disconnect != null){
+                disconnect.setVisibility(View.INVISIBLE);
+            }
+            if(disband != null){
+                disband.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
     @Override
     public void onResume(){
         super.onResume();
+        if(this.adapter != null){
+            this.adapter.notifyDataSetChanged();
+        }
         getActivity().setTitle(getTitle());
     }
     
@@ -176,6 +204,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     public void onDestroy() {
         unregisterReceivers();
         this.connectionServiceLocator.unbind();
+        this.userListServiceLocator.unbind();
         super.onDestroy();
     }
 
@@ -184,7 +213,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         try {
             connectionService = this.connectionServiceLocator.getService();
         } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
+            //TODO Make this a real error
+            Log.v(TAG, e.toString());
         }
         return connectionService;
     }
@@ -273,7 +303,10 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
-        ((CustomApp)getActivity().getApplication()).clearExternalUsers();
+        UserListService userService = getUserListService();
+        if(userService != null){
+            userService.clearExternalUsers();
+        }
         
         //Send the user to a page where they can start a network or join a different network
         Transitions.transitionToConnect((CoreActivity) getActivity());
@@ -326,5 +359,26 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     @Override
     public int getTitle() {
         return R.string.network;
+    }
+
+    private UserList getUserListFromService(){
+        UserList activeUsers = new UserList();
+        UserListService userService = getUserListService();
+        if(userService != null){
+            return userService.getUserList();
+        } else {
+            Log.i(TAG, "UserListService null, returning empty userlist");
+        }
+        return activeUsers;
+    }
+
+    private UserListService getUserListService(){
+        UserListService userService = null;
+        try{
+            userService = userListServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return userService;
     }
 }
