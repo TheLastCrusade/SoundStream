@@ -205,6 +205,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     @Override
     public int getTitle() {
-        return R.string.connect;
+        return R.string.select;
     }
 }
