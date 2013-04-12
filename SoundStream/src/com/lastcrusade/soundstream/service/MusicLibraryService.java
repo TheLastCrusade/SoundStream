@@ -41,6 +41,7 @@ import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
@@ -79,6 +80,7 @@ public class MusicLibraryService extends Service {
     private String myMacAddress;
 
     private ServiceLocator<MessagingService> messagingServiceLocator;
+    private ServiceLocator<UserListService> userListServiceLocator;
 
     public class MusicLibraryServiceBinder extends Binder implements
         ILocalBinder<MusicLibraryService> {
@@ -103,6 +105,8 @@ public class MusicLibraryService extends Service {
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingServiceBinder.class);
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this, UserListService.class, UserListService.UserListServiceBinder.class);
 
         registerReceivers();
     }
@@ -110,6 +114,8 @@ public class MusicLibraryService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceivers();
+        messagingServiceLocator.unbind();
+        userListServiceLocator.unbind();
         super.onDestroy();
     }
 
@@ -300,7 +306,7 @@ public class MusicLibraryService extends Service {
         synchronized(metadataMutex) {
             //TODO: remove use of bluetoothutils...replace with reference to userlist or some other way
             // of getting "my" address
-            String key = SongMetadataUtils.getUniqueKey(BluetoothUtils.getLocalBluetoothMAC(), songId);
+            String key = SongMetadataUtils.getUniqueKey(getMyMac(), songId);
             Integer inx = metadataMap.get(key);
             return inx != null ? metadataList.get(inx) : null;
         }
@@ -317,6 +323,28 @@ public class MusicLibraryService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getMyMac(){
+        String myMac;
+        UserListService userService = getUserListService();
+        if(userService != null){
+            myMac = userService.getMyMac();
+        } else {
+            myMac = "86:75:30:99";
+            Log.i(TAG, "UserListService null, returning fake mac: " + myMac);
+        }
+        return myMac;
+    }
+
+    private UserListService getUserListService(){
+        UserListService userService = null;
+        try{
+            userService = userListServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return userService;
     }
 
     private byte[] loadFile(File file) throws IOException {
