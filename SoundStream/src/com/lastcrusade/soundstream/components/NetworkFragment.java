@@ -265,7 +265,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
     private void disconnect() {
         //Disconnect from the host
-        
         getConnectionService().disconnectHost();
         //Reset all variables
         cleanUpAfterDisconnect();

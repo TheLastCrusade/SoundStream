@@ -265,7 +265,6 @@ public class MusicLibraryService extends Service {
         }
         if (notify) {
             notifyLibraryUpdated();
-            Log.i(TAG, "Sent Message to Remove Music");
         }
     }
 
