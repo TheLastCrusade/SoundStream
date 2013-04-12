@@ -34,7 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/music_label"
-            android:textColor="@color/light_gray"/>
+            android:textColor="@color/light_gray"
+            />
         
         <View
             android:id="@+id/music_line"
@@ -43,7 +44,8 @@
             android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
             android:layout_below="@+id/music_label"
-            android:background="@color/light_gray" />
+            android:background="@color/light_gray"
+            />
         
         <Button 
             android:id="@+id/playlist_btn"
@@ -59,7 +61,8 @@
             android:drawableLeft="@drawable/playlist_icon"
             android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
-            android:contentDescription="@string/playlist"/>
+            android:contentDescription="@string/playlist"
+            />
         
         <Button 
             android:id="@+id/music_library_btn"
@@ -75,7 +78,8 @@
             android:drawableLeft="@drawable/music_library_icon"
             android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
-            android:contentDescription="@string/music_library"/>
+            android:contentDescription="@string/music_library"
+            />
     </RelativeLayout>
     
     <!-- Network Things -->
@@ -93,7 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/network_category"
             android:text="@string/network_label"
-            android:textColor="@color/light_gray"/>
+            android:textColor="@color/light_gray"
+            />
 
         <View
             android:id="@+id/network_line"
@@ -119,7 +124,8 @@
             android:drawableLeft="@drawable/network_icon"
             android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
-            android:contentDescription="@string/network"/>
+            android:contentDescription="@string/network"
+            />
     </RelativeLayout>
     
     <!-- Connected Members -->
@@ -136,7 +142,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cur_member_label"
-            android:textColor="@color/light_gray"/>
+            android:textColor="@color/light_gray"
+            />
 
         <View
             android:id="@+id/users_line"
@@ -145,7 +152,8 @@
             android:layout_marginTop="3dp"
             android:layout_marginBottom="20dp"
             android:layout_below="@+id/connected_members_label"
-            android:background="@color/light_gray" />
+            android:background="@color/light_gray"
+            />
         
         <ListView
 	        android:id="@+id/connected_users"
@@ -155,7 +163,7 @@
 	        android:layout_marginLeft="20dp"
 	        android:layout_marginRight="20dp"
 	        android:textColor="@color/white"
-	        android:divider="@color/transparent" >
-    	</ListView>
+	        android:divider="@color/transparent"
+            />
     </RelativeLayout>
 </RelativeLayout>
