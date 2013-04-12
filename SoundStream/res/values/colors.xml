@@ -22,7 +22,7 @@
     <color name="red">#FF0000</color>
     <color name="blue">#0000FF</color>
     <color name="cornflower_blue">#6495ed</color>
-    <color name="gray">#ffcccccc</color>
+    <color name="gray">#CCCCCC</color>
     <color name="transparent">#00000000</color>
     <color name="loading">#22000000</color>
     <color name="used">#55000000</color>
@@ -30,5 +30,7 @@
     <color name="light_gray">#BBBBBB</color>
     <color name="white">#FFFFFF</color>
     <color name="playbar">#DEDEDE</color>
-    <color name="accent_blue">#008AA6</color>
+    <color name="accent_blue">#AA008AA6</color>
+    <color name="medium_gray">#EEEEEE</color>
+    
 </resources>

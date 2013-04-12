@@ -34,7 +34,7 @@
     
     <!-- button labels -->
     <string name="add_members">Add Members to Network</string>
-    <string name="connect">Connect</string>
+    <string name="connect">Select</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
     

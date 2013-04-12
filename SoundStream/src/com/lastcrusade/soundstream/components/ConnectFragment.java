@@ -29,9 +29,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -82,17 +80,19 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
         if(rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90){
             ((LinearLayout)v).setOrientation(LinearLayout.HORIZONTAL);
-            v.findViewById(R.id.join).setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT,1));
-            v.findViewById(R.id.create).setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT,1));
-            v.findViewById(R.id.mid_divider).setLayoutParams(new LinearLayout.LayoutParams(3, LinearLayout.LayoutParams.MATCH_PARENT));
-            
+            LinearLayout.LayoutParams clickableParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT,1);
+            clickableParams.setMargins(5, 10, 10, 10);
+            v.findViewById(R.id.join).setLayoutParams(clickableParams);
+            clickableParams.setMargins(10, 10, 5, 10);
+            v.findViewById(R.id.create).setLayoutParams(clickableParams); 
         }
         else{
             ((LinearLayout)v).setOrientation(LinearLayout.VERTICAL);
-            v.findViewById(R.id.join).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1));
-            v.findViewById(R.id.create).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1));
-            v.findViewById(R.id.mid_divider).setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0));
-
+            LinearLayout.LayoutParams clickableParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1);
+            clickableParams.setMargins(10, 5, 10, 10);
+            v.findViewById(R.id.join).setLayoutParams(clickableParams);
+            clickableParams.setMargins(10, 10, 10, 5);
+            v.findViewById(R.id.create).setLayoutParams(clickableParams);
         }
         View create = v.findViewById(R.id.create);
         create.setOnClickListener( new OnClickListener() {
