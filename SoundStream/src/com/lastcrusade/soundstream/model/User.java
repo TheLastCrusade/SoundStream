@@ -45,6 +45,10 @@ public class User {
         return color;
     } 
     
+    public void setColor(int color){
+        this.color = color;
+    }
+    
     public String getMacAddress(){
         if(macAddress == null){
             Log.wtf(TAG, "Mac address null");
