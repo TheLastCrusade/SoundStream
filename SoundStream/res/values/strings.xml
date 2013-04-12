@@ -65,7 +65,13 @@
     <string name="dialog_disband">Are you sure you want to disband? This will boot all connected users.</string>
 
     <!-- about things -->
-    <string name="meet_label">Meet The Crusaders</string>
-    <string name="beginning_label">How We Began</string>
+    <string name="about">About</string>
+    <string name="meet_label">Meet The Team</string>
+    <string name="reid">Reid Baker - Architect and Dynamite Developer</string>
+    <string name="david">David Greenhalgh - Best PM Ever</string>
+    <string name="elizabeth">Elizabeth Johnson - UX Designer / Dev</string>
+    <string name="jesse">Jesse Rosalia - Bluetooth and Messaging Master</string>
+    <string name="bryan">Bryan Sills - Testing Guru</string>
     <string name="thanks_label">Special Thanks</string>
+    <string name="thank_troy"> Troy Peace - A Super Sponsor, without whom this never could have happened</string>
 </resources>

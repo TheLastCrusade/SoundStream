@@ -16,120 +16,80 @@
     You should have received a copy of the GNU General Public License
     along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <!-- Meet the Crusaders -->
     <RelativeLayout
-        android:id="@+id/meet_the_crusaders"
+        android:id="@+id/meet_the_team"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp" >
+        android:layout_margin="10dp" 
+        >
 
 
         <TextView 
             android:id="@+id/meet_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/meet_label"/>
+            android:text="@string/meet_label"
+            />
         
         <View
             android:id="@+id/meet_line"
             android:layout_width="fill_parent"
-            android:layout_height="2sp"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="3sp"
-            android:layout_below="@+id/meet_label"
-            android:background="@color/dark_gray" />
-        
+            android:layout_height="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_below="@id/meet_label"
+            android:background="@color/dark_gray" 
+            />
 
-        
-        <TextView 
+        <ListView 
             android:id="@+id/meet_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/meet_label"/>
-    </RelativeLayout>
-    
-    <!-- How we got started -->
-    <RelativeLayout
-        android:id="@+id/network_category"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
-        android:layout_below="@+id/music_category" >
-
-        <TextView
-            android:id="@+id/network_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/network_category"
-            android:text="@string/network_label"
-            android:textColor="@color/light_gray"/>
-
-        <View
-            android:id="@+id/network_line"
-            android:layout_width="fill_parent"
-            android:layout_height="2sp"
-            android:layout_below="@+id/network_label"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="3sp"
-            android:background="@color/light_gray" 
+            android:layout_below="@id/meet_line"
+            android:layout_marginTop="3dp"
+            android:entries="@array/team_members"
+            android:divider="@color/transparent"
             />
         
-         <Button 
-            android:id="@+id/network_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/network_line"
-            android:text="@string/network"
-            android:textColor="@color/white"
-            android:textSize="18sp" 
-            android:clickable="true"
-            android:layout_marginLeft="20sp"
-            android:background="@color/transparent"
-            android:drawableLeft="@drawable/network_icon"
-            android:drawablePadding="6sp"
-            />
     </RelativeLayout>
-    
+
     <!-- Special Thanks -->
     <RelativeLayout
-        android:id="@+id/connected_users_category"
+        android:id="@+id/special_thanks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
-        android:layout_below="@id/network_category">
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
 
         <TextView
-            android:id="@+id/connected_members_label"
+            android:id="@+id/special_thanks_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cur_member_label"
+            android:text="@string/thanks_label"
             android:textColor="@color/light_gray"/>
 
         <View
-            android:id="@+id/users_line"
+            android:id="@+id/thanks_line"
             android:layout_width="fill_parent"
-            android:layout_height="2sp"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="20sp"
-            android:layout_below="@+id/connected_members_label"
+            android:layout_height="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="20dp"
+            android:layout_below="@id/special_thanks_label"
             android:background="@color/light_gray" />
         
-        <ListView
-            android:id="@+id/connected_users"
-            android:layout_width="match_parent"
+       <TextView
+            android:id="@+id/thanks"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/users_line"
-            android:layout_marginLeft="20sp"
-            android:layout_marginRight="20sp"
-            android:textColor="@color/white"
-        >
-        </ListView>
+            android:text="@string/thank_troy"
+            android:textColor="@color/light_gray"
+            android:layout_below="@id/thanks_line"/>
+       
     </RelativeLayout>
-</RelativeLayout>
+</LinearLayout>
