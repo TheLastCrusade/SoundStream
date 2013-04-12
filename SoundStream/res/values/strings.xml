@@ -66,6 +66,6 @@
 
     <!-- Default values -->
     <string name="default_mac">00:08:67:53:09</string>
-    <string name="default_name"></string>
+    <string name="default_name">Indiana Jones</string>
 
 </resources>
