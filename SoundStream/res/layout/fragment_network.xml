@@ -42,8 +42,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/connected_users_label"
         android:paddingLeft="10dp"
-        android:layout_alignLeft="@+id/connected_users_label">
-    </ListView>
+        android:divider="@color/transparent"
+        android:layout_alignLeft="@+id/connected_users_label" />
 
     <Button
         android:id="@+id/disconnect_btn"
