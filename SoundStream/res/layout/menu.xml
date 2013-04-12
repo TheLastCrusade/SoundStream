@@ -26,9 +26,8 @@
         android:id="@+id/music_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp" >
-
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" >
 
         <TextView 
             android:id="@+id/music_label"
@@ -40,9 +39,9 @@
         <View
             android:id="@+id/music_line"
             android:layout_width="fill_parent"
-            android:layout_height="2sp"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="3sp"
+            android:layout_height="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
             android:layout_below="@+id/music_label"
             android:background="@color/light_gray" />
         
@@ -51,14 +50,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/music_line"
-            android:layout_marginLeft="20sp"
+            android:layout_marginLeft="20dp"
             android:text="@string/playlist"
             android:textColor="@color/white"
             android:textSize="18sp" 
             android:clickable="true"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/playlist_icon"
-            android:drawablePadding="6sp"
+            android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
             android:contentDescription="@string/playlist"/>
         
@@ -67,14 +66,14 @@
             android:layout_width= "match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/playlist_btn"
-            android:layout_marginLeft="20sp"
+            android:layout_marginLeft="20dp"
             android:text="@string/music_library"
             android:textColor="@color/white"
             android:textSize="18sp" 
             android:clickable="true"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/music_library_icon"
-            android:drawablePadding="6sp"
+            android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
             android:contentDescription="@string/music_library"/>
     </RelativeLayout>
@@ -84,8 +83,8 @@
         android:id="@+id/network_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_below="@+id/music_category" >
 
         <TextView
@@ -99,10 +98,10 @@
         <View
             android:id="@+id/network_line"
             android:layout_width="fill_parent"
-            android:layout_height="2sp"
+            android:layout_height="2dp"
             android:layout_below="@+id/network_label"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="3sp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
             android:background="@color/light_gray" 
             />
         
@@ -115,10 +114,10 @@
             android:textColor="@color/white"
             android:textSize="18sp" 
             android:clickable="true"
-            android:layout_marginLeft="20sp"
+            android:layout_marginLeft="20dp"
             android:background="@color/transparent"
             android:drawableLeft="@drawable/network_icon"
-            android:drawablePadding="6sp"
+            android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
             android:contentDescription="@string/network"/>
     </RelativeLayout>
@@ -128,8 +127,8 @@
         android:id="@+id/connected_users_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_below="@id/network_category">
 
         <TextView
@@ -142,9 +141,9 @@
         <View
             android:id="@+id/users_line"
             android:layout_width="fill_parent"
-            android:layout_height="2sp"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="20sp"
+            android:layout_height="2dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="20dp"
             android:layout_below="@+id/connected_members_label"
             android:background="@color/light_gray" />
         
@@ -153,8 +152,8 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@+id/users_line"
-	        android:layout_marginLeft="20sp"
-	        android:layout_marginRight="20sp"
+	        android:layout_marginLeft="20dp"
+	        android:layout_marginRight="20dp"
 	        android:textColor="@color/white"
 	        android:divider="@color/transparent" >
     	</ListView>
