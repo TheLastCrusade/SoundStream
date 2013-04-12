@@ -104,7 +104,8 @@
             android:layout_below="@+id/network_label"
             android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
-            android:background="@color/light_gray"/>
+            android:background="@color/light_gray"
+            />
         
          <Button 
             android:id="@+id/network_btn"
@@ -158,6 +159,6 @@
 	        android:layout_marginRight="20dp"
 	        android:textColor="@color/white"
 	        android:divider="@color/transparent" >
-        </ListView>
+      </ListView>
     </RelativeLayout>
 </RelativeLayout>
