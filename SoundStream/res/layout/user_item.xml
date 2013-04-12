@@ -25,9 +25,9 @@
 
     <View
         android:id="@+id/user_color"
-        android:layout_width="20sp"
-        android:layout_height="20sp"
-        android:layout_margin="4sp">
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_margin="4dp">
     </View>
 
     <TextView
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/user_color"
         android:layout_alignBottom="@id/user_color"
-        android:layout_marginLeft="4sp"
+        android:layout_marginLeft="4dp"
         android:textColorHighlight="#656565"
         android:textSize="18sp" >
     </TextView>

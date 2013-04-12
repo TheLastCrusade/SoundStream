@@ -22,6 +22,8 @@ package com.lastcrusade.soundstream.net.message;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
+import static com.lastcrusade.soundstream.util.CustomAssert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,6 +48,6 @@ public class TransferSongMessageTest extends SerializationTest<TransferSongMessa
         assertEquals(oldMessage.getSongFileName(), newMessage.getSongFileName());
 
         //compare the song binary data
-        assertTrue(Arrays.equals(oldMessage.getSongData(), newMessage.getSongData()));
+        verifyChecksum(oldMessage.getFilePath(), newMessage.getFilePath());
     }
 }

@@ -19,20 +19,17 @@
 
 package com.lastcrusade.soundstream.net;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.message.IFileMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.Messenger;
 import com.lastcrusade.soundstream.net.message.TransferSongMessage;
+import com.lastcrusade.soundstream.net.wire.Messenger;
 
 /**
  * A class to manage writing messages from the MessageThread.  This class
@@ -46,10 +43,18 @@ public class MessageThreadWriter {
 
     private static String TAG = MessageThreadWriter.class.getSimpleName();
 
+    /**
+     * Maximum size in bytes to write to a socket at a time.
+     * 
+     */
+    private static final int MAX_WRITE_SIZE_BYTES = 1024;
+    private byte[] outBytes = new byte[MAX_WRITE_SIZE_BYTES];
+
     class QueueEntry {
         private int messageNo;
         private int score;
-        public IMessage message;
+        public Class<? extends IMessage> messageClass;
+        public InputStream messageStream;
     }
 
     PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>(11, new Comparator<QueueEntry>() {
@@ -67,24 +72,37 @@ public class MessageThreadWriter {
     public MessageThreadWriter(Messenger messenger, OutputStream outStream) {
         this.outStream = outStream;
         this.messenger = messenger;
+        this.messenger.setSendPacketSize(MAX_WRITE_SIZE_BYTES);
     }
 
-    public void enqueue(int messageNo, IMessage message) {
+    public void enqueue(int messageNo, IMessage message) throws IOException {
         QueueEntry qe = new QueueEntry();
-        qe.messageNo = messageNo;
-        qe.score     = messageNo * (TransferSongMessage.class.isAssignableFrom(message.getClass()) ? 100 : 1);
-        qe.message   = message;
+        qe.messageNo     = messageNo;
+        qe.score         = messageNo * (TransferSongMessage.class.isAssignableFrom(message.getClass()) ? 100 : 1);
+        qe.messageClass  = message.getClass();
+        qe.messageStream = messenger.serializeMessage(message);
         queue.add(qe);
     }
 
     public void writeOne() throws IOException {
         QueueEntry qe = queue.poll();
         if (qe != null) {
-            int len = messenger.serializeMessage(qe.message);
-            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.message.getClass().getSimpleName() + ", " + len + " bytes in length");
-            messenger.writeToOutputStream(outStream);
-            messenger.reset();
-            Log.i(TAG, "Message " + qe.messageNo + " finished writing");
+            int read = qe.messageStream.read(outBytes);
+            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.messageClass.getSimpleName() + ", " + read + " bytes in length");
+            outStream.write(outBytes, 0, read);
+            int left = qe.messageStream.available();
+            //if there are bytes left to write, add this message back into the queue
+            // to write at the next opportunity
+            if (left > 0) {
+                Log.i(TAG, "Message " + qe.messageNo + ", " + left + " bytes left to write");
+                queue.add(qe);
+            } else {
+                //otherwise, we're done
+                Log.i(TAG, "Message " + qe.messageNo + " finished writing");
+//            int len = messenger.serializeMessage(qe.message);
+//            messenger.writeToOutputStream(outStream);
+//            messenger.reset();
+            }
         }
     }
 }

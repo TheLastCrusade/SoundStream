@@ -19,7 +19,6 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import java.io.File;
 
 /**
  * A file message is used to transmit a file across the wire.  These

@@ -32,10 +32,12 @@ public class SongStatusMessageTest extends SerializationTest<SongStatusMessage> 
     
     @Test
     public void testSerializeSongStatusMessage() throws Exception {
+        int entryId = 0;
         SongMetadata song = getSomeSongMetadata();
+        //This checks all the boolean cases
         for (int ii = 0; ii < 1; ii++) {
             for (int jj = 0; ii < 1; ii++) {
-                SongStatusMessage preSer = new SongStatusMessage(song.getMacAddress(), song.getId(), ii > 0, jj > 0);
+                SongStatusMessage preSer = new SongStatusMessage(song.getMacAddress(), song.getId(), entryId, ii > 0, jj > 0);
 
                 SongStatusMessage postSer = super.testSerializeMessage(preSer);
                 

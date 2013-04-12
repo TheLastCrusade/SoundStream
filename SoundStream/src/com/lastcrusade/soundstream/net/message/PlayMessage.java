@@ -26,7 +26,7 @@ import java.io.OutputStream;
 
 
 public class PlayMessage implements IMessage {
-	private final String TAG = PlayMessage.class.getName();
+//	private final String TAG = PlayMessage.class.getName();
 	private String string;
 	private final String PLAY_MESSAGE = "Play"; 
 

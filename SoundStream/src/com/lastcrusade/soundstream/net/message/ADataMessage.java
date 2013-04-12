@@ -25,6 +25,7 @@ import java.io.OutputStream;
 
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.net.core.AComplexDataType;
 
 /**
  * An abstract message class for messages that send and receive data.  This class contains
@@ -33,7 +34,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
  * @author Jesse Rosalia
  *
  */
-public abstract class ADataMessage implements IMessage {
+public abstract class ADataMessage extends AComplexDataType implements IMessage {
 
     
     protected void writeBoolean(boolean known, OutputStream output) throws IOException {
@@ -45,8 +46,6 @@ public abstract class ADataMessage implements IMessage {
     }
 
     protected void writeString(String string, OutputStream output) throws IOException {
-        byte[] bytes = null;
-        
         if(string == null) {
             writeInteger(0, output);
         }
@@ -64,22 +63,6 @@ public abstract class ADataMessage implements IMessage {
         }
     }
 
-    protected void writeInteger(int integer, OutputStream output) throws IOException {
-        output.write(integer         & 0xFF);
-        output.write((integer >> 8)  & 0xFF);
-        output.write((integer >> 16) & 0xFF);
-        output.write((integer >> 24) & 0xFF);
-    }
-
-    protected int readInteger(InputStream input) throws IOException {
-        int value = input.read();
-        value    |= (input.read() << 8);
-        value    |= (input.read() << 16);
-        value    |= (input.read() << 24);
-        
-        return value;
-    }
-    
     protected void writeLong(long value, OutputStream output) throws IOException {
         output.write((int)(value         & 0xFF));
         output.write((int)((value >> 8)  & 0xFF));

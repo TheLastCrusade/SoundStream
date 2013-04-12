@@ -26,11 +26,11 @@
 
     <View
         android:id="@+id/user_color"
-        android:layout_width="10sp"
+        android:layout_width="10dp"
         android:layout_height="match_parent"
         android:minHeight="@dimen/song_height"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="4sp" >
+        android:layout_marginRight="8dp" >
     </View>
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/user_color"
         android:layout_toLeftOf="@+id/btn_add_to_playlist"
-        android:paddingTop="6sp"
+        android:paddingTop="6dp"
         android:singleLine="true"
         android:ellipsize="marquee"
         android:textSize="16sp" >
@@ -56,7 +56,7 @@
 	        android:id="@+id/artist"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:paddingRight="2sp"
+	        android:paddingRight="2dp"
 	        android:singleLine="true"
         	android:ellipsize="marquee"
 	        android:textSize="12sp">
@@ -66,7 +66,7 @@
 	        android:id="@+id/division"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:paddingRight="2sp"
+	        android:paddingRight="2dp"
 	        android:maxLines="1"
 	        android:textSize="12sp"
 	        android:text="@string/song_item_division" >
@@ -87,26 +87,34 @@
         android:id="@id/btn_add_to_playlist"
         android:src="@drawable/av_add_to_queue"
         android:layout_width = "wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:paddingRight = "16sp"
-        android:paddingLeft = "16sp" 
+        android:paddingRight = "16dp"
+        android:paddingLeft = "16dp" 
         android:visibility="invisible"
         android:contentDescription="@string/add_to_playlist"
-        android:background="@color/transparent"/>
-    
-     <ImageButton
-        android:id="@+id/btn_remove_from_playlist"
-        android:src="@drawable/content_remove"
+        />
+     
+     <ImageView 
+        android:id="@+id/now_playing"
         android:layout_width = "wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:paddingRight = "16sp"
-        android:paddingLeft = "16sp" 
-        android:visibility="invisible"
-        android:contentDescription="@string/remove_from_playlist"
-        android:background="@color/transparent"/>
-    
+        android:paddingRight = "16dp"
+        android:paddingLeft = "16dp" 
+        android:src="@drawable/speaker"
+        android:visibility="invisible" />
+     
+     <ProgressBar 
+         android:id="@+id/progress"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:paddingRight="16dp"
+         android:layout_alignParentRight="true"
+         android:layout_centerVertical="true"
+         style="@style/Widget.Sherlock.Light.ProgressBar"
+         android:visibility="invisible" />
+     
 </RelativeLayout>

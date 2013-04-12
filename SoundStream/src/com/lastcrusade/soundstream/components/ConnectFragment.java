@@ -80,9 +80,8 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
             
             @Override
             public void onClick(View v) {
-                Transitions.transitionToNetwork((CoreActivity)getActivity());
+                Transitions.transitionToHome((CoreActivity)getActivity());
                 ((CoreActivity)getActivity()).enableSlidingMenu();
-                
                 //add the playbar fragment onto the active content view
                 ((CoreActivity)getActivity()).showPlaybar();
             }

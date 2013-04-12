@@ -25,7 +25,7 @@ import java.io.OutputStream;
 
 public class PlayStatusMessage extends APlaylistEntryMessage {
 
-    private final String TAG = PlayStatusMessage.class.getSimpleName();
+//    private final String TAG = PlayStatusMessage.class.getSimpleName();
     private boolean playing;
 
     public PlayStatusMessage() {}

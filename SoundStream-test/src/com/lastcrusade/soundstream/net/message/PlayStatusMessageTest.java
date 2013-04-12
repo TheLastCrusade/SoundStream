@@ -19,37 +19,16 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
+public class PlayStatusMessageTest
+extends APlaylistEntrySerializationTest<PlayStatusMessage>{
 
-public class PlayStatusMessageTest extends SerializationTest<PlayStatusMessage> {
-	
     @Test
-    public void testSerializePlayStatusMessage() throws Exception {
-        PlayStatusMessage preSerializationPlayStatusMsg = new PlayStatusMessage();
-
-//        preSerializationPlayStatusMsg.setString(PlayStatusMessage.PLAY_MESSAGE);
-//        preSerializationPlayStatusMsg.setCurrentSong(getSomeSongMetadata());
-//        PlayStatusMessage postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
-//		
-//        // Testing play with song
-//        assertEquals(PlayStatusMessage.PLAY_MESSAGE, postSerializationPlayStatusMsg.getString());
-//        assertSongMetaEquals(getSomeSongMetadata(), postSerializationPlayStatusMsg.getCurrentSong());
-//
-//        // Testing pause with song
-//        preSerializationPlayStatusMsg.setString(PlayStatusMessage.PAUSE_MESSAGE);
-//	    preSerializationPlayStatusMsg.setCurrentSong(getSomeSongMetadata());
-//	    postSerializationPlayStatusMsg = super.testSerializeMessage(preSerializationPlayStatusMsg);
-//	    assertEquals(PlayStatusMessage.PAUSE_MESSAGE, postSerializationPlayStatusMsg.getString());
-//	    assertSongMetaEquals(getSomeSongMetadata(), postSerializationPlayStatusMsg.getCurrentSong());
-        fail("Need to reimplement");
-	}
-	
-	private SongMetadata getSomeSongMetadata(){
-	    return new SongMetadata(69, "Driver that Had a Dick on His Shoulder",
-	            "Aziz Ansari", "Dangerously Delicious", 2345, "David");
-	}
+    public void testSerializeRemoveFromPlaylistMessage() throws Exception {
+        super.testSerializeMessage(
+                new PlayStatusMessage("01:02:03:04:05", 4321L, 1, true));
+        super.testSerializeMessage(
+                new PlayStatusMessage("01:02:03:04:05", 1L, 200, false));
+    }
 }

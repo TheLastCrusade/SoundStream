@@ -32,7 +32,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.Messenger;
+import com.lastcrusade.soundstream.net.wire.Messenger;
 
 /**
  * This thread is responsible for sending and receiving messages once the connection has been established.
@@ -56,7 +56,6 @@ public abstract class MessageThread extends Thread {
 
     private Handler mmHandler;
 
-    private String mmDisconnectAction;
     //NOTE: Messenger is stateless
     private final Messenger mmMessenger;
     private MessageThreadWriter mmWriter;
@@ -64,7 +63,7 @@ public abstract class MessageThread extends Thread {
     protected boolean mmWriteThreadRunning;
     private Thread mmStoppingThread;
 
-    public MessageThread(Context context, BluetoothSocket socket, Handler handler, String disconnectAction) {
+    public MessageThread(Context context, BluetoothSocket socket, Handler handler) {
         super("MessageThread-" + safeSocketName(socket));
         mmSocket  = socket;
         mmHandler = handler;
@@ -80,8 +79,6 @@ public abstract class MessageThread extends Thread {
  
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
-        
-        mmDisconnectAction = disconnectAction;
         
         mmMessenger = new Messenger(context.getCacheDir());
         mmWriter    = new MessageThreadWriter(mmMessenger, mmOutStream);
@@ -135,8 +132,10 @@ public abstract class MessageThread extends Thread {
                 //attempt to deserialize from the socket input stream
                 boolean messageRecvd = mmMessenger.deserializeMessage(mmInStream);
                 if (messageRecvd) {
-                    //dispatch the message to the 
-                    sendMessageToHandler(mmMessenger.getReceivedMessage(), remoteDevice.getAddress());
+                    for (IMessage message : mmMessenger.getReceivedMessages()) {
+                        //dispatch the message to the handler
+                        sendMessageToHandler(message, remoteDevice.getAddress());
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -186,7 +185,7 @@ public abstract class MessageThread extends Thread {
     }
 
     /* Call this from the main activity to send data to the remote device */
-    public synchronized void write(IMessage message) {
+    public synchronized void write(IMessage message) throws IOException {
         Log.d(TAG, "MessageThread#write called from " + Thread.currentThread().getName());
         //enqueue this message
         mmWriter.enqueue(mmOutMessageNumber++, message);

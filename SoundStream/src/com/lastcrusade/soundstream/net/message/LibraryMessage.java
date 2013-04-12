@@ -28,7 +28,7 @@ import java.util.List;
 import com.lastcrusade.soundstream.model.SongMetadata;
 
 public class LibraryMessage extends ADataMessage {
-	private final String TAG = LibraryMessage.class.getName();
+//	private final String TAG = LibraryMessage.class.getName();
 	//JR, 03/13/13, I know this should be List, but Android intents allow you to
 	// bundle an ArrayList of parcelables and that functionality doesnt extend
 	// to the interface.

@@ -16,22 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lastcrusade.soundstream.net.wire;
 
-package com.lastcrusade.soundstream.net.message;
-
-import static org.junit.Assert.*;
-
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
-import org.junit.Test;
+/**
+ * @author thejenix
+ *
+ */
+public class WrappedFileInputStream extends InputStream {
 
-public class BumpSongOnPlaylistMessageTest
-extends APlaylistEntrySerializationTest<BumpSongOnPlaylistMessage>{
+    private FileInputStream fis;
 
-    @Test
-    public void testSerializeBumpSongOnPlaylistMessage() throws Exception {
-        super.testSerializeMessage(
-                new BumpSongOnPlaylistMessage("Test", 1234, 1));
+    /**
+     * 
+     */
+    public WrappedFileInputStream(FileInputStream fis) {
+        this.fis = fis;
+    }
+
+    @Override
+    public int read() throws IOException {
+        return this.fis.read();
     }
 }

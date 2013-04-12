@@ -16,22 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lastcrusade.soundstream.net.wire;
 
-package com.lastcrusade.soundstream.net.message;
+/**
+ * @author thejenix
+ *
+ */
+public class MessageNotCompleteException extends Exception {
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.net.URL;
-
-import org.junit.Test;
-
-public class BumpSongOnPlaylistMessageTest
-extends APlaylistEntrySerializationTest<BumpSongOnPlaylistMessage>{
-
-    @Test
-    public void testSerializeBumpSongOnPlaylistMessage() throws Exception {
-        super.testSerializeMessage(
-                new BumpSongOnPlaylistMessage("Test", 1234, 1));
-    }
 }

@@ -20,8 +20,6 @@
 package com.lastcrusade.soundstream.service;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +35,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -319,13 +316,6 @@ public class MusicLibraryService extends Service {
         }
     }
 
-    private byte[] loadFile(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        byte[] bytes = new byte[fis.available()];
-        fis.read(bytes);
-        return bytes;
-    }
-    
     private IMessagingService getMessagingService() {
         MessagingService messagingService = null;
         try {

@@ -25,12 +25,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.model.SongMetadata;
 
 public class PlaylistMessage extends ADataMessage {
-    private final String TAG = PlaylistMessage.class.getName();
+//    private final String TAG = PlaylistMessage.class.getName();
 	
     private ArrayList<PlaylistEntry> songsToPlay = new ArrayList<PlaylistEntry>();
 
