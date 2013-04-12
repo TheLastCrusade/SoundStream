@@ -80,6 +80,16 @@ public class UserList implements Parcelable{
             userColors.returnColor(color);
             connectedUsers.remove(removeIndex);
         }
+        
+        reassignColors();
+        
+    }
+    
+    private void reassignColors(){
+        userColors.clear();
+        for(User u: connectedUsers){
+            u.setColor(userColors.getNextAvailableColor());
+        }
     }
 
     public void copyFrom(UserList userList) {

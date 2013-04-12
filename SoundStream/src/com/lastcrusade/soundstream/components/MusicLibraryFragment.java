@@ -260,6 +260,7 @@ public class MusicLibraryFragment extends MusicListFragment {
          */
         private void updateMusicFromLibrary() {
             this.updateMusic(getMusicLibraryFromService());
+            notifyDataSetChanged();
         }
         
         private class ColorTimerTask extends TimerTask{
