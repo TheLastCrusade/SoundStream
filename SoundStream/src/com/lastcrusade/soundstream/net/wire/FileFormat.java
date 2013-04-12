@@ -76,7 +76,7 @@ public class FileFormat extends AComplexDataType {
      * @return
      * @throws FileNotFoundException
      */
-    public InputStream getWrappedInputStream() throws FileNotFoundException {
+    public InputStream getWrappedInputStream() throws IOException {
         return new WrappedFileInputStream(new FileInputStream(
                 message.getFilePath()));
     }

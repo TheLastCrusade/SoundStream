@@ -18,9 +18,12 @@
  */
 package com.lastcrusade.soundstream.net.wire;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 /**
  * @author thejenix
@@ -29,16 +32,31 @@ import java.io.InputStream;
 public class WrappedFileInputStream extends InputStream {
 
     private FileInputStream fis;
+    private ByteArrayInputStream lengthStream;
 
     /**
+     * @throws IOException 
      * 
      */
-    public WrappedFileInputStream(FileInputStream fis) {
+    public WrappedFileInputStream(FileInputStream fis) throws IOException {
         this.fis = fis;
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        bb.putInt(fis.available());
+        this.lengthStream = new ByteArrayInputStream(bb.array());
     }
 
     @Override
+    public int available() throws IOException {
+        return 4 + fis.available();
+    }
+    @Override
     public int read() throws IOException {
-        return this.fis.read();
+        int read = -1;
+        if (lengthStream.available() > 0) {
+            read = lengthStream.read();
+        } else {
+            read = this.fis.read();
+        }
+        return read;
     }
 }

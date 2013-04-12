@@ -99,7 +99,7 @@ public class WireSendInputStream extends InputStream {
             int ret = -1;
             if (this.message.available() > 0) {
                 ret = this.message.read();
-            } else if (file != null && file.available() > 0) {
+            } else if (file != null) {
                 ret = this.file.read();
             } else {
                 break;
