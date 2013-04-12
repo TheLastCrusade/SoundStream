@@ -86,7 +86,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
-        NetworkFragment.this.adapter = new UserListAdapter(getActivity(), new UserList(), false );
+        adapter = new UserListAdapter(getActivity(), new UserList(), false);
 
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListServiceBinder.class);

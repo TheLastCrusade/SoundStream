@@ -67,14 +67,25 @@ public class MusicLibraryFragment extends MusicListFragment {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        //make a new music list adapter and give it an empty list of songs and empty list of users to use until the service is connected
-        mMusicAdapter = new MusicAdapter(this.getActivity(), new ArrayList<SongMetadata>() , new UserList());
+        //make a new music list adapter and give it an empty list of songs and
+        // empty list of users to use until the service is connected
+        mMusicAdapter = new MusicAdapter(
+                this.getActivity(),
+                new ArrayList<SongMetadata>(),
+                new UserList()
+        );
 
-        playlistServiceLocator = new ServiceLocator<PlaylistService>(MusicLibraryFragment.this.getActivity(),
-                PlaylistService.class, PlaylistServiceBinder.class);
+        playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                MusicLibraryFragment.this.getActivity(),
+                PlaylistService.class,
+                PlaylistServiceBinder.class
+        );
 
         userListServiceLocator = new ServiceLocator<UserListService>(
-                this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
+                this.getActivity(),
+                UserListService.class,
+                UserListService.UserListServiceBinder.class
+        );
         userListServiceLocator.setOnBindListener(new IOnBindListener() {
             @Override
             public void onServiceBound() {
@@ -83,7 +94,10 @@ public class MusicLibraryFragment extends MusicListFragment {
         });
 
         musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
-                this.getActivity(), MusicLibraryService.class, MusicLibraryService.MusicLibraryServiceBinder.class);
+                this.getActivity(),
+                MusicLibraryService.class,
+                MusicLibraryService.MusicLibraryServiceBinder.class
+        );
         musicLibraryServiceLocator.setOnBindListener(new IOnBindListener() {
             @Override
             public void onServiceBound() {
@@ -171,11 +185,12 @@ public class MusicLibraryFragment extends MusicListFragment {
         return musicLibraryService;
     }
     private ArrayList<SongMetadata> getMusicLibraryFromService(){
-        ArrayList<SongMetadata> library = new ArrayList<SongMetadata>();
+        ArrayList<SongMetadata> library;
         MusicLibraryService musicLibraryService = getMusicLibraryService();
         if(musicLibraryService != null){
             library = new ArrayList<SongMetadata>(musicLibraryService.getLibrary());
         } else {
+            library = new ArrayList<SongMetadata>();
             Log.i(TAG, "MusicLibarysService null, returning empty library");
         }
         return library;

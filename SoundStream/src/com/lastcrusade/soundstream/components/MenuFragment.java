@@ -149,11 +149,12 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     }
 
     private UserList getUserListFromService(){
-        UserList activeUsers = new UserList();
+        UserList activeUsers;
         UserListService userService = getUserListService();
         if(userService != null){
-            return userService.getUserList();
+            activeUsers = userService.getUserList();
         } else {
+            activeUsers = new UserList();
             Log.i(TAG, "UserListService null, returning empty userlist");
         }
         return activeUsers;
