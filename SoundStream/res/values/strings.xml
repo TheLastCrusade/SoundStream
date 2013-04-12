@@ -34,7 +34,7 @@
     
     <!-- button labels -->
     <string name="add_members">Add Members to Network</string>
-    <string name="connect">Connect</string>
+    <string name="connect">Select</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
     
@@ -58,6 +58,7 @@
     <string name="song_item_division">-</string>
     <string name="dialog_disconnect">Are you sure that you want to disconnect?</string>
     <string name="cancel">Cancel</string>
+    <string name="select">Select</string>
 
     <string name="no_songs_in_playlist">There are no songs in your playlist! Quick, go add some from the music library!</string>
     <string name="disband">Disband</string>
