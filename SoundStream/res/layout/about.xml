@@ -1,0 +1,135 @@
+<!-- 
+    Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+    
+    This file is part of SoundStream.
+    
+    SoundStream is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    SoundStream is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Meet the Crusaders -->
+    <RelativeLayout
+        android:id="@+id/meet_the_crusaders"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp" >
+
+
+        <TextView 
+            android:id="@+id/meet_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/meet_label"/>
+        
+        <View
+            android:id="@+id/meet_line"
+            android:layout_width="fill_parent"
+            android:layout_height="2sp"
+            android:layout_marginTop="3sp"
+            android:layout_marginBottom="3sp"
+            android:layout_below="@+id/meet_label"
+            android:background="@color/dark_gray" />
+        
+
+        
+        <TextView 
+            android:id="@+id/meet_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/meet_label"/>
+    </RelativeLayout>
+    
+    <!-- How we got started -->
+    <RelativeLayout
+        android:id="@+id/network_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_below="@+id/music_category" >
+
+        <TextView
+            android:id="@+id/network_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/network_category"
+            android:text="@string/network_label"
+            android:textColor="@color/light_gray"/>
+
+        <View
+            android:id="@+id/network_line"
+            android:layout_width="fill_parent"
+            android:layout_height="2sp"
+            android:layout_below="@+id/network_label"
+            android:layout_marginTop="3sp"
+            android:layout_marginBottom="3sp"
+            android:background="@color/light_gray" 
+            />
+        
+         <Button 
+            android:id="@+id/network_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/network_line"
+            android:text="@string/network"
+            android:textColor="@color/white"
+            android:textSize="18sp" 
+            android:clickable="true"
+            android:layout_marginLeft="20sp"
+            android:background="@color/transparent"
+            android:drawableLeft="@drawable/network_icon"
+            android:drawablePadding="6sp"
+            />
+    </RelativeLayout>
+    
+    <!-- Special Thanks -->
+    <RelativeLayout
+        android:id="@+id/connected_users_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_below="@id/network_category">
+
+        <TextView
+            android:id="@+id/connected_members_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cur_member_label"
+            android:textColor="@color/light_gray"/>
+
+        <View
+            android:id="@+id/users_line"
+            android:layout_width="fill_parent"
+            android:layout_height="2sp"
+            android:layout_marginTop="3sp"
+            android:layout_marginBottom="20sp"
+            android:layout_below="@+id/connected_members_label"
+            android:background="@color/light_gray" />
+        
+        <ListView
+            android:id="@+id/connected_users"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/users_line"
+            android:layout_marginLeft="20sp"
+            android:layout_marginRight="20sp"
+            android:textColor="@color/white"
+        >
+        </ListView>
+    </RelativeLayout>
+</RelativeLayout>
