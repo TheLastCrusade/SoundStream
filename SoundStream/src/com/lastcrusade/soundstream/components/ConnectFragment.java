@@ -56,7 +56,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     private BroadcastRegistrar broadcastRegistrar;
     private View joinView;
-
+    
     private ServiceLocator<ConnectionService> connectionServiceLocator;
 
     private ServiceLocator<MessagingService> messagingServiceLocator;
@@ -175,19 +175,21 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 public void onReceiveAction(Context context, Intent intent) {
                     int mode = intent.getIntExtra(
                             BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
-                    switch(mode){
-                    case BluetoothAdapter.SCAN_MODE_NONE: 
-                        joinView.setEnabled(true);
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-                        joinView.setEnabled(true);
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-                        joinView.setEnabled(false);
-                        break;
-                    default:
-                        Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
-                        break;
+                    if(joinView != null){
+                        switch(mode){
+                        case BluetoothAdapter.SCAN_MODE_NONE:
+                            joinView.setEnabled(true);
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                            joinView.setEnabled(true);
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                            joinView.setEnabled(false);
+                            break;
+                        default:
+                            Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                            break;
+                        }
                     }
                 }
             })
