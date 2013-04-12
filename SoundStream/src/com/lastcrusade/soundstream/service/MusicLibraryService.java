@@ -21,7 +21,6 @@ package com.lastcrusade.soundstream.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,16 +36,13 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
