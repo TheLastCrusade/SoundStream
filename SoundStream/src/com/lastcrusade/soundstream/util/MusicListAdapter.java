@@ -40,7 +40,7 @@ import com.lastcrusade.soundstream.model.User;
 import com.lastcrusade.soundstream.model.UserList;
 
 public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
-    private final String TAG = MusicListAdapter.class.getName();
+    private final String TAG = MusicListAdapter.class.getSimpleName();
 
     private Context mContext;
     private List<T> metadataList;

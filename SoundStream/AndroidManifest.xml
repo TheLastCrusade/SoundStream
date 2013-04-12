@@ -42,6 +42,8 @@
         <service android:exported="false" android:name=".service.ConnectionService"/>
             
         <service android:exported="false" android:name=".service.MessagingService"/>
+        
+        <service android:exported="false" android:name=".service.UserListService"/>
             
         <service android:exported="false" android:label="@string/music_library" android:name=".service.MusicLibraryService"/>
         
