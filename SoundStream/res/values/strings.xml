@@ -63,4 +63,9 @@
     <string name="no_songs_in_playlist">There are no songs in your playlist! Quick, go add some from the music library!</string>
     <string name="disband">Disband</string>
     <string name="dialog_disband">Are you sure you want to disband? This will boot all connected users.</string>
+
+    <!-- Default values -->
+    <string name="default_mac">00:08:67:53:09</string>
+    <string name="default_name"></string>
+
 </resources>

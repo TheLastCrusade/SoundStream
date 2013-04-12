@@ -38,11 +38,13 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
@@ -92,21 +94,28 @@ public class MusicLibraryService extends Service {
 
     @Override
     public void onCreate() {
-        //load the local songs and set the mac address, so the metadata objects
-        // can live in the library
-        List<SongMetadata> metadataList = (new MediaStoreWrapper(this)).list();
-        this.myMacAddress = BluetoothUtils.getLocalBluetoothMAC();
-        for (SongMetadata song : metadataList) {
-            song.setMacAddress(this.myMacAddress);
-        }
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this, UserListService.class, UserListService.UserListServiceBinder.class);
         
-        //update the library with the local songs
-        updateLibrary(metadataList, false);
+        myMacAddress = getResources().getString(R.string.default_mac);
+        userListServiceLocator.setOnBindListener(new IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                myMacAddress = getMyMac();
+                //load the local songs and set the mac address, so the metadata objects
+                // can live in the library
+                List<SongMetadata> metadataList = (new MediaStoreWrapper(MusicLibraryService.this)).list();
+                for (SongMetadata song : metadataList) {
+                    song.setMacAddress(myMacAddress);
+                }
+
+                //update the library with the local songs
+                updateLibrary(metadataList, false);
+            }
+        });
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingServiceBinder.class);
-        userListServiceLocator = new ServiceLocator<UserListService>(
-                this, UserListService.class, UserListService.UserListServiceBinder.class);
 
         registerReceivers();
     }
@@ -306,7 +315,7 @@ public class MusicLibraryService extends Service {
         synchronized(metadataMutex) {
             //TODO: remove use of bluetoothutils...replace with reference to userlist or some other way
             // of getting "my" address
-            String key = SongMetadataUtils.getUniqueKey(getMyMac(), songId);
+            String key = SongMetadataUtils.getUniqueKey(myMacAddress, songId);
             Integer inx = metadataMap.get(key);
             return inx != null ? metadataList.get(inx) : null;
         }
@@ -331,7 +340,7 @@ public class MusicLibraryService extends Service {
         if(userService != null){
             myMac = userService.getMyMac();
         } else {
-            myMac = "86:75:30:99";
+            myMac = getResources().getString(R.string.default_mac);
             Log.w(TAG, "UserListService null, returning fake mac: " + myMac);
         }
         return myMac;
