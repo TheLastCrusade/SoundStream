@@ -332,7 +332,7 @@ public class MusicLibraryService extends Service {
             myMac = userService.getMyMac();
         } else {
             myMac = "86:75:30:99";
-            Log.i(TAG, "UserListService null, returning fake mac: " + myMac);
+            Log.w(TAG, "UserListService null, returning fake mac: " + myMac);
         }
         return myMac;
     }
