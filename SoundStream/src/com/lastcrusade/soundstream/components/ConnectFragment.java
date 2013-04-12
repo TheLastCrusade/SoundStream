@@ -179,12 +179,15 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         switch(mode){
                         case BluetoothAdapter.SCAN_MODE_NONE:
                             joinView.setEnabled(true);
+                            joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
                             break;
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
                             joinView.setEnabled(true);
+                            joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
                             break;
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
                             joinView.setEnabled(false);
+                            joinView.setBackgroundColor(getResources().getColor(R.color.gray));
                             break;
                         default:
                             Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
