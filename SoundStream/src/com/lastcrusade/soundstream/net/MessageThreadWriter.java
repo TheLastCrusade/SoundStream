@@ -30,6 +30,7 @@ import android.util.Log;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.TransferSongMessage;
 import com.lastcrusade.soundstream.net.wire.Messenger;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
  * A class to manage writing messages from the MessageThread.  This class
@@ -47,8 +48,7 @@ public class MessageThreadWriter {
      * Maximum size in bytes to write to a socket at a time.
      * 
      */
-    private static final int MAX_WRITE_SIZE_BYTES = 1024;
-    private byte[] outBytes = new byte[MAX_WRITE_SIZE_BYTES];
+    private byte[] outBytes;
 
     class QueueEntry {
         private int messageNo;
@@ -72,7 +72,7 @@ public class MessageThreadWriter {
     public MessageThreadWriter(Messenger messenger, OutputStream outStream) {
         this.outStream = outStream;
         this.messenger = messenger;
-        this.messenger.setSendPacketSize(MAX_WRITE_SIZE_BYTES);
+        this.outBytes = new byte[messenger.getSendPacketSize()];
     }
 
     public void enqueue(int messageNo, IMessage message) throws IOException {
@@ -84,24 +84,31 @@ public class MessageThreadWriter {
         queue.add(qe);
     }
 
+    public boolean canWrite() {
+        return !queue.isEmpty();
+    }
+
     public void writeOne() throws IOException {
         QueueEntry qe = queue.poll();
         if (qe != null) {
             int read = qe.messageStream.read(outBytes);
-            Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.messageClass.getSimpleName() + ", " + read + " bytes in length");
+            if (LogUtil.isLogAvailable()) {
+                Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.messageClass.getSimpleName() + ", " + read + " bytes in length");
+            }
             outStream.write(outBytes, 0, read);
             int left = qe.messageStream.available();
             //if there are bytes left to write, add this message back into the queue
             // to write at the next opportunity
             if (left > 0) {
-                Log.i(TAG, "Message " + qe.messageNo + ", " + left + " bytes left to write");
+                if (LogUtil.isLogAvailable()) {
+                    Log.i(TAG, "Message " + qe.messageNo + ", " + left + " bytes left to write");
+                }
                 queue.add(qe);
             } else {
                 //otherwise, we're done
-                Log.i(TAG, "Message " + qe.messageNo + " finished writing");
-//            int len = messenger.serializeMessage(qe.message);
-//            messenger.writeToOutputStream(outStream);
-//            messenger.reset();
+                if (LogUtil.isLogAvailable()) {
+                    Log.i(TAG, "Message " + qe.messageNo + " finished writing");
+                }
             }
         }
     }

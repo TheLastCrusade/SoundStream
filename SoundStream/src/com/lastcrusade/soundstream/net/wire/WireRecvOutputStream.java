@@ -66,6 +66,14 @@ public class WireRecvOutputStream extends OutputStream {
         buffer.write(oneByte);
     }
 
+    /* (non-Javadoc)
+     * @see java.io.OutputStream#write(byte[], int, int)
+     */
+    @Override
+    public void write(byte[] bytes, int offset, int count) throws IOException {
+        buffer.write(bytes, offset, count);
+    }
+
     /**
      * Process and consume one message contained in the input buffer.  This will modify the contents of the
      * input buffer when successful and when an error is occurred (the message in error is thrown away).
@@ -106,7 +114,7 @@ public class WireRecvOutputStream extends OutputStream {
                 }
             }
             buffer.consume();
-            if (LogUtil.isLogEnabled()) {
+            if (LogUtil.isLogAvailable()) {
                 if (buffer.size() > 0) {
                     Log.v(TAG, "Residual buffer data: " + buffer.size()
                             + " bytes left in buffer");

@@ -75,7 +75,7 @@ public class WireSendInputStream extends InputStream {
         int packets = this.available > 0 ? 1 + (this.available / payloadSize) : 0;
         this.available += packets * PacketFormat.getOverhead();
 
-        if (LogUtil.isLogEnabled()) {
+        if (LogUtil.isLogAvailable()) {
             Log.d(TAG, "Preparing to send " + this.available + " bytes across the wire.");
         }
     }
@@ -98,13 +98,36 @@ public class WireSendInputStream extends InputStream {
             return -1;
         }
 
+        advanceIfNeeded();
+
+        int read   = 0;
         int toRead = Math.min(this.available(), maxLen);
-        int len = 0;
-        for (; len < toRead; len++) {
-            int c = read();
-            buffer[off + len] = (byte) c;
+        while (availableInPacket() <= toRead && available() > 0) {
+//            int 
+            int partial = Math.min(availableInPacket(), toRead);
+            System.arraycopy(packet, packetIndex, buffer, off + read, partial);
+            packetIndex += partial;
+            available   -= partial;
+            advanceIfNeeded();
+            read        += partial;
+            toRead      -= partial;
         }
-        return len;
+
+//        packetIndex += toRead;
+//        int len = 0;
+//        for (; len < toRead; len++) {
+//            int c = read();
+//            buffer[off + len] = (byte) c;
+//        }
+//        return len;
+        return read;
+    }
+
+    /**
+     * @return
+     */
+    private int availableInPacket() {
+        return packet != null ? packet.length - packetIndex : 0;
     }
 
     @Override

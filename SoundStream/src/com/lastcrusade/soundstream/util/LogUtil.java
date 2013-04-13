@@ -28,7 +28,7 @@ public class LogUtil {
 
     private static Boolean logEnabled = null;
 
-    public static boolean isLogEnabled() {
+    public static boolean isLogAvailable() {
         if (logEnabled == null) {
             try {
                 //test to see if we can log (i.e. if the logger exists on the classpath)

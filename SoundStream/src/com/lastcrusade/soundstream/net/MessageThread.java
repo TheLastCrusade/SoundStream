@@ -91,7 +91,9 @@ public abstract class MessageThread extends Thread {
                     while (mmWriteThreadRunning) {
                         try {
                             mmWriter.writeOne();
-                            Thread.sleep(10); //give the system a chance to breath
+                            if (!mmWriter.canWrite()) {
+                                Thread.sleep(10); //give the system a chance to breath
+                            }
                         } catch (IOException e) {
                             //we've probably closed our socket...quit the thread
                             mmWriteThreadRunning = false;

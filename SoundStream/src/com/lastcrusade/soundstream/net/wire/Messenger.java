@@ -66,8 +66,11 @@ public class Messenger {
      * Maximum size in bytes to read from a socket at a time.
      * 
      */
-    private static final int MAX_READ_SIZE_BYTES = 1024;
+    //FIXME: there's a bug with slam dunk lifestyle and 1024 byte buffers...it never finishes transfering
+    private static final int MAX_READ_SIZE_BYTES = 4096;
     private byte[] inBytes = new byte[MAX_READ_SIZE_BYTES];
+
+    private static final int MAX_WRITE_SIZE_BYTES = 4096;
 
     /**
      * Maximum size in bytes to write to a socket at a time.
@@ -83,7 +86,8 @@ public class Messenger {
     private File tempFolder;
     
     public Messenger(File tempFolder) {
-        this.tempFolder = tempFolder;
+        this.tempFolder     = tempFolder;
+        this.sendPacketSize = MAX_WRITE_SIZE_BYTES;
     }
     
     /**
@@ -225,6 +229,13 @@ public class Messenger {
      */
     public List<IMessage> getReceivedMessages() {
         return Collections.unmodifiableList(receivedMessages);
+    }
+
+    /**
+     * @return
+     */
+    public int getSendPacketSize() {
+        return this.sendPacketSize;
     }
 
     /**

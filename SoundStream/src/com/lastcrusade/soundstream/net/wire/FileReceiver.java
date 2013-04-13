@@ -64,7 +64,7 @@ public class FileReceiver extends AComplexDataType {
      * incoming buffer, to avoid frequent writes to disk
      * 
      */
-    private static final int MIN_BYTES_READ_IN = 65536;
+    private static final int MIN_BYTES_READ_IN = 102400;
 
     private static final int READ_BUFFER_SIZE = 1024;
     /**
@@ -111,18 +111,18 @@ public class FileReceiver extends AComplexDataType {
 
         int read;
         while ((read = input.read(byteBuffer)) > 0) {
-            fileStream.write(byteBuffer, 0, read);
+            fileBuffer.write(byteBuffer, 0, read);
             this.fileBytesLeft -= read;
         }
-        if (LogUtil.isLogEnabled()) {
-            Log.d(TAG, "Writing " + read + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
-        }
+//        if (LogUtil.isLogEnabled()) {
+//            Log.d(TAG, "Writing " + read + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
+//        }
 
         boolean readComplete = isInFileComplete();
         
-//        if (isBufferFilled() || readComplete) {
-//            flushBuffer();
-//        }
+        if (isBufferFilled() || readComplete) {
+            flushBuffer();
+        }
 
         if (readComplete) {
             closeInFile();
