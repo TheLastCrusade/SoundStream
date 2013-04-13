@@ -18,12 +18,10 @@
  */
 package com.lastcrusade.soundstream.net.wire;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,6 +33,7 @@ import java.nio.ByteBuffer;
 import org.junit.Test;
 
 import com.lastcrusade.soundstream.net.core.AComplexDataType;
+import com.lastcrusade.soundstream.util.InputBuffer;
 
 /**
  * @author thejenix
@@ -60,11 +59,11 @@ public class WireSendInputStreamTest {
      * @return
      */
     private InputStream getTestStream(int byteCount) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        InputBuffer buffer = new InputBuffer();
         for (int ii = 0; ii < byteCount; ii++) {
-            baos.write(ii);
+            buffer.write(ii);
         }
-        return new ByteArrayInputStream(baos.toByteArray());
+        return buffer.getInputStream();
     }
 
     /**
@@ -129,7 +128,6 @@ public class WireSendInputStreamTest {
             int expectedBytes = test.available() + fileStream.available() + AComplexDataType.SIZEOF_INTEGER;
             assertEquals(computeExpectedSize(expectedBytes, packetSize), is.available());
             int expectedPackets = 18;
-            int count = 0;
             byte[] buf = new byte[packetSize];
             for (int ii = 0; ii < expectedPackets; ii++) {
                 int read = is.read(buf);

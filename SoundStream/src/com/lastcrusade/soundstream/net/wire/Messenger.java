@@ -19,23 +19,21 @@
 
 package com.lastcrusade.soundstream.net.wire;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
 import com.lastcrusade.soundstream.net.message.IFileMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.MessageFormat;
+import com.lastcrusade.soundstream.util.InputBuffer;
 
 /**
  * This class is the main entry point to send and receive messages in Sound Stream.  It implements a protocol
@@ -54,23 +52,15 @@ import com.lastcrusade.soundstream.net.message.MessageFormat;
  */
 public class Messenger {
 
-    private static final String TAG = Messenger.class.getSimpleName();
+//    private static final String TAG = Messenger.class.getSimpleName();
 
-    //package protected, so they can be accessed from the unit test
-    
-    private static final int SIZE_LEN = 4;
-
-    private int messageLength;
-
-    private ByteArrayOutputStream inputBuffer = new ByteArrayOutputStream();
+    private InputBuffer inputBuffer = new InputBuffer();
 
     //NOTE: implemented as a map, not a SparseArray, so our unit tests will run
     @SuppressLint("UseSparseArrays")
     private Map<Integer, WireRecvOutputStream> activeTransfers = new HashMap<Integer, WireRecvOutputStream>();
 
     private List<IMessage>                    receivedMessages = new LinkedList<IMessage>();
-
-    //    private ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 
     /**
      * Maximum size in bytes to read from a socket at a time.
@@ -86,8 +76,6 @@ public class Messenger {
    // private static final int MAX_WRITE_SIZE_BYTES = 1024;
    // private byte[] outBytes = new byte[MAX_WRITE_SIZE_BYTES];
 
-    private boolean canLog;
-
     private int sendPacketSize;
 
     private int nextMessageNo = 0;
@@ -96,15 +84,6 @@ public class Messenger {
     
     public Messenger(File tempFolder) {
         this.tempFolder = tempFolder;
-        //test to see if we can log (i.e. if the logger exists on the classpath)
-        //...this is required because we run unit tests using the android junit runner, which will remove
-        // android classes, such as Log, from the classpath.
-        try {
-            Log.v(TAG, "Creating messenger");
-            this.canLog = true;
-        } catch (NoClassDefFoundError e) {
-            this.canLog = false;
-        }
     }
     
     /**
@@ -117,8 +96,8 @@ public class Messenger {
      */
     public InputStream serializeMessage(IMessage message) throws IOException {
         MessageFormat format = new MessageFormat(message);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        format.serialize(baos);
+        InputBuffer buffer = new InputBuffer();
+        format.serialize(buffer);
         // if this is a file message, open the file and prepare it for the write
         // operation
         InputStream fileStream = null;
@@ -126,7 +105,7 @@ public class Messenger {
             FileReceiver fileFormat = new FileReceiver((IFileMessage) message, this.tempFolder);
             fileStream = fileFormat.getInputStream();
         }
-        return new WireSendInputStream(this.sendPacketSize, this.nextMessageNo++, new ByteArrayInputStream(baos.toByteArray()), fileStream);
+        return new WireSendInputStream(this.sendPacketSize, this.nextMessageNo++, buffer.getInputStream(), fileStream);
     }
 
     /**
@@ -186,20 +165,10 @@ public class Messenger {
         //REVIEW: character encoding issues may arise, but since we're controlling the class names
         // we should be able to decide how to handle these
         PacketFormat packet = new PacketFormat();
-        byte[] bytes = inputBuffer.toByteArray();
         try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-            packet.deserialize(bais);
-            //consume this message either way
-            int bufferLen = inputBuffer.size();
-            inputBuffer.reset();
-            byte[] bytes2 = new byte[1024];
-            int read;
-            while ((read = bais.read(bytes2)) > 0) {
-                inputBuffer.write(bytes2, 0, read);
-            }
-//            inputBuffer.write(bytes, packet.getPacketLength(), bufferLen - packet.getPacketLength());
-            this.messageLength = 0;
+            packet.deserialize(inputBuffer.getInputStream());
+            //consume this message in the input buffer
+            inputBuffer.consume();
 
             WireRecvOutputStream transfer = this.activeTransfers.get(packet.getMessageNo());
             if (transfer == null) {
@@ -220,14 +189,6 @@ public class Messenger {
         } finally {
         }
         return received;
-    }
-
-    /**
-     * True if we're waiting for a new message, false if we're currently processing a message.
-     * @return
-     */
-    private boolean isWaitingForNewMessage() {
-        return this.messageLength <= 0 && inputBuffer.size() >= SIZE_LEN;
     }
 
     /**
@@ -253,18 +214,17 @@ public class Messenger {
     }
 
     ///TODO
-//    public void clearReceivedMessages() {
-//        
-//    }
+    public void clearReceivedMessages() {
+        receivedMessages = new LinkedList<IMessage>();
+    }
+
     /**
      * Get the last received message processed by this messenger.
      * 
      * @return
      */
     public List<IMessage> getReceivedMessages() {
-        List<IMessage> toReturn = receivedMessages;
-        receivedMessages = new LinkedList<IMessage>();
-        return toReturn;
+        return Collections.unmodifiableList(receivedMessages);
     }
 
     /**

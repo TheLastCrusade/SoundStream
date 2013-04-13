@@ -75,11 +75,6 @@ public class AComplexDataType {
         ByteBuffer bb = ByteBuffer.allocate(SIZEOF_INTEGER);
         bb.putInt(integer);
         output.write(bb.array());
-        //
-        // output.write(integer & 0xFF);
-        // output.write((integer >> 8) & 0xFF);
-        // output.write((integer >> 16) & 0xFF);
-        // output.write((integer >> 24) & 0xFF);
     }
 
     protected int readInteger(InputStream input) throws IOException {
@@ -89,12 +84,5 @@ public class AComplexDataType {
         }
         ByteBuffer bb = ByteBuffer.wrap(in);
         return bb.getInt();
-        // int value = input.read();
-        // value |= (input.read() << 8);
-        // value |= (input.read() << 16);
-        // value |= (input.read() << 24);
-        //
-        // return value;
     }
-
 }

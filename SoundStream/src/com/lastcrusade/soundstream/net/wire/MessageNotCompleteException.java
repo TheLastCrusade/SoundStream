@@ -19,8 +19,11 @@
 package com.lastcrusade.soundstream.net.wire;
 
 /**
- * @author thejenix
- *
+ * This exception is thrown to indicate that a full message has not been
+ * received.
+ * 
+ * @author Jesse Rosalia
+ * 
  */
 public class MessageNotCompleteException extends Exception {
 

@@ -136,6 +136,8 @@ public abstract class MessageThread extends Thread {
                         //dispatch the message to the handler
                         sendMessageToHandler(message, remoteDevice.getAddress());
                     }
+                    
+                    mmMessenger.clearReceivedMessages();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

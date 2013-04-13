@@ -26,10 +26,18 @@ import java.io.InputStream;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.net.core.AComplexDataType;
+import com.lastcrusade.soundstream.net.core.IntegerLength;
 import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
- * @author thejenix
+ * An input stream used for reading packets to send via a network.
+ * 
+ * This class takes in a serialized message and an optional file
+ * stream, and will chunk the data into packets.  These packets
+ * can then be read from the stream and transmitted to the remote
+ * system.
+ * 
+ * @author Jesse Rosalia
  *
  */
 public class WireSendInputStream extends InputStream {
@@ -56,7 +64,7 @@ public class WireSendInputStream extends InputStream {
         //create an input stream to hold the file length, only once (first time through)
         if (this.file != null && this.fileLengthStream == null) {
             this.available += file.available() + AComplexDataType.SIZEOF_INTEGER;
-            Length length = new Length(file.available());
+            IntegerLength length = new IntegerLength(file.available());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             length.serialize(baos);
             this.fileLengthStream = new ByteArrayInputStream(baos.toByteArray());
@@ -112,11 +120,11 @@ public class WireSendInputStream extends InputStream {
      */
     private void advanceIfNeeded() throws IOException {
         if (packet == null || packetIndex >= packet.length) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             //grab the next x bytes (up to packetSize)
             byte[] nextBytes = readNextBytes();
             if (nextBytes.length > 0) {
                 PacketFormat format = new PacketFormat(this.messageNo, nextBytes);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 format.serialize(baos);
                 packet = baos.toByteArray();
                 packetIndex = 0;

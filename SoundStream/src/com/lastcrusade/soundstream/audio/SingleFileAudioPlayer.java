@@ -160,6 +160,7 @@ public class SingleFileAudioPlayer implements IPlayer {
         //indicate the system is paused
         new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
         try {
+            //FIXME this causes crashes
             this.messagingService
                 .getService()
                 .sendPlayStatusMessage(this.entry, false);

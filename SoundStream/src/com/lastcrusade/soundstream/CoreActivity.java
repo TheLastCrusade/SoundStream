@@ -112,6 +112,8 @@ public class CoreActivity extends SlidingFragmentActivity{
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+                    //Send the user to a page where they can start a network or join a different network
+                    Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
             .register(this);

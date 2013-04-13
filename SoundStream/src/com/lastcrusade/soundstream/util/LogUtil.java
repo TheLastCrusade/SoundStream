@@ -31,6 +31,9 @@ public class LogUtil {
     public static boolean isLogEnabled() {
         if (logEnabled == null) {
             try {
+                //test to see if we can log (i.e. if the logger exists on the classpath)
+                //...this is required because we run unit tests using the android junit runner, which will remove
+                // android classes, such as Log, from the classpath.
                 Log.isLoggable("test", Log.ASSERT);
                 logEnabled = true;
             } catch (NoClassDefFoundError e) {

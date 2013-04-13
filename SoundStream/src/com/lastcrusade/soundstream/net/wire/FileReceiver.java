@@ -32,11 +32,12 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.net.core.AComplexDataType;
 import com.lastcrusade.soundstream.net.message.IFileMessage;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
- * A format for receiving files.  This is different than other formats in that
- * it is not serializable (e.g. we do not expect the whole thing to be read in
- * at once).  Instead, we will receive file data one chunk at a time and will
+ * This class manages receiving files.  It is not a serializable object
+ * (e.g. we do not expect the whole thing to be read in at once).
+ * Instead, we will receive file data one chunk at a time and will
  * write that data immediately to a temporary file.
  * 
  * @author Jesse Rosalia
@@ -113,7 +114,9 @@ public class FileReceiver extends AComplexDataType {
             fileStream.write(byteBuffer, 0, read);
             this.fileBytesLeft -= read;
         }
-        Log.d(TAG, "Writing " + read + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
+        if (LogUtil.isLogEnabled()) {
+            Log.d(TAG, "Writing " + read + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
+        }
 
         boolean readComplete = isInFileComplete();
         

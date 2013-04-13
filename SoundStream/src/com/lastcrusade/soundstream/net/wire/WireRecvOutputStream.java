@@ -18,26 +18,37 @@
  */
 package com.lastcrusade.soundstream.net.wire;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+
+import android.util.Log;
 
 import com.lastcrusade.soundstream.net.message.IFileMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.MessageFormat;
+import com.lastcrusade.soundstream.util.InputBuffer;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
- * @author thejenix
+ * An output stream for receiving incoming message data.  This
+ * class allows callers to write message data as it is received.
+ * It will buffer data until a full message is received,
+ * deserialize the message, and (if present) write file data
+ * to a temporary file.
+ * 
+ * @author Jesse Rosalia
  *
  */
 public class WireRecvOutputStream extends OutputStream {
 
-    private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private static final String TAG = WireRecvOutputStream.class.getSimpleName();
+
+    private InputBuffer buffer = new InputBuffer();
     private IMessage receivedMessage;
     private File tempFolder;
-    private FileReceiver fileFormat;
+    private FileReceiver fileReceiver;
 
     /**
      * @param tempFolder
@@ -71,16 +82,15 @@ public class WireRecvOutputStream extends OutputStream {
         boolean received = false;
         
         try {
-            byte[] bytes = buffer.toByteArray();
-            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            InputStream is = buffer.getInputStream();
             //NOTE: we must keep the file format for multiple calls, as we expect to receive the file in parts
             //...this is different from the message format, where we'll try and deserialize and throw an exception
             // if its not available
-            if (this.fileFormat != null) {
-                received = this.fileFormat.receive(bais);
+            if (this.fileReceiver != null) {
+                received = this.fileReceiver.receive(is);
             } else {
                 MessageFormat format = new MessageFormat();
-                format.deserialize(bais);
+                format.deserialize(is);
                 //TODO: consume the bytes in buffer
                 this.receivedMessage = format.getMessage();
                 if (!isFileMessage(this.receivedMessage)) {
@@ -88,21 +98,21 @@ public class WireRecvOutputStream extends OutputStream {
                     received = true;
                 } else {
                     //otherwise, we want to attempt to read a file if the message is processed and it is a file message
-                    this.fileFormat = new FileReceiver((IFileMessage) this.receivedMessage, this.tempFolder);
+                    this.fileReceiver = new FileReceiver((IFileMessage) this.receivedMessage, this.tempFolder);
                     //receive any file data that happens to be in the 
-                    if (bais.available() > 0) {
-                        received = this.fileFormat.receive(bais);
+                    if (is.available() > 0) {
+                        received = this.fileReceiver.receive(is);
                     }
                 }
             }
-//      if (this.canLog) {
-//          Log.v(TAG, "Residual buffer data: " + inputBuffer.size() + " bytes left in buffer");
-//      }
-            int left = bais.available();
-            //consume the bytes read in by the processing above
-            buffer.reset();
-            buffer.write(bytes, bytes.length - left, left);
-            
+            buffer.consume();
+            if (LogUtil.isLogEnabled()) {
+                if (buffer.size() > 0) {
+                    Log.v(TAG, "Residual buffer data: " + buffer.size()
+                            + " bytes left in buffer");
+                }
+            }
+
         } catch (MessageNotCompleteException e) {
             //fall thru
         }
@@ -110,7 +120,7 @@ public class WireRecvOutputStream extends OutputStream {
     }
 
     /**
-     * @param receivedMessage2
+     * @param message
      * @return
      */
     private boolean isFileMessage(IMessage message) {

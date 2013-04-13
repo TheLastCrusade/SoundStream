@@ -16,45 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.wire;
+package com.lastcrusade.soundstream.util;
+
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-import com.lastcrusade.soundstream.net.core.AComplexDataType;
-import com.lastcrusade.soundstream.net.core.ISerializable;
+import org.junit.Test;
 
 /**
  * @author thejenix
  *
  */
-public class Length extends AComplexDataType implements ISerializable {
-
-    private int length;
+public class InputBufferTest {
 
     /**
-     * 
+     * Test method for {@link com.lastcrusade.soundstream.util.InputBuffer#getInputStream()}.
+     * @throws IOException 
      */
-    public Length() {
-        // TODO Auto-generated constructor stub
+    @Test
+    public void testInputBuffer() throws IOException {
+        InputBuffer buffer = new InputBuffer();
+        buffer.write('a');
+        buffer.write('b');
+        buffer.write('c');
+        assertEquals(3, buffer.size());
+        assertEquals('a', buffer.getInputStream().read());
+        buffer.consume();
+        assertEquals(2, buffer.size());
+        byte[] bytes = buffer.toByteArray();
+        assertEquals('b', bytes[0]);
+        assertEquals('c', bytes[1]);
     }
-
-    /**
-     * @param available
-     */
-    public Length(int length) {
-        this.length = length;
-    }
-
-    @Override
-    public void deserialize(InputStream input) throws IOException,
-            MessageNotCompleteException {
-        this.length = readInteger(input);
-    }
-
-    @Override
-    public void serialize(OutputStream output) throws IOException {
-        writeInteger(this.length, output);
-    }
+    
+    //TODO: need to add a test with -1s in the stream, to make sure we read things in properly
 }
