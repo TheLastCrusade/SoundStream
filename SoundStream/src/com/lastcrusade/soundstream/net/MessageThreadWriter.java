@@ -42,6 +42,16 @@ import com.lastcrusade.soundstream.util.LogUtil;
  */
 public class MessageThreadWriter {
 
+    /**
+     * 
+     */
+    private static final int NORMAL_SCORE_MULTIPLIER = 1;
+
+    /**
+     * 
+     */
+    private static final int TRANSFER_SONG_SCORE_MULTIPLIER = 100;
+
     private static String TAG = MessageThreadWriter.class.getSimpleName();
 
     /**
@@ -78,16 +88,47 @@ public class MessageThreadWriter {
     public void enqueue(int messageNo, IMessage message) throws IOException {
         QueueEntry qe = new QueueEntry();
         qe.messageNo     = messageNo;
-        qe.score         = messageNo * (TransferSongMessage.class.isAssignableFrom(message.getClass()) ? 100 : 1);
+        qe.score         = computeMessageScore(messageNo, message);
         qe.messageClass  = message.getClass();
         qe.messageStream = messenger.serializeMessage(message);
         queue.add(qe);
+    }
+
+    /**
+     * Compute the score of the message.  Messages are held in a min-first priority
+     * queue.  This, along with the partial transfer of song messages, allows commands
+     * such as play or add to "jump ahead" of any transferring song data, thus
+     * maintaining a usable system while shipping around large amounts of data.
+     * 
+     * @param messageNo
+     * @param message
+     * @return
+     */
+    private int computeMessageScore(int messageNo, IMessage message) {
+        //transfer song has a higher score, so it is a lower priority message
+        return messageNo * (TransferSongMessage.class.isAssignableFrom(
+                                message.getClass()) 
+                            ? TRANSFER_SONG_SCORE_MULTIPLIER
+                            : NORMAL_SCORE_MULTIPLIER);
     }
 
     public boolean canWrite() {
         return !queue.isEmpty();
     }
 
+    /**
+     * Write one message (or part of a message) to the connected output stream.
+     * 
+     * This may write a partial message, if the message is bigger than our output buffer.
+     * If this is the case, the queue entry is readded to the priority queue and given
+     * another chance to write more data.  This is repeated until the message is
+     * completely sent.  Note that this means other, higher priority messages may
+     * jump the line while this message is in the middle of sending its data.  This
+     * is ok, and how we allow the system to send command messages when long transfer
+     * messages are in progress.
+     * 
+     * @throws IOException
+     */
     public void writeOne() throws IOException {
         QueueEntry qe = queue.poll();
         if (qe != null) {

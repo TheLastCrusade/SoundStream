@@ -28,6 +28,7 @@ import android.util.Log;
 import com.lastcrusade.soundstream.net.core.AComplexDataType;
 import com.lastcrusade.soundstream.net.core.ISerializable;
 import com.lastcrusade.soundstream.net.wire.MessageNotCompleteException;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
  * A format for all messages.  All messages consists of:
@@ -122,15 +123,10 @@ public class MessageFormat extends AComplexDataType implements ISerializable {
     private IMessage instantiateMessage(String messageName) {
         try {
             return (IMessage) Class.forName(messageName).newInstance();
-//            if (obj instanceof IMessage) {
-//                return (IMessage)obj;
-//            } else {
-//                //otherwise, it's a WTF
-////                if (this.canLog) {
-////                }
-//            }
         } catch (ClassCastException ex) {
-            Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
+            if (LogUtil.isLogAvailable()) {
+                Log.wtf(TAG, "Received message '" + messageName + "', but it does not implement IMessage");
+            }
             throw new RuntimeException("Unable to instantiate message...this is a critical error.", ex);
         } catch (Exception ex) {
             throw new RuntimeException("Unable to instantiate message...this is a critical error.", ex);
