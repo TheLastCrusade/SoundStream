@@ -37,7 +37,7 @@ public class WireRecvOutputStream extends OutputStream {
     private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     private IMessage receivedMessage;
     private File tempFolder;
-    private FileFormat fileFormat;
+    private FileReceiver fileFormat;
 
     /**
      * @param tempFolder
@@ -71,7 +71,8 @@ public class WireRecvOutputStream extends OutputStream {
         boolean received = false;
         
         try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(buffer.toByteArray());
+            byte[] bytes = buffer.toByteArray();
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             //NOTE: we must keep the file format for multiple calls, as we expect to receive the file in parts
             //...this is different from the message format, where we'll try and deserialize and throw an exception
             // if its not available
@@ -80,18 +81,28 @@ public class WireRecvOutputStream extends OutputStream {
             } else {
                 MessageFormat format = new MessageFormat();
                 format.deserialize(bais);
+                //TODO: consume the bytes in buffer
                 this.receivedMessage = format.getMessage();
                 if (!isFileMessage(this.receivedMessage)) {
                     //not a file message, we're done
                     received = true;
                 } else {
                     //otherwise, we want to attempt to read a file if the message is processed and it is a file message
-                    this.fileFormat = new FileFormat((IFileMessage) this.receivedMessage, this.tempFolder);
+                    this.fileFormat = new FileReceiver((IFileMessage) this.receivedMessage, this.tempFolder);
+                    //receive any file data that happens to be in the 
+                    if (bais.available() > 0) {
+                        received = this.fileFormat.receive(bais);
+                    }
                 }
             }
 //      if (this.canLog) {
 //          Log.v(TAG, "Residual buffer data: " + inputBuffer.size() + " bytes left in buffer");
 //      }
+            int left = bais.available();
+            //consume the bytes read in by the processing above
+            buffer.reset();
+            buffer.write(bytes, bytes.length - left, left);
+            
         } catch (MessageNotCompleteException e) {
             //fall thru
         }

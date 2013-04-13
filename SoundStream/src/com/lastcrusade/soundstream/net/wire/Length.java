@@ -18,45 +18,43 @@
  */
 package com.lastcrusade.soundstream.net.wire;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.io.OutputStream;
+
+import com.lastcrusade.soundstream.net.core.AComplexDataType;
+import com.lastcrusade.soundstream.net.core.ISerializable;
 
 /**
  * @author thejenix
  *
  */
-public class WrappedFileInputStream extends InputStream {
+public class Length extends AComplexDataType implements ISerializable {
 
-    private FileInputStream fis;
-    private ByteArrayInputStream lengthStream;
+    private int length;
 
     /**
-     * @throws IOException 
      * 
      */
-    public WrappedFileInputStream(FileInputStream fis) throws IOException {
-        this.fis = fis;
-        ByteBuffer bb = ByteBuffer.allocate(4);
-        bb.putInt(fis.available());
-        this.lengthStream = new ByteArrayInputStream(bb.array());
+    public Length() {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param available
+     */
+    public Length(int length) {
+        this.length = length;
     }
 
     @Override
-    public int available() throws IOException {
-        return 4 + fis.available();
+    public void deserialize(InputStream input) throws IOException,
+            MessageNotCompleteException {
+        this.length = readInteger(input);
     }
+
     @Override
-    public int read() throws IOException {
-        int read = -1;
-        if (lengthStream.available() > 0) {
-            read = lengthStream.read();
-        } else {
-            read = this.fis.read();
-        }
-        return read;
+    public void serialize(OutputStream output) throws IOException {
+        writeInteger(this.length, output);
     }
 }

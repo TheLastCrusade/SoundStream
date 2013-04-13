@@ -20,19 +20,25 @@
 package com.lastcrusade.soundstream.net.message;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
+import com.lastcrusade.soundstream.net.core.AComplexDataType;
+import com.lastcrusade.soundstream.net.wire.FileReceiver;
 import com.lastcrusade.soundstream.net.wire.Messenger;
+import com.lastcrusade.soundstream.net.wire.PacketFormat;
 
 /**
  * Doesn't inherit from SerializationTest and is separate from its generalized
@@ -53,21 +59,19 @@ public class MessengerTest {
         String className   = StringMessage.class.getCanonicalName();
         String testMessage = "This is a test of the messaging system";
         appendMessage(className, testMessage, baos);
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-
+        InputStream is = simulateSendAndReceive(baos);
         //attempt to deserialize it
-        assertTrue(messenger.deserializeMessage(bais));
+        assertTrue(messenger.deserializeMessage(is));
         
         //and check the deserialized message
-        IMessage message = messenger.getReceivedMessage();
+        IMessage message = messenger.getReceivedMessages().get(0);
         assertNotNull(message);
         assertTrue(message instanceof StringMessage);
         assertEquals(testMessage, ((StringMessage)message).getString());
         //make sure all bytes are consumed
-        assertEquals(0, bais.available());
+        assertEquals(0, is.available());
     }
-    
+
     @Test
     public void testDeserializeMessageMultiple() throws Exception {
 
@@ -81,31 +85,83 @@ public class MessengerTest {
         String testMessage2 = "This is another test of the messaging system";
         appendMessage(className, testMessage,  baos);
         appendMessage(className, testMessage2, baos);
+        //FIXME: rewrite this so that it's one message per packet, but multiple packets in the input stream
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        InputStream is = simulateSendAndReceive(baos);
 
         //attempt to deserialize the first message
-        assertTrue(messenger.deserializeMessage(bais));
+        assertTrue(messenger.deserializeMessage(is));
         
         //and check the deserialized message
-        IMessage message = messenger.getReceivedMessage();
+        IMessage message = messenger.getReceivedMessages().get(0);
         assertNotNull(message);
         assertTrue(message instanceof StringMessage);
         assertEquals(testMessage, ((StringMessage)message).getString());
 
         //attempt to deserialize the second message
-        assertTrue(messenger.deserializeMessage(bais));
+        assertTrue(messenger.deserializeMessage(is));
         
         //and check the deserialized message
-        message = messenger.getReceivedMessage();
+        message = messenger.getReceivedMessages().get(1);
         assertNotNull(message);
         assertTrue(message instanceof StringMessage);
         assertEquals(testMessage2, ((StringMessage)message).getString());
 
         //make sure all bytes are consumed
-        assertEquals(0, bais.available());
+        assertEquals(0, is.available());
     }
     
+    @Test
+    public void testDeserializeFileMessage() throws Exception {
+
+        File tempFile = getTempTestFile();
+        //get the temp folder
+        Messenger messenger = new Messenger(File.createTempFile("test", "").getParentFile());
+        //build up a TestMessage object
+        FileMessage testMessage = new FileMessage();
+        testMessage.setFilePath(tempFile.getCanonicalPath());
+        InputStream is = simulateSendAndReceive(testMessage);
+
+        //attempt to deserialize the first message
+        assertTrue(messenger.deserializeMessage(is));
+        
+        //and check the deserialized message
+        IMessage message = messenger.getReceivedMessages().get(0);
+        assertNotNull(message);
+        assertTrue(message instanceof FileMessage);
+        //different paths
+        assertFalse(tempFile.getCanonicalPath().equals(((FileMessage)message).getFilePath()));
+        assertFileEquals(tempFile, new File(((FileMessage)message).getFilePath()));
+        //make sure all bytes are consumed
+        assertEquals(0, is.available());
+    }
+    /**
+     * @param tempFile
+     * @param file
+     * @throws IOException 
+     */
+    private void assertFileEquals(File expected, File actual) throws IOException {
+        FileInputStream expectedS = new FileInputStream(expected);
+        FileInputStream actualS   = new FileInputStream(actual);
+        
+        assertEquals(expectedS.available(), actualS.available());
+        for (int ii = 0; ii < expectedS.available(); ii++) {
+            assertEquals(expectedS.read(), actualS.read());
+        }
+    }
+
+    /**
+     * @return
+     * @throws IOException 
+     */
+    private File getTempTestFile() throws IOException {
+        File file = File.createTempFile("test", ".tst");
+        FileWriter writer = new FileWriter(file);
+        writer.write("This is a test file.");
+        writer.close();
+        return file;
+    }
+
     @Test
     public void testSerializeMessage() throws Exception {
         
@@ -114,15 +170,15 @@ public class MessengerTest {
         StringMessage message = new StringMessage();
         String testMessage = "This is a test of the messaging system";
         message.setString(testMessage);
-        messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger);
+        InputStream is = messenger.serializeMessage(message);
+        is = simulateSendAndReceive(is);
         
         Messenger rcvMessenger = new Messenger(new File(""));
         //attempt to deserialize the second message
         assertTrue(rcvMessenger.deserializeMessage(is));
         
         //and check the deserialized message
-        IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+        IMessage rcvMessage = rcvMessenger.getReceivedMessages().get(0);
         assertNotNull(rcvMessage);
         assertTrue(rcvMessage instanceof StringMessage);
         assertEquals(testMessage, ((StringMessage)rcvMessage).getString());
@@ -144,15 +200,15 @@ public class MessengerTest {
         String testMessage2 = "This is another test of the messaging system";
         message = new StringMessage();
         message.setString(testMessage2);
-        messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger);
+        InputStream is = messenger.serializeMessage(message);
+        is = simulateSendAndReceive(is);
         
         Messenger rcvMessenger = new Messenger(new File(""));
         //attempt to deserialize the second message
         assertTrue(rcvMessenger.deserializeMessage(is));
         
         //and check the deserialized message
-        IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+        IMessage rcvMessage = rcvMessenger.getReceivedMessages().get(0);
         assertNotNull(rcvMessage);
         assertTrue(rcvMessage instanceof StringMessage);
         assertEquals(testMessage, ((StringMessage)rcvMessage).getString());
@@ -161,7 +217,7 @@ public class MessengerTest {
         assertTrue(rcvMessenger.deserializeMessage(is));
         
         //and check the deserialized message
-        rcvMessage = rcvMessenger.getReceivedMessage();
+        rcvMessage = rcvMessenger.getReceivedMessages().get(0);
         assertNotNull(rcvMessage);
         assertTrue(rcvMessage instanceof StringMessage);
         assertEquals(testMessage2, ((StringMessage)rcvMessage).getString());
@@ -170,12 +226,54 @@ public class MessengerTest {
     }
     
     private InputStream simulateSendAndReceive(
-            Messenger messenger) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        messenger.writeToOutputStream(baos);
-        return new ByteArrayInputStream(baos.toByteArray());
+            InputStream is) throws IOException {
+        return is;
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        is.writeToOutputStream(baos);
+//        return new ByteArrayInputStream(baos.toByteArray());
     }
     
+    
+    /**
+     * @param baos
+     * @return
+     * @throws IOException 
+     */
+    private InputStream simulateSendAndReceive(ByteArrayOutputStream baos) throws IOException {
+        byte[] bytes = baos.toByteArray();
+        baos.reset();
+        int testMessageNo = 1;
+        PacketFormat format = new PacketFormat(testMessageNo, bytes);
+        format.serialize(baos);
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
+
+    /**
+     * @param baos
+     * @return
+     * @throws IOException 
+     */
+    private InputStream simulateSendAndReceive(IFileMessage message) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        MessageFormat format = new MessageFormat(message);
+        
+        format.serialize(baos);
+        FileReceiver fileFormat = new FileReceiver(message, null);
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        InputStream fis = fileFormat.getInputStream();
+        int length = fis.available();
+        bb.putInt(length);
+        baos.write(bb.array());
+        byte[] temp = new byte[1024];
+        fis.read(temp);
+        baos.write(temp, 0, length);
+        byte[] bytes = baos.toByteArray();
+        baos.reset();
+        int testMessageNo = 1;
+        PacketFormat pf = new PacketFormat(testMessageNo, bytes);
+        pf.serialize(baos);
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
     /**
      * NOTE: keep this separate, so we have independent verification of the Messenger.  This lets
      * us use the independently verified side to test the other side of the messenger.
@@ -188,16 +286,19 @@ public class MessengerTest {
             String testMessage, ByteArrayOutputStream baos) throws IOException {
         //only write the length bytes the first time through
         int start = baos.size();
-        baos.write(new byte[Messenger.SIZE_LEN]);
-        baos.write(new byte[Messenger.VERSION_LEN]);
+        baos.write(new byte[AComplexDataType.SIZEOF_INTEGER]);
+        baos.write(new byte[AComplexDataType.SIZEOF_INTEGER]);
         baos.write(className.getBytes());
         baos.write('\n');
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        bb.putInt(testMessage.getBytes().length);
+        baos.write(bb.array());
         baos.write(testMessage.getBytes());
         byte[] bytes = baos.toByteArray();
-        ByteBuffer bb = ByteBuffer.wrap(bytes, start, Messenger.SIZE_LEN + Messenger.VERSION_LEN);
-        int len = baos.size() - start - Messenger.SIZE_LEN;
+        bb = ByteBuffer.wrap(bytes, start, AComplexDataType.SIZEOF_INTEGER + AComplexDataType.SIZEOF_INTEGER);
+        int len = baos.size() - start - AComplexDataType.SIZEOF_INTEGER;
         bb.putInt(len);
-        bb.putInt(Messenger.MESSENGER_VERSION);
+        bb.putInt(1);
         
         baos.reset();
         baos.write(bytes);

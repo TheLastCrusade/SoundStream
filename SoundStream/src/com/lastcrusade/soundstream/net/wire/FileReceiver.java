@@ -18,12 +18,14 @@
  */
 package com.lastcrusade.soundstream.net.wire;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import android.util.Log;
@@ -40,9 +42,9 @@ import com.lastcrusade.soundstream.net.message.IFileMessage;
  * @author Jesse Rosalia
  * 
  */
-public class FileFormat extends AComplexDataType {
+public class FileReceiver extends AComplexDataType {
 
-    private static final String TAG = FileFormat.class.getSimpleName();
+    private static final String TAG = FileReceiver.class.getSimpleName();
 
     private IFileMessage message;
 
@@ -50,35 +52,37 @@ public class FileFormat extends AComplexDataType {
 
     private int fileBytesLeft;
 
-    private FileOutputStream fileStream;
+    private OutputStream fileStream;
+    
+    private ByteArrayOutputStream fileBuffer = new ByteArrayOutputStream();
 
     private byte[] byteBuffer;
-
+    
     /**
      * Min size in bytes to read in before flushing to file. Used for the
      * incoming buffer, to avoid frequent writes to disk
      * 
      */
-    private static final int MIN_BYTES_READ_IN = 1024;
+    private static final int MIN_BYTES_READ_IN = 65536;
 
+    private static final int READ_BUFFER_SIZE = 1024;
     /**
      * @param message
      * @param tempFolder
      */
-    public FileFormat(IFileMessage message, File tempFolder) {
+    public FileReceiver(IFileMessage message, File tempFolder) {
         this.message = message;
         this.tempFolder = tempFolder;
 
-        this.byteBuffer = new byte[MIN_BYTES_READ_IN];
+        this.byteBuffer = new byte[READ_BUFFER_SIZE];
     }
 
     /**
      * @return
      * @throws FileNotFoundException
      */
-    public InputStream getWrappedInputStream() throws IOException {
-        return new WrappedFileInputStream(new FileInputStream(
-                message.getFilePath()));
+    public InputStream getInputStream() throws IOException {
+        return new FileInputStream(message.getFilePath());
     }
 
     /**
@@ -104,20 +108,35 @@ public class FileFormat extends AComplexDataType {
             openRandomInFile();
         }
 
-        Log.d(TAG, "Writing " + input.available() + " bytes to incoming file");
-
         int read;
         while ((read = input.read(byteBuffer)) > 0) {
             fileStream.write(byteBuffer, 0, read);
             this.fileBytesLeft -= read;
         }
+        Log.d(TAG, "Writing " + read + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
 
         boolean readComplete = isInFileComplete();
+        
+//        if (isBufferFilled() || readComplete) {
+//            flushBuffer();
+//        }
 
         if (readComplete) {
             closeInFile();
         }
         return readComplete;
+    }
+
+    private boolean isBufferFilled() {
+        int available = fileBuffer.size();
+        return available > 0 && available >= Math.min(MIN_BYTES_READ_IN, this.fileBytesLeft);
+    }
+
+    private void flushBuffer() throws IOException {
+        Log.d(TAG, "Writing " + fileBuffer.size() + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
+
+        fileStream.write(fileBuffer.toByteArray());
+        fileBuffer.reset();
     }
 
     /**

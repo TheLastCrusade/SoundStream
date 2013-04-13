@@ -18,9 +18,15 @@
  */
 package com.lastcrusade.soundstream.net.wire;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import android.util.Log;
+
+import com.lastcrusade.soundstream.net.core.AComplexDataType;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
  * @author thejenix
@@ -28,41 +34,76 @@ import java.io.InputStream;
  */
 public class WireSendInputStream extends InputStream {
 
+    private static final String TAG = WireSendInputStream.class.getSimpleName();
+
     private InputStream message;
     private InputStream file;
     private int packetSize;
     private int messageNo;
     private byte[] packet;
     private int packetIndex = 0;
+    private ByteArrayInputStream fileLengthStream;
+    private int available;
     
-    public WireSendInputStream(int packetSize, int messageNo, InputStream message, InputStream file) {
+    public WireSendInputStream(int packetSize, int messageNo, InputStream message, InputStream file) throws IOException {
         this.message = message;
         this.file = file;
         this.messageNo = messageNo;
         this.packetSize = packetSize;
-        this.packet = null;
+        this.packet = null; 
+
+        this.available = this.message.available();
+        //create an input stream to hold the file length, only once (first time through)
+        if (this.file != null && this.fileLengthStream == null) {
+            this.available += file.available() + AComplexDataType.SIZEOF_INTEGER;
+            Length length = new Length(file.available());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            length.serialize(baos);
+            this.fileLengthStream = new ByteArrayInputStream(baos.toByteArray());
+        }
+
+        //precompute the total number of bytes available from this input stream
+        int payloadSize = this.packetSize - PacketFormat.getOverhead();
+        int packets = this.available > 0 ? 1 + (this.available / payloadSize) : 0;
+        this.available += packets * PacketFormat.getOverhead();
+
+        if (LogUtil.isLogEnabled()) {
+            Log.d(TAG, "Preparing to send " + this.available + " bytes across the wire.");
+        }
     }
 
     @Override
     public int available() throws IOException {
-        int bytesLeft = getMessageBytesLeft();
-        int packets = bytesLeft > 0 ? 1 + (bytesLeft % this.packetSize) : 0;
-        return bytesLeft + packets * PacketFormat.getOverhead();
+        return this.available;
     }
 
-    /**
-     * @return
-     * @throws IOException
-     */
-    private int getMessageBytesLeft() throws IOException {
-        return this.message.available() + (this.file != null ? this.file.available() : 0);
+    @Override
+    public int read(byte[] buffer, int off, int maxLen) throws IOException {
+        if (buffer == null) {
+            throw new NullPointerException();
+        } else if (off < 0 || maxLen < 0 || maxLen > buffer.length - off) {
+            throw new IndexOutOfBoundsException();
+        } else if (maxLen == 0) {
+            return 0;
+        }
+        if (this.available() <= 0) {
+            return -1;
+        }
+
+        int toRead = Math.min(this.available(), maxLen);
+        int len = 0;
+        for (; len < toRead; len++) {
+            int c = read();
+            buffer[off + len] = (byte) c;
+        }
+        return len;
     }
 
     @Override
     public int read() throws IOException {
         //on every read, check to see if we need to advance to the next packet.
         advanceIfNeeded();
-        return packet != null ? packet[packetIndex++] : -1;
+        return readNext();
     }
 
     /**
@@ -86,6 +127,21 @@ public class WireSendInputStream extends InputStream {
     }
 
     /**
+     * Read the next byte from the packet, or return -1 if a next byte doesnt exist.
+     * 
+     * This should only return -1 when we're done with a stream, as read will
+     * call advanceIfNeeded to line up the next set of bytes before calling this.
+     * @return
+     */
+    private int readNext() {
+        if (packet != null && packetIndex < packet.length) {
+            this.available--;
+            return packet[packetIndex++];
+        } else {
+            return -1;
+        }
+    }
+    /**
      * Read the next segment of bytes, making sure we leave room in the packet
      * for the header info at the front.
      * 
@@ -94,19 +150,31 @@ public class WireSendInputStream extends InputStream {
      */
     private byte[] readNextBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int len;
-        for (len = PacketFormat.getOverhead(); len < this.packetSize; len++) {
-            int ret = -1;
-            if (this.message.available() > 0) {
-                ret = this.message.read();
-            } else if (file != null) {
-                ret = this.file.read();
-            } else {
-                break;
-            }
+        if (this.available() <= 0) {
+            return baos.toByteArray();
+        }
 
+        int len;
+        
+        for (len = PacketFormat.getOverhead(); len < this.packetSize && this.message.available() > 0; len++) {
+            int ret = -1;
+            ret = this.message.read();
             baos.write(ret);
         }
+        if (this.fileLengthStream != null) {
+            for (; len < this.packetSize && this.fileLengthStream.available() > 0; len++) {
+                baos.write(this.fileLengthStream.read());
+            }
+        }
+        
+        if (this.file != null) {
+            byte[] buf = new byte[this.packetSize - len];
+            int read;
+            if ((read = this.file.read(buf)) > 0) {
+                baos.write(buf, 0, read);
+            }
+        }
+
         return baos.toByteArray();
     }
 }

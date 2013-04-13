@@ -33,7 +33,7 @@ import java.nio.ByteBuffer;
  */
 public class AComplexDataType {
 
-    protected static final int SIZEOF_INTEGER = 4;
+    public static final int SIZEOF_INTEGER = 4;
 
     protected void writeByte(byte theByte, OutputStream output)
             throws IOException {

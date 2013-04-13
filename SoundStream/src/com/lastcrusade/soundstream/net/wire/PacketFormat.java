@@ -61,6 +61,13 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
         this.bytes = bytes;
     }
 
+    public static int getLengthOverhead() {
+        return SIZEOF_INTEGER;
+    }
+    public static int getMessageNoOverhead() {
+        return SIZEOF_INTEGER;
+    }
+
     public static int getOverhead() {
         return HEADER_LEN;
     }

@@ -25,11 +25,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.lastcrusade.soundstream.net.message.IFileMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
@@ -62,7 +64,9 @@ public class Messenger {
 
     private ByteArrayOutputStream inputBuffer = new ByteArrayOutputStream();
 
-    private SparseArray<WireRecvOutputStream> activeTransfers   = new SparseArray<WireRecvOutputStream>();
+    //NOTE: implemented as a map, not a SparseArray, so our unit tests will run
+    @SuppressLint("UseSparseArrays")
+    private Map<Integer, WireRecvOutputStream> activeTransfers = new HashMap<Integer, WireRecvOutputStream>();
 
     private List<IMessage>                    receivedMessages = new LinkedList<IMessage>();
 
@@ -119,8 +123,8 @@ public class Messenger {
         // operation
         InputStream fileStream = null;
         if (isFileMessage(message)) {
-            FileFormat fileFormat = new FileFormat((IFileMessage) message, this.tempFolder);
-            fileStream = fileFormat.getWrappedInputStream();
+            FileReceiver fileFormat = new FileReceiver((IFileMessage) message, this.tempFolder);
+            fileStream = fileFormat.getInputStream();
         }
         return new WireSendInputStream(this.sendPacketSize, this.nextMessageNo++, new ByteArrayInputStream(baos.toByteArray()), fileStream);
     }
@@ -154,6 +158,9 @@ public class Messenger {
             //always check to see if we have more message data waiting...this is so we can process
             // grouped/batched messages without having to wait on the call to readNext
             if (inputBuffer.size() > 0) {
+                if (inputBuffer.size() == 126) {
+                    System.out.println("woo");
+                }
                 //check to see if we can process this message
                 processed = processAndConsumePacket();
             }
@@ -197,7 +204,7 @@ public class Messenger {
             WireRecvOutputStream transfer = this.activeTransfers.get(packet.getMessageNo());
             if (transfer == null) {
                 transfer = new WireRecvOutputStream(this.tempFolder);
-                this.activeTransfers.append(packet.getMessageNo(), transfer);
+                this.activeTransfers.put(packet.getMessageNo(), transfer);
             }
 
             transfer.write(packet.getBytes());
@@ -245,24 +252,10 @@ public class Messenger {
         }
     }
 
-    /**
-     * Read the first 4 bytes off of the input buffer, and remove those bytes
-     * from the buffer.
-     * 
-     * NOTE: This assumes that there is at least 4 bytes (SIZE_LEN bytes) in
-     * the buffer.
-     * 
-     * @return
-     */
-    private int readAndConsumeLength() {
-        byte[] bytes = inputBuffer.toByteArray();
-        ByteBuffer bb = ByteBuffer.wrap(bytes, 0, SIZE_LEN);
-        //this actually consumes the first 4 bytes (removes it from the stream)
-        inputBuffer.reset();
-        inputBuffer.write(bytes, SIZE_LEN, bytes.length - SIZE_LEN);
-        return bb.getInt();
-    }
-
+    ///TODO
+//    public void clearReceivedMessages() {
+//        
+//    }
     /**
      * Get the last received message processed by this messenger.
      * 

@@ -71,7 +71,7 @@ public class MessageFormat extends AComplexDataType implements ISerializable {
         }
 
         //if we havent read in the whole message, throw an exception
-        if (this.length < input.available()) {
+        if (this.length > input.available()) {
             throw new MessageNotCompleteException();
         }
 
