@@ -64,8 +64,19 @@
     <string name="disband">Disband</string>
     <string name="dialog_disband">Are you sure you want to disband? This will boot all connected users.</string>
 
-    <!-- Default values -->
+    <!-- default values -->
     <string name="default_mac">00:08:67:53:09</string>
     <string name="default_name">Indiana Jones</string>
+
+    <!-- about things -->
+    <string name="about">About</string>
+    <string name="meet_label">Meet The Team</string>
+    <string name="reid">Reid Baker</string>
+    <string name="david">David Greenhalgh</string>
+    <string name="elizabeth">Elizabeth Johnson</string>
+    <string name="jesse">Jesse Rosalia</string>
+    <string name="bryan">Bryan Sills</string>
+    <string name="thanks_label">Special Thanks</string>
+    <string name="thank_troy"> Troy Peace - A Super Sponsor, without whom this never could have happened</string>
 
 </resources>

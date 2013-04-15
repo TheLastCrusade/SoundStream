@@ -23,17 +23,23 @@ public class UserColors {
     //color set not finished yet - might change some or all colors
     private ColorEntry[] colors = new ColorEntry[] {
         
-        new ColorEntry(0xFF02AD8C),
-        new ColorEntry(0xFFB3ED00),
-        new ColorEntry(0xFFFFC600),
-        new ColorEntry(0xFFC10091),
-        new ColorEntry(0xFFF99500),
-        new ColorEntry(0xFF91B22C),
-        new ColorEntry(0xFFF94000),
-        new ColorEntry(0xFF1E7766),
-        new ColorEntry(0xFFCAA72B),
-        new ColorEntry(0xFF9B217D),
-        new ColorEntry(0xFFC88C32)
+        new ColorEntry(0xFF1F9BA4), //teal
+        new ColorEntry(0xFFBDD74A), //lime
+        new ColorEntry(0xFF894D9E), //purple
+        new ColorEntry(0xFFE06634), //burnt orange
+        new ColorEntry(0xFFEBBE1C), //gold
+        new ColorEntry(0xFF3A75BA), //blue
+        new ColorEntry(0xFF739A58), //olive
+        new ColorEntry(0xFFA52431), //red
+        new ColorEntry(0xFF3C439B), //dark blue
+        new ColorEntry(0xFFE59B37), //orange
+        new ColorEntry(0xFFF3DC64), //yellow
+        new ColorEntry(0xFF64C7CB), //light teal
+        new ColorEntry(0xFF70BE44), //green
+        new ColorEntry(0xFF5C4C9F), //faded purple
+        new ColorEntry(0xFFB3499B), //pink
+        new ColorEntry(0xFFDCACCF)  //light pink
+
     };
     
     //gets the next color that is not taken and marks it as such
