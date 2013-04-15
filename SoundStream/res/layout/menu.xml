@@ -157,4 +157,47 @@
 	        android:divider="@color/transparent" >
     	</ListView>
     </RelativeLayout>
+    
+    <!-- About Things -->
+    <RelativeLayout
+        android:id="@+id/about_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@+id/connected_users_category" >
+
+        <TextView
+            android:id="@+id/about_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/about"
+            android:textColor="@color/light_gray"/>
+
+        <View
+            android:id="@+id/about_line"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/about_label"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:background="@color/light_gray" 
+            />
+        
+         <Button 
+            android:id="@+id/about_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/about_line"
+            android:text="@string/about"
+            android:textColor="@color/white"
+            android:textSize="18sp" 
+            android:clickable="true"
+            android:layout_marginLeft="20dp"
+            android:background="@color/transparent"
+            android:drawableLeft="@drawable/action_about"
+            android:drawablePadding="6dp"
+            android:gravity="left|center_vertical"
+            />
+    </RelativeLayout>
+    
 </RelativeLayout>

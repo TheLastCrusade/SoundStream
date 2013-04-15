@@ -108,6 +108,15 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
         ListView userView = (ListView)v.findViewById(R.id.connected_users);
         userView.setAdapter(this.userAdapter);
         
+        Button about = (Button)v.findViewById(R.id.about_btn);
+        about.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                Transitions.transitionToAbout((CoreActivity)getActivity());
+            }
+        });
+        
         return v;
     }
 
