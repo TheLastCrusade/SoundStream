@@ -116,18 +116,58 @@ public class WireSendInputStreamTest {
      */
     @Test
     public void testAvailableWithLargeFile() throws IOException {
-        int packetSize = 1024;
-        int messageNo  = 1;
         //NOTE: these test values to cover a specific edge case where we weren't calculating the packet count properly
         //...using these values, we will miss 1 packet if 
-        InputStream test = getTestStream(100);
-        File file = getTempTestFile(17294);
+        int packetSize  = 1024;
+        int messageNo   = 1;
+        int messageSize = 100;
+        int fileSize    = 17294;
+        int expectedPackets = computeExpectedPackets(packetSize, messageSize, fileSize);
+        
+        doTestAvailable(messageNo, packetSize, messageSize, fileSize, expectedPackets);
+    }
+
+    @Test
+    public void testAvailableWithSlamDunkLifestyle() throws IOException {
+        //6315349, 1024
+        int packetSize  = 1024;
+        int messageNo   = 1;
+        int messageSize = 100;
+        int fileSize    = 6315349;
+        int expectedPackets = computeExpectedPackets(packetSize, messageSize, fileSize);
+        
+        doTestAvailable(messageNo, packetSize, messageSize, fileSize, expectedPackets);
+    }
+
+    /**
+     * @param packetSize
+     * @param messageSize
+     * @param fileSize
+     * @return
+     */
+    private int computeExpectedPackets(int packetSize, int messageSize,
+            int fileSize) {
+        return 1 + ((messageSize + fileSize) / (packetSize - PacketFormat.getOverhead()));
+    }
+
+    /**
+     * @param messageNo
+     * @param packetSize
+     * @param fileSize
+     * @param expectedPackets
+     * @return
+     * @throws IOException 
+     */
+    private void doTestAvailable(int messageNo, int packetSize,
+            int messageSize, int fileSize, int expectedPackets) throws IOException {
+        InputStream test = getTestStream(messageSize);
+        File file = getTempTestFile(fileSize);
+        
         InputStream fileStream = new FileInputStream(file);
         try {
             WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, fileStream);
             int expectedBytes = test.available() + fileStream.available() + AComplexDataType.SIZEOF_INTEGER;
             assertEquals(computeExpectedSize(expectedBytes, packetSize), is.available());
-            int expectedPackets = 18;
             byte[] buf = new byte[packetSize];
             for (int ii = 0; ii < expectedPackets; ii++) {
                 int read = is.read(buf);

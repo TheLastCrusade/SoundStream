@@ -29,11 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.net.message.IFileMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.MessageFormat;
 import com.lastcrusade.soundstream.util.InputBuffer;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
  * This class is the main entry point to send and receive messages in Sound Stream.  It implements a protocol
@@ -52,7 +54,7 @@ import com.lastcrusade.soundstream.util.InputBuffer;
  */
 public class Messenger {
 
-//    private static final String TAG = Messenger.class.getSimpleName();
+    private static final String TAG = Messenger.class.getSimpleName();
 
     private InputBuffer inputBuffer = new InputBuffer();
 
@@ -67,10 +69,10 @@ public class Messenger {
      * 
      */
     //FIXME: there's a bug with slam dunk lifestyle and 1024 byte buffers...it never finishes transfering
-    private static final int MAX_READ_SIZE_BYTES = 4096;
+    private static final int MAX_READ_SIZE_BYTES = 1024;
     private byte[] inBytes = new byte[MAX_READ_SIZE_BYTES];
 
-    private static final int MAX_WRITE_SIZE_BYTES = 4096;
+    private static final int MAX_WRITE_SIZE_BYTES = 1024;
 
     /**
      * Maximum size in bytes to write to a socket at a time.
@@ -137,23 +139,31 @@ public class Messenger {
      */
     public boolean deserializeMessage(InputStream input) throws Exception {
         boolean processed = false;
+        int read = 0;
         do {
             //always check to see if we have more message data waiting...this is so we can process
             // grouped/batched messages without having to wait on the call to readNext
             if (inputBuffer.size() > 0) {
-                if (inputBuffer.size() == 126) {
-                    System.out.println("woo");
-                }
                 //check to see if we can process this message
-                processed = processAndConsumePacket();
+                if (LogUtil.isLogAvailable()) {
+                    if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                        Log.v(TAG, "Bytes available in " + inputBuffer.size());
+                    }
+                }
+                processed = processAndConsumePackets();
+                if (LogUtil.isLogAvailable()) {
+                    if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                        Log.v(TAG, "Bytes left in " + inputBuffer.size());
+                    }
+                }
             }
             
             //if we don't have a message processed, attempt to read new data and loop back around
             if (!processed) {
-                readNext(input);
+                read = readNext(input);
             }
             //loop back around if we havent processed a message yet
-        } while (!processed);
+        } while (!processed && read > 0 && inputBuffer.size() > 0);
         return processed;
     }
 
@@ -164,29 +174,34 @@ public class Messenger {
      * @return
      * @throws IOException 
      */
-    private boolean processAndConsumePacket() throws IOException {
+    private boolean processAndConsumePackets() throws IOException {
         boolean received = false;
         //REVIEW: character encoding issues may arise, but since we're controlling the class names
         // we should be able to decide how to handle these
         PacketFormat packet = new PacketFormat();
         try {
-            packet.deserialize(inputBuffer.getInputStream());
-            //consume this message in the input buffer
-            inputBuffer.consume();
-
-            WireRecvOutputStream transfer = this.activeTransfers.get(packet.getMessageNo());
-            if (transfer == null) {
-                transfer = new WireRecvOutputStream(this.tempFolder);
-                this.activeTransfers.put(packet.getMessageNo(), transfer);
-            }
-
-            transfer.write(packet.getBytes());
-            received = transfer.attemptReceive();
-            //if we've received the full message, remove it from our active
-            // transfer array and add the underlying message to the received messages list
-            if (received) {
-                this.activeTransfers.remove(packet.getMessageNo());
-                this.receivedMessages.add(transfer.getReceivedMessage());
+            //while there is data to process, attempt to pull out packets
+            //...this will "receive" as many messages as it can, and will throw an exception
+            // to exit the loop when we've run out of full packets in our buffer
+            while (inputBuffer.size() > 0) {
+                packet.deserialize(inputBuffer.getInputStream());
+                //consume this message in the input buffer
+                inputBuffer.consume();
+    
+                WireRecvOutputStream transfer = this.activeTransfers.get(packet.getMessageNo());
+                if (transfer == null) {
+                    transfer = new WireRecvOutputStream(this.tempFolder);
+                    this.activeTransfers.put(packet.getMessageNo(), transfer);
+                }
+    
+                transfer.write(packet.getBytes());
+                received = transfer.attemptReceive();
+                //if we've received the full message, remove it from our active
+                // transfer array and add the underlying message to the received messages list
+                if (received) {
+                    this.activeTransfers.remove(packet.getMessageNo());
+                    this.receivedMessages.add(transfer.getReceivedMessage());
+                }
             }
         } catch (MessageNotCompleteException ex) {
             //fall thru
@@ -202,19 +217,24 @@ public class Messenger {
      * an exception if the stream is closed while reading.
      * 
      * @param input
+     * @return 
+     * @return 
      * @throws IOException
      */
-    private void readNext(InputStream input) throws IOException {
+    private int readNext(InputStream input) throws IOException {
         //read a chunk at a time...the buffer size was determined through trial and error, and
         // could be optimized more.
         //NOTE: this is so input.read can block, and will throw an exception when the connection
         // goes down.  this is the only way we'll get a notification of a downed client
-        int read = input.read(inBytes);
-        if (read > 0) {
-            inputBuffer.write(inBytes, 0, read);
-        } else {
-            inputBuffer.write(inBytes);
+        int read = -1;
+        int toRead = Math.min(inBytes.length, input.available());
+        if (toRead > 0) {
+            read = input.read(inBytes, 0, toRead);
+            if (read > 0) {
+                inputBuffer.write(inBytes, 0, read);
+            }
         }
+        return read;
     }
 
     ///TODO

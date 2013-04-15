@@ -109,16 +109,17 @@ public class FileReceiver extends AComplexDataType {
             openRandomInFile();
         }
 
+        //read all that is available, since the incoming stream should be only
+        // for this file
         int read;
         while ((read = input.read(byteBuffer)) > 0) {
             fileBuffer.write(byteBuffer, 0, read);
+            //we've read the data in...decrement the bytes from
+            // the count of bytes left
             this.fileBytesLeft -= read;
         }
-//        if (LogUtil.isLogEnabled()) {
-//            Log.d(TAG, "Writing " + read + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
-//        }
 
-        boolean readComplete = isInFileComplete();
+        boolean readComplete = isFileComplete();
         
         if (isBufferFilled() || readComplete) {
             flushBuffer();
@@ -130,13 +131,23 @@ public class FileReceiver extends AComplexDataType {
         return readComplete;
     }
 
+    /**
+     * Test to see if the buffer is filled.  Note that this only considers
+     * bytes in the buffer, not how many bytes are left to read.  You may
+     * also need to test if the file is complete, to flush the last bits
+     * of data to file.
+     * 
+     * @return
+     */
     private boolean isBufferFilled() {
         int available = fileBuffer.size();
-        return available > 0 && available >= Math.min(MIN_BYTES_READ_IN, this.fileBytesLeft);
+        return available > 0 && available >= MIN_BYTES_READ_IN;
     }
 
     private void flushBuffer() throws IOException {
-        Log.d(TAG, "Writing " + fileBuffer.size() + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
+        if (LogUtil.isLogAvailable()) {
+            Log.d(TAG, "Writing " + fileBuffer.size() + " bytes to incoming file (" + this.fileBytesLeft + " bytes left)");
+        }
 
         fileStream.write(fileBuffer.toByteArray());
         fileBuffer.reset();
@@ -174,7 +185,7 @@ public class FileReceiver extends AComplexDataType {
      * 
      * @return
      */
-    private boolean isInFileComplete() {
+    private boolean isFileComplete() {
         return this.fileStream != null && this.fileBytesLeft == 0;
     }
 
