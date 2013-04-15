@@ -194,7 +194,7 @@
             android:clickable="true"
             android:layout_marginLeft="20dp"
             android:background="@color/transparent"
-            android:drawableLeft="@drawable/network_icon"
+            android:drawableLeft="@drawable/action_about"
             android:drawablePadding="6dp"
             android:gravity="left|center_vertical"
             />

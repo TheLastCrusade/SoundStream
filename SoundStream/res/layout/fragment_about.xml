@@ -19,6 +19,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     >
 
     <!-- Meet the Crusaders -->
@@ -35,6 +36,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/meet_label"
+            android:textSize="20sp"
+            
             />
         
         <View
@@ -44,7 +47,7 @@
             android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
             android:layout_below="@id/meet_label"
-            android:background="@color/dark_gray" 
+            android:background="@color/accent_blue" 
             />
 
         <ListView 
@@ -65,14 +68,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_marginRight="10dp"
+        >
 
         <TextView
             android:id="@+id/special_thanks_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/thanks_label"
-            android:textColor="@color/light_gray"/>
+            android:textSize="20sp"/>
 
         <View
             android:id="@+id/thanks_line"
@@ -81,15 +85,17 @@
             android:layout_marginTop="3dp"
             android:layout_marginBottom="20dp"
             android:layout_below="@id/special_thanks_label"
-            android:background="@color/light_gray" />
+            android:background="@color/accent_blue" />
         
        <TextView
             android:id="@+id/thanks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:text="@string/thank_troy"
-            android:textColor="@color/light_gray"
-            android:layout_below="@id/thanks_line"/>
+            android:layout_below="@id/thanks_line"
+            android:textSize="18sp"
+            />
        
     </RelativeLayout>
 </LinearLayout>

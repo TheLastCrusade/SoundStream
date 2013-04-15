@@ -67,11 +67,11 @@
     <!-- about things -->
     <string name="about">About</string>
     <string name="meet_label">Meet The Team</string>
-    <string name="reid">Reid Baker - Architect and Dynamite Developer</string>
-    <string name="david">David Greenhalgh - Best PM Ever</string>
-    <string name="elizabeth">Elizabeth Johnson - UX Designer / Dev</string>
-    <string name="jesse">Jesse Rosalia - Bluetooth and Messaging Master</string>
-    <string name="bryan">Bryan Sills - Testing Guru</string>
+    <string name="reid">Reid Baker</string>
+    <string name="david">David Greenhalgh</string>
+    <string name="elizabeth">Elizabeth Johnson</string>
+    <string name="jesse">Jesse Rosalia</string>
+    <string name="bryan">Bryan Sills</string>
     <string name="thanks_label">Special Thanks</string>
     <string name="thank_troy"> Troy Peace - A Super Sponsor, without whom this never could have happened</string>
 </resources>
