@@ -6,7 +6,7 @@ import getopt
 class UITest(object):
     """Base class for building UI tests"""
     def __init__(self):
-        super(UITest, self)
+        #super(UITest, self)
         self.setup()
         deviceArg = self.parseArgs()
         if (deviceArg is not None):
@@ -59,6 +59,5 @@ class UITest(object):
         self.device, serialno = ViewClient.connectToDeviceOrExit(**kwargs1)
         self.vc = ViewClient(self.device, serialno, **kwargs2)
         
-    def execute_test():
+    def execute_test(self):
         raise NotImplementedError( "Should have implemented this in test class" )
-        
