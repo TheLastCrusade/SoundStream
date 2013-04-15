@@ -253,7 +253,7 @@ public class PlaylistFragment extends MusicListFragment{
         private class PlaylistSongGestureListener extends SongGestureListener{
             private PlaylistEntry entry;
             private View view;
-            private final int SWIPE_MIN_DISTANCE = 150;
+            private final int SWIPE_MIN_DISTANCE = 100;
             private boolean removed;
             
             public PlaylistSongGestureListener(View view, PlaylistEntry entry){
