@@ -259,9 +259,9 @@ public class PlaylistFragment extends MusicListFragment{
             public PlaylistSongGestureListener(View view, PlaylistEntry entry){
                 super(view);
                 this.view = view;
-                this.entry = entry;
-                
+                this.entry = entry;    
             }
+            
             //fling a song to the right to remove it
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
@@ -277,6 +277,7 @@ public class PlaylistFragment extends MusicListFragment{
                             getPlaylistService().getCurrentEntry().equals(entry)){
                         getPlaylistService().skip();
                     }
+                    
                     getPlaylistService().removeSong(entry);
                     removed = true;
                     swipe=true;
@@ -303,7 +304,6 @@ public class PlaylistFragment extends MusicListFragment{
                 }
                 
                 return super.onScroll(e1, e2, distanceX, distanceY);
-            
             }
             
             //bump the song to the top when double tapped
@@ -312,8 +312,6 @@ public class PlaylistFragment extends MusicListFragment{
                 getPlaylistService().bumpSong(entry);
                 return true;
             } 
-            
-           
             
             /**
              * Animates the current view by moving it to the right by the given 
@@ -349,11 +347,8 @@ public class PlaylistFragment extends MusicListFragment{
                 if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
                     return true;
                 }
-                return false;
-               
+                return false;  
             }
- 
-        }
-        
+        } 
     }
 }
