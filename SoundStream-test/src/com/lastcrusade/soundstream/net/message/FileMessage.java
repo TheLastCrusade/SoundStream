@@ -16,45 +16,40 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.lastcrusade.soundstream.net.message;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.lastcrusade.soundstream.net.wire.MessageNotCompleteException;
+
 /**
- * A simple implementation of IMessage for sending strings back and forth.
- * 
- * @author Jesse Rosalia
+ * @author thejenix
  *
  */
-public class StringMessage implements IMessage {
-    private final String TAG = StringMessage.class.getName();
-    private String string;
+public class FileMessage extends ADataMessage implements IFileMessage {
+
+    private String filePath;
 
     @Override
-    public void deserialize(InputStream input) throws IOException {
-        byte[] bytes = new byte[1024];
-        int read = 0;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        while ((read = input.read(bytes)) > 0) {
-            out.write(bytes, 0, read);
-        }
-        this.setString(out.toString());
+    public void deserialize(InputStream input) throws IOException,
+            MessageNotCompleteException {
+        this.filePath = readString(input);
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        output.write(this.getString().getBytes());
+        writeString(this.filePath, output);
     }
 
-    public String getString() {
-        return string;
+    @Override
+    public String getFilePath() {
+        return this.filePath;
     }
 
-    public void setString(String string) {
-        this.string = string;
+    @Override
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

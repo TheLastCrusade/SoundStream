@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.lastcrusade.soundstream.net.message.FoundGuest;
+import com.lastcrusade.soundstream.model.FoundGuest;
 import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 
 public class FoundGuestsMessageTest extends SerializationTest<FoundGuestsMessage> {

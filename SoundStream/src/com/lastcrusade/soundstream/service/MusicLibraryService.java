@@ -346,7 +346,7 @@ public class MusicLibraryService extends Service {
         fis.read(bytes);
         return bytes;
     }
-    
+
     private IMessagingService getMessagingService() {
         MessagingService messagingService = null;
         try {
