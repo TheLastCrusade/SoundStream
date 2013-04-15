@@ -26,4 +26,8 @@
 
   <!--Enable automatic exception tracking-->
   <bool name="ga_reportUncaughtExceptions">true</bool>
+
+  <!-- Log google analytics -->
+  <bool name="ga_debug">true</bool>
+
 </resources>
