@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.components.AboutFragment;
 import com.lastcrusade.soundstream.components.ConnectFragment;
 import com.lastcrusade.soundstream.components.MusicLibraryFragment;
 import com.lastcrusade.soundstream.components.NetworkFragment;
@@ -38,11 +39,13 @@ public class Transitions {
     private final static int MUSIC_LIBRARY = R.string.music_library;
     private final static int NETWORK  = R.string.network;
     private final static int CONNECT = R.string.connect;
+    private final static int ABOUT = R.string.about;
     
     private final static PlaylistFragment playlistFragment = new PlaylistFragment();
     private final static MusicLibraryFragment musicLibraryFragment = new MusicLibraryFragment();
     private final static NetworkFragment networkFragment = new NetworkFragment();
     private final static ConnectFragment connectFragment = new ConnectFragment();
+    private final static AboutFragment aboutFragment = new AboutFragment();
 
     //Home is where you get sent after connecting to the network
     private final static int HOME = MUSIC_LIBRARY;
@@ -66,6 +69,10 @@ public class Transitions {
     
     public static void transitionToConnect(CoreActivity activity){
         switchFragment(CONNECT, activity);
+    }
+    
+    public static void transitionToAbout(CoreActivity activity){
+        switchFragment(ABOUT, activity);
     }
     
     private static void switchFragment(int fragmentName, CoreActivity activity){
@@ -94,6 +101,9 @@ public class Transitions {
             break;
         case CONNECT:
             newFragment = connectFragment;
+            break;
+        case ABOUT:
+            newFragment = aboutFragment;
             break;
         }
         return newFragment;
