@@ -37,6 +37,8 @@ public class UserListService extends Service {
     private BroadcastRegistrar registrar;
     private UserList userList;
     private ServiceLocator<MessagingService> messagingServiceLocator;
+    private String myMac;
+    private String myName;
     
     /**
      * Class for clients to access. Because we know this service always runs in
@@ -56,11 +58,13 @@ public class UserListService extends Service {
         super.onCreate();
 
         userList = new UserList();
-        addSelfToUserList();
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
+        myName = BluetoothUtils.getLocalBluetoothName();
+        myMac = BluetoothUtils.getLocalBluetoothMAC();
 
+        addSelfToUserList();
         registerReceivers();
     }
     
@@ -120,7 +124,7 @@ public class UserListService extends Service {
     }
 
     private void addSelfToUserList() {
-        userList.addUser(BluetoothUtils.getLocalBluetoothName(), BluetoothUtils.getLocalBluetoothMAC());
+        userList.addUser(myName, myMac);
     }
 
     private void unregisterReceivers() {
@@ -140,6 +144,14 @@ public class UserListService extends Service {
 
     public UserList getUserList(){
         return userList;
+    }
+
+    public String getMyMac() {
+        return myMac;
+    }
+
+    public String getMyName(){
+        return myName;
     }
 
 }
