@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
 import com.lastcrusade.soundstream.service.ConnectionService;
@@ -103,7 +104,20 @@ public class CoreActivity extends SlidingFragmentActivity{
         unregisterReceivers();
         super.onDestroy();
     }
-    
+
+    @Override
+    public void onStart() {
+      super.onStart();
+      //For Google Analytics
+      EasyTracker.getInstance().activityStart(this);
+    }
+
+    @Override
+    public void onStop() {
+      super.onStop();
+      //For Google Analytics
+      EasyTracker.getInstance().activityStop(this);
+    }
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
