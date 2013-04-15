@@ -70,7 +70,6 @@ public class CoreActivity extends SlidingFragmentActivity{
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
             getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-            setSlidingActionBarEnabled(false);
             hidePlaybar();
         }
         else{
@@ -81,8 +80,8 @@ public class CoreActivity extends SlidingFragmentActivity{
         }
 
         // setup the sliding bar
-        getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
-
+        setSlidingActionBarEnabled(false);
+        getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
         registerReceivers();
     }
 
