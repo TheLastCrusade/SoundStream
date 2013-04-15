@@ -43,12 +43,13 @@ import com.lastcrusade.soundstream.util.LogUtil;
 public class MessageThreadWriter {
 
     /**
-     * 
+     * The normal multiplier uses the score as is.
      */
     private static final int NORMAL_SCORE_MULTIPLIER = 1;
 
     /**
-     * 
+     * A multiplier to lower the priority of transfer song messages,
+     * so control messages will jump the queue to be sent quicker.
      */
     private static final int TRANSFER_SONG_SCORE_MULTIPLIER = 100;
 
@@ -91,6 +92,11 @@ public class MessageThreadWriter {
         qe.score         = computeMessageScore(messageNo, message);
         qe.messageClass  = message.getClass();
         qe.messageStream = messenger.serializeMessage(message);
+        if (LogUtil.isLogAvailable()) {
+            Log.i(TAG, "Message " + qe.messageNo + " enqueued, it's a "
+                        + qe.messageClass.getSimpleName() + ", "
+                        + qe.messageStream.available() + " bytes in length");
+        }
         queue.add(qe);
     }
 
@@ -105,11 +111,15 @@ public class MessageThreadWriter {
      * @return
      */
     private int computeMessageScore(int messageNo, IMessage message) {
+        int mult = NORMAL_SCORE_MULTIPLIER;
         //transfer song has a higher score, so it is a lower priority message
-        return messageNo * (TransferSongMessage.class.isAssignableFrom(
-                                message.getClass()) 
-                            ? TRANSFER_SONG_SCORE_MULTIPLIER
-                            : NORMAL_SCORE_MULTIPLIER);
+        if (TransferSongMessage.class.isAssignableFrom(
+                                message.getClass())) { 
+            mult = TRANSFER_SONG_SCORE_MULTIPLIER;
+        }
+        //compute the score by multiplying the message no by a multiplier
+        // to push some messages down in priority
+        return messageNo * mult;
     }
 
     public boolean canWrite() {
@@ -134,7 +144,7 @@ public class MessageThreadWriter {
         if (qe != null) {
             int read = qe.messageStream.read(outBytes);
             if (LogUtil.isLogAvailable()) {
-                Log.i(TAG, "Message " + qe.messageNo + " written, it's a " + qe.messageClass.getSimpleName() + ", " + read + " bytes in length");
+                Log.d(TAG, "Message " + qe.messageNo + " written, it's a " + qe.messageClass.getSimpleName() + ", " + read + " bytes in length");
             }
             outStream.write(outBytes, 0, read);
             int left = qe.messageStream.available();
@@ -142,7 +152,7 @@ public class MessageThreadWriter {
             // to write at the next opportunity
             if (left > 0) {
                 if (LogUtil.isLogAvailable()) {
-                    Log.i(TAG, "Message " + qe.messageNo + ", " + left + " bytes left to write");
+                    Log.d(TAG, "Message " + qe.messageNo + ", " + left + " bytes left to write");
                 }
                 queue.add(qe);
             } else {

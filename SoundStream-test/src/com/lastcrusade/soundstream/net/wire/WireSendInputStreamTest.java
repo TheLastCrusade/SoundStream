@@ -49,8 +49,8 @@ public class WireSendInputStreamTest {
         int packetSize = 100;
         int messageNo  = 1;
         InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
-        WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, null);
-        assertEquals(computeExpectedSize(test.available(), packetSize), is.available());
+        WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, null);
+        assertEquals(computeExpectedSize(test.available(), packetSize), input.available());
     }
 
     /**
@@ -76,9 +76,9 @@ public class WireSendInputStreamTest {
         File file = MessageTestUtil.getTempTestFile(100);
         InputStream fileStream = new FileInputStream(file);
         try {
-            WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, fileStream);
+            WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, fileStream);
             int expectedBytes = test.available() + fileStream.available() + AComplexDataType.SIZEOF_INTEGER;
-            assertEquals(computeExpectedSize(expectedBytes, packetSize), is.available());
+            assertEquals(computeExpectedSize(expectedBytes, packetSize), input.available());
         } finally {
             file.delete();
         }
@@ -139,16 +139,16 @@ public class WireSendInputStreamTest {
         
         InputStream fileStream = new FileInputStream(file);
         try {
-            WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, fileStream);
+            WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, fileStream);
             int expectedBytes = test.available() + fileStream.available() + AComplexDataType.SIZEOF_INTEGER;
-            assertEquals(computeExpectedSize(expectedBytes, packetSize), is.available());
+            assertEquals(computeExpectedSize(expectedBytes, packetSize), input.available());
             byte[] buf = new byte[packetSize];
             for (int ii = 0; ii < expectedPackets; ii++) {
-                int read = is.read(buf);
+                int read = input.read(buf);
                 assertTrue(read > 0);
             }
             //it should be 18 packets exactly
-            assertEquals(0, is.available());
+            assertEquals(0, input.available());
             
         } finally {
             file.delete();
@@ -165,23 +165,23 @@ public class WireSendInputStreamTest {
         int messageNo  = 1;
         InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
         InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
-        WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, null);
+        WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, null);
         int bytesLeft = computeExpectedSize(test.available(), packetSize);
-        assertEquals(bytesLeft, is.available());
+        assertEquals(bytesLeft, input.available());
 
         for (; bytesLeft > 0; ) {
             int toRead = Math.min(packetSize, bytesLeft);
             int payloadSize = toRead - PacketFormat.getLengthOverhead();
             int dataSize    = payloadSize - PacketFormat.getMessageNoOverhead();
-            verifyPacket(is, expected, messageNo, payloadSize, dataSize);
+            verifyPacket(input, expected, messageNo, payloadSize, dataSize);
             
             bytesLeft -= toRead;
-            assertEquals(bytesLeft, is.available());
+            assertEquals(bytesLeft, input.available());
         }
 
         //this should be the last one
-        assertEquals(0, is.available());
-        assertEquals(-1, is.read());
+        assertEquals(0, input.available());
+        assertEquals(-1, input.read());
     }
 
     /**
@@ -261,37 +261,37 @@ public class WireSendInputStreamTest {
         File testFile = MessageTestUtil.getTempTestFile(100);
         InputStream expectedFile = new FileInputStream(testFile);
         InputStream actualFile   = new FileInputStream(testFile);
-        WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
+        WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
 
         int expectedBytes = computeExpectedSize(expected.available() + expectedFile.available() + AComplexDataType.SIZEOF_INTEGER, packetSize);
         int bytesLeft = expectedBytes;
         int messageBytes = computeExpectedSize(expected.available(), packetSize);
         int fileBytes = expectedBytes - messageBytes;
-        assertEquals(bytesLeft, is.available());
+        assertEquals(bytesLeft, input.available());
 
         for (; bytesLeft > 0; ) {
             int toRead = Math.min(packetSize, bytesLeft);
             if (bytesLeft <= fileBytes) {
                 int payloadSize = toRead - PacketFormat.getLengthOverhead();
                 int dataSize    = payloadSize - PacketFormat.getMessageNoOverhead();
-                verifyPacket(is, expectedFile, messageNo, payloadSize, dataSize);
+                verifyPacket(input, expectedFile, messageNo, payloadSize, dataSize);
             } else {
                 int partialToRead = Math.min(toRead, bytesLeft - fileBytes);
                 int payloadSize = toRead - PacketFormat.getLengthOverhead();
                 int dataSize    = partialToRead - PacketFormat.getOverhead();
-                verifyPacket(is, expected, messageNo, payloadSize, dataSize);
+                verifyPacket(input, expected, messageNo, payloadSize, dataSize);
                 int rest = toRead - partialToRead;
                 if (rest > 0) {
-                    verifyFileStart(is, expectedFile, rest);
+                    verifyFileStart(input, expectedFile, rest);
                 }
             }
             
             bytesLeft -= toRead;
-            assertEquals(bytesLeft, is.available());
+            assertEquals(bytesLeft, input.available());
         }
 
-        assertEquals(0, is.available());
-        assertEquals(-1, is.read());
+        assertEquals(0, input.available());
+        assertEquals(-1, input.read());
     }
 
     /**
@@ -304,13 +304,13 @@ public class WireSendInputStreamTest {
         int messageNo  = 1;
         InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
         InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
-        WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, null);
+        WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, null);
         int bytesLeft = computeExpectedSize(test.available(), packetSize);
-        assertEquals(bytesLeft, is.available());
+        assertEquals(bytesLeft, input.available());
 
         byte[] buf = new byte[packetSize];
         for (; bytesLeft > 0; ) {
-            int read = is.read(buf, 0, buf.length);
+            int read = input.read(buf, 0, buf.length);
             //verify the same way as testRead
             ByteArrayInputStream bais = new ByteArrayInputStream(buf, 0, read);
             int payloadSize = read - PacketFormat.getLengthOverhead();
@@ -318,12 +318,12 @@ public class WireSendInputStreamTest {
             verifyPacket(bais, expected, messageNo, payloadSize, dataSize);
 
             bytesLeft -= read;
-            assertEquals(bytesLeft, is.available());
+            assertEquals(bytesLeft, input.available());
         }
 
         //this should be the last one
-        assertEquals(0, is.available());
-        assertEquals(-1, is.read());
+        assertEquals(0, input.available());
+        assertEquals(-1, input.read());
     }
 
     /**
@@ -332,6 +332,7 @@ public class WireSendInputStreamTest {
      */
     @Test
     public void testReadByteArrayIntIntOddPacketSize() throws IOException {
+        //TODO: need to verify this is needed...please leave for now
 //        int packetSize = 100;
 //        int messageNo  = 1;
 //        InputStream test = getTestStream(packetSize * 2);
@@ -379,19 +380,19 @@ public class WireSendInputStreamTest {
         InputStream actual   = MessageTestUtil.getTestStream(packetSize * 2);
         File testFile = MessageTestUtil.getTempTestFile(100);
         try {
-            InputStream expectedFile = new FileInputStream(testFile);
-            InputStream actualFile   = new FileInputStream(testFile);
-            WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
+            InputStream expectedFile  = new FileInputStream(testFile);
+            InputStream actualFile    = new FileInputStream(testFile);
+            WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
     
             int expectedBytes = computeExpectedSize(expected.available() + expectedFile.available() + AComplexDataType.SIZEOF_INTEGER, packetSize);
             int bytesLeft = expectedBytes;
             int messageBytes = computeExpectedSize(expected.available(), packetSize);
             int fileBytes = expectedBytes - messageBytes;
-            assertEquals(bytesLeft, is.available());
+            assertEquals(bytesLeft, input.available());
     
             byte[] buf = new byte[packetSize];
             for (; bytesLeft > 0; ) {
-                int read = is.read(buf, 0, buf.length);
+                int read = input.read(buf, 0, buf.length);
                 //verify the same way as testRead
                 ByteArrayInputStream bais = new ByteArrayInputStream(buf, 0, read);
                 if (bytesLeft <= fileBytes) {
@@ -410,11 +411,11 @@ public class WireSendInputStreamTest {
                 }
                 
                 bytesLeft -= read;
-                assertEquals(bytesLeft, is.available());
+                assertEquals(bytesLeft, input.available());
             }
     
-            assertEquals(0, is.available());
-            assertEquals(-1, is.read());
+            assertEquals(0, input.available());
+            assertEquals(-1, input.read());
         } finally {
             testFile.delete();
         }

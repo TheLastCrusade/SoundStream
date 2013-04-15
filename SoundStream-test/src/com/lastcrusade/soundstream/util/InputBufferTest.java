@@ -49,5 +49,22 @@ public class InputBufferTest {
         assertEquals('c', bytes[1]);
     }
     
-    //TODO: need to add a test with -1s in the stream, to make sure we read things in properly
+    /**
+     * Test method for {@link com.lastcrusade.soundstream.util.InputBuffer#getInputStream()}.
+     * @throws IOException 
+     */
+    @Test
+    public void testInputBufferWithNegOnes() throws IOException {
+        InputBuffer buffer = new InputBuffer();
+        buffer.write('a');
+        buffer.write(-1);
+        buffer.write('c');
+        assertEquals(3, buffer.size());
+        assertEquals('a', buffer.getInputStream().read());
+        buffer.consume();
+        assertEquals(2, buffer.size());
+        byte[] bytes = buffer.toByteArray();
+        assertEquals(-1, bytes[0]);
+        assertEquals('c', bytes[1]);
+    }
 }
