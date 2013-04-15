@@ -4,7 +4,7 @@ import os
 import getopt
 
 class UITest(object):
-    """docstring for UITest"""
+    """Base class for building UI tests"""
     def __init__(self):
         super(UITest, self)
         self.setup()

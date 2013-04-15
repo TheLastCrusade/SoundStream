@@ -26,7 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:contentDescription="@string/create_network"
         />
     
     <Button 
@@ -35,6 +34,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/btn_create"
-        android:contentDescription="@string/connect"
         />    
 </RelativeLayout>

@@ -41,6 +41,7 @@ import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBind
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
@@ -54,7 +55,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     private static final String TAG = ConnectFragment.class.getName();
 
     private BroadcastRegistrar broadcastRegistrar;
-    private Button connectButton;
+    private Button connectButton, createButton;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
 
@@ -75,8 +76,8 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_connect, container, false);
 
-        Button create = (Button)v.findViewById(R.id.btn_create);
-        create.setOnClickListener( new OnClickListener() {
+        createButton = (Button)v.findViewById(R.id.btn_create);
+        createButton.setOnClickListener( new OnClickListener() {
             
             @Override
             public void onClick(View v) {
@@ -86,15 +87,17 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 ((CoreActivity)getActivity()).showPlaybar();
             }
         });
+        createButton.setContentDescription(ContentDescriptionUtils.CREATE);
         
-        this.connectButton = (Button)v.findViewById(R.id.btn_connect);
-        this.connectButton.setOnClickListener(new OnClickListener() {
+        connectButton = (Button)v.findViewById(R.id.btn_connect);
+        connectButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 getConnectionService().broadcastGuest(getActivity());
             }
         });
+        connectButton.setContentDescription(ContentDescriptionUtils.CONNECT);
 
         return v;
     }
