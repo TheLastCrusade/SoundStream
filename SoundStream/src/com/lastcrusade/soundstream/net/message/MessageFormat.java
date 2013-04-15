@@ -32,8 +32,8 @@ import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
  * A format for all messages.  All messages consists of:
- *  4 byte length of the message, not including the length (using java.nio.ByteBuffer)
- *  4 byte messenger version
+ *  integer length of the message, not including the length (using java.nio.ByteBuffer, size defined by {@link AComplexDataType#SIZEOF_INTEGER})
+ *  integer byte messenger version (size defined by {@link AComplexDataType#SIZEOF_INTEGER})
  *  class name (in bytes)
  *  \n character to terminate the class name
  *  n bytes of message payload

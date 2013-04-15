@@ -62,9 +62,9 @@ public class MessengerTest {
         String className   = StringMessage.class.getCanonicalName();
         String testMessage = "This is a test of the messaging system";
         appendMessage(className, testMessage, baos);
-        InputStream is = simulateSendAndReceive(baos);
+        InputStream received = simulateSendAndReceive(baos);
         //attempt to deserialize it
-        assertTrue(messenger.deserializeMessage(is));
+        assertTrue(messenger.deserializeMessage(received));
         
         //and check the deserialized message
         IMessage message = messenger.getReceivedMessages().get(0);
@@ -72,7 +72,7 @@ public class MessengerTest {
         assertTrue(message instanceof StringMessage);
         assertEquals(testMessage, ((StringMessage)message).getString());
         //make sure all bytes are consumed
-        assertEquals(0, is.available());
+        assertEquals(0, received.available());
     }
 
     @Test
@@ -91,10 +91,10 @@ public class MessengerTest {
         appendMessage(className, testMessage2, baos);
         //FIXME: rewrite this so that it's one message per packet, but multiple packets in the input stream
 
-        InputStream is = simulateSendAndReceive(baos);
+        InputStream received = simulateSendAndReceive(baos);
 
         //attempt to deserialize the data...this should deserialize both messages
-        assertTrue(messenger.deserializeMessage(is));
+        assertTrue(messenger.deserializeMessage(received));
         
         assertEquals(expectedMessages, messenger.getReceivedMessages().size());
         //and check the first deserialized message
@@ -110,7 +110,7 @@ public class MessengerTest {
         assertEquals(testMessage2, ((StringMessage)message).getString());
 
         //make sure all bytes are consumed
-        assertEquals(0, is.available());
+        assertEquals(0, received.available());
     }
     
     @Test
@@ -224,12 +224,12 @@ public class MessengerTest {
         StringMessage message = new StringMessage();
         String testMessage = "This is a test of the messaging system";
         message.setString(testMessage);
-        InputStream is = messenger.serializeMessage(message);
-        is = simulateSendAndReceive(is);
+        InputStream send = messenger.serializeMessage(message);
+        InputStream received = simulateSendAndReceive(send);
         
         Messenger rcvMessenger = new Messenger(new File(""));
         //attempt to deserialize the second message
-        assertTrue(rcvMessenger.deserializeMessage(is));
+        assertTrue(rcvMessenger.deserializeMessage(received));
         
         //and check the deserialized message
         IMessage rcvMessage = rcvMessenger.getReceivedMessages().get(0);
@@ -238,7 +238,7 @@ public class MessengerTest {
         assertEquals(testMessage, ((StringMessage)rcvMessage).getString());
 
         //make sure all bytes are consumed
-        assertEquals(0, is.available());
+        assertEquals(0, received.available());
     }
 
 //TODO: unclear if we need this test...lets leave it alone for a bit
@@ -305,9 +305,9 @@ public class MessengerTest {
         MessageFormat format = new MessageFormat(message);
         
         format.serialize(baos);
-        FileReceiver fileFormat = new FileReceiver(message, null);
-        ByteBuffer bb = ByteBuffer.allocate(4);
-        InputStream fis = fileFormat.getInputStream();
+        FileReceiver fileReceiver = new FileReceiver(message, null);
+        ByteBuffer bb = ByteBuffer.allocate(AComplexDataType.SIZEOF_INTEGER);
+        InputStream fis = fileReceiver.getInputStream();
         int length = fis.available();
         bb.putInt(length);
         baos.write(bb.array());
@@ -350,7 +350,7 @@ public class MessengerTest {
         messageStream.write(new byte[AComplexDataType.SIZEOF_INTEGER]);
         messageStream.write(className.getBytes());
         messageStream.write('\n');
-        ByteBuffer bb = ByteBuffer.allocate(4);
+        ByteBuffer bb = ByteBuffer.allocate(AComplexDataType.SIZEOF_INTEGER);
         bb.putInt(testMessage.getBytes().length);
         messageStream.write(bb.array());
         messageStream.write(testMessage.getBytes());

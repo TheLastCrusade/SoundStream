@@ -33,8 +33,8 @@ import com.lastcrusade.soundstream.net.core.ISerializable;
  * transferring long file data over a single communications channel.
  * 
  * A packet consists of:
- *  4 byte length of the message, not including the length (using java.nio.ByteBuffer)
- *  4 byte packet number (to disambiguate packets)
+ *  integer length of the message, not including the length (using java.nio.ByteBuffer, size defined by {@link AComplexDataType#SIZEOF_INTEGER})
+ *  integer byte packet number (to disambiguate packets, size defined by {@link AComplexDataType#SIZEOF_INTEGER})
  *  n bytes of packet data
  *  
  * @author Jesse Rosalia
