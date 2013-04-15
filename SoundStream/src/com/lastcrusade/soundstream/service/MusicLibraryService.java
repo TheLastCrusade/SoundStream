@@ -93,11 +93,11 @@ public class MusicLibraryService extends Service {
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this, UserListService.class, UserListService.UserListServiceBinder.class);
         
+        myMacAddress = getResources().getString(R.string.default_mac);
         userListServiceLocator.setOnBindListener(new IOnBindListener() {
             @Override
             public void onServiceBound() {
-                UserListService userService = getUserListService();
-                myMacAddress = userService.getMyMac();
+                myMacAddress = getMyMac();
                 //load the local songs and set the mac address, so the metadata objects
                 // can live in the library
                 List<SongMetadata> metadataList = (new MediaStoreWrapper(MusicLibraryService.this)).list();
@@ -328,6 +328,18 @@ public class MusicLibraryService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getMyMac(){
+        String myMac;
+        UserListService userService = getUserListService();
+        if(userService != null){
+            myMac = userService.getMyMac();
+        } else {
+            myMac = getResources().getString(R.string.default_mac);
+            Log.w(TAG, "UserListService null, returning fake mac: " + myMac);
+        }
+        return myMac;
     }
 
     private UserListService getUserListService(){
