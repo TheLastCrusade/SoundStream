@@ -27,21 +27,22 @@
         >
 
         <!-- Music Things -->
-
         <RelativeLayout
             android:id="@+id/music_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp" >
+            android:layout_marginTop="10dp" 
+            >
 
             <TextView
                 android:id="@+id/music_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/music_label"
-                android:textColor="@color/light_gray" />
+                android:textColor="@color/light_gray" 
+                />
 
             <View
                 android:id="@+id/music_line"
@@ -50,7 +51,8 @@
                 android:layout_below="@+id/music_label"
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
-                android:background="@color/light_gray" />
+                android:background="@color/light_gray" 
+                />
 
             <Button
                 android:id="@+id/playlist_btn"
@@ -65,7 +67,8 @@
                 android:gravity="left|center_vertical"
                 android:text="@string/playlist"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp" 
+                />
 
             <Button
                 android:id="@+id/music_library_btn"
@@ -80,11 +83,11 @@
                 android:gravity="left|center_vertical"
                 android:text="@string/music_library"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp" 
+                />
         </RelativeLayout>
 
         <!-- Network Things -->
-
         <RelativeLayout
             android:id="@+id/network_category"
             android:layout_width="match_parent"
@@ -92,7 +95,8 @@
             android:layout_below="@+id/music_category"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp" >
+            android:layout_marginTop="10dp" 
+            >
 
             <TextView
                 android:id="@+id/network_label"
@@ -100,7 +104,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/network_category"
                 android:text="@string/network_label"
-                android:textColor="@color/light_gray" />
+                android:textColor="@color/light_gray" 
+                />
 
             <View
                 android:id="@+id/network_line"
@@ -109,7 +114,8 @@
                 android:layout_below="@+id/network_label"
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
-                android:background="@color/light_gray" />
+                android:background="@color/light_gray" 
+                />
 
             <Button
                 android:id="@+id/network_btn"
@@ -124,7 +130,8 @@
                 android:gravity="left|center_vertical"
                 android:text="@string/network"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp" 
+                />
         </RelativeLayout>
 
         <!-- Connected Members -->
@@ -136,14 +143,16 @@
             android:layout_below="@id/network_category"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp" >
+            android:layout_marginTop="10dp" 
+            >
 
             <TextView
                 android:id="@+id/connected_members_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cur_member_label"
-                android:textColor="@color/light_gray" />
+                android:textColor="@color/light_gray" 
+                />
 
             <View
                 android:id="@+id/users_line"
@@ -152,7 +161,8 @@
                 android:layout_below="@+id/connected_members_label"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="3dp"
-                android:background="@color/light_gray" />
+                android:background="@color/light_gray" 
+                />
 
             <ListView
                 android:id="@+id/connected_users"
@@ -162,12 +172,12 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:divider="@color/transparent"
-                android:textColor="@color/white" >
+                android:textColor="@color/white" 
+                >
             </ListView>
         </RelativeLayout>
 
         <!-- About Things -->
-
         <RelativeLayout
             android:id="@+id/about_category"
             android:layout_width="match_parent"
@@ -175,14 +185,16 @@
             android:layout_below="@+id/connected_users_category"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="16dp" >
+            android:layout_marginTop="16dp" 
+            >
 
             <TextView
                 android:id="@+id/about_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/about"
-                android:textColor="@color/light_gray" />
+                android:textColor="@color/light_gray" 
+                />
 
             <View
                 android:id="@+id/about_line"
@@ -191,7 +203,8 @@
                 android:layout_below="@id/about_label"
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
-                android:background="@color/light_gray" />
+                android:background="@color/light_gray" 
+                />
 
             <Button
                 android:id="@+id/about_btn"
@@ -206,7 +219,9 @@
                 android:gravity="left|center_vertical"
                 android:text="@string/about"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp" 
+                />
         </RelativeLayout>
     </RelativeLayout>
-</ScrollView>    
+</ScrollView>
+    
