@@ -105,7 +105,9 @@ public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
         album.setSingleLine(true);
 
         addButton.setTag(position);
-        addButton.setContentDescription(addButton.getContentDescription() + "_" + metadataList.get(position).getTitle());
+        addButton.setContentDescription(ContentDescriptionUtils
+                .addSongTitleToContentDescription(
+                        element.getResources().getString(R.string.add_to_playlist), metadataList.get(position)));
 
         title.setText(metadataList.get(position).getTitle());
         artist.setText(metadataList.get(position).getArtist());

@@ -7,8 +7,6 @@ class UITest(object):
     """docstring for UITest"""
     def __init__(self):
         super(UITest, self)
-        #self.vc = None
-        #self.device = None
         self.setup()
         deviceArg = self.parseArgs()
         if (deviceArg is not None):
@@ -32,7 +30,7 @@ class UITest(object):
         except:
             pass        
 
-    def usage(exitVal=1):
+    def print_usage(exitVal=1):
         print >> sys.stderr, 'usage: <test-name>.py [-d|--device]'
         sys.exit(exitVal)
 
@@ -45,7 +43,7 @@ class UITest(object):
 
         for opt, arg in opts:
             if opt == '-h':
-                usage()
+                print_usage()
             elif opt in ("-d", "--device"):
                 deviceArg = arg
 
@@ -60,3 +58,7 @@ class UITest(object):
 
         self.device, serialno = ViewClient.connectToDeviceOrExit(**kwargs1)
         self.vc = ViewClient(self.device, serialno, **kwargs2)
+        
+    def execute_test():
+        raise NotImplementedError( "Should have implemented this in test class" )
+        

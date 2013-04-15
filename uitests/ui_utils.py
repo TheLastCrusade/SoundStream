@@ -1,9 +1,29 @@
 #! /usr/bin/env monkeyrunner
-"""this requires ui_test.py to run"""
 
-def printLayout(vc):
-    vc.traverse(transform=ViewClient.TRAVERSE_CITCD)
+# Connect fragment
+CREATE = 'Create'
 
-def touchWithCD(vc, contentDescription):
-    vc.findViewWithContentDescriptionOrRaise(contentDescription).touch()
-    vc.dump()
+# Menu fragment
+NAVIGATE_UP = 'Navigate up'
+MUSIC_LIBRARY = 'Music Library'
+PLAYLIST = 'Playlist'
+
+# Playbar fragment
+PLAY_PAUSE = 'Play/Pause'
+SKIP = 'Skip'
+
+# Add to Playlist buttons
+# NOTE: these require the sdcard.img file to be loaded on your emulator/phone
+ATP_AVALANCHE_ROCK = 'Add To Playlist_Avalanche Rock'
+ATP_I_M_SO_SAD = 'Add To Playlist_I\'m So Sad, So Very, Very, Sad'
+ATP_ROLLING_PAPERS = 'Add To Playlist_Rolling Papers (feat Wolf Haley)'
+ATP_THE_IRONMAN_TAKEOVER = 'Add To Playlist_The Ironman Takeover (Skit)'
+ATP_DONUTS = 'Add To Playlist_Donuts (Outro)'
+ATP_ONE_LAST = 'Add To Playlist_One Last "Whoo-Hoo!" for the Pullman'
+
+def print_layout(view_client):
+    view_client.traverse(transform=ViewClient.TRAVERSE_CITCD)
+
+def touch_with_cd(view_client, content_description):
+    view_client.findViewWithContentDescriptionOrRaise(content_description).touch()
+    view_client.dump()
