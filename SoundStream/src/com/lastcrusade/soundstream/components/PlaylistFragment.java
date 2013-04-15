@@ -27,14 +27,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -232,7 +231,6 @@ public class PlaylistFragment extends MusicListFragment{
                 public boolean onTouch(View v, MotionEvent event) {
                     return songGesture.onTouchEvent(event);
                 }
-
             });
 
             
@@ -250,18 +248,20 @@ public class PlaylistFragment extends MusicListFragment{
             }
         }
         
+        
       //detect gestures 
         private class PlaylistSongGestureListener extends SongGestureListener{
             private PlaylistEntry entry;
             private View view;
             private final int SWIPE_MIN_DISTANCE = 100;
+            private boolean removed;
             
             public PlaylistSongGestureListener(View view, PlaylistEntry entry){
                 super(view);
                 this.view = view;
-                this.entry = entry;
-                
+                this.entry = entry;    
             }
+            
             //fling a song to the right to remove it
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
@@ -270,15 +270,16 @@ public class PlaylistFragment extends MusicListFragment{
                 // Fling is what the gesture detector detects
                 // Swipe is our internal vocabulary for a 
                 // horizontal left to right fling
-                if(isSwipe(e1, e2, velocityX, velocityY)){
+                if( !removed && isSwipe(e1, e2, velocityX, velocityY)){
+                    animateDragging((int)e2.getX());
+                    
                     if(getPlaylistService().getCurrentEntry()!= null && 
                             getPlaylistService().getCurrentEntry().equals(entry)){
                         getPlaylistService().skip();
                     }
-                    getPlaylistService().removeSong(entry);
                     
-                    animateDragging((int)e2.getX());
-               
+                    getPlaylistService().removeSong(entry);
+                    removed = true;
                     swipe=true;
                 }
                     
@@ -293,8 +294,16 @@ public class PlaylistFragment extends MusicListFragment{
                 float dx = e2.getX() - e1.getX();
                 animateDragging(dx);
                 
+                if(!removed && e2.getX() > ((View)view.getParent()).getWidth()-100){
+                    if(getPlaylistService().getCurrentEntry()!= null && 
+                            getPlaylistService().getCurrentEntry().equals(entry)){
+                        getPlaylistService().skip();
+                    }
+                    getPlaylistService().removeSong(entry);
+                    removed = true;
+                }
+                
                 return super.onScroll(e1, e2, distanceX, distanceY);
-            
             }
             
             //bump the song to the top when double tapped
@@ -311,11 +320,16 @@ public class PlaylistFragment extends MusicListFragment{
              * @param amount
              */
             private void animateDragging(float amount){
-                TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
-                trans.initialize(view.getWidth(), view.getHeight(), 
-                        ((View)view.getParent()).getWidth(), ((View)view.getParent()).getHeight());
-                view.startAnimation(trans);
+                if(!removed){
+                    TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
+                    trans.setDuration(100);
+                    trans.initialize(view.getWidth(), view.getHeight(), 
+                            ((View)view.getParent()).getWidth(), ((View)view.getParent()).getHeight());
+                    
+                    view.startAnimation(trans);
+                }
             }
+            
             
             /**
              * Checks to see if the fling motion described by these inputs matches
@@ -333,9 +347,8 @@ public class PlaylistFragment extends MusicListFragment{
                 if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
                     return true;
                 }
-                return false;
+                return false;  
             }
-        }
+        } 
     }
-
 }
