@@ -42,6 +42,7 @@ import com.lastcrusade.soundstream.net.wire.Messenger;
 import com.lastcrusade.soundstream.net.wire.PacketFormat;
 import com.lastcrusade.soundstream.util.CustomAssert;
 import com.lastcrusade.soundstream.util.InputBuffer;
+import com.lastcrusade.soundstream.util.MessageTestUtil;
 
 /**
  * Doesn't inherit from SerializationTest and is separate from its generalized
@@ -116,7 +117,7 @@ public class MessengerTest {
     @Test
     public void testDeserializeFileMessage() throws Exception {
 
-        File tempFile = getTempTestFile(20);
+        File tempFile = MessageTestUtil.getTempTestFile(20);
         //get the temp folder
         Messenger messenger = new Messenger(File.createTempFile("test", "").getParentFile());
         //build up a TestMessage object
@@ -148,7 +149,7 @@ public class MessengerTest {
     @Test
     public void testDeserializeFileMessageMultiplePackets() throws Exception {
 
-        File tempFile = getTempTestFile(1025);
+        File tempFile = MessageTestUtil.getTempTestFile(1025);
         //get the temp folder
         Messenger messenger = new Messenger(File.createTempFile("test", "").getParentFile());
         //build up a TestMessage object
@@ -184,20 +185,6 @@ public class MessengerTest {
         //different paths
         assertFalse(tempFile.getCanonicalPath().equals(((FileMessage)message).getFilePath()));
         CustomAssert.assertChecksumsMatch(tempFile.getCanonicalPath(), ((FileMessage)message).getFilePath());
-    }
-
-    /**
-     * @return
-     * @throws IOException 
-     */
-    private File getTempTestFile(int size) throws IOException {
-        File file = File.createTempFile("test", ".tst");
-        FileWriter writer = new FileWriter(file);
-        for (int ii = 0; ii < size; ii++) {
-            writer.append("a");
-        }
-        writer.close();
-        return file;
     }
 
     @Test

@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -33,38 +32,13 @@ import java.nio.ByteBuffer;
 import org.junit.Test;
 
 import com.lastcrusade.soundstream.net.core.AComplexDataType;
-import com.lastcrusade.soundstream.util.InputBuffer;
+import com.lastcrusade.soundstream.util.MessageTestUtil;
 
 /**
  * @author thejenix
  *
  */
 public class WireSendInputStreamTest {
-
-    /**
-     * @return
-     * @throws IOException 
-     */
-    private File getTempTestFile(int size) throws IOException {
-        File file = File.createTempFile("test", ".tst");
-        FileWriter writer = new FileWriter(file);
-        for (int ii = 0; ii < size; ii++) {
-            writer.append("a");
-        }
-        writer.close();
-        return file;
-    }
-
-    /**
-     * @return
-     */
-    private InputStream getTestStream(int byteCount) {
-        InputBuffer buffer = new InputBuffer();
-        for (int ii = 0; ii < byteCount; ii++) {
-            buffer.write(ii);
-        }
-        return buffer.getInputStream();
-    }
 
     /**
      * Test method for {@link com.lastcrusade.soundstream.net.wire.WireSendInputStream#available()}.
@@ -74,7 +48,7 @@ public class WireSendInputStreamTest {
     public void testAvailable() throws IOException {
         int packetSize = 100;
         int messageNo  = 1;
-        InputStream test = getTestStream(packetSize * 2);
+        InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
         WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, null);
         assertEquals(computeExpectedSize(test.available(), packetSize), is.available());
     }
@@ -98,8 +72,8 @@ public class WireSendInputStreamTest {
     public void testAvailableWithFile() throws IOException {
         int packetSize = 100;
         int messageNo  = 1;
-        InputStream test = getTestStream(packetSize * 2);
-        File file = getTempTestFile(100);
+        InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
+        File file = MessageTestUtil.getTempTestFile(100);
         InputStream fileStream = new FileInputStream(file);
         try {
             WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, fileStream);
@@ -160,8 +134,8 @@ public class WireSendInputStreamTest {
      */
     private void doTestAvailable(int messageNo, int packetSize,
             int messageSize, int fileSize, int expectedPackets) throws IOException {
-        InputStream test = getTestStream(messageSize);
-        File file = getTempTestFile(fileSize);
+        InputStream test = MessageTestUtil.getTestStream(messageSize);
+        File file = MessageTestUtil.getTempTestFile(fileSize);
         
         InputStream fileStream = new FileInputStream(file);
         try {
@@ -189,8 +163,8 @@ public class WireSendInputStreamTest {
     public void testRead() throws IOException {
         int packetSize = 100;
         int messageNo  = 1;
-        InputStream expected = getTestStream(packetSize * 2);
-        InputStream test = getTestStream(packetSize * 2);
+        InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
+        InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
         WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, null);
         int bytesLeft = computeExpectedSize(test.available(), packetSize);
         assertEquals(bytesLeft, is.available());
@@ -282,9 +256,9 @@ public class WireSendInputStreamTest {
     public void testReadWithFile() throws FileNotFoundException, IOException {
         int packetSize = 100;
         int messageNo  = 1;
-        InputStream expected = getTestStream(packetSize * 2);
-        InputStream actual   = getTestStream(packetSize * 2);
-        File testFile = getTempTestFile(100);
+        InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
+        InputStream actual   = MessageTestUtil.getTestStream(packetSize * 2);
+        File testFile = MessageTestUtil.getTempTestFile(100);
         InputStream expectedFile = new FileInputStream(testFile);
         InputStream actualFile   = new FileInputStream(testFile);
         WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
@@ -328,8 +302,8 @@ public class WireSendInputStreamTest {
     public void testReadByteArrayIntInt() throws IOException {
         int packetSize = 100;
         int messageNo  = 1;
-        InputStream expected = getTestStream(packetSize * 2);
-        InputStream test = getTestStream(packetSize * 2);
+        InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
+        InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
         WireSendInputStream is = new WireSendInputStream(packetSize, messageNo, test, null);
         int bytesLeft = computeExpectedSize(test.available(), packetSize);
         assertEquals(bytesLeft, is.available());
@@ -401,9 +375,9 @@ public class WireSendInputStreamTest {
     public void testReadByteArrayIntIntWithFile() throws IOException {
         int packetSize = 100;
         int messageNo  = 1;
-        InputStream expected = getTestStream(packetSize * 2);
-        InputStream actual   = getTestStream(packetSize * 2);
-        File testFile = getTempTestFile(100);
+        InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
+        InputStream actual   = MessageTestUtil.getTestStream(packetSize * 2);
+        File testFile = MessageTestUtil.getTempTestFile(100);
         try {
             InputStream expectedFile = new FileInputStream(testFile);
             InputStream actualFile   = new FileInputStream(testFile);
