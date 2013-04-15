@@ -28,7 +28,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.net.message.FoundGuest;
+import com.lastcrusade.soundstream.model.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 

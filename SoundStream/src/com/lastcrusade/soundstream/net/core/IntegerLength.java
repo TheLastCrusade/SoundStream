@@ -16,42 +16,46 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.lastcrusade.soundstream.net.message;
+package com.lastcrusade.soundstream.net.core;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class PlayStatusMessage extends APlaylistEntryMessage {
+import com.lastcrusade.soundstream.net.wire.MessageNotCompleteException;
 
-    @SuppressWarnings("unused")
-    private final String TAG = PlayStatusMessage.class.getSimpleName();
-    private boolean playing;
+/**
+ * A complex data type for serializing/deserializing integer length
+ * fields.
+ * 
+ * @author thejenix
+ *
+ */
+public class IntegerLength extends AComplexDataType implements ISerializable {
 
-    public PlayStatusMessage() {}
+    private int length;
 
-    public PlayStatusMessage(String macAddress, long id, int entryId, boolean playing) {
-        super(macAddress, id, entryId);
-        this.playing = playing;
+    /**
+     * Default constructor required because this is serializable
+     */
+    public IntegerLength() {
     }
 
-    public void deserialize(InputStream input) throws IOException {
-        super.deserialize(input);
-        playing = readBoolean(input);
+    /**
+     * @param available
+     */
+    public IntegerLength(int length) {
+        this.length = length;
+    }
+
+    @Override
+    public void deserialize(InputStream input) throws IOException,
+            MessageNotCompleteException {
+        this.length = readInteger(input);
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        super.serialize(output);
-        writeBoolean(playing, output);
-    }
-    
-    public boolean isPlaying(){
-        return playing;
-    }
-    
-    public void setPlaying(boolean isPlaying){
-        this.playing = isPlaying;
+        writeInteger(this.length, output);
     }
 }

@@ -31,25 +31,23 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-import org.junit.Test;
-
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.Messenger;
+import com.lastcrusade.soundstream.net.wire.Messenger;
 
 public class SerializationTest<T extends IMessage> {
     
     public T testSerializeMessage(T message) throws Exception {
         Messenger messenger = new Messenger(getTempFolder());
         
-        messenger.serializeMessage(message);
-        InputStream is = simulateSendAndReceive(messenger);
+        InputStream is = messenger.serializeMessage(message);
+        is = simulateSendAndReceive(is);
         
         Messenger rcvMessenger = new Messenger(getTempFolder());
         //attempt to deserialize the second message
         assertTrue(rcvMessenger.deserializeMessage(is));
         
         //and check the deserialized message
-        IMessage rcvMessage = rcvMessenger.getReceivedMessage();
+        assertEquals(1, rcvMessenger.getReceivedMessages().size());
+        IMessage rcvMessage = rcvMessenger.getReceivedMessages().get(0);
         assertNotNull(rcvMessage);
         assertEquals(message.getClass(), rcvMessage.getClass());
         
@@ -68,7 +66,8 @@ public class SerializationTest<T extends IMessage> {
         assertTrue(messenger.deserializeMessage(bais));
         
         //and check the deserialized message
-        IMessage rcvMessage = messenger.getReceivedMessage();
+        assertEquals(1, messenger.getReceivedMessages().size());
+        IMessage rcvMessage = messenger.getReceivedMessages().get(0);
         assertNotNull(rcvMessage);
         assertEquals(message.getClass(), rcvMessage.getClass());
         
@@ -78,10 +77,8 @@ public class SerializationTest<T extends IMessage> {
     }
     
     private InputStream simulateSendAndReceive(
-            Messenger messenger) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        messenger.writeToOutputStream(baos);
-        return new ByteArrayInputStream(baos.toByteArray());
+            InputStream is) throws IOException {
+        return is;
     }
     
     /**

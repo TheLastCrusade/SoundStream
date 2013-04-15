@@ -16,24 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lastcrusade.soundstream.util;
 
-package com.lastcrusade.soundstream.net.message;
-
+import android.util.Log;
 
 /**
- * A file message is used to transmit a file across the wire.  These
- * are handled specially, as we want to avoid loading the whole file
- * into memory and passing it around through the app.  Instead
- * we want to read and write from a file at the lowest possible level,
- * and let senders/receivers specify the file or use the file
- * as they need.
- * 
- * @author Jesse Rosalia
+ * @author thejenix
  *
  */
-public interface IFileMessage extends IMessage {
+public class LogUtil {
 
-    public String getFilePath();
+    private static Boolean logEnabled = null;
 
-    public void setFilePath(String filePath);
+    public static boolean isLogAvailable() {
+        if (logEnabled == null) {
+            try {
+                //test to see if we can log (i.e. if the logger exists on the classpath)
+                //...this is required because we run unit tests using the android junit runner, which will remove
+                // android classes, such as Log, from the classpath.
+                Log.isLoggable("test", Log.ASSERT);
+                logEnabled = true;
+            } catch (NoClassDefFoundError e) {
+                logEnabled = false;
+            }
+        }
+        return logEnabled;
+    }
 }

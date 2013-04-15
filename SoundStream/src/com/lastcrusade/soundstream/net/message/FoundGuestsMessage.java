@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.bluetooth.BluetoothDevice;
+import com.lastcrusade.soundstream.model.FoundGuest;
 
 public class FoundGuestsMessage extends ADataMessage {
 

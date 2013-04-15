@@ -19,13 +19,7 @@
 
 package com.lastcrusade.soundstream.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import android.app.Service;
 import android.content.Intent;
@@ -50,20 +44,15 @@ import com.lastcrusade.soundstream.net.message.RemoveFromPlaylistMessage;
 import com.lastcrusade.soundstream.net.message.RequestSongMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
 import com.lastcrusade.soundstream.net.message.SongStatusMessage;
-import com.lastcrusade.soundstream.net.message.StringMessage;
 import com.lastcrusade.soundstream.net.message.TransferSongMessage;
 import com.lastcrusade.soundstream.net.message.UserListMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 
 public class MessagingService extends Service implements IMessagingService {
 
     private static final String TAG = MessagingService.class.getName();
 
-    public static final String ACTION_STRING_MESSAGE = MessagingService.class.getName() + ".action.StringMessage";
-    public static final String EXTRA_STRING          = MessagingService.class.getName() + ".extra.String";
-    
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
     public static final String ACTION_SKIP_MESSAGE  = MessagingService.class.getName() + ".action.SkipMessage";
@@ -130,15 +119,12 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
 
-    private BroadcastRegistrar                broadcastRegistrar;
     private MessageThreadMessageDispatch      messageDispatch;
-    private Map<IMessage, String>             actionDispatchMap;
     private ServiceLocator<ConnectionService> connectServiceLocator;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        this.actionDispatchMap = new HashMap<IMessage, String>();
         this.connectServiceLocator = new ServiceLocator<ConnectionService>(
                 this, ConnectionService.class, ConnectionServiceBinder.class);
         
@@ -168,7 +154,6 @@ public class MessagingService extends Service implements IMessagingService {
 
     private void registerMessageHandlers() {
         this.messageDispatch = new MessageThreadMessageDispatch();
-        registerStringMessageHandler();
         registerLibraryMessageHandler();
         registerPauseMessageHandler();
         registerPlayMessageHandler();
@@ -194,20 +179,6 @@ public class MessagingService extends Service implements IMessagingService {
                     .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary())
                     .send(MessagingService.this);
             }
-        });
-    }
-
-    private void registerStringMessageHandler() {
-        this.messageDispatch.registerHandler(StringMessage.class, new IMessageHandler<StringMessage>() {
-
-            @Override
-            public void handleMessage(int messageNo,
-                    StringMessage message, String fromAddr) {
-                StringMessage sm = (StringMessage) message;
-                new BroadcastIntent(ACTION_STRING_MESSAGE)
-                    .putExtra(EXTRA_STRING, sm.getString())
-                    .send(MessagingService.this);
-            }            
         });
     }
 
@@ -453,26 +424,6 @@ public class MessagingService extends Service implements IMessagingService {
                 new PlayStatusMessage(currentSong.getMacAddress(), currentSong.getId(), currentSong.getEntryId(), isPlaying);
     	//send the message to the guests
     	sendMessageToGuests(msg);
-    }
-
-    public void sendStringMessage(String message) {
-        StringMessage sm = new StringMessage();
-        sm.setString(message);
-        //JR, 03/02/12, TODO: the connection service should be changed to only deal with "connections".  The mode of connection will
-        // be determined by which method is called initially (braodcastGuest vs findNewGuests), but after that point, it should just
-        // work with connections
-        try {
-            //send the message to the host
-            if (this.connectServiceLocator.getService().isHostConnected()) {
-                sendMessageToHost(sm);
-            }
-            
-            if (this.connectServiceLocator.getService().isGuestConnected()) {
-                sendMessageToGuests(sm);
-            }
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
     }
     
     @Override

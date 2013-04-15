@@ -48,6 +48,6 @@ public class TransferSongMessageTest extends SerializationTest<TransferSongMessa
         assertEquals(oldMessage.getSongFileName(), newMessage.getSongFileName());
 
         //compare the song binary data
-        verifyChecksum(oldMessage.getFilePath(), newMessage.getFilePath());
+        assertChecksumsMatch(oldMessage.getFilePath(), newMessage.getFilePath());
     }
 }
