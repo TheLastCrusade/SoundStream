@@ -28,7 +28,8 @@ import java.util.List;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 
 public class PlaylistMessage extends ADataMessage {
-//    private final String TAG = PlaylistMessage.class.getName();
+    @SuppressWarnings("unused")
+    private final String TAG = PlaylistMessage.class.getName();
 	
     private ArrayList<PlaylistEntry> songsToPlay = new ArrayList<PlaylistEntry>();
 

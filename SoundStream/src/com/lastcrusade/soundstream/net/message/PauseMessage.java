@@ -26,7 +26,8 @@ import java.io.OutputStream;
 
 
 public class PauseMessage implements IMessage {
-//	private final String TAG = PauseMessage.class.getName();
+    @SuppressWarnings("unused")
+	private final String TAG = PauseMessage.class.getName();
 	private String string;
 	private final String PAUSE_MESSAGE = "Pause";
 

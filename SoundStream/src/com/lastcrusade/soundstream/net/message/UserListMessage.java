@@ -27,7 +27,8 @@ import java.util.List;
 import com.lastcrusade.soundstream.model.UserList;
 
 public class UserListMessage extends ADataMessage {
-//	private final String TAG = UserListMessage.class.getName();
+    @SuppressWarnings("unused")
+	private final String TAG = UserListMessage.class.getName();
 	
 	private UserList userList; 
 	
