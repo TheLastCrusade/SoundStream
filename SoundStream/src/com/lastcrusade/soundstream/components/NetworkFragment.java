@@ -20,7 +20,9 @@
 package com.lastcrusade.soundstream.components;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -329,19 +331,29 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         
         //locally initiated device discovery...pop up a dialog for the user
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
-        //pull out the known items, so we can preselect them
+        
+        //deduplicate and pull out the known items, so we can preselect them
+        //NOTE: retained is the list of deduplicated found guests, known
+        // is the list of guests that were previously paired.
+        Set<FoundGuest>  unique = new HashSet<FoundGuest>(guests);
+        List<FoundGuest> retained = new ArrayList<FoundGuest>();
         List<FoundGuest> known = new ArrayList<FoundGuest>();
         for (FoundGuest guest : guests) {
+            if (unique.contains(guest)) {
+                retained.add(guest);
+                unique.remove(guest);
+            }
             if (guest.isKnown()) {
                 known.add(guest);
             }
         }
+        
         if (guests.isEmpty()) {
             Toaster.iToast(this.getActivity(), R.string.no_guests_found);
         } else {
             new MultiSelectListDialog<FoundGuest>(this.getActivity(),
                     R.string.select_guests, R.string.connect)
-                    .setItems(guests)
+                    .setItems(retained)
                     .setSelected(known)
                     .setOnClickListener(
                             new IOnDialogMultiItemClickListener<FoundGuest>() {
