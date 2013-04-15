@@ -300,6 +300,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
         
         //deduplicate and pull out the known items, so we can preselect them
+        //NOTE: retained is the list of deduplicated found guests, known
+        // is the list of guests that were previously paired.
         Set<FoundGuest>  unique = new HashSet<FoundGuest>(guests);
         List<FoundGuest> retained = new ArrayList<FoundGuest>();
         List<FoundGuest> known = new ArrayList<FoundGuest>();
