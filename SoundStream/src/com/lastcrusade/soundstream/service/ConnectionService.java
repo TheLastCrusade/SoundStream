@@ -356,7 +356,7 @@ public class ConnectionService extends Service {
             .send(this);
     }
 
-    public void findNewGuests()  {
+    public void findNewGuests() {
         Log.w(TAG, "Starting Discovery");
         if (isHostConnected()) {
             //NOTE: this does not originate at the messaging service...consumer code doesn't need to worry about

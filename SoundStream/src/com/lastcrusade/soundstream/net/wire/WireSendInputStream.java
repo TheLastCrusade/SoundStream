@@ -98,12 +98,15 @@ public class WireSendInputStream extends InputStream {
             return -1;
         }
 
+        //advance to the next packet if needed before we start reading
         advanceIfNeeded();
 
+        //read in batches, advancing to the next packet if needed
+        //NOTE: as complicated as this looks, it is MUCH more efficient
+        // than calling read() over and over
         int read   = 0;
         int toRead = Math.min(this.available(), maxLen);
         while (availableInPacket() <= toRead && available() > 0) {
-//            int 
             int partial = Math.min(availableInPacket(), toRead);
             System.arraycopy(packet, packetIndex, buffer, off + read, partial);
             packetIndex += partial;
@@ -113,13 +116,6 @@ public class WireSendInputStream extends InputStream {
             toRead      -= partial;
         }
 
-//        packetIndex += toRead;
-//        int len = 0;
-//        for (; len < toRead; len++) {
-//            int c = read();
-//            buffer[off + len] = (byte) c;
-//        }
-//        return len;
         return read;
     }
 

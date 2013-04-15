@@ -90,15 +90,15 @@ public class WireRecvOutputStream extends OutputStream {
         boolean received = false;
         
         try {
-            InputStream is = buffer.getInputStream();
+            InputStream input = buffer.getInputStream();
             //NOTE: we must keep the file format for multiple calls, as we expect to receive the file in parts
             //...this is different from the message format, where we'll try and deserialize and throw an exception
             // if its not available
             if (this.fileReceiver != null) {
-                received = this.fileReceiver.receive(is);
+                received = this.fileReceiver.receive(input);
             } else {
                 MessageFormat format = new MessageFormat();
-                format.deserialize(is);
+                format.deserialize(input);
                 //TODO: consume the bytes in buffer
                 this.receivedMessage = format.getMessage();
                 if (!isFileMessage(this.receivedMessage)) {
@@ -108,8 +108,8 @@ public class WireRecvOutputStream extends OutputStream {
                     //otherwise, we want to attempt to read a file if the message is processed and it is a file message
                     this.fileReceiver = new FileReceiver((IFileMessage) this.receivedMessage, this.tempFolder);
                     //receive any file data that happens to be in the 
-                    if (is.available() > 0) {
-                        received = this.fileReceiver.receive(is);
+                    if (input.available() > 0) {
+                        received = this.fileReceiver.receive(input);
                     }
                 }
             }
