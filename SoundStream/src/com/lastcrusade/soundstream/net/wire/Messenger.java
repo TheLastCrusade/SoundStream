@@ -68,11 +68,10 @@ public class Messenger {
      * Maximum size in bytes to read from a socket at a time.
      * 
      */
-    //FIXME: there's a bug with slam dunk lifestyle and 1024 byte buffers...it never finishes transfering
-    private static final int MAX_READ_SIZE_BYTES = 1024;
+    private static final int MAX_READ_SIZE_BYTES = 4096;
     private byte[] inBytes = new byte[MAX_READ_SIZE_BYTES];
 
-    private static final int MAX_WRITE_SIZE_BYTES = 1024;
+    private static final int MAX_WRITE_SIZE_BYTES = 4096;
 
     /**
      * Maximum size in bytes to write to a socket at a time.
