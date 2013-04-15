@@ -16,24 +16,44 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.lastcrusade.soundstream.net.message;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import com.lastcrusade.soundstream.net.wire.MessageNotCompleteException;
 
 /**
- * A file message is used to transmit a file across the wire.  These
- * are handled specially, as we want to avoid loading the whole file
- * into memory and passing it around through the app.  Instead
- * we want to read and write from a file at the lowest possible level,
- * and let senders/receivers specify the file or use the file
- * as they need.
- * 
- * @author Jesse Rosalia
+ * @author thejenix
  *
  */
-public interface IFileMessage extends IMessage {
+public class StringMessage extends ADataMessage {
 
-    public String getFilePath();
+    private String string;
 
-    public void setFilePath(String filePath);
+    @Override
+    public void deserialize(InputStream input) throws IOException,
+            MessageNotCompleteException {
+        this.string = readString(input);
+    }
+
+    @Override
+    public void serialize(OutputStream output) throws IOException {
+        writeString(this.string, output);
+    }
+    
+    /**
+     * @return the string
+     */
+    public String getString() {
+        return string;
+    }
+
+    /**
+     * @param testMessage
+     */
+    public void setString(String string) {
+        this.string = string;
+    }
 }

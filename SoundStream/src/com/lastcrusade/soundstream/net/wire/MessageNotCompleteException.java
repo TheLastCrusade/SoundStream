@@ -16,24 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.lastcrusade.soundstream.net.message;
-
+package com.lastcrusade.soundstream.net.wire;
 
 /**
- * A file message is used to transmit a file across the wire.  These
- * are handled specially, as we want to avoid loading the whole file
- * into memory and passing it around through the app.  Instead
- * we want to read and write from a file at the lowest possible level,
- * and let senders/receivers specify the file or use the file
- * as they need.
+ * This exception is thrown to indicate that a full message has not been
+ * received.  It is expected in normal operation, and used as an
+ * alternative to if/break or if/return blocks.
  * 
  * @author Jesse Rosalia
- *
+ * 
  */
-public interface IFileMessage extends IMessage {
+public class MessageNotCompleteException extends Exception {
 
-    public String getFilePath();
-
-    public void setFilePath(String filePath);
 }
