@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +40,7 @@ import com.lastcrusade.soundstream.net.core.AComplexDataType;
 import com.lastcrusade.soundstream.net.wire.FileReceiver;
 import com.lastcrusade.soundstream.net.wire.Messenger;
 import com.lastcrusade.soundstream.net.wire.PacketFormat;
+import com.lastcrusade.soundstream.util.CustomAssert;
 import com.lastcrusade.soundstream.util.InputBuffer;
 
 /**
@@ -132,6 +132,8 @@ public class MessengerTest {
             packet.serialize(buffer);
             received = messenger.deserializeMessage(buffer.getInputStream());
         }
+        //if this asserts false, it means there may be data stuck in the buffer
+        // which means we're not processing all available packets
         assertTrue(received);
         
         //and check the deserialized message
@@ -140,9 +142,7 @@ public class MessengerTest {
         assertTrue(message instanceof FileMessage);
         //different paths
         assertFalse(tempFile.getCanonicalPath().equals(((FileMessage)message).getFilePath()));
-        assertFileEquals(tempFile, new File(((FileMessage)message).getFilePath()));
-        //make sure all bytes are consumed
-//        assertEquals(0, received.available());
+        CustomAssert.assertChecksumsMatch(tempFile.getCanonicalPath(), ((FileMessage)message).getFilePath());
     }
     
     @Test
@@ -183,23 +183,7 @@ public class MessengerTest {
         assertTrue(message instanceof FileMessage);
         //different paths
         assertFalse(tempFile.getCanonicalPath().equals(((FileMessage)message).getFilePath()));
-        assertFileEquals(tempFile, new File(((FileMessage)message).getFilePath()));
-        //make sure all bytes are consumed
-//        assertEquals(0, received.available());
-    }
-    /**
-     * @param tempFile
-     * @param file
-     * @throws IOException 
-     */
-    private void assertFileEquals(File expected, File actual) throws IOException {
-        FileInputStream expectedS = new FileInputStream(expected);
-        FileInputStream actualS   = new FileInputStream(actual);
-        
-        assertEquals(expectedS.available(), actualS.available());
-        for (int ii = 0; ii < expectedS.available(); ii++) {
-            assertEquals(expectedS.read(), actualS.read());
-        }
+        CustomAssert.assertChecksumsMatch(tempFile.getCanonicalPath(), ((FileMessage)message).getFilePath());
     }
 
     /**
