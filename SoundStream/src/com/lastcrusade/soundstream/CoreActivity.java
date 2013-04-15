@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
 import com.lastcrusade.soundstream.service.ConnectionService;
@@ -70,7 +71,6 @@ public class CoreActivity extends SlidingFragmentActivity{
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
             getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-            setSlidingActionBarEnabled(false);
             hidePlaybar();
         }
         else{
@@ -81,8 +81,8 @@ public class CoreActivity extends SlidingFragmentActivity{
         }
 
         // setup the sliding bar
-        getSlidingMenu().setBehindOffsetRes(R.dimen.show_content);
-
+        setSlidingActionBarEnabled(false);
+        getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
         registerReceivers();
     }
 
@@ -103,7 +103,20 @@ public class CoreActivity extends SlidingFragmentActivity{
         unregisterReceivers();
         super.onDestroy();
     }
-    
+
+    @Override
+    public void onStart() {
+      super.onStart();
+      //For Google Analytics
+      EasyTracker.getInstance().activityStart(this);
+    }
+
+    @Override
+    public void onStop() {
+      super.onStop();
+      //For Google Analytics
+      EasyTracker.getInstance().activityStop(this);
+    }
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
@@ -112,6 +125,8 @@ public class CoreActivity extends SlidingFragmentActivity{
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+                    //Send the user to a page where they can start a network or join a different network
+                    Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
             .register(this);

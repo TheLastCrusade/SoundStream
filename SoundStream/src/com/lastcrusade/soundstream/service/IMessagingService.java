@@ -21,7 +21,6 @@ package com.lastcrusade.soundstream.service;
 
 import java.util.List;
 
-import com.lastcrusade.soundstream.model.Playlist;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
@@ -60,15 +59,6 @@ public interface IMessagingService {
      */
     public void sendSkipMessage();
     
-    /**
-     * FOR TESTING
-     * 
-     * Send a string message to all connected devices (host or guests).
-     * 
-     * @param message
-     */
-    public void sendStringMessage(String message);
-
     public void sendAddToPlaylistMessage(PlaylistEntry song);
     
     public void sendBumpSongOnPlaylistMessage(PlaylistEntry song);

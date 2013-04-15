@@ -20,8 +20,8 @@
 
 <resources>
 
-    <dimen name="show_content">80sp</dimen>
-    <dimen name="song_height">50sp</dimen>
+    <dimen name="show_menu">280dp</dimen>
+    <dimen name="song_height">50dp</dimen>
     
 
 </resources>

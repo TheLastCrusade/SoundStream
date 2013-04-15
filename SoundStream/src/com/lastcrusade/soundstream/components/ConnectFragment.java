@@ -25,10 +25,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -55,7 +56,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     private static final String TAG = ConnectFragment.class.getName();
 
     private BroadcastRegistrar broadcastRegistrar;
-    private Button connectButton, createButton;
+    private View joinView;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
 
@@ -76,8 +77,27 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_connect, container, false);
 
-        createButton = (Button)v.findViewById(R.id.btn_create);
-        createButton.setOnClickListener( new OnClickListener() {
+        ((CoreActivity)getActivity()).hidePlaybar();
+        
+        int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
+        if(rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90){
+            ((LinearLayout)v).setOrientation(LinearLayout.HORIZONTAL);
+            LinearLayout.LayoutParams clickableParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT,1);
+            clickableParams.setMargins(5, 10, 10, 10);
+            v.findViewById(R.id.join).setLayoutParams(clickableParams);
+            clickableParams.setMargins(10, 10, 5, 10);
+            v.findViewById(R.id.create).setLayoutParams(clickableParams); 
+        }
+        else{
+            ((LinearLayout)v).setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams clickableParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,0,1);
+            clickableParams.setMargins(10, 5, 10, 10);
+            v.findViewById(R.id.join).setLayoutParams(clickableParams);
+            clickableParams.setMargins(10, 10, 10, 5);
+            v.findViewById(R.id.create).setLayoutParams(clickableParams);
+        }
+        View create = v.findViewById(R.id.create);
+        create.setOnClickListener( new OnClickListener() {
             
             @Override
             public void onClick(View v) {
@@ -87,17 +107,17 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 ((CoreActivity)getActivity()).showPlaybar();
             }
         });
-        createButton.setContentDescription(ContentDescriptionUtils.CREATE);
+        create.setContentDescription(ContentDescriptionUtils.CREATE);
         
-        connectButton = (Button)v.findViewById(R.id.btn_connect);
-        connectButton.setOnClickListener(new OnClickListener() {
+        this.joinView = v.findViewById(R.id.join);
+        this.joinView.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 getConnectionService().broadcastGuest(getActivity());
             }
         });
-        connectButton.setContentDescription(ContentDescriptionUtils.CONNECT);
+        joinView.setContentDescription(ContentDescriptionUtils.CONNECT);
 
         return v;
     }
@@ -144,7 +164,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {
-                        connectButton.setEnabled(true);
+                        joinView.setEnabled(true);
                         //switch 
                         Transitions.transitionToHome((CoreActivity)getActivity());
                         ((CoreActivity)getActivity()).enableSlidingMenu();
@@ -159,19 +179,24 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 public void onReceiveAction(Context context, Intent intent) {
                     int mode = intent.getIntExtra(
                             BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
-                    switch(mode){
-                    case BluetoothAdapter.SCAN_MODE_NONE: 
-                        connectButton.setEnabled(true);
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-                        connectButton.setEnabled(true);
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-                        connectButton.setEnabled(false);
-                        break;
-                    default:
-                        Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
-                        break;
+                    if(joinView != null){
+                        switch(mode){
+                        case BluetoothAdapter.SCAN_MODE_NONE:
+                            joinView.setEnabled(true);
+                            joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                            joinView.setEnabled(true);
+                            joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                            joinView.setEnabled(false);
+                            joinView.setBackgroundColor(getResources().getColor(R.color.gray));
+                            break;
+                        default:
+                            Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                            break;
+                        }
                     }
                 }
             })
@@ -184,6 +209,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     @Override
     public int getTitle() {
-        return R.string.connect;
+        return R.string.select;
     }
 }

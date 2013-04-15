@@ -25,6 +25,7 @@ import java.io.OutputStream;
 
 public class PlayStatusMessage extends APlaylistEntryMessage {
 
+    @SuppressWarnings("unused")
     private final String TAG = PlayStatusMessage.class.getSimpleName();
     private boolean playing;
 

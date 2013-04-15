@@ -59,7 +59,7 @@ public class CustomAssert {
     /**
      * Verifies file's SHA1 checksum
      */
-    public static void verifyChecksum(String fileOne, String fileTwo){
+    public static void assertChecksumsMatch(String fileOne, String fileTwo){
         String fileHash1 = null;
         String fileHash2 = null;
         try {

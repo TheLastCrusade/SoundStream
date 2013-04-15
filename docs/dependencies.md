@@ -61,5 +61,10 @@ Because we use new Android Gesture Detection, we need to have the most recent ve
 5. Navigate to third_party/ABSLibrary/libs
 6. Paste the copied jar to replace the existing one
 
+##Google Analytics sdk
+
+1. Download the [Analytics SDK](https://developers.google.com/analytics/devguides/collection/android/resources)
+2. Unzip and copy libGoogleAnalyticsV2.jar into libs folder
+
 ###Finished!
 Everything should be set up just fine now :]

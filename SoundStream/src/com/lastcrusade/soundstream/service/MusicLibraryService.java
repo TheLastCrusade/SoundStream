@@ -21,7 +21,6 @@ package com.lastcrusade.soundstream.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,13 +36,13 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -79,6 +78,7 @@ public class MusicLibraryService extends Service {
     private String myMacAddress;
 
     private ServiceLocator<MessagingService> messagingServiceLocator;
+    private ServiceLocator<UserListService> userListServiceLocator;
 
     public class MusicLibraryServiceBinder extends Binder implements
         ILocalBinder<MusicLibraryService> {
@@ -90,16 +90,25 @@ public class MusicLibraryService extends Service {
 
     @Override
     public void onCreate() {
-        //load the local songs and set the mac address, so the metadata objects
-        // can live in the library
-        List<SongMetadata> metadataList = (new MediaStoreWrapper(this)).list();
-        this.myMacAddress = BluetoothUtils.getLocalBluetoothMAC();
-        for (SongMetadata song : metadataList) {
-            song.setMacAddress(this.myMacAddress);
-        }
+        userListServiceLocator = new ServiceLocator<UserListService>(
+                this, UserListService.class, UserListService.UserListServiceBinder.class);
         
-        //update the library with the local songs
-        updateLibrary(metadataList, false);
+        myMacAddress = getResources().getString(R.string.default_mac);
+        userListServiceLocator.setOnBindListener(new IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                myMacAddress = getMyMac();
+                //load the local songs and set the mac address, so the metadata objects
+                // can live in the library
+                List<SongMetadata> metadataList = (new MediaStoreWrapper(MusicLibraryService.this)).list();
+                for (SongMetadata song : metadataList) {
+                    song.setMacAddress(myMacAddress);
+                }
+
+                //update the library with the local songs
+                updateLibrary(metadataList, false);
+            }
+        });
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingServiceBinder.class);
@@ -110,6 +119,8 @@ public class MusicLibraryService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceivers();
+        messagingServiceLocator.unbind();
+        userListServiceLocator.unbind();
         super.onDestroy();
     }
 
@@ -300,7 +311,7 @@ public class MusicLibraryService extends Service {
         synchronized(metadataMutex) {
             //TODO: remove use of bluetoothutils...replace with reference to userlist or some other way
             // of getting "my" address
-            String key = SongMetadataUtils.getUniqueKey(BluetoothUtils.getLocalBluetoothMAC(), songId);
+            String key = SongMetadataUtils.getUniqueKey(myMacAddress, songId);
             Integer inx = metadataMap.get(key);
             return inx != null ? metadataList.get(inx) : null;
         }
@@ -319,13 +330,35 @@ public class MusicLibraryService extends Service {
         }
     }
 
+    private String getMyMac(){
+        String myMac;
+        UserListService userService = getUserListService();
+        if(userService != null){
+            myMac = userService.getMyMac();
+        } else {
+            myMac = getResources().getString(R.string.default_mac);
+            Log.w(TAG, "UserListService null, returning fake mac: " + myMac);
+        }
+        return myMac;
+    }
+
+    private UserListService getUserListService(){
+        UserListService userService = null;
+        try{
+            userService = userListServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.w(TAG, "UserListService not bound");
+        }
+        return userService;
+    }
+
     private byte[] loadFile(File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);
         byte[] bytes = new byte[fis.available()];
         fis.read(bytes);
         return bytes;
     }
-    
+
     private IMessagingService getMessagingService() {
         MessagingService messagingService = null;
         try {

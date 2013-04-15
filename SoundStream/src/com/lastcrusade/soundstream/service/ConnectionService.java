@@ -35,6 +35,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.model.FoundGuest;
 import com.lastcrusade.soundstream.net.AcceptThread;
 import com.lastcrusade.soundstream.net.BluetoothDiscoveryHandler;
 import com.lastcrusade.soundstream.net.BluetoothNotEnabledException;
@@ -45,7 +46,6 @@ import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
 import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
-import com.lastcrusade.soundstream.net.message.FoundGuest;
 import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
@@ -272,7 +272,12 @@ public class ConnectionService extends Service {
                     //remote initiated device discovery...we want to send the list of devices back to the client
                     List<FoundGuest> foundGuests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
                     FoundGuestsMessage msg = new FoundGuestsMessage(foundGuests);
-                    discoveryInitiator.write(msg);
+                    try {
+                        discoveryInitiator.write(msg);
+                    } catch (IOException e) {
+                        Log.wtf(TAG, e);
+                        Toaster.eToast(ConnectionService.this, "Unable to enqueue message " + msg.getClass().getSimpleName());
+                    }
                     discoveryInitiator = null; //clear the initiator to handle the next one
                 }
             })
@@ -331,7 +336,7 @@ public class ConnectionService extends Service {
         Log.w(TAG, "Connected to server");
 
         //create the message thread, which will be responsible for reading and writing messages
-        MessageThread newMessageThread = new MessageThread(this, socket, this.messageDispatch, ACTION_GUEST_DISCONNECTED) {
+        MessageThread newMessageThread = new MessageThread(this, socket, this.messageDispatch) {
 
             @Override
             public void onDisconnected() {
@@ -369,8 +374,13 @@ public class ConnectionService extends Service {
 
     public void broadcastMessageToGuests(IMessage msg) {
         if (isGuestConnected()) {
-            for (MessageThread guest : this.guests) {
-                guest.write(msg);
+            try {
+                for (MessageThread guest : this.guests) {
+                    guest.write(msg);
+                }
+            } catch (IOException e) {
+                Log.wtf(TAG, e);
+                Toaster.eToast(this, "Unable to enqueue message " + msg.getClass().getSimpleName());
             }
         } else {
             Toaster.eToast(this, R.string.no_guests_connected);
@@ -380,7 +390,12 @@ public class ConnectionService extends Service {
     public void sendMessageToGuest(String address, IMessage msg) {
         MessageThread fan = findMessageThreadByAddress(address);
         if (fan != null) {
-            fan.write(msg);
+            try {
+                fan.write(msg);
+            } catch (IOException e) {
+                Log.wtf(TAG, e);
+                Toaster.eToast(this, "Unable to enqueue message " + msg.getClass().getSimpleName());
+            }
         } else {
             Toaster.eToast(this, R.string.guest_not_connected);
         }
@@ -388,7 +403,12 @@ public class ConnectionService extends Service {
 
     public void sendMessageToHost(IMessage msg) {
         if (isHostConnected()) {
-            this.host.write(msg);
+            try {
+                this.host.write(msg);
+            } catch (IOException e) {
+                Log.wtf(TAG, e);
+                Toaster.eToast(this, "Unable to enqueue message " + msg.getClass().getSimpleName());
+            }
         } else {
             Toaster.eToast(this, R.string.no_host_connected);
         }
@@ -502,7 +522,7 @@ public class ConnectionService extends Service {
         BluetoothUtils.disableDiscovery(this);
 
         //create the message thread for handling this connection
-        this.host = new MessageThread(this, socket, this.messageDispatch, ACTION_HOST_DISCONNECTED) {
+        this.host = new MessageThread(this, socket, this.messageDispatch) {
 
             @Override
             public void onDisconnected() {
