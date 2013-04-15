@@ -36,10 +36,9 @@ public class IntegerLength extends AComplexDataType implements ISerializable {
     private int length;
 
     /**
-     * 
+     * Default constructor required because this is serializable
      */
     public IntegerLength() {
-        // TODO Auto-generated constructor stub
     }
 
     /**

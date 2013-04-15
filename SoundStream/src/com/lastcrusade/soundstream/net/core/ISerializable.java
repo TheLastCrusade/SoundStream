@@ -41,7 +41,7 @@ public interface ISerializable {
      * @throws IOException 
      * @throws MessageNotCompleteException 
      */
-    public void deserialize(InputStream  input) throws IOException, MessageNotCompleteException;
+    public void deserialize(InputStream  input)  throws IOException, MessageNotCompleteException;
 
     public void serialize(  OutputStream output) throws IOException;
 

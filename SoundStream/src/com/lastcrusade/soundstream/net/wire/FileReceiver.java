@@ -66,7 +66,7 @@ public class FileReceiver extends AComplexDataType {
      */
     private static final int MIN_BYTES_READ_IN = 102400;
 
-    private static final int READ_BUFFER_SIZE = 1024;
+    private static final int READ_BUFFER_BYTES = 1024;
     /**
      * @param message
      * @param tempFolder
@@ -75,7 +75,7 @@ public class FileReceiver extends AComplexDataType {
         this.message = message;
         this.tempFolder = tempFolder;
 
-        this.byteBuffer = new byte[READ_BUFFER_SIZE];
+        this.byteBuffer = new byte[READ_BUFFER_BYTES];
     }
 
     /**

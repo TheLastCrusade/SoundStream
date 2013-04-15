@@ -60,9 +60,8 @@ public class Messenger {
 
     //NOTE: implemented as a map, not a SparseArray, so our unit tests will run
     @SuppressLint("UseSparseArrays")
-    private Map<Integer, WireRecvOutputStream> activeTransfers = new HashMap<Integer, WireRecvOutputStream>();
-
-    private List<IMessage>                    receivedMessages = new LinkedList<IMessage>();
+    private Map<Integer, WireRecvOutputStream> activeTransfers  = new HashMap<Integer, WireRecvOutputStream>();
+    private List<IMessage>                     receivedMessages = new LinkedList<IMessage>();
 
     /**
      * Maximum size in bytes to read from a socket at a time.
@@ -72,13 +71,6 @@ public class Messenger {
     private byte[] inBytes = new byte[MAX_READ_SIZE_BYTES];
 
     private static final int MAX_WRITE_SIZE_BYTES = 4096;
-
-    /**
-     * Maximum size in bytes to write to a socket at a time.
-     * 
-     */
-   // private static final int MAX_WRITE_SIZE_BYTES = 1024;
-   // private byte[] outBytes = new byte[MAX_WRITE_SIZE_BYTES];
 
     private int sendPacketSize;
 
@@ -103,7 +95,7 @@ public class Messenger {
         MessageFormat format = new MessageFormat(message);
         InputBuffer buffer = new InputBuffer();
         format.serialize(buffer);
-        // if this is a file message, open the file and prepare it for the write
+        //if this is a file message, open the file and prepare it for the write
         // operation
         InputStream fileStream = null;
         if (isFileMessage(message)) {
@@ -255,12 +247,5 @@ public class Messenger {
      */
     public int getSendPacketSize() {
         return this.sendPacketSize;
-    }
-
-    /**
-     * @param maxWriteSizeBytes
-     */
-    public void setSendPacketSize(int sendPacketSize) {
-        this.sendPacketSize = sendPacketSize;
     }
 }

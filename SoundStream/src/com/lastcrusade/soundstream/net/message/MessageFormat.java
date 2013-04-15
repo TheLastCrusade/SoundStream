@@ -47,11 +47,11 @@ public class MessageFormat extends AComplexDataType implements ISerializable {
     private static final int MESSENGER_VERSION = 1;
     private static final char END_OF_CLASS_CHAR = '\n';
 
-    private IMessage message;
-    private int length;
+    private IMessage message = null;
+    private int      length  = 0;
 
     /**
-     * 
+     * Default constructor required because this is serializable
      */
     public MessageFormat() {
     }
@@ -134,9 +134,9 @@ public class MessageFormat extends AComplexDataType implements ISerializable {
     }
 
     /**
-     * @param input
-     * @param endChar
-     * @return
+     * @param input The stream from which to read bytes.
+     * @param endChar The character to stop on when read.
+     * @return The bytes read from the input stream.
      * @throws IOException 
      */
     private byte[] readBytesUntil(InputStream input, char endChar) throws IOException {

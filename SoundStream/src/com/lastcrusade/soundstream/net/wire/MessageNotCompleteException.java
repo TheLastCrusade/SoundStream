@@ -20,7 +20,8 @@ package com.lastcrusade.soundstream.net.wire;
 
 /**
  * This exception is thrown to indicate that a full message has not been
- * received.
+ * received.  It is expected in normal operation, and used as an
+ * alternative to if/break or if/return blocks.
  * 
  * @author Jesse Rosalia
  * 

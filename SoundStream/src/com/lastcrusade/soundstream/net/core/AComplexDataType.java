@@ -44,21 +44,11 @@ public class AComplexDataType {
         return (byte) input.read();
     }
 
-    /**
-     * @param bytes
-     * @param packetBytes
-     * @throws IOException
-     */
     protected void writeBytes(byte[] bytes, OutputStream output)
             throws IOException {
         output.write(bytes);
     }
 
-    /**
-     * @param nextBytes
-     * @param packetBytes
-     * @throws IOException
-     */
     protected byte[] readBytes(InputStream input, int length)
             throws IOException {
         if (length <= 0) {
