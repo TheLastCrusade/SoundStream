@@ -35,11 +35,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.FoundGuest;
 import com.lastcrusade.soundstream.model.UserList;
@@ -70,7 +70,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private BroadcastRegistrar broadcastRegistrar;
     private Button addMembersButton, disconnect, disband;
-    private UserListAdapter adapter;
+    private UserListAdapter userAdapter;
+    private LinearLayout userView;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
@@ -88,15 +89,17 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
-        adapter = new UserListAdapter(getActivity(), new UserList(), false);
-
+        userAdapter = new UserListAdapter(getActivity(), new UserList(), false);
+        userView = new LinearLayout(getActivity());
+        
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListServiceBinder.class);
 
         userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                NetworkFragment.this.adapter.updateUsers(getUserListFromService());
+                NetworkFragment.this.userAdapter.updateUsers(getUserListFromService());
+                updateUserView();
             }
         });
 
@@ -122,8 +125,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         disconnect = (Button)v.findViewById(R.id.disconnect_btn);
         disband = (Button)v.findViewById(R.id.disband_btn);
 
-        ListView users = (ListView) v.findViewById(R.id.connected_users);
-        users.setAdapter(this.adapter);
+        userView = (LinearLayout) v.findViewById(R.id.connected_users);
+        updateUserView();
+        //users.setAdapter(this.adapter);
 
         //TODO react to changing state
         setDisconnectDisbandVisibility();
@@ -196,8 +200,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     @Override
     public void onResume(){
         super.onResume();
-        if(this.adapter != null){
-            this.adapter.notifyDataSetChanged();
+        if(this.userAdapter != null){
+            this.userAdapter.notifyDataSetChanged();
+            updateUserView();
         }
         getActivity().setTitle(getTitle());
     }
@@ -235,7 +240,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    adapter.notifyDataSetChanged();
+                    userAdapter.notifyDataSetChanged();
+                    updateUserView();
                 }
             })
             .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
@@ -393,5 +399,15 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             Log.w(TAG, "UserListService not bound");
         }
         return userService;
+    }
+    
+    private void updateUserView(){
+        userView.removeAllViews();
+        
+        for(int i=0; i<userAdapter.getCount(); i++){
+            View user = userAdapter.getView(i, null, userView);
+            userView.addView(user);
+        }
+        
     }
 }

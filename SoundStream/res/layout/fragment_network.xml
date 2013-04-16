@@ -18,60 +18,66 @@
     You should have received a copy of the GNU General Public License
     along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" 
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+	 android:layout_height="match_parent"
     >
+	<RelativeLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" 
+	    >
+	
+	    <Button 
+	        android:id="@+id/add_members"
+	        android:text="@string/add_members"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        />
+	
+	    <TextView 
+	        android:id="@+id/connected_users_label"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/cur_member_label"
+	        android:layout_margin="8dp"
+	        android:layout_below="@+id/add_members"
+	        android:textSize="20sp"
+	        />
+	    <LinearLayout
+	        android:id="@+id/connected_users"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/connected_users_label"
+	        android:paddingLeft="10dp"
+	        android:divider="@color/transparent"
+	        android:layout_alignLeft="@+id/connected_users_label" 
+	        />
+	
+	    <Button
+	        android:id="@+id/disconnect_btn"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:background="@color/red"
+	        android:layout_marginLeft="10dp"
+	        android:layout_marginRight="10dp"
+	        android:layout_marginBottom="10dp"
+	        android:text="@string/disconnect"
+	        android:textColor="@color/white"
+	        />
+	    <Button
+	        android:id="@+id/disband_btn"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:background="@color/red"
+	        android:visibility="invisible"
+	        android:layout_marginLeft="10dp"
+	        android:layout_marginRight="10dp"
+	        android:layout_marginBottom="10dp"
+	        android:text="@string/disband"
+	        android:textColor="@color/white"
+	        />
+	</RelativeLayout>
+</ScrollView>
 
-    <Button 
-        android:id="@+id/add_members"
-        android:text="@string/add_members"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-
-    <TextView 
-        android:id="@+id/connected_users_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/cur_member_label"
-        android:layout_margin="8dp"
-        android:layout_below="@+id/add_members"
-        android:textSize="20sp"
-        />
-    <ListView
-        android:id="@+id/connected_users"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/connected_users_label"
-        android:paddingLeft="10dp"
-        android:divider="@color/transparent"
-        android:layout_alignLeft="@+id/connected_users_label" 
-        />
-
-    <Button
-        android:id="@+id/disconnect_btn"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/red"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/disconnect"
-        android:textColor="@color/white"
-        />
-    <Button
-        android:id="@+id/disband_btn"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/red"
-        android:visibility="invisible"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/disband"
-        android:textColor="@color/white"
-        />
-</RelativeLayout>
