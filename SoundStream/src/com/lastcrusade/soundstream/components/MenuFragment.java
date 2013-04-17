@@ -29,11 +29,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -52,12 +51,14 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     private BroadcastRegistrar registrar;
     private UserListAdapter userAdapter;
     private ServiceLocator<UserListService> userListServiceLocator;
+    private LinearLayout userView;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userAdapter = new UserListAdapter(getActivity(), new UserList(), true);
-
+        userView = new LinearLayout(getActivity());
+        
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this.getActivity(), UserListService.class, UserListService.UserListServiceBinder.class);
 
@@ -67,6 +68,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onServiceBound() {
                 userAdapter.updateUsers(getUserListFromService());
+                updateUserView();
             }
         });
         registerReceivers();
@@ -106,8 +108,11 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             }
         });
         
-        ListView userView = (ListView)v.findViewById(R.id.connected_users);
-        userView.setAdapter(this.userAdapter);
+        //ListView userView = (ListView)v.findViewById(R.id.connected_users);
+        //userView.setAdapter(this.userAdapter);
+        
+        userView = (LinearLayout)v.findViewById(R.id.connected_users);
+        updateUserView();
         
         Button about = (Button)v.findViewById(R.id.about_btn);
         about.setOnClickListener(new OnClickListener() {
@@ -153,6 +158,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
                 userAdapter.notifyDataSetChanged();
+                updateUserView();
             }
         }).register(this.getActivity());
     }
@@ -181,5 +187,15 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             Log.w(TAG, "UserListService not bound");
         }
         return userService;
+    }
+    
+    private void updateUserView(){
+        userView.removeAllViews();
+        
+        for(int i=0; i<userAdapter.getCount(); i++){
+            View user = userAdapter.getView(i, null, userView);
+            userView.addView(user);
+        }
+        
     }
 }
