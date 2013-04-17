@@ -105,6 +105,8 @@ public class UserListService extends Service {
             public void onReceiveAction(Context context, Intent intent) {
                 //extract the new user list from the intent
                 userList.copyFrom((UserList) intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST));
+                addSelfToUserList();
+                Log.i(TAG, "New userlist with length" + userList.getUsers().size());
                 //tell app to update the user list in all the UI
                 new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
             }
