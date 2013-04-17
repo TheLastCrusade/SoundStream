@@ -41,10 +41,14 @@ public class AlphabeticalComparator implements Comparator<SongMetadata> {
         int albumComp =  songA.getAlbum().compareTo(songB.getAlbum());
         int titleComp = songA.getTitle().compareTo(songB.getTitle());
 
-        //not the most efficient way of doing things, but it works for now
+        // not the most efficient way of doing things, but it works for now
+        // if the first character of songA's artist is a special character,
+        // and the first character of songB's artist is a normal letter, songA is ordered
+        // after songB
         if(!songA.getArtist().substring(0, 1).matches("[a-zA-Z]") && songB.getArtist().substring(0, 1).matches("[a-zA-Z]")){
             artistComp = 1;
         }
+        //handles the opposite - A starts with a normal letter and B starts with a special character
         else if(songA.getArtist().substring(0, 1).matches("[a-zA-Z]") && !songB.getArtist().substring(0, 1).matches("[a-zA-Z]")){
             artistComp = -1;
         }
@@ -53,6 +57,7 @@ public class AlphabeticalComparator implements Comparator<SongMetadata> {
             return artistComp;
         }
         
+        //does the same thing with albums
         if(!songA.getAlbum().substring(0, 1).matches("[a-zA-Z]") && songB.getAlbum().substring(0, 1).matches("[a-zA-Z]")){
             albumComp = 1;
         }
@@ -64,6 +69,7 @@ public class AlphabeticalComparator implements Comparator<SongMetadata> {
             return albumComp;
         }
         
+        //does the same thing with the title
         if(!songA.getTitle().substring(0, 1).matches("[a-zA-Z]") && songB.getTitle().substring(0, 1).matches("[a-zA-Z]")){
             titleComp = 1;
         }
