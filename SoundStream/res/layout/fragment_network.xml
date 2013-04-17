@@ -49,6 +49,7 @@
 	        android:layout_height="wrap_content"
 	        android:paddingLeft="10dp"
 	        android:divider="@color/transparent"
+	        android:orientation="vertical"
 	        />
 	
 	    <Button
