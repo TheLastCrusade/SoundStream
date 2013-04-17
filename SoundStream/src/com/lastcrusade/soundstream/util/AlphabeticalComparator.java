@@ -21,6 +21,8 @@ package com.lastcrusade.soundstream.util;
 
 import java.util.Comparator;
 
+import android.util.Log;
+
 import com.lastcrusade.soundstream.model.SongMetadata;
 
 /**
@@ -39,12 +41,34 @@ public class AlphabeticalComparator implements Comparator<SongMetadata> {
         int albumComp =  songA.getAlbum().compareTo(songB.getAlbum());
         int titleComp = songA.getTitle().compareTo(songB.getTitle());
 
+        //not the most efficient way of doing things, but it works for now
+        if(!songA.getArtist().substring(0, 1).matches("[a-zA-Z]") && songB.getArtist().substring(0, 1).matches("[a-zA-Z]")){
+            artistComp = 1;
+        }
+        else if(songA.getArtist().substring(0, 1).matches("[a-zA-Z]") && !songB.getArtist().substring(0, 1).matches("[a-zA-Z]")){
+            artistComp = -1;
+        }
+
         if(artistComp!=0){
             return artistComp;
         }
         
+        if(!songA.getAlbum().substring(0, 1).matches("[a-zA-Z]") && songB.getAlbum().substring(0, 1).matches("[a-zA-Z]")){
+            albumComp = 1;
+        }
+        else if(songA.getAlbum().substring(0, 1).matches("[a-zA-Z]") && !songB.getAlbum().substring(0, 1).matches("[a-zA-Z]")){
+            albumComp = -1;
+        }
+        
         if(albumComp!=0){
             return albumComp;
+        }
+        
+        if(!songA.getTitle().substring(0, 1).matches("[a-zA-Z]") && songB.getTitle().substring(0, 1).matches("[a-zA-Z]")){
+            titleComp = 1;
+        }
+        else if(songA.getTitle().substring(0, 1).matches("[a-zA-Z]") && !songB.getTitle().substring(0, 1).matches("[a-zA-Z]")){
+            titleComp = -1;
         }
         
         return titleComp;
