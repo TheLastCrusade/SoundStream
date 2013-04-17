@@ -108,9 +108,6 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             }
         });
         
-        //ListView userView = (ListView)v.findViewById(R.id.connected_users);
-        //userView.setAdapter(this.userAdapter);
-        
         userView = (LinearLayout)v.findViewById(R.id.connected_users);
         updateUserView();
         
