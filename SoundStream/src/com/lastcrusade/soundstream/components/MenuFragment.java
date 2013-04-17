@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -123,6 +124,9 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     @Override
     public void onResume(){
         super.onResume();
+        if(userAdapter != null){
+            userAdapter.notifyDataSetChanged();
+        }
         getActivity().setTitle(getTitle());
     }
 
@@ -148,7 +152,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                userAdapter.updateUsers(getUserListFromService());
+                userAdapter.notifyDataSetChanged();
             }
         }).register(this.getActivity());
     }
