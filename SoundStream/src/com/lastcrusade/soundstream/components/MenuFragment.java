@@ -67,7 +67,6 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
         userListServiceLocator.setOnBindListener(new IOnBindListener() {
             @Override
             public void onServiceBound() {
-                userAdapter.updateUsers(getUserListFromService());
                 updateUserView();
             }
         });
@@ -127,7 +126,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     public void onResume(){
         super.onResume();
         if(userAdapter != null){
-            userAdapter.notifyDataSetChanged();
+            updateUserView();
         }
         getActivity().setTitle(getTitle());
     }
@@ -153,8 +152,6 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
         this.registrar.addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
-                //Update library shown when the library service gets an update
-                userAdapter.notifyDataSetChanged();
                 updateUserView();
             }
         }).register(this.getActivity());
@@ -188,7 +185,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
     
     private void updateUserView(){
         userView.removeAllViews();
-        
+        userAdapter.updateUsers(getUserListFromService());
         for(int i=0; i<userAdapter.getCount(); i++){
             View user = userAdapter.getView(i, null, userView);
             userView.addView(user);
