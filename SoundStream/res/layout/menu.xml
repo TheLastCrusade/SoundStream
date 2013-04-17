@@ -17,13 +17,14 @@
     along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
     -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/dark_gray"  >
-
-    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dark_gray" >
+    
+    <LinearLayout 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         >
 
         <!-- Music Things -->
@@ -92,7 +93,6 @@
             android:id="@+id/network_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/music_category"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
@@ -121,7 +121,7 @@
                 android:id="@+id/network_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/network_line"
+                android:layout_below="@id/network_line"
                 android:layout_marginLeft="20dp"
                 android:background="@color/transparent"
                 android:clickable="true"
@@ -140,7 +140,6 @@
             android:id="@+id/connected_users_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/network_category"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
@@ -164,17 +163,12 @@
                 android:background="@color/light_gray"
                 />
 
-            <ListView
+            <LinearLayout
                 android:id="@+id/connected_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/users_line"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:divider="@color/transparent"
-                android:textColor="@color/white"
                 >
-            </ListView>
+            </LinearLayout>
         </RelativeLayout>
 
         <!-- About Things -->
@@ -182,7 +176,6 @@
             android:id="@+id/about_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/connected_users_category"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="16dp"
@@ -222,6 +215,5 @@
                 android:textSize="18sp"
                 />
         </RelativeLayout>
-    </RelativeLayout>
+    </LinearLayout>
 </ScrollView>
-        
