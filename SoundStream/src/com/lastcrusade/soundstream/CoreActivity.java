@@ -19,16 +19,25 @@
 
 package com.lastcrusade.soundstream;
 
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
+import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.ConnectionService;
+import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -43,7 +52,10 @@ public class CoreActivity extends SlidingFragmentActivity{
     private Fragment menu;
     private PlaybarFragment playbar;
     private BroadcastRegistrar registrar;
-        
+
+    private ServiceLocator<MusicLibraryService>   musicLibraryLocator;
+    private ServiceLocator<MessagingService>    messagingServiceLocator;
+
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
@@ -129,6 +141,15 @@ public class CoreActivity extends SlidingFragmentActivity{
                     Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
+            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    //send the library to the connected host
+                    List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
+                    getMessagingService().sendLibraryMessageToHost(metadata);
+                }
+            })
             .register(this);
         
     }
@@ -159,5 +180,25 @@ public class CoreActivity extends SlidingFragmentActivity{
         .beginTransaction()
         .hide(playbar)
         .commit();
+    }
+
+    private IMessagingService getMessagingService() {
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
+    }
+
+    private MusicLibraryService getMusicLibraryService() {
+        MusicLibraryService musicLibraryService = null;
+        try {
+            musicLibraryService = this.musicLibraryLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return musicLibraryService;
     }
 }
