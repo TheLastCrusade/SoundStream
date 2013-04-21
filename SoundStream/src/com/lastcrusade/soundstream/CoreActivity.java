@@ -54,7 +54,7 @@ public class CoreActivity extends SlidingFragmentActivity{
     private BroadcastRegistrar registrar;
 
     private ServiceLocator<MusicLibraryService>   musicLibraryLocator;
-    private ServiceLocator<MessagingService>    messagingServiceLocator;
+    private ServiceLocator<MessagingService>      messagingServiceLocator;
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -151,7 +151,6 @@ public class CoreActivity extends SlidingFragmentActivity{
                 }
             })
             .register(this);
-        
     }
 
     private void unregisterReceivers() {
