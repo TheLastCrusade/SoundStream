@@ -36,8 +36,10 @@ import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -95,6 +97,7 @@ public class CoreActivity extends SlidingFragmentActivity{
         // setup the sliding bar
         setSlidingActionBarEnabled(false);
         getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
+        createServiceLocators();
         registerReceivers();
     }
 
@@ -116,6 +119,14 @@ public class CoreActivity extends SlidingFragmentActivity{
         super.onDestroy();
     }
 
+    private void createServiceLocators() {
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
+
+        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryService.MusicLibraryServiceBinder.class);
+    }
+
     @Override
     public void onStart() {
       super.onStart();
@@ -129,6 +140,7 @@ public class CoreActivity extends SlidingFragmentActivity{
       //For Google Analytics
       EasyTracker.getInstance().activityStop(this);
     }
+
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
