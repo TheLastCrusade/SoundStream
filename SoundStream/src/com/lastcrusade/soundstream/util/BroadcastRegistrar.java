@@ -26,6 +26,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 
 /**
  * A registrar for broadcast actions.  This provides an interface to register for individual
@@ -67,7 +68,7 @@ public class BroadcastRegistrar {
             }
         };
         //register the receiver, with the assembled filter
-        context.registerReceiver(internalReceiver, filter);
+        LocalBroadcastManager.getInstance(context).registerReceiver(internalReceiver, filter);
         //hold on to the registered context, for unregister
         this.registeredContext = context;
     }

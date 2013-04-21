@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
+import android.support.v4.content.LocalBroadcastManager;
 
 /**
  * A helper class for building and sending broadcast intents.
@@ -95,6 +96,6 @@ public class BroadcastIntent extends Intent {
     }
     
     public void send(Context context) {
-        context.sendBroadcast(this);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(this);
     }
 }
