@@ -112,14 +112,14 @@ public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
         album.setText(metadataList.get(position).getAlbum());
         
         artist.setMaxWidth(parent.getWidth()/2);
-        
+        /*
         final GestureDetectorCompat songGesture = new GestureDetectorCompat(mContext, new SongGestureListener(element));
         element.setOnTouchListener(new View.OnTouchListener() {       
             @Override
             public boolean onTouch(View v, MotionEvent event) {
               return songGesture.onTouchEvent(event);
             }
-        });
+        });*/
         return element;
     }
     
@@ -134,82 +134,6 @@ public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
         notifyDataSetChanged();
     }
     
-    public void toggleViewSize(View v){
-        TextView title = (TextView)v.findViewById(R.id.title); 
-        TextView album = (TextView)v.findViewById(R.id.album);
-        TextView artist = (TextView)v.findViewById(R.id.artist);
         
-        //if the view height is larger than the standard element, set it back to the standard
-        if(v.getHeight()>mContext.getResources().getDimension(R.dimen.song_height)){
-            
-            title.setSingleLine(true);
-            artist.setSingleLine(true);
-            album.setSingleLine(true);
-            
-            //set the height of the color bar to the standard song element height
-            v.findViewById(R.id.user_color).setMinimumHeight((int) mContext.getResources().getDimension(R.dimen.song_height));
-        }
-        //otherwise, expand the view
-        else{            
-            title.setSingleLine(false);
-            artist.setSingleLine(false);
-            album.setSingleLine(false);
-            
-            /*
-             * Calculates the number of additional lines needed to contain the text
-             */
-            Rect titleBounds = new Rect();
-            title.getPaint().getTextBounds(title.getText().toString(), 0, title.length(), titleBounds);
-            int titleLines = titleBounds.width()/title.getWidth();
-           
-            Rect artistBounds = new Rect();
-            artist.getPaint().getTextBounds(artist.getText().toString(), 0, artist.length(), artistBounds);
-            int artistLines = artistBounds.width()/artist.getWidth();
-            
-            Rect albumBounds = new Rect();
-            album.getPaint().getTextBounds(album.getText().toString(), 0, album.length(), albumBounds);
-            /*
-             *  +1 accounts for the fact that since album wraps its contents, it is almost
-             * always exactly as big as it needs to b. This makes album think it is a pixel
-             * larger than it is, which eliminates the possibility of thinking we have
-             * to add another line when in reality it is just a perfect match
-             */
-            int albumLines = albumBounds.width()/(album.getWidth()+1);
-            
-            // determines whether artist or album is longer, that way expansion can
-            // reference the correct one
-            int bottomLines = artistLines;
-            if(albumLines > bottomLines){
-                bottomLines = albumLines;
-            }
-            
-            //calculate the total height of the expanded view
-            int viewHeight = (int) mContext.getResources().getDimension(R.dimen.song_height)
-                    + titleLines*title.getLineHeight() + bottomLines*artist.getLineHeight();
-            
-            
-            //set the height of the color bar to the new view height
-            v.findViewById(R.id.user_color).setMinimumHeight(viewHeight);
-        }
-    }
-    
-    protected class SongGestureListener extends GestureDetector.SimpleOnGestureListener{
-        private View view;
-        
-        public SongGestureListener(View view){
-            this.view = view;
-        }
-        
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            toggleViewSize(view);
-            return true;
-        }
-        @Override
-        public boolean onDown(MotionEvent e) {
-           return true;
-        }
 
-        
-    }
 }
