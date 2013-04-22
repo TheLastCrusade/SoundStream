@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -50,7 +51,7 @@ import com.lastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show
-    private final String TAG = PlaylistFragment.class.getName();
+    private final String TAG = PlaylistFragment.class.getSimpleName();
 
     private BroadcastRegistrar registrar;
 
@@ -100,6 +101,15 @@ public class PlaylistFragment extends MusicListFragment{
         View v = inflater.inflate(R.layout.list, container, false);
         setListAdapter(mPlayListAdapter);
         return v;
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onStart()
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        EasyTracker.getTracker().sendView(TAG);
     }
 
     @Override

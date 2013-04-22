@@ -32,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.service.ConnectionService;
@@ -52,7 +53,7 @@ import com.lastcrusade.soundstream.util.Transitions;
  */
 public class ConnectFragment extends SherlockFragment implements ITitleable{
     
-    private static final String TAG = ConnectFragment.class.getName();
+    private static final String TAG = ConnectFragment.class.getSimpleName();
 
     private BroadcastRegistrar broadcastRegistrar;
     private View joinView;
@@ -116,6 +117,15 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         });
 
         return v;
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onStart()
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        EasyTracker.getTracker().sendView(TAG);
     }
 
     @Override

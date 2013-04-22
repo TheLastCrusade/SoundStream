@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.CustomApp;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -122,6 +123,15 @@ public class MusicLibraryFragment extends MusicListFragment {
             Bundle savedInstanceState) {
         setListAdapter(mMusicAdapter);
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onStart()
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        EasyTracker.getTracker().sendView(TAG);
     }
 
     @Override
