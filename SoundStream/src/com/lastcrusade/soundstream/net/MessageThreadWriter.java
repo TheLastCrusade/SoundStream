@@ -93,9 +93,13 @@ public class MessageThreadWriter {
         qe.messageClass  = message.getClass();
         qe.messageStream = messenger.serializeMessage(message);
         if (LogUtil.isLogAvailable()) {
+            //precompute the expected queue size...this is because the writer thread may quickly pick
+            // up the queue item which, while swell, means the debug output may be confusing
+            int newExpectedQueueSize = queue.size() + 1;
             Log.i(TAG, "Message " + qe.messageNo + " enqueued, it's a "
                         + qe.messageClass.getSimpleName() + ", "
-                        + qe.messageStream.available() + " bytes in length");
+                        + qe.messageStream.available() + " bytes in length, "
+                        + newExpectedQueueSize + " entries in the queue");
         }
         queue.add(qe);
     }

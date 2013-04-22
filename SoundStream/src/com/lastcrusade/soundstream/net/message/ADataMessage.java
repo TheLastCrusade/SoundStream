@@ -62,6 +62,8 @@ public abstract class ADataMessage extends AComplexDataType implements IMessage 
             return null;
         }
     }
+    
+    //TODO: move these into AComplexDataType and use ByteBuffer
 
     protected void writeLong(long value, OutputStream output) throws IOException {
         output.write((int)(value         & 0xFF));
@@ -75,16 +77,30 @@ public abstract class ADataMessage extends AComplexDataType implements IMessage 
     }
 
     protected long readLong(InputStream input) throws IOException {
-    	long value = input.read();
-    	value 	  |= (input.read() << 8);
-    	value 	  |= (input.read() << 16);
-    	value 	  |= (input.read() << 24);
-    	value 	  |= (input.read() << 32);
-    	value 	  |= (input.read() << 40);
-    	value 	  |= (input.read() << 48);
-    	value 	  |= (input.read() << 56);
+    	long value = toInt(input.read());
+    	value 	  |= (toInt(input.read()) << 8);
+    	value 	  |= (toInt(input.read()) << 16);
+    	value 	  |= (toInt(input.read()) << 24);
+    	value 	  |= (toInt(input.read()) << 32);
+    	value 	  |= (toInt(input.read()) << 40);
+    	value 	  |= (toInt(input.read()) << 48);
+    	value 	  |= (toInt(input.read()) << 56);
     	
     	return value;
+    }
+
+    /**
+     * Convert an unsigned byte read from an input stream (held in an int) into
+     * an unsigned number.
+     * 
+     * This is because Java does not have unsigned types, and so bytes that
+     * are > 127 will come in as negative and F everything up.
+     * 
+     * @param read
+     * @return
+     */
+    private int toInt(int read) {
+        return (read & 0xFF);
     }
 
     protected void writeSongMetadata(SongMetadata metadata, OutputStream output) throws IOException{
