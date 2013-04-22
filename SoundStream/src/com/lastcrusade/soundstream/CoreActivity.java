@@ -26,6 +26,8 @@ import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.Tracker;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
 import com.lastcrusade.soundstream.service.ConnectionService;
@@ -43,10 +45,19 @@ public class CoreActivity extends SlidingFragmentActivity{
     private Fragment menu;
     private PlaybarFragment playbar;
     private BroadcastRegistrar registrar;
-        
+
+    private GoogleAnalytics mGaInstance;
+    private Tracker mGaTracker;
+
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
+        //Get the GoogleAnalytics singleton. Note that the SDK uses
+        // the application context to avoid leaking the current context.
+        mGaInstance = GoogleAnalytics.getInstance(this);
+        // Use the GoogleAnalytics singleton to get a Tracker.
+        mGaTracker = mGaInstance.getTracker(getString(R.string.ga_trackingId));
+        
         //set the layout for the content - this is just a placeholder
         setContentView(R.layout.content_frame);
         
@@ -107,7 +118,8 @@ public class CoreActivity extends SlidingFragmentActivity{
     @Override
     public void onStart() {
       super.onStart();
-      //For Google Analytics
+      mGaTracker.sendView(TAG);
+      //we are also keeping Easytracker till we figure out what else we get automagicly
       EasyTracker.getInstance().activityStart(this);
     }
 
@@ -159,5 +171,9 @@ public class CoreActivity extends SlidingFragmentActivity{
         .beginTransaction()
         .hide(playbar)
         .commit();
+    }
+
+    public Tracker getTracker(){
+        return mGaTracker;
     }
 }
