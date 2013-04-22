@@ -61,7 +61,11 @@ public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
                 new SongMetadata(23, "Toronto Customs Lady", "Aziz Ansari",
                         null, 3423462, "David"), 
                 new SongMetadata(42, "Motley Crue Tour vs. Aziz Tour", "Aziz Ansari",
-                        "Dangerously Delicious", 2346236, null)));
+                        "Dangerously Delicious", 2346236, null),
+                //NOTE: this id is specifically chosen to make sure that readLong/writeLong
+                // will handle encoded bytes that are negative
+                new SongMetadata(59916, "Numbers are Fun", "Jesse and Reid",
+                        "The WTF Tour", 2346236, null)));
         return library;
     }
 }
