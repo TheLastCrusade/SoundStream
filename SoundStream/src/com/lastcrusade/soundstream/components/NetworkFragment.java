@@ -36,10 +36,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.FoundGuest;
@@ -201,7 +199,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     @Override
     public void onStart() {
         super.onStart();
-        EasyTracker.getTracker().sendView(TAG);
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override

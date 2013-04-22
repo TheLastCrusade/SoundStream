@@ -27,14 +27,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 
-import com.google.analytics.tracking.android.EasyTracker;
+import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -106,7 +105,7 @@ public class PlaylistFragment extends MusicListFragment{
     @Override
     public void onStart() {
         super.onStart();
-        EasyTracker.getTracker().sendView(TAG);
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override
