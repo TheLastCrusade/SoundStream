@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
@@ -141,6 +142,12 @@ public class MusicLibraryFragment extends MusicListFragment {
         setListAdapter(mMusicAdapter);
         
         return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override

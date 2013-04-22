@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.util.ITitleable;
 
@@ -32,6 +33,7 @@ import com.lastcrusade.soundstream.util.ITitleable;
  *
  */
 public class AboutFragment extends SherlockFragment implements ITitleable {
+    private final String TAG = AboutFragment.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +41,12 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         View v = inflater.inflate(R.layout.fragment_about, container, false);
         
         return v;
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override
