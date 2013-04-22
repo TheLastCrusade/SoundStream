@@ -32,7 +32,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.google.analytics.tracking.android.EasyTracker;
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.service.ConnectionService;
@@ -122,7 +121,6 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     @Override
     public void onStart() {
         super.onStart();
-        EasyTracker.getTracker().sendView(TAG);
     }
 
     @Override
