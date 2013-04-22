@@ -125,9 +125,6 @@ public class MusicLibraryFragment extends MusicListFragment {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onStart()
-     */
     @Override
     public void onStart() {
         super.onStart();

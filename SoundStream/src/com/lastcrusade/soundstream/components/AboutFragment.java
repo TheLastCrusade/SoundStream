@@ -43,6 +43,7 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         return v;
     }
 
+    @Override
     public void onStart(){
         super.onStart();
         EasyTracker.getTracker().sendView(TAG);

@@ -103,9 +103,6 @@ public class PlaylistFragment extends MusicListFragment{
         return v;
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onStart()
-     */
     @Override
     public void onStart() {
         super.onStart();
