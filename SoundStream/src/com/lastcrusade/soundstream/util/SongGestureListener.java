@@ -94,6 +94,8 @@ public class SongGestureListener extends GestureDetector.SimpleOnGestureListener
             /*
              * Calculates the number of additional lines needed to contain the text
              */
+            
+            //TODO:fix magical 0
             Rect titleBounds = new Rect();
             title.getPaint().getTextBounds(title.getText().toString(), 0, title.length(), titleBounds);
             int titleLines = titleBounds.width()/title.getWidth();
@@ -132,6 +134,4 @@ public class SongGestureListener extends GestureDetector.SimpleOnGestureListener
     protected View getSelectedView(){
         return musicView.getChildAt(selectedIndex-musicView.getFirstVisiblePosition());
     }
-    
-
 }

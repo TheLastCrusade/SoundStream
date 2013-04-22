@@ -119,7 +119,6 @@ public class MusicLibraryFragment extends MusicListFragment {
      */
     @Override
     public void onResume() {
-        // TODO Auto-generated method stub
         super.onResume();
         
         final GestureDetectorCompat songGesture = new GestureDetectorCompat(getActivity(),

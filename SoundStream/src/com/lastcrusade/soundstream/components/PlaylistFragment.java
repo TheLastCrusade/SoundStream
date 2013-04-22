@@ -99,9 +99,7 @@ public class PlaylistFragment extends MusicListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
-        setListAdapter(mPlayListAdapter);
-       
-        
+        setListAdapter(mPlayListAdapter);  
         return v;
     }
 
@@ -190,9 +188,6 @@ public class PlaylistFragment extends MusicListFragment{
         return playlistService;
     }
 
-    /**
-     * 
-     */
     private void updatePlaylist() {
         mPlayListAdapter.updateMusic(getPlaylistService().getPlaylistEntries());
     }
