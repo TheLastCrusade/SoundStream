@@ -37,47 +37,43 @@ public class AlphabeticalComparator implements Comparator<SongMetadata> {
 
     @Override
     public int compare(SongMetadata songA, SongMetadata songB) {
-        int artistComp = songA.getArtist().compareTo(songB.getArtist());
-        int albumComp =  songA.getAlbum().compareTo(songB.getAlbum());
-        int titleComp = songA.getTitle().compareTo(songB.getTitle());
-
-        // not the most efficient way of doing things, but it works for now
-        // if the first character of songA's artist is a special character,
-        // and the first character of songB's artist is a normal letter, songA is ordered
-        // after songB
-        if(!songA.getArtist().substring(0, 1).matches("[a-zA-Z]") && songB.getArtist().substring(0, 1).matches("[a-zA-Z]")){
-            artistComp = 1;
-        }
-        //handles the opposite - A starts with a normal letter and B starts with a special character
-        else if(songA.getArtist().substring(0, 1).matches("[a-zA-Z]") && !songB.getArtist().substring(0, 1).matches("[a-zA-Z]")){
-            artistComp = -1;
-        }
-
+        
+        //compare the songs by artist - if they are the same, check album
+        int artistComp = compareStringsWithSpecialChars(songA.getArtist(), songB.getArtist());
         if(artistComp!=0){
             return artistComp;
         }
         
-        //does the same thing with albums
-        if(!songA.getAlbum().substring(0, 1).matches("[a-zA-Z]") && songB.getAlbum().substring(0, 1).matches("[a-zA-Z]")){
-            albumComp = 1;
-        }
-        else if(songA.getAlbum().substring(0, 1).matches("[a-zA-Z]") && !songB.getAlbum().substring(0, 1).matches("[a-zA-Z]")){
-            albumComp = -1;
-        }
-        
+        //compare the songs by album - if they are the same, check title
+        int albumComp  = compareStringsWithSpecialChars(songA.getAlbum(), songB.getAlbum());
         if(albumComp!=0){
             return albumComp;
         }
         
-        //does the same thing with the title
-        if(!songA.getTitle().substring(0, 1).matches("[a-zA-Z]") && songB.getTitle().substring(0, 1).matches("[a-zA-Z]")){
-            titleComp = 1;
-        }
-        else if(songA.getTitle().substring(0, 1).matches("[a-zA-Z]") && !songB.getTitle().substring(0, 1).matches("[a-zA-Z]")){
-            titleComp = -1;
-        }
-        
+        //compare the songs by title
+        int titleComp  = compareStringsWithSpecialChars(songA.getTitle(), songB.getTitle());
         return titleComp;
 
+    }
+    
+    private int compareStringsWithSpecialChars(String a, String b){
+        int comp = a.compareTo(b);
+        
+        //only check for special characters if they are not the same
+        if(comp != 0){
+            // doing it this way instead of just passing in the first character
+            // in case we want to handle more than just the first character
+            String firstA = a.substring(0, 1);
+            String firstB = b.substring(0, 1);
+            
+            if(!firstA.matches("[a-zA-Z]") && firstB.matches("[a-zA-Z]")){
+                comp = 1;
+            }
+            else if(firstA.matches("[a-zA-Z]") && !firstB.matches("[a-zA-Z]")){
+                comp = -1;
+            }
+        }
+        
+        return comp;
     }
 }
