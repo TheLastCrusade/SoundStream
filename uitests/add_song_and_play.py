@@ -11,7 +11,7 @@ class AddSongAndPlay(UITest):
 
 		touch_with_cd(self.vc, CREATE)
 		touch_with_cd(self.vc, MUSIC_LIBRARY)
-		touch_with_cd(self.vc, ATP_AVALANCHE_ROCK)
+		touch_with_cd(self.vc, ATP_SHORT_1)
 		touch_with_cd(self.vc, NAVIGATE_UP)
 		touch_with_cd(self.vc, PLAYLIST)
 		touch_with_cd(self.vc, PLAY_PAUSE)

@@ -14,12 +14,14 @@ SKIP = 'Skip'
 
 # Add to Playlist buttons
 # NOTE: these require the sdcard.img file to be loaded on your emulator/phone
-ATP_AVALANCHE_ROCK = 'Add To Playlist_Avalanche Rock'
-ATP_I_M_SO_SAD = 'Add To Playlist_I\'m So Sad, So Very, Very, Sad'
-ATP_ROLLING_PAPERS = 'Add To Playlist_Rolling Papers (feat Wolf Haley)'
-ATP_THE_IRONMAN_TAKEOVER = 'Add To Playlist_The Ironman Takeover (Skit)'
-ATP_DONUTS = 'Add To Playlist_Donuts (Outro)'
-ATP_ONE_LAST = 'Add To Playlist_One Last "Whoo-Hoo!" for the Pullman'
+ATP_SHORT_1 = 'Add To Playlist_Oh Xmas'
+ATP_SHORT_2 = 'Add To Playlist_Beach Party'
+ATP_SHORT_3 = 'Add To Playlist_At The Shore'
+ATP_MED_1 = 'Add To Playlist_Ether Disco'
+ATP_MED_2 = 'Add To Playlist_Montego'
+ATP_LONG_1 = 'Add To Playlist_Piece for Disaffected Piano Two'
+ATP_LONG_2 = 'Add To Playlist_Controlled Chaos'
+ATP_XLONG = 'Add To Playlist_Music for Funeral Home - Part 11'
 
 def print_layout(view_client):
     """prints out a hierarchical view of the current screen with all its components
