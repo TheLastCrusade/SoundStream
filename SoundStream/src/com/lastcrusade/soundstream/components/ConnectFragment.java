@@ -169,7 +169,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         ((CoreActivity)getActivity()).showPlaybar();
                     }
                 })
-             .addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
+             .addGlobalAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

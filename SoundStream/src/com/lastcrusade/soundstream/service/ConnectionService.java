@@ -57,7 +57,7 @@ import com.lastcrusade.soundstream.util.Toaster;
 
 public class ConnectionService extends Service {
 
-    private static final String TAG = ConnectionService.class.getName();
+    private static final String TAG = ConnectionService.class.getSimpleName();
 
     /**
      * Action to indicate find guests action has finished.  This action is sent in response to local UI initiated
@@ -243,21 +243,21 @@ public class ConnectionService extends Service {
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED, new IBroadcastActionHandler() {
+            .addGlobalAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
                 }
             })
-           .addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
+           .addGlobalAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     bluetoothDiscoveryHandler.onDiscoveryFinished();
                 }
             })
-           .addAction(BluetoothDevice.ACTION_FOUND, new IBroadcastActionHandler() {
+           .addGlobalAction(BluetoothDevice.ACTION_FOUND, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
