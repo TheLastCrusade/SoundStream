@@ -27,7 +27,7 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -108,7 +108,7 @@ public class UserListService extends Service {
                 addSelfToUserList();
                 Log.i(TAG, "New userlist with length" + userList.getUsers().size());
                 //tell app to update the user list in all the UI
-                new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
+                new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
             }
         })
         .register(this);
@@ -117,11 +117,11 @@ public class UserListService extends Service {
     public void clearExternalUsers() {
         this.userList.clear();
         addSelfToUserList();
-        new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
+        new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
     }
 
     private void notifyUserListUpdate() {
-        new BroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
+        new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
         getMessagingService().sendUserListMessage(userList);
     }
 

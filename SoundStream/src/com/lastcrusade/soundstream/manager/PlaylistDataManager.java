@@ -42,7 +42,7 @@ import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
@@ -99,7 +99,7 @@ public class PlaylistDataManager implements Runnable {
                     }
                 }
                 if (loaded) {
-                    new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                 }
                 pauseForNextRun();
             }
@@ -167,7 +167,7 @@ public class PlaylistDataManager implements Runnable {
                         PlaylistEntry entry = findSongByAddressAndId(fromAddr, songId);
                         saveTempFileData(entry, fileName, tempFilePath);
                         getMessagingService().sendSongStatusMessage(entry);
-                        new BroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
+                        new LocalBroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                     }
                 }
             })

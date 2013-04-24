@@ -42,7 +42,7 @@ import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
@@ -195,7 +195,7 @@ public class PlaylistService extends Service {
                 if (!mThePlayer.isPaused()) {
                     play();
                 }
-                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
         .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
@@ -325,7 +325,7 @@ public class PlaylistService extends Service {
                 for (PlaylistEntry entry : newList) {
                     mPlaylist.add(entry);
                 }
-                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
         .addAction(MessagingService.ACTION_SONG_STATUS_MESSAGE, new IBroadcastActionHandler() {
@@ -348,7 +348,7 @@ public class PlaylistService extends Service {
                         entry.setLoaded(loaded);
                         entry.setPlayed(played);
                         // send an intent to the fragments that the playlist is updated
-                        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
                     } else {
                         Log.e(TAG, "Attempting to update information about a song that is not in our playlist: " + song);
                     }
@@ -498,7 +498,7 @@ public class PlaylistService extends Service {
     public void clearPlaylist() {
         mPlaylist.clear();
         currentEntry = null;
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
     public void pause() {
@@ -521,11 +521,11 @@ public class PlaylistService extends Service {
         if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
         }
-        new BroadcastIntent(ACTION_SONG_ADDED)
+        new LocalBroadcastIntent(ACTION_SONG_ADDED)
             .putExtra(EXTRA_SONG, entry)
             .send(this);
         // send an intent to the fragments that the playlist is updated
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
 
         if (isLocalPlayer) {
             //send a message to the guests with the new playlist
@@ -541,12 +541,12 @@ public class PlaylistService extends Service {
         if (entry != null) {
             mPlaylist.remove(entry);
             //broadcast the fact that a song has been removed
-            new BroadcastIntent(ACTION_SONG_REMOVED)
+            new LocalBroadcastIntent(ACTION_SONG_REMOVED)
                 .putExtra(EXTRA_SONG, entry)
                 .send(this);
             
             //broadcast the fact that the playlist has been updated
-            new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+            new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     
             if (isLocalPlayer) {
                 //send a message to the guests with the new playlist
@@ -577,7 +577,7 @@ public class PlaylistService extends Service {
     public void bumpSong(PlaylistEntry entry){
         mPlaylist.bumpSong(entry);
         
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         
         if (isLocalPlayer) {
             //send a message to the guests with the new playlist

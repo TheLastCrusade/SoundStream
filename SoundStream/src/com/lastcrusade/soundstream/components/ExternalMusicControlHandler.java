@@ -26,7 +26,7 @@ import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
 
 import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 /**
@@ -50,13 +50,13 @@ public class ExternalMusicControlHandler extends BroadcastReceiver {
 
             switch (keyEvent.getKeyCode()) {
                 case KeyEvent.KEYCODE_HEADSETHOOK:
-                    new BroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                    new BroadcastIntent(PlaylistService.ACTION_PLAY_PAUSE).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAY_PAUSE).send(context);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
-                    new BroadcastIntent(PlaylistService.ACTION_SKIP).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_SKIP).send(context);
                     break;
 //                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
 //                        // TODO: ensure that doing this in rapid succession actually plays the

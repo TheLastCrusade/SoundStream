@@ -22,7 +22,7 @@ package com.lastcrusade.soundstream.audio;
 import android.content.Context;
 
 import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 
 public class AudioPlayerWithEvents implements IPlayer {
 
@@ -47,24 +47,24 @@ public class AudioPlayerWithEvents implements IPlayer {
     @Override
     public void play() {
         this.player.play();
-        new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
     }
 
     @Override
     public void pause() {
         this.player.pause();
-        new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
     }
 
     @Override
     public void resume() {
         this.player.resume();
-        new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
     }
 
     @Override
     public void skip() {
         this.player.skip();
-        new BroadcastIntent(PlaylistService.ACTION_SKIPPING_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_SKIPPING_AUDIO).send(this.context);
     }
 }
