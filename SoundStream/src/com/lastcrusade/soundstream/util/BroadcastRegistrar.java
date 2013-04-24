@@ -103,7 +103,8 @@ public class BroadcastRegistrar {
     }
 
     public void unregister() {
-        this.registeredContext.unregisterReceiver(localReceiver);
+        LocalBroadcastManager.getInstance(registeredContext)
+            .unregisterReceiver(localReceiver);
         this.registeredContext.unregisterReceiver(globalReceiver);
     }
 }
