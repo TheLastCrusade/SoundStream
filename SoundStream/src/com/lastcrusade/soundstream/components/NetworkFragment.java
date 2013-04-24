@@ -174,7 +174,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
             @Override
             public void onClick(View v) {
-                getConnectionService().broadcastGuest(getActivity());
+                getConnectionService().broadcastSelfAsGuest(getActivity().getApplicationContext());
             }
         });
         return v;
