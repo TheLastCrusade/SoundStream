@@ -168,6 +168,15 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .show();
             }
         });
+        
+        Button connect = (Button)v.findViewById(R.id.connect_btn);
+        connect.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getConnectionService().broadcastSelfAsGuest(getActivity().getApplicationContext());
+            }
+        });
         return v;
     }
 
