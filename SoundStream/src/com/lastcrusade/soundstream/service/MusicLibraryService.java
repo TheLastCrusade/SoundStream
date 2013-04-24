@@ -287,7 +287,7 @@ public class MusicLibraryService extends Service {
         synchronized(metadataMutex) {
             //sort the metadata alphabetically
             Collections.sort(metadataList, new AlphabeticalComparator());
-            
+           
             //recreate the map
             Map<String, Integer> newMap  = new HashMap<String, Integer>();
             for(int i=0; i<metadataList.size(); i++){

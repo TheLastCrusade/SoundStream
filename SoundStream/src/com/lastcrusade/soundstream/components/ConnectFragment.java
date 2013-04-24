@@ -52,7 +52,7 @@ import com.lastcrusade.soundstream.util.Transitions;
  */
 public class ConnectFragment extends SherlockFragment implements ITitleable{
     
-    private static final String TAG = ConnectFragment.class.getName();
+    private static final String TAG = ConnectFragment.class.getSimpleName();
 
     private BroadcastRegistrar broadcastRegistrar;
     private View joinView;
@@ -116,6 +116,11 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         });
 
         return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override

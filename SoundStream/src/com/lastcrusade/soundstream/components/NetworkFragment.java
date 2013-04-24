@@ -36,7 +36,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -195,6 +194,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 disband.setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override

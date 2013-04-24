@@ -27,13 +27,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
+import android.widget.ListView;
 
+import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -46,11 +47,12 @@ import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
+import com.lastcrusade.soundstream.util.SongGestureListener;
 import com.lastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show
-    private final String TAG = PlaylistFragment.class.getName();
+    private final String TAG = PlaylistFragment.class.getSimpleName();
 
     private BroadcastRegistrar registrar;
 
@@ -98,14 +100,38 @@ public class PlaylistFragment extends MusicListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
-        setListAdapter(mPlayListAdapter);
+        setListAdapter(mPlayListAdapter);  
         return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override
     public void onResume(){
         super.onResume();
         getActivity().setTitle(getTitle());
+        
+        final GestureDetectorCompat songGesture = new GestureDetectorCompat(getActivity(), 
+                new PlaylistSongGestureListener(getListView()));
+        
+        getListView().setOnTouchListener(new View.OnTouchListener() {       
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(songGesture.onTouchEvent(event)){
+                    if(event.getAction() != MotionEvent.ACTION_DOWN){
+                        MotionEvent cancelEvent = MotionEvent.obtain(event);
+                        cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
+                        v.onTouchEvent(cancelEvent);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -169,9 +195,6 @@ public class PlaylistFragment extends MusicListFragment{
         return playlistService;
     }
 
-    /**
-     * 
-     */
     private void updatePlaylist() {
         mPlayListAdapter.updateMusic(getPlaylistService().getPlaylistEntries());
     }
@@ -223,17 +246,6 @@ public class PlaylistFragment extends MusicListFragment{
                 }
             }
             
-
-            //add gesture detection on the song element
-            final GestureDetectorCompat songGesture = new GestureDetectorCompat(getActivity(), new PlaylistSongGestureListener(element, entry));
-            element.setOnTouchListener(new View.OnTouchListener() {       
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return songGesture.onTouchEvent(event);
-                }
-            });
-
-            
             return element;
         }
         
@@ -247,108 +259,113 @@ public class PlaylistFragment extends MusicListFragment{
                 Toaster.iToast(getActivity(),R.string.no_songs_in_playlist);
             }
         }
+    }
+    
+  //detect gestures 
+    private class PlaylistSongGestureListener extends SongGestureListener{
+        private final int SWIPE_MIN_DISTANCE = 200;
         
+        public PlaylistSongGestureListener(ListView view){
+            super(view);   
+        }
         
-      //detect gestures 
-        private class PlaylistSongGestureListener extends SongGestureListener{
-            private PlaylistEntry entry;
-            private View view;
-            private final int SWIPE_MIN_DISTANCE = 100;
-            private boolean removed;
-            
-            public PlaylistSongGestureListener(View view, PlaylistEntry entry){
-                super(view);
-                this.view = view;
-                this.entry = entry;    
-            }
-            
-            //fling a song to the right to remove it
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                    float velocityY) {
-                boolean swipe = false;
-                // Fling is what the gesture detector detects
-                // Swipe is our internal vocabulary for a 
-                // horizontal left to right fling
-                if( !removed && isSwipe(e1, e2, velocityX, velocityY)){
-                    animateDragging((int)e2.getX());
-                    
-                    if(getPlaylistService().getCurrentEntry()!= null && 
-                            getPlaylistService().getCurrentEntry().equals(entry)){
-                        getPlaylistService().skip();
-                    }
-                    
-                    getPlaylistService().removeSong(entry);
-                    removed = true;
-                    swipe=true;
-                }
-                    
-                return swipe;
-            }
-            
-            //allows the view to be moved horizontally
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                float distanceX, float distanceY) {
+        //fling a song to the right to remove it
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                float velocityY) {
+            boolean swipe = false;
+            // Fling is what the gesture detector detects
+            // Swipe is our internal vocabulary for a 
+            // horizontal left to right fling
+            if(selectedIndex != -1 && isSwipe(e1, e2, velocityX, velocityY)){
+                animateDragging((int)e2.getX());
                 
-                float dx = e2.getX() - e1.getX();
+                if(getPlaylistService().getCurrentEntry()!= null && 
+                        getPlaylistService().getCurrentEntry().equals(getSelectedEntry()) ){
+                    getPlaylistService().skip();
+                }
+                
+                getPlaylistService().removeSong(getSelectedEntry());
+                selectedIndex = -1;
+                swipe=true;
+            }
+                
+            return swipe;
+        }
+        
+        //allows the view to be moved horizontally
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+            float distanceX, float distanceY) {
+            float dx = e2.getX() - e1.getX();
+            if(selectedIndex != -1 && Math.abs(distanceX) > Math.abs(distanceY)){
+                
                 animateDragging(dx);
                 
-                if(!removed && e2.getX() > ((View)view.getParent()).getWidth()-100){
+                if(e2.getX() > ((View)getSelectedView().getParent()).getWidth()-100 && dx > 100){
                     if(getPlaylistService().getCurrentEntry()!= null && 
-                            getPlaylistService().getCurrentEntry().equals(entry)){
+                            getPlaylistService().getCurrentEntry().equals(getSelectedEntry())){
                         getPlaylistService().skip();
                     }
-                    getPlaylistService().removeSong(entry);
-                    removed = true;
+                    getPlaylistService().removeSong(getSelectedEntry());
+                    selectedIndex = -1;
                 }
-                
-                return super.onScroll(e1, e2, distanceX, distanceY);
-            }
-            
-            //bump the song to the top when double tapped
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                getPlaylistService().bumpSong(entry);
                 return true;
-            } 
-            
-            /**
-             * Animates the current view by moving it to the right by the given 
-             * amount
-             * 
-             * @param amount
-             */
-            private void animateDragging(float amount){
-                if(!removed){
-                    TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
-                    trans.setDuration(100);
+            }
+            return false;
+        }
+        
+        //bump the song to the top when double tapped
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            if(selectedIndex != -1){
+                getPlaylistService().bumpSong(getSelectedEntry());
+                selectedIndex = -1;
+            }
+            return true;
+        } 
+        
+        /**
+         * Animates the current view by moving it to the right by the given 
+         * amount
+         * 
+         * @param amount
+         */
+        private void animateDragging(float amount){
+                TranslateAnimation trans = new TranslateAnimation(amount, amount, 0,0);
+                trans.setDuration(100);
+                View view = getSelectedView();
+                if(view != null){
                     trans.initialize(view.getWidth(), view.getHeight(), 
                             ((View)view.getParent()).getWidth(), ((View)view.getParent()).getHeight());
                     
                     view.startAnimation(trans);
                 }
-            }
+        }
+        
+        
+        /**
+         * Checks to see if the fling motion described by these inputs matches
+         * our definition of a left to right swipe
+         * 
+         * @param e1
+         * @param e2
+         * @param velocityX
+         * @param velocityY
+         * @return
+         */
+        private boolean isSwipe(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
+            float dx = e2.getX() - e1.getX();
             
-            
-            /**
-             * Checks to see if the fling motion described by these inputs matches
-             * our definition of a left to right swipe
-             * 
-             * @param e1
-             * @param e2
-             * @param velocityX
-             * @param velocityY
-             * @return
-             */
-            private boolean isSwipe(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
-                float dx = e2.getX() - e1.getX();
-                
-                if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
-                    return true;
-                }
-                return false;  
+            if(dx > SWIPE_MIN_DISTANCE && velocityX > velocityY){
+                return true;
             }
-        } 
-    }
+            return false;  
+        }
+        
+        private PlaylistEntry getSelectedEntry(){
+            return (PlaylistEntry)musicView.getAdapter().getItem(selectedIndex);
+        }
+    } 
+
 }

@@ -24,24 +24,22 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.lastcrusade.soundstream.CustomApp;
+import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -51,7 +49,7 @@ import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.MusicListAdapter;
-import com.lastcrusade.soundstream.util.Toaster;
+import com.lastcrusade.soundstream.util.SongGestureListener;
 
 public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getSimpleName();
@@ -117,11 +115,39 @@ public class MusicLibraryFragment extends MusicListFragment {
         unregisterReceivers();
     }
 
+    /* (non-Javadoc)
+     * @see com.lastcrusade.soundstream.components.MusicListFragment#onResume()
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        final GestureDetectorCompat songGesture = new GestureDetectorCompat(getActivity(),
+                new SongGestureListener(getListView()));
+        getListView().setOnTouchListener(new View.OnTouchListener() {       
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+              return songGesture.onTouchEvent(event);
+            }
+        });
+     
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        
+        super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.list, container, false);
+        
         setListAdapter(mMusicAdapter);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        
+        return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override
