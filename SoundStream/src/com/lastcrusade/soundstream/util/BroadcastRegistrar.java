@@ -94,10 +94,10 @@ public class BroadcastRegistrar {
         //register the local receiver, with the assembled filter
         LocalBroadcastManager.getInstance(context)
             .registerReceiver(localReceiver, localFilter);
-        
+
         //register the global receiver, with the assembled filter
         context.registerReceiver(globalReceiver, globalFilter);
-        
+
         //hold on to the registered context, for unregister
         this.registeredContext = context;
     }
