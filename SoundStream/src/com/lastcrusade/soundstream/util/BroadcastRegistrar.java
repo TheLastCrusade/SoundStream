@@ -37,43 +37,73 @@ import android.support.v4.content.LocalBroadcastManager;
  */
 public class BroadcastRegistrar {
 
-    private IntentFilter filter;
-    private Map<String, IBroadcastActionHandler> handlerMap =
+    private IntentFilter localFilter;
+    private IntentFilter globalFilter;
+    private Map<String, IBroadcastActionHandler> localHandlerMap =
             new HashMap<String, IBroadcastActionHandler>();
-    private BroadcastReceiver internalReceiver;
+    private Map<String, IBroadcastActionHandler> globalHandlerMap =
+            new HashMap<String, IBroadcastActionHandler>();
+
+    private BroadcastReceiver localReceiver;
+    private BroadcastReceiver globalReceiver;
     private Context registeredContext;
 
     public BroadcastRegistrar() {
-        this.filter = new IntentFilter();
+        this.localFilter  = new IntentFilter();
+        this.globalFilter = new IntentFilter();
     }
-    
+
     public BroadcastRegistrar addAction(String action, IBroadcastActionHandler handler) {
         //add the action to the filter and store the handler
-        this.filter.addAction(action);
-        this.handlerMap.put(action, handler);
+        this.localFilter.addAction(action);
+        this.localHandlerMap.put(action, handler);
+        return this;
+    }
+
+    public BroadcastRegistrar addGlobalAction(String action, IBroadcastActionHandler handler){
+        this.globalFilter.addAction(action);
+        this.globalHandlerMap.put(action, handler);
         return this;
     }
 
     public void register(Context context) {
         //this receiver routes actions to their registered handler
-        this.internalReceiver = new BroadcastReceiver() {
+        this.localReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
-                for (String key : handlerMap.keySet()) {
+                for (String key : localHandlerMap.keySet()) {
                     if (key.equals(intent.getAction())) {
-                        handlerMap.get(key).onReceiveAction(context, intent);
+                        localHandlerMap.get(key).onReceiveAction(context, intent);
                     }
                 }
             }
         };
-        //register the receiver, with the assembled filter
-        LocalBroadcastManager.getInstance(context).registerReceiver(internalReceiver, filter);
+
+        this.globalReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                for (String key : globalHandlerMap.keySet()) {
+                    if (key.equals(intent.getAction())) {
+                        globalHandlerMap.get(key).onReceiveAction(context, intent);
+                    }
+                }
+            }
+        };
+
+        //register the local receiver, with the assembled filter
+        LocalBroadcastManager.getInstance(context)
+            .registerReceiver(localReceiver, localFilter);
+        
+        //register the global receiver, with the assembled filter
+        context.registerReceiver(globalReceiver, globalFilter);
+        
         //hold on to the registered context, for unregister
         this.registeredContext = context;
     }
-    
+
     public void unregister() {
-        this.registeredContext.unregisterReceiver(internalReceiver);
+        this.registeredContext.unregisterReceiver(localReceiver);
+        this.registeredContext.unregisterReceiver(globalReceiver);
     }
 }
