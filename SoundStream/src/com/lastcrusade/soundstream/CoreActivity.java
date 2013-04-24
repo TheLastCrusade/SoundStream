@@ -126,7 +126,13 @@ public class CoreActivity extends SlidingFragmentActivity{
     @Override
     protected void onDestroy() {
         unregisterReceivers();
+        unbindServiceLocators();
         super.onDestroy();
+    }
+
+    private void unbindServiceLocators(){
+        messagingServiceLocator.unbind();
+        musicLibraryLocator.unbind();
     }
 
     private void createServiceLocators() {
@@ -147,9 +153,9 @@ public class CoreActivity extends SlidingFragmentActivity{
 
     @Override
     public void onStop() {
-      super.onStop();
       //For Google Analytics
       EasyTracker.getInstance().activityStop(this);
+      super.onStop();
     }
 
     private void registerReceivers() {
