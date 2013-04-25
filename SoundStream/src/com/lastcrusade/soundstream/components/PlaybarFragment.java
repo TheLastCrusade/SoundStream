@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService;
@@ -99,13 +100,21 @@ public class PlaybarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 PlaylistService service = getPlaylistService();
+                long state; //Number for google analytics
                 if (service != null) {
                     if (service.isPlaying()) {
                         service.pause();
+                        state = 0; // 0 means we have paused
                     } else {
                         service.play();
+                        state = 1; // 1 means we are now playing
                     }
                     smartSetPlayPauseImage(service);
+                    ((CoreActivity)getActivity()).getTracker().sendEvent(
+                            "ui_action",  // Category
+                            "click",      // Action
+                            "play_pause", // Label
+                            state);       // Value
                 }
             }
 
@@ -119,6 +128,11 @@ public class PlaybarFragment extends Fragment {
                     PlaylistService service = getPlaylistService();
                     if(service != null){
                         service.skip();
+                        ((CoreActivity)getActivity()).getTracker().sendEvent(
+                                "ui_action",  // Category
+                                "click",      // Action
+                                "skip",       // Label
+                                0L);          // Value doesn't matter
                     }
                 }
             });

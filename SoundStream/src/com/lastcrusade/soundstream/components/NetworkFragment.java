@@ -118,6 +118,11 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 addMembersButton.setEnabled(false);
                 //TODO: add some kind of visual indicator while discovering...seconds until discovery is finished, number of clients found, etc
                 getConnectionService().findNewGuests();
+                ((CoreActivity)getActivity()).getTracker().sendEvent(
+                        "ui_action",  // Category
+                        "click",      // Action
+                        "add_members",// Label
+                        0L);          // Value doesn't matter
             }
         });
 
@@ -139,12 +144,21 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "Disconnecting...");
+                                ((CoreActivity)getActivity()).getTracker().sendEvent(
+                                        "ui_action",  // Category
+                                        "click",      // Action
+                                        "disconnect", // Label
+                                        1L);          // Value positive
                                 disconnect();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
+                                ((CoreActivity)getActivity()).getTracker().sendEvent(
+                                        "ui_action",  // Category
+                                        "click",      // Action
+                                        "disconnect", // Label
+                                        0L);          // Value negative
                             }
                         })
                         .show();
@@ -158,11 +172,20 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 disband();
+                                ((CoreActivity)getActivity()).getTracker().sendEvent(
+                                        "ui_action",  // Category
+                                        "click",      // Action
+                                        "disband",    // Label
+                                        1L);          // Value positive
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
+                                ((CoreActivity)getActivity()).getTracker().sendEvent(
+                                        "ui_action",  // Category
+                                        "click",      // Action
+                                        "disband",    // Label
+                                        0L);          // Value negative
                             }
                         })
                         .show();
@@ -372,6 +395,11 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                                 @Override
                                 public void onItemsClick(
                                         List<FoundGuest> foundGuests) {
+                                    ((CoreActivity)getActivity()).getTracker().sendEvent(
+                                            "ui_action",                // Category
+                                            "MultiSelectListDialog",    // Action
+                                            "found_guests",             // Label
+                                            (long)foundGuests.size());  // Value length of list
                                     getConnectionService().connectToGuests(foundGuests);
                                 }
                             })
