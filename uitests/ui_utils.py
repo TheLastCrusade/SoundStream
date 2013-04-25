@@ -22,6 +22,7 @@ ATP_MED_2 = 'Add To Playlist_Montego'
 ATP_LONG_1 = 'Add To Playlist_Piece for Disaffected Piano Two'
 ATP_LONG_2 = 'Add To Playlist_Controlled Chaos'
 ATP_XLONG = 'Add To Playlist_Music for Funeral Home - Part 11'
+ATP_TITLE_LONG = 'Add To Playlist_In The Early Months Of The Emergency Or really any month that has 31 days'
 
 def print_layout(view_client):
     """prints out a hierarchical view of the current screen with all its components
