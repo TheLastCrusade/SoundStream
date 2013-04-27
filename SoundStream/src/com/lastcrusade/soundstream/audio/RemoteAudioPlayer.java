@@ -23,8 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CustomApp;
-import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;

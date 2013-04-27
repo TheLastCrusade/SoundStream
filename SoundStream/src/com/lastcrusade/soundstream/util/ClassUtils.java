@@ -16,27 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lastcrusade.soundstream.util;
 
-package com.lastcrusade.soundstream.audio;
+import com.lastcrusade.soundstream.audio.AudioPlayerWithEvents;
 
 /**
- * A generic media player interface.  This will be used both to implement the actual media player, and
- * anything that acts as an interface into the media player (e.g. the play bar).
+ * Utilities for working with Class objects and their effects on
+ * other objects.
  * 
  * @author Jesse Rosalia
  *
  */
-public interface IPlayer {
+public class ClassUtils {
 
-    public boolean isPaused();
-
-    public boolean isPlaying();
-    
-    public void play();
-
-    public void pause();
-    
-    public void resume();
-    
-    public void skip();
+    /**
+     * Get a class or interface from an object, if available.  This is useful
+     * when an object may implement optional interfaces, and we want to
+     * get those interfaces.
+     * 
+     * As an example, see {@link AudioPlayerWithEvents}.
+     * 
+     * @param object the object to inspect
+     * @param clazz the class to get
+     * @return
+     */
+    public static <T> T getIfAvailable(Object object, Class<T> clazz) {
+        return (clazz.isAssignableFrom(object.getClass()))
+                    ? clazz.cast(object)
+                    : null;
+    }
 }

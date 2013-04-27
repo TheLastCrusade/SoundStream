@@ -20,20 +20,141 @@
 package com.lastcrusade.soundstream.audio;
 
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
+import android.util.Log;
 
+import com.lastcrusade.soundstream.SoundStreamExternalControlClient;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.ClassUtils;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 public class AudioPlayerWithEvents implements IPlayer {
 
+    private static final String TAG = AudioPlayerWithEvents.class.getSimpleName();
+
     private IPlayer player;
     private Context context;
+    private IDuckable duckable;
 
+    private SoundStreamExternalControlClient externalControlClient;
+
+    //NOTE: this is static, because music focus is a global attribute that belongs to the phone
+    //TODO: this may be better off put in a global settings object...
+    private static boolean hasFocus;
+    
     public AudioPlayerWithEvents(IPlayer player, Context context) {
         this.player  = player;
+        this.duckable = ClassUtils.getIfAvailable(player, IDuckable.class);
         this.context = context;
+        this.externalControlClient = new SoundStreamExternalControlClient(this.context);
+        hasFocus = false;
     }
     
+    private void registerExternalControlClient() {
+        externalControlClient.registerClient();
+    }
+
+    private void unregisterExternalControlClient() {
+        externalControlClient.unregisterClient();
+    }
+
+
+    private void requestAudio() {
+        //NOTE: we need to request the audio for the remote controls to work, but
+        // we also want to handle things like audio ducking and pausing here.
+        AudioManager myAudioManager = (AudioManager) this.context.getSystemService(Context.AUDIO_SERVICE);
+        if (!hasFocus) {
+            int response = myAudioManager.requestAudioFocus(new OnAudioFocusChangeListener() {
+    
+                @Override
+                public void onAudioFocusChange(int focusChange) {
+                    //TODO: duck audio or pause in other cases where focus has changed.
+                    switch (focusChange) {
+                    //handle loss of focus, which includes when a phonecall is coming in
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                        handleAudioFocusLoss(focusChange == AudioManager.AUDIOFOCUS_LOSS);
+                        hasFocus = false;
+                        break;
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        handleAudioFocusCanDuck();
+                        //NOTE: this will not change the audio focus permanently, so
+                        // we dont change hasFocus
+                        break;
+                    case AudioManager.AUDIOFOCUS_GAIN:
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
+                        handleAudioFocusReturned(focusChange == AudioManager.AUDIOFOCUS_GAIN);
+                        hasFocus = true;
+                        break;
+                    }
+                }
+
+            }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            hasFocus = response == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            if (hasFocus) {
+                registerExternalControlClient();
+            }
+        }
+    }
+
+    /**
+     * @param focusChange
+     */
+    private void handleAudioFocusLoss(boolean permanent) {
+        if (LogUtil.isLogAvailable()) {
+            Log.d(TAG, String.format("Audio focus lost%s", permanent ? "" : " (transient)"));
+        }
+        //unregister the external control client when focus is lost, as per best practice
+        unregisterExternalControlClient();
+        //NOTE: this calls the the pause method directly, because we want instant action.
+        pause();
+    }
+
+    /**
+     * 
+     */
+    private void handleAudioFocusCanDuck() {
+        if (LogUtil.isLogAvailable()) {
+            Log.d(TAG, "Audio focus lost (can duck)");
+        }
+        duck();
+        //NOTE: don't touch the external client
+        //...we have technically not lost focus
+    }
+
+    /**
+     * @param focusChange
+     */
+    private void handleAudioFocusReturned(boolean permanent) {
+        if (LogUtil.isLogAvailable()) {
+            Log.d(TAG, String.format("Audio focus returned%s", permanent ? "" : " (transient)"));
+        }
+        //register the external control client when we gain focus
+        registerExternalControlClient();
+        unduck();
+        resume();
+    }
+
+    /**
+     * 
+     */
+    protected void duck() {
+        if (this.duckable != null) {
+            this.duckable.duck();
+        }
+    }
+
+    /**
+     * 
+     */
+    protected void unduck() {
+        if (this.duckable != null) {
+            this.duckable.unduck();
+        }
+    }
+
     @Override
     public boolean isPaused() {
         return this.player.isPaused();
@@ -46,6 +167,7 @@ public class AudioPlayerWithEvents implements IPlayer {
 
     @Override
     public void play() {
+        requestAudio();
         this.player.play();
         new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
     }
@@ -58,6 +180,7 @@ public class AudioPlayerWithEvents implements IPlayer {
 
     @Override
     public void resume() {
+        requestAudio();
         this.player.resume();
         new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
     }

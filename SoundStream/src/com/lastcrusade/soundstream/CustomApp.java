@@ -54,8 +54,6 @@ public class CustomApp extends Application {
 
     private BroadcastRegistrar registrar;
 
-    private SoundStreamExternalControlClient externalControlClient;
-
     public CustomApp() {
         super();
     }
@@ -67,47 +65,11 @@ public class CustomApp extends Application {
         createServiceLocators();
 
         registerReceivers();
-        
-        registerExternalControlClient();
-        
-        requestAudio();
     }
     
-    private void registerExternalControlClient() {
-        externalControlClient = new SoundStreamExternalControlClient(this);
-    }
-
-    private void unregisterExtranlControlClient() {
-        externalControlClient.unregister();
-    }
-
-    private void requestAudio() {
-        //NOTE: we need to request the audio for the remote controls to work, but
-        // we also want to handle things like audio ducking and pausing here.
-        AudioManager myAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        myAudioManager.requestAudioFocus(new OnAudioFocusChangeListener() {
-
-            @Override
-            public void onAudioFocusChange(int focusChange) {
-                //TODO: duck audio or pause in other cases where focus has changed.
-                switch (focusChange) {
-                //handle loss of focus, which includes when a phonecall is coming in
-                case AudioManager.AUDIOFOCUS_LOSS:
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-//                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                    //NOTE: this calls the playlist service directly, because we want instant action.
-                    getPlaylistService().pause();
-                    break;
-                }
-            }
-            
-        }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-    }
-
     @Override
     public void onTerminate() {
         unregisterReceivers();
-        externalControlClient.unregister();
         super.onTerminate();
     }
 
