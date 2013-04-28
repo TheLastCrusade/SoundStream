@@ -37,12 +37,12 @@ public class ClassUtils {
      * As an example, see {@link AudioPlayerWithEvents}.
      * 
      * @param object the object to inspect
-     * @param clazz the class to get
+     * @param desiredClass the class to get
      * @return
      */
-    public static <T> T getIfAvailable(Object object, Class<T> clazz) {
-        return (clazz.isAssignableFrom(object.getClass()))
-                    ? clazz.cast(object)
+    public static <T> T getIfAvailable(Object object, Class<T> desiredClass) {
+        return (desiredClass.isAssignableFrom(object.getClass()))
+                    ? desiredClass.cast(object)
                     : null;
     }
 }
