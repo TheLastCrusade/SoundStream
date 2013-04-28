@@ -38,7 +38,7 @@ def touch_with_cd(view_client, content_description):
 
     Keyword arguments:
     view_client -- the connected android device/emulator
-    content_description -- content description of the component you want to press/touch/click
+    content_description -- content description +as a string+ of the component you want to press/touch/click
     """
     view_client.findViewWithContentDescriptionOrRaise(content_description).touch()
     view_client.dump()
