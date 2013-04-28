@@ -40,6 +40,8 @@ public class AudioPlayerWithEvents implements IPlayer {
 
     private SoundStreamExternalControlClient externalControlClient;
 
+    private boolean registered;
+
     //NOTE: this is static, because music focus is a global attribute that belongs to the phone
     //TODO: this may be better off put in a global settings object...
     private static boolean hasFocus;
@@ -49,17 +51,23 @@ public class AudioPlayerWithEvents implements IPlayer {
         this.duckable = ClassUtils.getIfAvailable(player, IDuckable.class);
         this.context = context;
         this.externalControlClient = new SoundStreamExternalControlClient(this.context);
+        this.registered = false;
         hasFocus = false;
     }
     
     private void registerExternalControlClient() {
         externalControlClient.registerClient();
+        this.registered = true;
     }
 
     private void unregisterExternalControlClient() {
+        this.registered = false;
         externalControlClient.unregisterClient();
     }
-
+    
+    private boolean isExternalControlClientRegistered() {
+        return this.registered;
+    }
 
     private void requestAudio() {
         //NOTE: we need to request the audio for the remote controls to work, but
@@ -100,6 +108,12 @@ public class AudioPlayerWithEvents implements IPlayer {
     }
 
     /**
+     * Handle loss of audio focus.  In both permanent and temporary cases,
+     * we want to unregister our external control client and pause the music.
+     * 
+     * No further cleanup is required for permanent loss, as the user may come
+     * back and use the app and expect state to be maintained.
+     * 
      * @param focusChange
      */
     private void handleAudioFocusLoss(boolean permanent) {
@@ -113,6 +127,9 @@ public class AudioPlayerWithEvents implements IPlayer {
     }
 
     /**
+     * Handle ducking due to loss of audio focus.  This is not really a
+     * loss of focus (compared to other focus loss events) so all we
+     * need to do is duck the player volume.
      * 
      */
     private void handleAudioFocusCanDuck() {
@@ -125,6 +142,8 @@ public class AudioPlayerWithEvents implements IPlayer {
     }
 
     /**
+     * Handle focus returning after a loss or a duck.  In all cases
+     * we will register the external client
      * @param focusChange
      */
     private void handleAudioFocusReturned(boolean permanent) {
@@ -132,13 +151,17 @@ public class AudioPlayerWithEvents implements IPlayer {
             Log.d(TAG, String.format("Audio focus returned%s", permanent ? "" : " (transient)"));
         }
         //register the external control client when we gain focus
-        registerExternalControlClient();
+        // but only if we're unregistered
+        if (!isExternalControlClientRegistered()) {
+            registerExternalControlClient();
+        }
         unduck();
         resume();
     }
 
     /**
-     * 
+     * Duck the volume of the player, if the player supports
+     * audio ducking.
      */
     protected void duck() {
         if (this.duckable != null) {
@@ -147,7 +170,8 @@ public class AudioPlayerWithEvents implements IPlayer {
     }
 
     /**
-     * 
+     * Unduck the volume of the player, if the player supports
+     * audio ducking.
      */
     protected void unduck() {
         if (this.duckable != null) {
