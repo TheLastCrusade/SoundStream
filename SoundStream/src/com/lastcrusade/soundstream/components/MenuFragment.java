@@ -40,6 +40,7 @@ import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
@@ -87,6 +88,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
                 
             }
         });
+        playlist.setContentDescription(ContentDescriptionUtils.PLAYLIST);
         
         Button musicLibrary = (Button)v.findViewById(R.id.music_library_btn);
         musicLibrary.setOnClickListener(new OnClickListener() {
@@ -97,7 +99,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
                 
             }
         });
-      
+        musicLibrary.setContentDescription(ContentDescriptionUtils.MUSIC_LIBRARY);
         
         Button network = (Button)v.findViewById(R.id.network_btn);
         network.setOnClickListener(new OnClickListener() {
@@ -107,6 +109,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
                 Transitions.transitionToNetwork((CoreActivity)getActivity());
             }
         });
+        network.setContentDescription(ContentDescriptionUtils.NETWORK);
         
         userView = (LinearLayout)v.findViewById(R.id.connected_users);
         updateUserView();
