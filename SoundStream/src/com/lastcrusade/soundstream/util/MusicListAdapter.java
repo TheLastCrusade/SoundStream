@@ -84,8 +84,8 @@ public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
         
                View userColor = (View) element.findViewById(R.id.user_color); 
                TextView title = (TextView) element.findViewById(R.id.title);
-              TextView artist = (TextView) element.findViewById(R.id.artist);
                TextView album = (TextView) element.findViewById(R.id.album);
+              TextView artist = (TextView) element.findViewById(R.id.artist);
         ImageButton addButton = (ImageButton) element.findViewById(R.id.btn_add_to_playlist);
 
         String macAddress = metadataList.get(position).getMacAddress();
