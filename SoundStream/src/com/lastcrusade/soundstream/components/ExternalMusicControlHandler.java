@@ -22,12 +22,14 @@ package com.lastcrusade.soundstream.components;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.telephony.TelephonyManager;
+import android.media.AudioManager;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.LogUtil;
 
 /**
  * Handle external music control events that the Android OS may
@@ -39,10 +41,19 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
  */
 public class ExternalMusicControlHandler extends BroadcastReceiver {
 
+    private static final String TAG = ExternalMusicControlHandler.class.getSimpleName();
+    
     @Override
     public void onReceive(Context context, Intent intent) {
+        //headphones disconnected, or other "audio becoming noisy" events
+        if (intent.getAction().equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+            if (LogUtil.isLogAvailable()) {
+                Log.d(TAG, "Audio becoming noisy");
+            }
+            new BroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
+        }
         //media button or disconnnected headset or ICS (or greater) remote control
-        if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+        else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
             
             KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
             if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
@@ -50,12 +61,21 @@ public class ExternalMusicControlHandler extends BroadcastReceiver {
 
             switch (keyEvent.getKeyCode()) {
                 case KeyEvent.KEYCODE_HEADSETHOOK:
+                    if (LogUtil.isLogAvailable()) {
+                        Log.d(TAG, "Headset hook button pressed");
+                    }
                     new BroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                    if (LogUtil.isLogAvailable()) {
+                        Log.d(TAG, "External play/pause button pressed");
+                    }
                     new BroadcastIntent(PlaylistService.ACTION_PLAY_PAUSE).send(context);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
+                    if (LogUtil.isLogAvailable()) {
+                        Log.d(TAG, "External skip button pressed");
+                    }
                     new BroadcastIntent(PlaylistService.ACTION_SKIP).send(context);
                     break;
 //                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
