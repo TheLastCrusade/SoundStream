@@ -93,7 +93,6 @@
         android:paddingRight = "16dp"
         android:paddingLeft = "16dp" 
         android:visibility="invisible"
-        android:contentDescription="@string/add_to_playlist"
         />
      
      <ImageView 

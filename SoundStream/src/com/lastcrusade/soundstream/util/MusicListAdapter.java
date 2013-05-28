@@ -82,10 +82,11 @@ public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
             element = inflater.inflate(R.layout.song_item, null);
         }
         
-        View userColor = (View) element.findViewById(R.id.user_color); 
-        TextView title = (TextView)element.findViewById(R.id.title);
-        TextView artist = (TextView) element.findViewById(R.id.artist);
-        TextView album = (TextView) element.findViewById(R.id.album);
+               View userColor = (View) element.findViewById(R.id.user_color); 
+               TextView title = (TextView) element.findViewById(R.id.title);
+               TextView album = (TextView) element.findViewById(R.id.album);
+              TextView artist = (TextView) element.findViewById(R.id.artist);
+        ImageButton addButton = (ImageButton) element.findViewById(R.id.btn_add_to_playlist);
 
         String macAddress = metadataList.get(position).getMacAddress();
         
@@ -102,10 +103,10 @@ public class MusicListAdapter<T extends SongMetadata> extends BaseAdapter {
         title.setSingleLine(true);
         artist.setSingleLine(true);
         album.setSingleLine(true);
-        
-        ImageButton addButton = (ImageButton) element.findViewById(R.id.btn_add_to_playlist);
 
         addButton.setTag(position);
+        addButton.setContentDescription(ContentDescriptionUtils
+                .addToPlaylistAppendSongTitle(metadataList.get(position)));
 
         title.setText(metadataList.get(position).getTitle());
         artist.setText(metadataList.get(position).getArtist());

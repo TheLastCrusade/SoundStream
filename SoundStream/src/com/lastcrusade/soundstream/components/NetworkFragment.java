@@ -97,7 +97,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                NetworkFragment.this.userAdapter.updateUsers(getUserListFromService());
                 updateUserView();
             }
         });
@@ -126,7 +125,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
         userView = (LinearLayout) v.findViewById(R.id.connected_users);
         updateUserView();
-        //users.setAdapter(this.adapter);
 
         //TODO react to changing state
         setDisconnectDisbandVisibility();
@@ -166,6 +164,15 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                             }
                         })
                         .show();
+            }
+        });
+        
+        Button connect = (Button)v.findViewById(R.id.connect_btn);
+        connect.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getConnectionService().broadcastSelfAsGuest(getActivity());
             }
         });
         return v;
@@ -245,7 +252,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    userAdapter.notifyDataSetChanged();
                     updateUserView();
                 }
             })
@@ -408,7 +414,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private void updateUserView(){
         userView.removeAllViews();
-        
+        userAdapter.updateUsers(getUserListFromService());
         for(int i=0; i<userAdapter.getCount(); i++){
             View user = userAdapter.getView(i, null, userView);
             userView.addView(user);

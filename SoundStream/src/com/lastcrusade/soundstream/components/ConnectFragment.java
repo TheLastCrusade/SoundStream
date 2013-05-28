@@ -42,6 +42,7 @@ import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBind
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
@@ -56,7 +57,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     private BroadcastRegistrar broadcastRegistrar;
     private View joinView;
-    
+
     private ServiceLocator<ConnectionService> connectionServiceLocator;
 
     private ServiceLocator<MessagingService> messagingServiceLocator;
@@ -75,6 +76,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_connect, container, false);
+
         ((CoreActivity)getActivity()).hidePlaybar();
         
         int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
@@ -105,15 +107,17 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 ((CoreActivity)getActivity()).showPlaybar();
             }
         });
+        create.setContentDescription(ContentDescriptionUtils.CREATE);
         
         this.joinView = v.findViewById(R.id.join);
         this.joinView.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getConnectionService().broadcastGuest(getActivity());
+                getConnectionService().broadcastSelfAsGuest(getActivity());
             }
         });
+        joinView.setContentDescription(ContentDescriptionUtils.CONNECT);
 
         return v;
     }

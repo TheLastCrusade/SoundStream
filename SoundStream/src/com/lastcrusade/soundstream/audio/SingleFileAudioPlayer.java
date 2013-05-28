@@ -28,7 +28,6 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
@@ -43,11 +42,16 @@ import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
  * 
  * @author Jesse Rosalia
  */
-public class SingleFileAudioPlayer implements IPlayer {
+public class SingleFileAudioPlayer implements IPlayer, IDuckable {
 
     public static final String ACTION_SONG_FINISHED = SingleFileAudioPlayer.class.getName() + ".action.SongFinished";
 
     private static final String TAG = SingleFileAudioPlayer.class.getName();
+
+    private static final float DUCK_VOLUME = 0.1f;
+
+    private static final float NORMAL_VOLUME = 1.0f;
+
     private PlaylistEntry entry;
     private MediaPlayer player;
 
@@ -193,5 +197,21 @@ public class SingleFileAudioPlayer implements IPlayer {
 
     public boolean isPaused() {
         return paused;
+    }
+    
+    /* (non-Javadoc)
+     * @see com.lastcrusade.soundstream.audio.IDuckable#duck()
+     */
+    @Override
+    public void duck() {
+        player.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+    }
+    
+    /* (non-Javadoc)
+     * @see com.lastcrusade.soundstream.audio.IDuckable#unduck()
+     */
+    @Override
+    public void unduck() {
+        player.setVolume(NORMAL_VOLUME, NORMAL_VOLUME);
     }
 }

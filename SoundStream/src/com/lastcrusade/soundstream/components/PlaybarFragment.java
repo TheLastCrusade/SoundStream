@@ -42,6 +42,7 @@ import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class PlaybarFragment extends Fragment {
@@ -52,7 +53,7 @@ public class PlaybarFragment extends Fragment {
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-    private ImageButton playPause;
+    private ImageButton playPause, skip;
     private boolean boundToPlaylistService;
     private TextView songTitle;
 
@@ -90,6 +91,7 @@ public class PlaybarFragment extends Fragment {
         
         songTitle = (TextView) view.findViewById(R.id.text_now_playing);
         playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
+        skip = (ImageButton) view.findViewById(R.id.btn_skip);
         
         if(boundToPlaylistService){
             updateView();
@@ -110,18 +112,19 @@ public class PlaybarFragment extends Fragment {
             }
 
         });
+        playPause.setContentDescription(ContentDescriptionUtils.PLAY_PAUSE);
 
-        ((ImageButton) view.findViewById(R.id.btn_skip))
-            .setOnClickListener(new OnClickListener() {
-    
+        skip.setOnClickListener(new OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
                     PlaylistService service = getPlaylistService();
-                    if(service != null){
+                    if (service != null) {
                         service.skip();
                     }
                 }
             });
+        skip.setContentDescription(ContentDescriptionUtils.SKIP);
 
         return view;
     }

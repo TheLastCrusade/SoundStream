@@ -45,6 +45,7 @@ import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServi
 import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.LogUtil;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 import com.lastcrusade.soundstream.util.Toaster;
 
@@ -380,13 +381,6 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 skip();
-            }
-        })
-        .addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY, new IBroadcastActionHandler() {
-
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                pause();
             }
         })
         .register(this);

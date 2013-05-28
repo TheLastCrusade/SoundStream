@@ -487,10 +487,10 @@ public class ConnectionService extends Service {
      * NOTE: Must be called from an activity
      * 
      * TODO: this exposes an implementation detail, namely that bluetooth discoverability
-     * @param activity
+     * @param contex
      */
-    public void broadcastGuest(Activity activity) {
-        BluetoothUtils.enableDiscovery(activity);
+    public void broadcastSelfAsGuest(Context contex) {
+        BluetoothUtils.enableDiscovery(contex);
 
         try {
             if (adapter == null) {

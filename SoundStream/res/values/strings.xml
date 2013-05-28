@@ -37,6 +37,7 @@
     <string name="connect">Select</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join</string>
+    <string name="join_different_network">Join A Different Network</string>
     
     
     <!-- text labels -->
