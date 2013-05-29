@@ -52,7 +52,9 @@ public class BroadcastRegistrar {
         this.localFilter  = new IntentFilter();
         this.globalFilter = new IntentFilter();
     }
-
+    /**
+     * Used for internal application communication
+     */
     public BroadcastRegistrar addLocalAction(String action, IBroadcastActionHandler handler) {
         //add the action to the filter and store the handler
         this.localFilter.addAction(action);
@@ -60,6 +62,10 @@ public class BroadcastRegistrar {
         return this;
     }
 
+    /**
+     * Used for receiving device wide Broadcast intent's
+     * such as Bluetooth state intents
+     */
     public BroadcastRegistrar addGlobalAction(String action, IBroadcastActionHandler handler){
         this.globalFilter.addAction(action);
         this.globalHandlerMap.put(action, handler);
