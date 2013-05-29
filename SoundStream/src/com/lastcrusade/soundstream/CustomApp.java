@@ -44,7 +44,7 @@ import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class CustomApp extends Application {
-    private final String TAG = CustomApp.class.getName();
+    private final String TAG = CustomApp.class.getSimpleName();
     
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
