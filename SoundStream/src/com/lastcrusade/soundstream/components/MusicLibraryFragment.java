@@ -161,7 +161,7 @@ public class MusicLibraryFragment extends MusicListFragment {
      */
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(MusicLibraryService.ACTION_LIBRARY_UPDATED, new IBroadcastActionHandler() {
+        this.registrar.addLocalAction(MusicLibraryService.ACTION_LIBRARY_UPDATED, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -169,7 +169,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                 mMusicAdapter.updateMusicFromLibrary();
             }
         })
-        .addAction(PlaylistService.ACTION_SONG_ADDED, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_SONG_ADDED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {

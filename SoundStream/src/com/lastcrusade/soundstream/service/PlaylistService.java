@@ -180,7 +180,7 @@ public class PlaylistService extends Service {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-        .addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+        .addLocalAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -199,7 +199,7 @@ public class PlaylistService extends Service {
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
-        .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -213,7 +213,7 @@ public class PlaylistService extends Service {
                 stopDataManager();
             }
         })
-        .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -223,34 +223,34 @@ public class PlaylistService extends Service {
                 startDataManager();
             }
         })
-        .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
-        .addAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 pause();
             }
         })
-        .addAction(MessagingService.ACTION_PLAY_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_PLAY_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 play();
             }
         })
-        .addAction(MessagingService.ACTION_SKIP_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_SKIP_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 skip();
             }
         })
-        .addAction(MessagingService.ACTION_ADD_TO_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_ADD_TO_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -269,7 +269,7 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(MessagingService.ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -291,7 +291,7 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(MessagingService.ACTION_REMOVE_FROM_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_REMOVE_FROM_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -313,7 +313,7 @@ public class PlaylistService extends Service {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
-        .addAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -329,7 +329,7 @@ public class PlaylistService extends Service {
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
-        .addAction(MessagingService.ACTION_SONG_STATUS_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_SONG_STATUS_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -358,14 +358,14 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(PlaylistService.ACTION_PAUSE, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_PAUSE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 pause();
             }
         })
-        .addAction(PlaylistService.ACTION_PLAY_PAUSE, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_PLAY_PAUSE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -376,7 +376,7 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(PlaylistService.ACTION_SKIP, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_SKIP, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {

@@ -81,7 +81,7 @@ public class UserListService extends Service {
 
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+        this.registrar.addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_GUEST_NAME);
@@ -90,7 +90,7 @@ public class UserListService extends Service {
                 notifyUserListUpdate();
             }
         })
-        .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -99,7 +99,7 @@ public class UserListService extends Service {
                 notifyUserListUpdate();
             }
         })
-        .addAction(MessagingService.ACTION_NEW_CONNECTED_USERS_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_NEW_CONNECTED_USERS_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {

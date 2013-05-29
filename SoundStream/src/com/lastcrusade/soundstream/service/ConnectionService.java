@@ -265,7 +265,7 @@ public class ConnectionService extends Service {
                             (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
                 }
             })
-           .addAction(ConnectionService.ACTION_REMOTE_FIND_FINISHED, new IBroadcastActionHandler() {
+           .addLocalAction(ConnectionService.ACTION_REMOTE_FIND_FINISHED, new IBroadcastActionHandler() {
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

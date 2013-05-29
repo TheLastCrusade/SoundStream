@@ -117,7 +117,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         BroadcastRegistrar registrar = new BroadcastRegistrar();
         try {
             TestHandler handler = new TestHandler();
-            registrar.addAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
+            registrar.addLocalAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
                     handler).register(service);
 
             // add one song, make sure we have 1 good item
@@ -165,7 +165,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         BroadcastRegistrar registrar = new BroadcastRegistrar();
         try {
             TestHandler handler = new TestHandler();
-            registrar.addAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
+            registrar.addLocalAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
                     handler).register(service);
 
             // add one song, make sure we have 1 good item
@@ -206,7 +206,7 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         BroadcastRegistrar registrar = new BroadcastRegistrar();
         try {
             TestHandler handler = new TestHandler();
-            registrar.addAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
+            registrar.addLocalAction(MusicLibraryService.ACTION_LIBRARY_UPDATED,
                     handler).register(service);
 
             // add one song, make sure we have 1 good item

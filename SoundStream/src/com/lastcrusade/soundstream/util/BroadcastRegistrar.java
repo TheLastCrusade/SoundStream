@@ -53,7 +53,7 @@ public class BroadcastRegistrar {
         this.globalFilter = new IntentFilter();
     }
 
-    public BroadcastRegistrar addAction(String action, IBroadcastActionHandler handler) {
+    public BroadcastRegistrar addLocalAction(String action, IBroadcastActionHandler handler) {
         //add the action to the filter and store the handler
         this.localFilter.addAction(action);
         this.localHandlerMap.put(action, handler);

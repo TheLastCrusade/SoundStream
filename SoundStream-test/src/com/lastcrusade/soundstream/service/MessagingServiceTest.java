@@ -77,10 +77,10 @@ public class MessagingServiceTest extends ServiceTestCase {
         BroadcastRegistrar registrar = new BroadcastRegistrar();                
         try {
             final CommandMessageTestHandler handler = new CommandMessageTestHandler();
-            registrar.addAction(action, handler);
+            registrar.addLocalAction(action, handler);
             
             for (String a : inappropriateActions) {
-                registrar.addAction(a, new InappropriateActionTestHandler());
+                registrar.addLocalAction(a, new InappropriateActionTestHandler());
             }
             registrar.register(this.mContext);
             service.receiveMessage(1, message, "00:11:22:33:44:55");

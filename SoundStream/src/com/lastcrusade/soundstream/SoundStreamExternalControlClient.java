@@ -76,21 +76,21 @@ public class SoundStreamExternalControlClient {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPaused();
                 }
             })
-            .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPlaying();
                 }
             })
-            .addAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

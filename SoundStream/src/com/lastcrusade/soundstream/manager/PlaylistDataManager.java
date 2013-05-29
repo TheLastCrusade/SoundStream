@@ -153,7 +153,7 @@ public class PlaylistDataManager implements Runnable {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(MessagingService.ACTION_TRANSFER_SONG_MESSAGE, new IBroadcastActionHandler() {
+            .addLocalAction(MessagingService.ACTION_TRANSFER_SONG_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

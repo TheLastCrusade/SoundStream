@@ -161,7 +161,7 @@ public class CoreActivity extends SlidingFragmentActivity{
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -170,7 +170,7 @@ public class CoreActivity extends SlidingFragmentActivity{
                     Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
-            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

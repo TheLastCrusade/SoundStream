@@ -165,7 +165,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
 
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {

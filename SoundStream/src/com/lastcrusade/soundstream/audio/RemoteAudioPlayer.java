@@ -108,7 +108,7 @@ public class RemoteAudioPlayer implements IPlayer {
     
     private void registerReceivers() {
     	this.registrar = new BroadcastRegistrar();
-    	this.registrar.addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE,
+    	this.registrar.addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE,
     			new IBroadcastActionHandler() {
 			
 			@Override
