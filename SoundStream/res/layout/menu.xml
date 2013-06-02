@@ -167,6 +167,8 @@
                 android:id="@+id/connected_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_below="@id/users_line"
                 >
             </LinearLayout>
         </RelativeLayout>
