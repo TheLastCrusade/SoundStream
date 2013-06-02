@@ -115,7 +115,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onClick(View v) {
                 addMembersButton.setEnabled(false);
-                //TODO: add some kind of visual indicator while discovering...seconds until discovery is finished, number of clients found, etc
+                //TODO: add some kind of visual indicator while discovering
+                //...seconds until discovery is finished, number of clients found, etc
                 getConnectionService().findNewGuests();
             }
         });
