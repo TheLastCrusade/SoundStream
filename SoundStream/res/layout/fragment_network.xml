@@ -22,18 +22,12 @@
      android:layout_width="match_parent"
 	 android:layout_height="match_parent"
     >
+    
 	<LinearLayout 
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content" 
 	    android:orientation="vertical"
 	    >
-	
-	    <Button 
-	        android:id="@+id/add_members"
-	        android:text="@string/add_members"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        />
 	
 	    <TextView 
 	        android:id="@+id/connected_users_label"
@@ -43,6 +37,7 @@
 	        android:layout_margin="8dp"
 	        android:textSize="20sp"
 	        />
+	    
 	    <LinearLayout
 	        android:id="@+id/connected_users"
 	        android:layout_width="match_parent"
@@ -52,38 +47,157 @@
 	        android:orientation="vertical"
 	        />
 	
-	    <Button
-	        android:id="@+id/disconnect_btn"
-	        android:layout_width="fill_parent"
+	    <!-- add new memebers -->
+	    <LinearLayout 
+	        android:id="@+id/add_members"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:background="@color/red"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="10dp"
-	        android:layout_marginBottom="10dp"
-	        android:text="@string/disconnect"
-	        android:textColor="@color/white"
-	        />
-	    <Button
-	        android:id="@+id/disband_btn"
-	        android:layout_width="fill_parent"
+	        android:background="@color/gray"
+	        android:layout_margin="10dp"
+	        >
+	        
+		    <RelativeLayout 
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/white"
+		        android:layout_margin="3dp">
+			    
+			    <ImageView 
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:src="@drawable/guest"
+			     	/>
+			    
+			    <!-- Text at the bottom of image -->
+			    <RelativeLayout
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content" 
+		            android:layout_alignParentBottom="true">
+	
+		            <View
+		                android:layout_width="match_parent"
+		                android:layout_height="36dp"
+		                android:layout_alignParentBottom="true"
+		                android:alpha=".18"
+		                android:background="@color/accent_blue"/>
+		
+		            <TextView 
+		                android:text="@string/join_network"
+		                android:textSize="18sp"
+		                android:padding="6dp"
+		                android:layout_width="match_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_alignParentBottom="true"
+		                />
+		            
+		        </RelativeLayout>			        
+		    </RelativeLayout>
+	    
+	    </LinearLayout>
+	    
+	
+	    <!-- Disconnect -->
+	    <LinearLayout 
+	        android:id="@+id/disconnect_disband_btn"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:background="@color/red"
-	        android:visibility="invisible"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="10dp"
-	        android:layout_marginBottom="10dp"
-	        android:text="@string/disband"
-	        android:textColor="@color/white"
-	        />
-	    <Button
+	        android:background="@color/gray"
+	        android:layout_margin="10dp"
+	        >
+	        
+		    <RelativeLayout 
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/white"
+		        android:layout_margin="3dp">
+			    
+			    <ImageView 
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:src="@drawable/content_remove"
+			     	/>
+			    
+			    <!-- Text at the bottom of image -->
+			    <RelativeLayout
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content" 
+		            android:layout_alignParentBottom="true">
+	
+		            <View
+		                android:layout_width="match_parent"
+		                android:layout_height="36dp"
+		                android:layout_alignParentBottom="true"
+		                android:alpha=".18"
+		                android:background="@color/accent_blue"/>
+		
+		            <TextView 
+		                android:id="@+id/disconnect_disband_label"
+		                android:text="@string/disconnect"
+		                android:textSize="18sp"
+		                android:padding="6dp"
+		                android:layout_width="match_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_alignParentBottom="true"
+		                />
+		            
+		        </RelativeLayout>			        
+		    </RelativeLayout>
+	    
+	    </LinearLayout>
+	
+	        
+	    <!-- join different network 
+	    	TODO: rename this
+	    -->
+	    <LinearLayout 
 	        android:id="@+id/connect_btn"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="10dp"
-	        android:layout_marginBottom="10dp"
-	        android:text="@string/join_different_network"
-	        />
+	        android:background="@color/gray"
+	        android:layout_margin="10dp"
+	        >
+	        
+		    <RelativeLayout 
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/white"
+		        android:layout_margin="3dp">
+			    
+			    <ImageView 
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:src="@drawable/speaker"
+			     	/>
+			    
+			    <!-- Text at the bottom of image -->
+			    <RelativeLayout
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content" 
+		            android:layout_alignParentBottom="true">
+	
+		            <View
+		                android:layout_width="match_parent"
+		                android:layout_height="36dp"
+		                android:layout_alignParentBottom="true"
+		                android:alpha=".18"
+		                android:background="@color/accent_blue"/>
+		
+		            <TextView 
+		                android:text="@string/join_different_network"
+		                android:textSize="18sp"
+		                android:padding="6dp"
+		                android:layout_width="match_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_alignParentBottom="true"
+		                />
+		            
+		        </RelativeLayout>			        
+		    </RelativeLayout>
+	    
+	    </LinearLayout>
+	
+	
+	
 	</LinearLayout>
 </ScrollView>
 
