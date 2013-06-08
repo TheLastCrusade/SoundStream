@@ -110,21 +110,20 @@ public class CoreActivity extends SlidingFragmentActivity{
         super.onResume();
         
         SharedPreferences prefs = getSharedPreferences(
-                "com.thelastcrusade.soundstream", MODE_PRIVATE);
+                getPackageName(), MODE_PRIVATE);
 
         if (prefs.getBoolean("firstrun", true)) {
             
             prefs.edit().putBoolean("firstrun", false).commit();
 
             new AlertDialog.Builder(this)
-                    .setMessage(R.string.welcome)
-                    .setPositiveButton("Ok",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog,
-                                        int which) {
-
-                                }
-                            }).show();
+                .setMessage(R.string.welcome)
+                .setPositiveButton("Ok",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int which) {
+                            //do nothing
+                        }
+                     }).show();
         }
 
     }
