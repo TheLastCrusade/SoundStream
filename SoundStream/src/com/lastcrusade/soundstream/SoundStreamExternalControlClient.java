@@ -56,9 +56,31 @@ public class SoundStreamExternalControlClient {
 
     public SoundStreamExternalControlClient(Context context) {
         this.context = context;
+        
+        buildClient();
+        //we want the receivers even before we've registered the client,
+        // to accumulate state
         registerReceivers();
     }
     
+    /**
+     * 
+     */
+    private void buildClient() {
+        Class<?> receiverClass = ExternalMusicControlHandler.class;
+        this.mediaButtonEventReceiver = new ComponentName(
+                context.getPackageName(),
+                receiverClass.getName());
+        // build the PendingIntent for the remote control client
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonIntent.setComponent(mediaButtonEventReceiver);
+        PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, mediaButtonIntent, 0);
+        // create and register the remote control client
+        //NOTE: the client is created in all cases, but we call a method to
+        // set up and register it...this is so we can gracefully handle older versions of android.
+        mRemoteControlClientCompat = new RemoteControlClientCompat(mediaPendingIntent);
+    }
+
     public void registerClient() {
         registerRemoteControlClient();
         updateRemoteControlClient();
@@ -106,20 +128,8 @@ public class SoundStreamExternalControlClient {
     }
 
     private void registerRemoteControlClient() {
-        Class<?> receiverClass = ExternalMusicControlHandler.class;
-        this.mediaButtonEventReceiver = new ComponentName(
-                context.getPackageName(),
-                receiverClass.getName());
         AudioManager audioManager = (AudioManager) this.context.getSystemService(Context.AUDIO_SERVICE);
         audioManager.registerMediaButtonEventReceiver(mediaButtonEventReceiver);
-        // build the PendingIntent for the remote control client
-        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-        mediaButtonIntent.setComponent(mediaButtonEventReceiver);
-        PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, mediaButtonIntent, 0);
-        // create and register the remote control client
-        //NOTE: the client is created in all cases, but we call a method to
-        // set up and register it...this is so we can gracefully handle older versions of android.
-        mRemoteControlClientCompat = new RemoteControlClientCompat(mediaPendingIntent);
         registerRemoteControlClientCompat(audioManager);
     }
 
