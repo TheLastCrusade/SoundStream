@@ -212,7 +212,9 @@ public class AudioPlayerWithEvents implements IPlayer {
      * 
      */
     private void cancelDuckTimer() {
-        this.duckTimer.cancel();
+        if (this.duckTimer != null) {
+            this.duckTimer.cancel();
+        }
         this.duckTimer = null;
     }
 
