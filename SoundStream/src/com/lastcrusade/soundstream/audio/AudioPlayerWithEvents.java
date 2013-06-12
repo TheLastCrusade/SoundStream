@@ -37,7 +37,7 @@ public class AudioPlayerWithEvents implements IPlayer {
 
     private static final String TAG = AudioPlayerWithEvents.class.getSimpleName();
 
-    private static final int DUCK_TIMER_DELAY = 2000;
+    private static final int DUCK_TIMER_DELAY_MS = 2000;
 
     private IPlayer player;
     private Context context;
@@ -137,7 +137,7 @@ public class AudioPlayerWithEvents implements IPlayer {
     }
 
     /**
-     * Handle loss of audio focus.  In the both permanent case,
+     * Handle loss of audio focus.  In the the case of permanent loss,
      * we want to unregister our external control client and pause the music.
      * 
      * In all cases, pause the music and indicate that the music can be resumed
@@ -229,7 +229,7 @@ public class AudioPlayerWithEvents implements IPlayer {
             @Override
             public void run() {
                 if (LogUtil.isLogAvailable()) {
-                    Log.d(TAG, "Duck timer executed...something's wrong.  Resetting audio focus and unducking volumne..");
+                    Log.d(TAG, "Duck timer executed...something's wrong.  Resetting audio focus and unducking volume..");
                 }
                 //in this case, something is stuck...rerequest audio focus
                 //NOTE: this is important, because if we didn't receive the AUDIOFOCUS_GAIN
@@ -240,7 +240,7 @@ public class AudioPlayerWithEvents implements IPlayer {
                 unduck();
             }
             
-        }, DUCK_TIMER_DELAY);
+        }, DUCK_TIMER_DELAY_MS);
     }
     /**
      * Duck the volume of the player, if the player supports
@@ -289,7 +289,7 @@ public class AudioPlayerWithEvents implements IPlayer {
     /**
      * Private helper method that will pause the audio, regardless of who calls it.
      * 
-     * Callers can then decide whehter its appropriate to pause on their own terms. 
+     * Callers can then decide whether its appropriate to pause on their own terms. 
      * 
      */
     private void doPause() {
