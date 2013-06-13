@@ -155,14 +155,10 @@
 			        </RelativeLayout>			        
 			    </LinearLayout>
 		    
-		    </LinearLayout>
-		
-		        
-		    <!-- join different network 
-		    	TODO: rename this
-		    -->
+		    </LinearLayout>  
+		   
 		    <LinearLayout 
-		        android:id="@+id/connect_btn"
+		        android:id="@+id/join_different_network_btn"
 		        android:layout_weight="1"
 		        android:layout_width="0dp"
 		        android:layout_height="wrap_content"

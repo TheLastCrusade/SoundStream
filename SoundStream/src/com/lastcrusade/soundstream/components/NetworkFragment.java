@@ -129,8 +129,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         //TODO react to changing state
         setDisconnectDisbandBtn();
         
-        LinearLayout connect = (LinearLayout)v.findViewById(R.id.connect_btn);
-        connect.setOnClickListener(new OnClickListener() {
+        LinearLayout joinDifferentNetwork = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
+        joinDifferentNetwork.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
