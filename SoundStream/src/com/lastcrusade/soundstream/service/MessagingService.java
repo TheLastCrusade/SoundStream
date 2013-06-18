@@ -51,7 +51,7 @@ import com.lastcrusade.soundstream.util.BroadcastIntent;
 
 public class MessagingService extends Service implements IMessagingService {
 
-    private static final String TAG = MessagingService.class.getName();
+    private static final String TAG = MessagingService.class.getSimpleName();
 
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
