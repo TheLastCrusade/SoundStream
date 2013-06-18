@@ -36,7 +36,7 @@
     <string name="add_members">Add Members to Network</string>
     <string name="connect">Select</string>
     <string name="create_network">Create</string>
-    <string name="join_network">Join as %1$s</string>
+    <string name="join_network">Join as \"%1$s\"</string>
     <string name="join_different_network">Join A Different Network</string>
     
     
