@@ -102,7 +102,6 @@
                 android:id="@+id/network_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/network_category"
                 android:text="@string/network_label"
                 android:textColor="@color/light_gray"
                 />
@@ -167,6 +166,10 @@
                 android:id="@+id/connected_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_below="@id/users_line"
+                android:divider="@color/transparent"
+                android:orientation="vertical"
                 >
             </LinearLayout>
         </RelativeLayout>
