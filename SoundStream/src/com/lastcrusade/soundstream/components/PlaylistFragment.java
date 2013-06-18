@@ -149,12 +149,12 @@ public class PlaylistFragment extends MusicListFragment{
 
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(PlaylistService.ACTION_PLAYLIST_UPDATED, new IBroadcastActionHandler() {
+        this.registrar.addLocalAction(PlaylistService.ACTION_PLAYLIST_UPDATED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 updatePlaylist();
             }
-        }).addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+        }).addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //when the playlist starts playing a song, we want to make sure that we are
@@ -163,7 +163,7 @@ public class PlaylistFragment extends MusicListFragment{
                 updatePlaylist();
             }
         })
-        .addAction(PlaylistService.ACTION_SONG_REMOVED, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_SONG_REMOVED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {

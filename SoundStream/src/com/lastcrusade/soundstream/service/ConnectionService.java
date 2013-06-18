@@ -50,7 +50,7 @@ import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.Toaster;
@@ -178,7 +178,7 @@ public class ConnectionService extends Service {
                     String fromAddr) {
                 //send the same intent that is sent for local finds...the listening mechanism should be
                 // the same for both processes.
-                new BroadcastIntent(ACTION_FIND_FINISHED)
+                new LocalBroadcastIntent(ACTION_FIND_FINISHED)
                     .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, message.getFoundGuests())
                     .send(ConnectionService.this);
             }
@@ -243,21 +243,21 @@ public class ConnectionService extends Service {
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED, new IBroadcastActionHandler() {
+            .addGlobalAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
                 }
             })
-           .addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
+           .addGlobalAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     bluetoothDiscoveryHandler.onDiscoveryFinished();
                 }
             })
-           .addAction(BluetoothDevice.ACTION_FOUND, new IBroadcastActionHandler() {
+           .addGlobalAction(BluetoothDevice.ACTION_FOUND, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -265,7 +265,7 @@ public class ConnectionService extends Service {
                             (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
                 }
             })
-           .addAction(ConnectionService.ACTION_REMOTE_FIND_FINISHED, new IBroadcastActionHandler() {
+           .addLocalAction(ConnectionService.ACTION_REMOTE_FIND_FINISHED, new IBroadcastActionHandler() {
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -341,7 +341,7 @@ public class ConnectionService extends Service {
             @Override
             public void onDisconnected() {
                 guests.remove(this);
-                new BroadcastIntent(ACTION_GUEST_DISCONNECTED)
+                new LocalBroadcastIntent(ACTION_GUEST_DISCONNECTED)
                     .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
                     .send(ConnectionService.this);
             }
@@ -350,7 +350,7 @@ public class ConnectionService extends Service {
         this.guests.add(newMessageThread);
 
         //announce that we're connected
-        new BroadcastIntent(ACTION_GUEST_CONNECTED)
+        new LocalBroadcastIntent(ACTION_GUEST_CONNECTED)
             .putExtra(EXTRA_GUEST_NAME,    socket.getRemoteDevice().getName())
             .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
             .send(this);
@@ -527,12 +527,12 @@ public class ConnectionService extends Service {
             @Override
             public void onDisconnected() {
                 host = null;
-                new BroadcastIntent(ACTION_HOST_DISCONNECTED).send(ConnectionService.this);
+                new LocalBroadcastIntent(ACTION_HOST_DISCONNECTED).send(ConnectionService.this);
             }
         };
         this.host.start();
 
         //announce that we're connected
-        new BroadcastIntent(ACTION_HOST_CONNECTED).send(this);
+        new LocalBroadcastIntent(ACTION_HOST_CONNECTED).send(this);
     }
 }

@@ -152,7 +152,7 @@ public class PlaybarFragment extends Fragment {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -165,21 +165,21 @@ public class PlaybarFragment extends Fragment {
                     }
                 }
             })
-            .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPauseImage();
                 }
             })
-            .addAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPlayImage();
                 }
             })
-            .addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
+            .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
