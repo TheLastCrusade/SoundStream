@@ -19,29 +19,16 @@
 
 package com.lastcrusade.soundstream;
 
-import java.util.List;
-
 import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
-import android.media.AudioManager;
-import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getSimpleName();
@@ -52,8 +39,6 @@ public class CustomApp extends Application {
     private ServiceLocator<PlaylistService>     playlistServiceLocator;
     private ServiceLocator<UserListService>     userListServiceLocator;
 
-    private BroadcastRegistrar registrar;
-
     public CustomApp() {
         super();
     }
@@ -63,17 +48,17 @@ public class CustomApp extends Application {
         super.onCreate();
         
         createServiceLocators();
-
-        registerReceivers();
     }
     
     @Override
     public void onTerminate() {
-        unregisterReceivers();
+        
         super.onTerminate();
     }
 
     public void createServiceLocators() {
+        //All of these services should exist for the lifetime of the application
+        // bind them here so that you can quickly bind to them in the fragments
         connectionServiceLocator = new ServiceLocator<ConnectionService>(
                 this, ConnectionService.class, ConnectionService.ConnectionServiceBinder.class);
 
@@ -90,56 +75,7 @@ public class CustomApp extends Application {
                 this, UserListService.class, UserListService.UserListServiceBinder.class);
     }
 
-    private void registerReceivers() {
-        this.registrar = new BroadcastRegistrar();
-        this.registrar
-            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
-
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    //send the library to the connected host
-                    List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
-                    getMessagingService().sendLibraryMessageToHost(metadata);
-                }
-            })
-            .register(this);
-    }
- 
-    private void unregisterReceivers() {
-        this.registrar.unregister();
-    }
-
-    private ConnectionService getConnectionService() {
-        ConnectionService connectionService = null;
-        try {
-            connectionService = this.connectionServiceLocator.getService();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return connectionService;
-    }
-
-    private IMessagingService getMessagingService() {
-        MessagingService messagingService = null;
-        try {
-            messagingService = this.messagingServiceLocator.getService();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return messagingService;
-    }
-    
-    public MusicLibraryService getMusicLibraryService() {
-        MusicLibraryService musicLibraryService = null;
-        try {
-            musicLibraryService = this.musicLibraryLocator.getService();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return musicLibraryService;
-    }
-    
-    public PlaylistService getPlaylistService() {
+    private PlaylistService getPlaylistService() {
         PlaylistService playlistService = null;
         try{
             playlistService = this.playlistServiceLocator.getService();

@@ -26,9 +26,10 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.SoundStreamExternalControlClient;
 import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
 import com.lastcrusade.soundstream.util.ClassUtils;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.LogUtil;
+
 
 public class AudioPlayerWithEvents implements IPlayer {
 
@@ -193,25 +194,25 @@ public class AudioPlayerWithEvents implements IPlayer {
     public void play() {
         requestAudio();
         this.player.play();
-        new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
     }
 
     @Override
     public void pause() {
         this.player.pause();
-        new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
     }
 
     @Override
     public void resume() {
         requestAudio();
         this.player.resume();
-        new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(this.context);
     }
 
     @Override
     public void skip() {
         this.player.skip();
-        new BroadcastIntent(PlaylistService.ACTION_SKIPPING_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_SKIPPING_AUDIO).send(this.context);
     }
 }

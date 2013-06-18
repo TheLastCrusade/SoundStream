@@ -152,7 +152,7 @@ public class MenuFragment extends SherlockFragment implements ITitleable {
      */
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
-        this.registrar.addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
+        this.registrar.addLocalAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 updateUserView();
