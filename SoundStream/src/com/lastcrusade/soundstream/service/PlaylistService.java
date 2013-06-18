@@ -115,7 +115,7 @@ public class PlaylistService extends Service {
     public static final String ACTION_SONG_PLAYING     = PlaylistService.class + ".action.SongPlaying";
     public static final String EXTRA_SONG              = PlaylistService.class + ".extra.Song";
 
-    private static final String TAG = PlaylistService.class.getName();
+    private static final String TAG = PlaylistService.class.getSimpleName();
 
     /**
      * Class for clients to access. Because we know this service always runs in

@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -41,6 +42,7 @@ import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
+import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
@@ -119,6 +121,10 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         });
         joinView.setContentDescription(ContentDescriptionUtils.CONNECT);
 
+        TextView joinText = (TextView) v.findViewById(R.id.join_network_id);
+        joinText.setText(String.format(
+                         getString(R.string.join_network),
+                         BluetoothUtils.getLocalBluetoothName()));
         return v;
     }
 
