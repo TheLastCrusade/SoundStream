@@ -57,7 +57,7 @@ import com.lastcrusade.soundstream.util.Toaster;
 
 public class ConnectionService extends Service {
 
-    private static final String TAG = ConnectionService.class.getName();
+    private static final String TAG = ConnectionService.class.getSimpleName();
 
     /**
      * Action to indicate find guests action has finished.  This action is sent in response to local UI initiated

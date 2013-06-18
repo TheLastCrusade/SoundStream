@@ -47,7 +47,7 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class PlaybarFragment extends Fragment {
 
-    private static final String TAG = PlaybarFragment.class.getName();
+    private static final String TAG = PlaybarFragment.class.getSimpleName();
     
     private BroadcastRegistrar registrar;
     

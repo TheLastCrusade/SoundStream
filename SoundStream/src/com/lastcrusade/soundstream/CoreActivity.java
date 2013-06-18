@@ -44,7 +44,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity{
-    private final String TAG = CoreActivity.class.getName();
+    private final String TAG = CoreActivity.class.getSimpleName();
 
     private Fragment menu;
     private PlaybarFragment playbar;
