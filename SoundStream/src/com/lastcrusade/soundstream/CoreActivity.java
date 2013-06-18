@@ -21,8 +21,11 @@ package com.lastcrusade.soundstream;
 
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -38,10 +41,8 @@ import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -51,7 +52,7 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity{
-    private final String TAG = CoreActivity.class.getName();
+    private final String TAG = CoreActivity.class.getSimpleName();
 
     private Fragment menu;
     private PlaybarFragment playbar;
@@ -109,6 +110,33 @@ public class CoreActivity extends SlidingFragmentActivity{
         getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
         createServiceLocators();
         registerReceivers();
+    }
+    
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        
+        SharedPreferences prefs = getSharedPreferences(
+                getPackageName(), MODE_PRIVATE);
+
+        if (prefs.getBoolean("firstrun", true)) {
+            
+            prefs.edit().putBoolean("firstrun", false).commit();
+
+            new AlertDialog.Builder(this)
+                .setMessage(R.string.welcome)
+                .setPositiveButton("Ok",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int which) {
+                            //do nothing
+                        }
+                     }).show();
+        }
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

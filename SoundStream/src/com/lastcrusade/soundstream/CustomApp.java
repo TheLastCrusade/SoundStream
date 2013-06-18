@@ -31,7 +31,7 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
 
 public class CustomApp extends Application {
-    private final String TAG = CustomApp.class.getName();
+    private final String TAG = CustomApp.class.getSimpleName();
     
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
