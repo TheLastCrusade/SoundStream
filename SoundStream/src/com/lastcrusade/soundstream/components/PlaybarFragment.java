@@ -44,6 +44,7 @@ import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.TrackerAPI;
 
 public class PlaybarFragment extends Fragment {
 
@@ -56,6 +57,8 @@ public class PlaybarFragment extends Fragment {
     private ImageButton playPause;
     private boolean boundToPlaylistService;
     private TextView songTitle;
+
+    private TrackerAPI tracker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,8 @@ public class PlaybarFragment extends Fragment {
             }
             
         });
+        
+        this.tracker = new TrackerAPI((CoreActivity)getActivity());
         this.musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
                 this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
         registerReceivers();
@@ -100,21 +105,26 @@ public class PlaybarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 PlaylistService service = getPlaylistService();
-                long state; //Number for google analytics
                 if (service != null) {
-                    if (service.isPlaying()) {
-                        service.pause();
-                        state = 0; // 0 means we have paused
-                    } else {
+                    //determine the intended action based on the current play state
+                    //  intended == true  => we should start playing
+                    //  intended == false => we should pause
+                    boolean intended = !service.isPlaying();
+                    // play or pause, according to the intended action
+                    if (intended) {
                         service.play();
-                        state = 1; // 1 means we are now playing
+                    } else {
+                        service.pause();
                     }
+                    //use the service to set the image, because we want it to reflect
+                    // the real state (not the intended action)
                     smartSetPlayPauseImage(service);
-                    ((CoreActivity)getActivity()).getTracker().sendEvent(
-                            "ui_action",  // Category
-                            "click",      // Action
-                            "play_pause", // Label
-                            state);       // Value
+                    //use the intended action...this is a small semantic point, but 
+                    // we want this tracker to track the intentions, not necessarily
+                    // the state (which, due to a bug, may be different).
+                    //TODO: we may want to also track the real state, as a potential way
+                    // of identifying bugs
+                    tracker.trackPlayPauseEvent(intended);
                 }
             }
 
@@ -128,11 +138,7 @@ public class PlaybarFragment extends Fragment {
                     PlaylistService service = getPlaylistService();
                     if(service != null){
                         service.skip();
-                        ((CoreActivity)getActivity()).getTracker().sendEvent(
-                                "ui_action",  // Category
-                                "click",      // Action
-                                "skip",       // Label
-                                0L);          // Value doesn't matter
+                        tracker.trackSkipEvent();
                     }
                 }
             });

@@ -34,12 +34,13 @@ import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
+import com.lastcrusade.soundstream.util.Trackable;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
-public class CoreActivity extends SlidingFragmentActivity{
+public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     private final String TAG = CoreActivity.class.getSimpleName();
 
     private Fragment menu;

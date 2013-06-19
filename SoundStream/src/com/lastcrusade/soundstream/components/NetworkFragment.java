@@ -56,6 +56,7 @@ import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Toaster;
+import com.lastcrusade.soundstream.util.TrackerAPI;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.lastcrusade.soundstream.util.UserListAdapter;
 
@@ -75,6 +76,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
 
+    private TrackerAPI tracker;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +91,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
+        tracker = new TrackerAPI((CoreActivity)getActivity());
         userAdapter = new UserListAdapter(getActivity(), new UserList(), false);
         userView = new LinearLayout(getActivity());
         
@@ -118,11 +122,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 addMembersButton.setEnabled(false);
                 //TODO: add some kind of visual indicator while discovering...seconds until discovery is finished, number of clients found, etc
                 getConnectionService().findNewGuests();
-                ((CoreActivity)getActivity()).getTracker().sendEvent(
-                        "ui_action",  // Category
-                        "click",      // Action
-                        "add_members",// Label
-                        0L);          // Value doesn't matter
+                tracker.trackAddMembersEvent();
             }
         });
 
@@ -144,21 +144,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "Disconnecting...");
-                                ((CoreActivity)getActivity()).getTracker().sendEvent(
-                                        "ui_action",  // Category
-                                        "click",      // Action
-                                        "disconnect", // Label
-                                        1L);          // Value positive
+                                tracker.trackDisconnectEvent(true);
                                 disconnect();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                ((CoreActivity)getActivity()).getTracker().sendEvent(
-                                        "ui_action",  // Category
-                                        "click",      // Action
-                                        "disconnect", // Label
-                                        0L);          // Value negative
+                                tracker.trackDisconnectEvent(false);
                             }
                         })
                         .show();
@@ -172,20 +164,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 disband();
-                                ((CoreActivity)getActivity()).getTracker().sendEvent(
-                                        "ui_action",  // Category
-                                        "click",      // Action
-                                        "disband",    // Label
-                                        1L);          // Value positive
+                                tracker.trackDisbandEvent(true);
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                ((CoreActivity)getActivity()).getTracker().sendEvent(
-                                        "ui_action",  // Category
-                                        "click",      // Action
-                                        "disband",    // Label
-                                        0L);          // Value negative
+                                tracker.trackDisbandEvent(false);
                             }
                         })
                         .show();
@@ -395,11 +379,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                                 @Override
                                 public void onItemsClick(
                                         List<FoundGuest> foundGuests) {
-                                    ((CoreActivity)getActivity()).getTracker().sendEvent(
-                                            "ui_action",                // Category
-                                            "MultiSelectListDialog",    // Action
-                                            "found_guests",             // Label
-                                            (long)foundGuests.size());  // Value length of list
+                                    tracker.trackFoundGuestsEvent(foundGuests.size());
                                     getConnectionService().connectToGuests(foundGuests);
                                 }
                             })
