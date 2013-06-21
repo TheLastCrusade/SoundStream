@@ -202,6 +202,35 @@ public class Messenger {
     }
 
     /**
+     * Block and read one byte off of the stream.  This is because we NEED to
+     * call read to catch any socket disconnect errors (available will simply
+     * return 0 for a disconnected socket, which doesn't tell us anything).
+     * 
+     * Waiting for one byte before filling up inBytes is a happy medium between
+     * trying to optimize receive packet size (e.g. inBytes buffer), and passing
+     * control back to the message processor as quickly as possible (e.g. reading
+     * one byte at a time).  This method, therefore, is best used as a gate to decide
+     * if we need to look for more available data.
+     * 
+     * NOTE we use the array version of read and write.  This is because the single
+     * byte version uses -1 (255 unsigned) to indicate that a stream has no more
+     * data.  This is really dumb, as 255s show up in our data all the time.  We
+     * therefore need to use the array version, with a one byte array, to get accurate
+     * data and count of bytes available.
+     * 
+     * @param input
+     * @return
+     * @throws IOException
+     */
+    private int blockAndReadOne(InputStream input) throws IOException {
+        byte[] local = new byte[1];
+        int read = input.read(local, 0, 1);
+        if (read > 0) {
+            inputBuffer.write(local, 0, 1);
+        }
+        return read;
+    }
+    /**
      * Read the next set of bytes from the input stream.
      * 
      * NOTE: This will block until data is available, and may throw
@@ -217,15 +246,16 @@ public class Messenger {
         // could be optimized more.
         //NOTE: this is so input.read can block, and will throw an exception when the connection
         // goes down.  this is the only way we'll get a notification of a downed client
-        int read = -1;
+        int totalRead = blockAndReadOne(input);
         int toRead = Math.min(inBytes.length, input.available());
         if (toRead > 0) {
-            read = input.read(inBytes, 0, toRead);
+            int read = input.read(inBytes, 0, toRead);
             if (read > 0) {
                 inputBuffer.write(inBytes, 0, read);
             }
+            totalRead += read;
         }
-        return read;
+        return totalRead;
     }
 
     ///TODO
