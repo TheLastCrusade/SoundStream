@@ -165,9 +165,11 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
         new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
         try {
             //FIXME this causes crashes
-            this.messagingService
-                .getService()
-                .sendPlayStatusMessage(this.entry, false);
+            if (this.entry != null) {
+                this.messagingService
+                    .getService()
+                    .sendPlayStatusMessage(this.entry, false);
+            }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
