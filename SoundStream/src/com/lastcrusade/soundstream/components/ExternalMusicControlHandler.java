@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.LogUtil;
 
@@ -50,7 +50,7 @@ public class ExternalMusicControlHandler extends BroadcastReceiver {
             if (LogUtil.isLogAvailable()) {
                 Log.d(TAG, "Audio becoming noisy");
             }
-            new BroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
+            new LocalBroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
         }
         //media button or disconnnected headset or ICS (or greater) remote control
         else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
@@ -64,19 +64,19 @@ public class ExternalMusicControlHandler extends BroadcastReceiver {
                     if (LogUtil.isLogAvailable()) {
                         Log.d(TAG, "Headset hook button pressed");
                     }
-                    new BroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PAUSE).send(context);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
                     if (LogUtil.isLogAvailable()) {
                         Log.d(TAG, "External play/pause button pressed");
                     }
-                    new BroadcastIntent(PlaylistService.ACTION_PLAY_PAUSE).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAY_PAUSE).send(context);
                     break;
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
                     if (LogUtil.isLogAvailable()) {
                         Log.d(TAG, "External skip button pressed");
                     }
-                    new BroadcastIntent(PlaylistService.ACTION_SKIP).send(context);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_SKIP).send(context);
                     break;
 //                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
 //                        // TODO: ensure that doing this in rapid succession actually plays the
