@@ -47,11 +47,11 @@ import com.lastcrusade.soundstream.net.message.SongStatusMessage;
 import com.lastcrusade.soundstream.net.message.TransferSongMessage;
 import com.lastcrusade.soundstream.net.message.UserListMessage;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 
 public class MessagingService extends Service implements IMessagingService {
 
-    private static final String TAG = MessagingService.class.getName();
+    private static final String TAG = MessagingService.class.getSimpleName();
 
     public static final String ACTION_PAUSE_MESSAGE = MessagingService.class.getName() + ".action.PauseMessage";
     public static final String ACTION_PLAY_MESSAGE  = MessagingService.class.getName() + ".action.PlayMessage";
@@ -104,7 +104,7 @@ public class MessagingService extends Service implements IMessagingService {
 
         @Override
         public void handleMessage(int messageNo, T message, String fromAddr) {
-            new BroadcastIntent(this.action).send(MessagingService.this);
+            new LocalBroadcastIntent(this.action).send(MessagingService.this);
         }
     }
 
@@ -175,7 +175,7 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     LibraryMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_LIBRARY_MESSAGE)
+                new LocalBroadcastIntent(ACTION_LIBRARY_MESSAGE)
                     .putParcelableArrayListExtra(EXTRA_SONG_METADATA, message.getLibrary())
                     .send(MessagingService.this);
             }
@@ -204,7 +204,7 @@ public class MessagingService extends Service implements IMessagingService {
                     @Override
                     public void handleMessage(int messageNo,
                             PlayStatusMessage message, String fromAddr) {
-                        new BroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
+                        new LocalBroadcastIntent(ACTION_PLAY_STATUS_MESSAGE)
                                 .putExtra(EXTRA_IS_PLAYING, message.isPlaying())
                                 .putExtra(EXTRA_ADDRESS,
                                         message.getMacAddress())
@@ -220,7 +220,7 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     SongStatusMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_SONG_STATUS_MESSAGE)
+                new LocalBroadcastIntent(ACTION_SONG_STATUS_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
                     .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
@@ -237,7 +237,7 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo,
                     RequestSongMessage message, String fromAddr) {
-                new BroadcastIntent(ACTION_REQUEST_SONG_MESSAGE)
+                new LocalBroadcastIntent(ACTION_REQUEST_SONG_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, fromAddr)
                     .putExtra(EXTRA_SONG_ID, message.getSongId())
                     .send(MessagingService.this);
@@ -252,7 +252,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     TransferSongMessage message, String fromAddr) {
                 try {
-                    new BroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
+                    new LocalBroadcastIntent(ACTION_TRANSFER_SONG_MESSAGE)
                         .putExtra(EXTRA_ADDRESS,        fromAddr)
                         .putExtra(EXTRA_SONG_ID,        message.getSongId())
                         .putExtra(EXTRA_SONG_FILE_NAME, message.getSongFileName())
@@ -272,7 +272,7 @@ public class MessagingService extends Service implements IMessagingService {
             @Override
             public void handleMessage(int messageNo, UserListMessage message,
                     String fromAddr) {
-                new BroadcastIntent(ACTION_NEW_CONNECTED_USERS_MESSAGE)
+                new LocalBroadcastIntent(ACTION_NEW_CONNECTED_USERS_MESSAGE)
                     .putExtra(EXTRA_USER_LIST, message.getUserList())
                     .send(MessagingService.this);
                 
@@ -288,7 +288,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     AddToPlaylistMessage message, String fromAddr) {
 
-                new BroadcastIntent(ACTION_ADD_TO_PLAYLIST_MESSAGE)
+                new LocalBroadcastIntent(ACTION_ADD_TO_PLAYLIST_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
                     .send(MessagingService.this);
@@ -304,7 +304,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     BumpSongOnPlaylistMessage message, String fromAddr) {
 
-                new BroadcastIntent(ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE)
+                new LocalBroadcastIntent(ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
                     .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
@@ -321,7 +321,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     RemoveFromPlaylistMessage message, String fromAddr) {
 
-                new BroadcastIntent(ACTION_REMOVE_FROM_PLAYLIST_MESSAGE)
+                new LocalBroadcastIntent(ACTION_REMOVE_FROM_PLAYLIST_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, message.getMacAddress())
                     .putExtra(EXTRA_SONG_ID, message.getId())
                     .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
@@ -337,7 +337,7 @@ public class MessagingService extends Service implements IMessagingService {
             public void handleMessage(int messageNo,
                     PlaylistMessage message, String fromAddr) {
 
-                new BroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
+                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED_MESSAGE)
                     .putParcelableArrayListExtra(EXTRA_PLAYLIST_ENTRY, message.getSongsToPlay())
                     .send(MessagingService.this);
                 

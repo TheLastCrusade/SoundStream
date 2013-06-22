@@ -242,33 +242,33 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(ConnectionService.ACTION_FIND_FINISHED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_FIND_FINISHED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     onFindFinished(intent);
                 }
             })
-            .addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
+            .addLocalAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     updateUserView();
                 }
             })
-            .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setDisconnectDisbandBtn();
                 }
             })
-            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setDisconnectDisbandBtn();
                 }
             })
-            .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     Log.i(TAG, "Host Disconnected");

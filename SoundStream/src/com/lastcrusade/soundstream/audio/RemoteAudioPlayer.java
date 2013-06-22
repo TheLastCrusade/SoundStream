@@ -27,7 +27,7 @@ import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -108,7 +108,7 @@ public class RemoteAudioPlayer implements IPlayer {
     
     private void registerReceivers() {
     	this.registrar = new BroadcastRegistrar();
-    	this.registrar.addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE,
+    	this.registrar.addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE,
     			new IBroadcastActionHandler() {
 			
 			@Override
@@ -116,11 +116,11 @@ public class RemoteAudioPlayer implements IPlayer {
 				playing = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
 				if(playing) {
 				    paused = false;
-					new BroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(context);
+					new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(context);
 				}
 				else {
 				    paused = true;
-					new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(context);
+					new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(context);
 				}
 			}
 		}).register(this.context);

@@ -19,10 +19,16 @@
 
 package com.lastcrusade.soundstream;
 
+import java.util.List;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -30,7 +36,13 @@ import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
+import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.ConnectionService;
+import com.lastcrusade.soundstream.service.IMessagingService;
+import com.lastcrusade.soundstream.service.MessagingService;
+import com.lastcrusade.soundstream.service.MusicLibraryService;
+import com.lastcrusade.soundstream.service.ServiceLocator;
+import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -40,12 +52,14 @@ import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity{
-    private final String TAG = CoreActivity.class.getName();
+    private final String TAG = CoreActivity.class.getSimpleName();
 
     private Fragment menu;
     private PlaybarFragment playbar;
     private BroadcastRegistrar registrar;
 
+    private ServiceLocator<MusicLibraryService>   musicLibraryLocator;
+    private ServiceLocator<MessagingService>      messagingServiceLocator;
     private GoogleAnalytics mGaInstance;
     private Tracker mGaTracker;
 
@@ -94,7 +108,35 @@ public class CoreActivity extends SlidingFragmentActivity{
         // setup the sliding bar
         setSlidingActionBarEnabled(false);
         getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
+        createServiceLocators();
         registerReceivers();
+    }
+    
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        
+        SharedPreferences prefs = getSharedPreferences(
+                getPackageName(), MODE_PRIVATE);
+
+        if (prefs.getBoolean("firstrun", true)) {
+            
+            prefs.edit().putBoolean("firstrun", false).commit();
+
+            new AlertDialog.Builder(this)
+                .setMessage(R.string.welcome)
+                .setPositiveButton("Ok",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int which) {
+                            //do nothing
+                        }
+                     }).show();
+        }
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -112,7 +154,21 @@ public class CoreActivity extends SlidingFragmentActivity{
     @Override
     protected void onDestroy() {
         unregisterReceivers();
+        unbindServiceLocators();
         super.onDestroy();
+    }
+
+    private void unbindServiceLocators(){
+        messagingServiceLocator.unbind();
+        musicLibraryLocator.unbind();
+    }
+
+    private void createServiceLocators() {
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
+
+        musicLibraryLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryService.MusicLibraryServiceBinder.class);
     }
 
     @Override
@@ -125,14 +181,15 @@ public class CoreActivity extends SlidingFragmentActivity{
 
     @Override
     public void onStop() {
-      super.onStop();
       //For Google Analytics
       EasyTracker.getInstance().activityStop(this);
+      super.onStop();
     }
+
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -141,8 +198,16 @@ public class CoreActivity extends SlidingFragmentActivity{
                     Transitions.transitionToConnect(CoreActivity.this);
                 }
             })
+            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    //send the library to the connected host
+                    List<SongMetadata> metadata = getMusicLibraryService().getMyLibrary();
+                    getMessagingService().sendLibraryMessageToHost(metadata);
+                }
+            })
             .register(this);
-        
     }
 
     private void unregisterReceivers() {
@@ -171,6 +236,26 @@ public class CoreActivity extends SlidingFragmentActivity{
         .beginTransaction()
         .hide(playbar)
         .commit();
+    }
+
+    private IMessagingService getMessagingService() {
+        MessagingService messagingService = null;
+        try {
+            messagingService = this.messagingServiceLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return messagingService;
+    }
+
+    private MusicLibraryService getMusicLibraryService() {
+        MusicLibraryService musicLibraryService = null;
+        try {
+            musicLibraryService = this.musicLibraryLocator.getService();
+        } catch (ServiceNotBoundException e) {
+            Log.wtf(TAG, e);
+        }
+        return musicLibraryService;
     }
 
     public Tracker getTracker(){
