@@ -29,7 +29,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-
+import android.view.KeyEvent;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -48,6 +48,8 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
+import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
@@ -139,6 +141,38 @@ public class CoreActivity extends SlidingFragmentActivity{
 
     }
 
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        //necessary because of the way that the sliding menu handles back presses
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            onBackPressed();
+            return false;
+        }
+        else{
+            return super.onKeyUp(keyCode, event);
+        }
+        
+    }
+    
+    @Override
+    public void onBackPressed() {
+        //if we are in the connect fragment or the menu is open, 
+        //back out of the app by pulling up the home screen
+        if(getTitle().equals(getString(R.string.select)) || getSlidingMenu().isMenuShowing()){
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startMain);
+        }
+        //otherwise, open the menu
+        else{
+            showMenu();
+        }
+        
+    }
+    
+    
     public boolean onOptionsItemSelected(MenuItem item) {
         // home references the app icon
         if (item.getItemId() == android.R.id.home) {
