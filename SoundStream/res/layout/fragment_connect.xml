@@ -91,6 +91,7 @@
                 android:background="@color/accent_blue"/>
 
             <TextView 
+                android:id="@+id/join_network_id"
                 android:text="@string/join_network"
                 android:textSize="18sp"
                 android:padding="6dp"

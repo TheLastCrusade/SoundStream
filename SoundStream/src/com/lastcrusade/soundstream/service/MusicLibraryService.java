@@ -43,7 +43,7 @@ import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
@@ -135,7 +135,7 @@ public class MusicLibraryService extends Service {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(MessagingService.ACTION_LIBRARY_MESSAGE, new IBroadcastActionHandler() {
+            .addLocalAction(MessagingService.ACTION_LIBRARY_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -143,7 +143,7 @@ public class MusicLibraryService extends Service {
                     updateLibrary(remoteMetas, true);
                 }
             })
-            .addAction(MessagingService.ACTION_REQUEST_SONG_MESSAGE, new IBroadcastActionHandler() {
+            .addLocalAction(MessagingService.ACTION_REQUEST_SONG_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -157,7 +157,7 @@ public class MusicLibraryService extends Service {
                     }
                 }
             })
-            .addAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -240,7 +240,7 @@ public class MusicLibraryService extends Service {
      * to the guests.
      */
     private void notifyLibraryUpdated() {
-        new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
         //send the updated library to all the guests out there
         if (getMessagingService() != null) {
             getMessagingService().sendLibraryMessageToGuests(getLibrary());
@@ -373,6 +373,6 @@ public class MusicLibraryService extends Service {
         metadataList = getMyModifiableLibrary();
         metadataMap.clear();
         orderAlphabetically();
-        new BroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_LIBRARY_UPDATED).send(this);
     }
 }

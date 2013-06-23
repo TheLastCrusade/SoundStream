@@ -101,7 +101,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                NetworkFragment.this.userAdapter.updateUsers(getUserListFromService());
                 updateUserView();
             }
         });
@@ -131,7 +130,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
         userView = (LinearLayout) v.findViewById(R.id.connected_users);
         updateUserView();
-        //users.setAdapter(this.adapter);
 
         //TODO react to changing state
         setDisconnectDisbandVisibility();
@@ -173,6 +171,15 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                             }
                         })
                         .show();
+            }
+        });
+        
+        Button connect = (Button)v.findViewById(R.id.connect_btn);
+        connect.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getConnectionService().broadcastSelfAsGuest(getActivity());
             }
         });
         return v;
@@ -241,34 +248,33 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private void registerReceivers() {
         this.broadcastRegistrar = new BroadcastRegistrar();
         this.broadcastRegistrar
-            .addAction(ConnectionService.ACTION_FIND_FINISHED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_FIND_FINISHED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     onFindFinished(intent);
                 }
             })
-            .addAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
+            .addLocalAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    userAdapter.notifyDataSetChanged();
                     updateUserView();
                 }
             })
-            .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setDisconnectDisbandVisibility();
                 }
             })
-            .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setDisconnectDisbandVisibility();
                 }
             })
-            .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+            .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     Log.i(TAG, "Host Disconnected");
@@ -416,7 +422,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private void updateUserView(){
         userView.removeAllViews();
-        
+        userAdapter.updateUsers(getUserListFromService());
         for(int i=0; i<userAdapter.getCount(); i++){
             View user = userAdapter.getView(i, null, userView);
             userView.addView(user);

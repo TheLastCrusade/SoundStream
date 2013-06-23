@@ -30,7 +30,7 @@ import android.util.Log;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.FoundGuest;
 import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 
 /**
  * A generic handler for discovering devices.  This handler will accumulate discovered devices and
@@ -75,7 +75,7 @@ public class BluetoothDiscoveryHandler {
         String action = this.remoteInitiated
                           ? ConnectionService.ACTION_REMOTE_FIND_FINISHED
                           : ConnectionService.ACTION_FIND_FINISHED;
-        new BroadcastIntent(action)
+        new LocalBroadcastIntent(action)
             .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, this.discoveredGuests)
             .send(this.context);
     }

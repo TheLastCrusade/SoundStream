@@ -19,7 +19,6 @@
 
 package com.lastcrusade.soundstream;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -52,37 +51,68 @@ public class SoundStreamExternalControlClient {
     private Context context;
     private BroadcastRegistrar registrar;
     private RemoteControlClientCompat mRemoteControlClientCompat;
+    private ComponentName mediaButtonEventReceiver;
+    private SongMetadata currentSong;
 
     public SoundStreamExternalControlClient(Context context) {
         this.context = context;
-
+        
+        buildClient();
+        //we want the receivers even before we've registered the client,
+        // to accumulate state
         registerReceivers();
-        registerRemoteControlClient();
     }
     
+    /**
+     * 
+     */
+    private void buildClient() {
+        Class<?> receiverClass = ExternalMusicControlHandler.class;
+        this.mediaButtonEventReceiver = new ComponentName(
+                context.getPackageName(),
+                receiverClass.getName());
+        // build the PendingIntent for the remote control client
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonIntent.setComponent(mediaButtonEventReceiver);
+        PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, mediaButtonIntent, 0);
+        // create and register the remote control client
+        //NOTE: the client is created in all cases, but we call a method to
+        // set up and register it...this is so we can gracefully handle older versions of android.
+        mRemoteControlClientCompat = new RemoteControlClientCompat(mediaPendingIntent);
+    }
+
+    public void registerClient() {
+        registerRemoteControlClient();
+        updateRemoteControlClient();
+    }
+    
+    public void unregisterClient() {
+        unregisterRemoteControlClient();
+    }
+
     public void unregister() {
         unregisterReceivers();
-        unregisterRemoteControlClientCompat();
+        unregisterRemoteControlClient();    
     }
 
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPaused();
                 }
             })
-            .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPlaying();
                 }
             })
-            .addAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -98,21 +128,15 @@ public class SoundStreamExternalControlClient {
     }
 
     private void registerRemoteControlClient() {
-        Class<?> receiverClass = ExternalMusicControlHandler.class;
-        ComponentName myEventReceiver = new ComponentName(
-                context.getPackageName(),
-                receiverClass.getName());
         AudioManager audioManager = (AudioManager) this.context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.registerMediaButtonEventReceiver(myEventReceiver);
-        // build the PendingIntent for the remote control client
-        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-        mediaButtonIntent.setComponent(myEventReceiver);
-        PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, mediaButtonIntent, 0);
-        // create and register the remote control client
-        //NOTE: the client is created in all cases, but we call a method to
-        // set up and register it...this is so we can gracefully handle older versions of android.
-        mRemoteControlClientCompat = new RemoteControlClientCompat(mediaPendingIntent);
+        audioManager.registerMediaButtonEventReceiver(mediaButtonEventReceiver);
         registerRemoteControlClientCompat(audioManager);
+    }
+
+    private void unregisterRemoteControlClient() {
+        AudioManager audioManager = (AudioManager) this.context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.unregisterMediaButtonEventReceiver(mediaButtonEventReceiver);
+        unregisterRemoteControlClientCompat();
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -146,11 +170,16 @@ public class SoundStreamExternalControlClient {
     }
 
     public void setCurrentSong(SongMetadata song) {
-        if (mRemoteControlClientCompat.isSupportsRemoteControl()) {
+        this.currentSong = song;
+        updateRemoteControlClient();
+    }
+
+    private void updateRemoteControlClient() {
+        if (mRemoteControlClientCompat.isSupportsRemoteControl() && currentSong != null) {
             mRemoteControlClientCompat.editMetadata(true)
-                .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, song.getArtist())
-                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, song.getAlbum())
-                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, song.getTitle())
+                .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, currentSong.getArtist())
+                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, currentSong.getAlbum())
+                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, currentSong.getTitle())
         //        .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
         //                playingItem.getDuration())
         //        // TODO: fetch real item artwork

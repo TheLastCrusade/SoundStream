@@ -43,18 +43,19 @@ import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
+import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.TrackerAPI;
 
 public class PlaybarFragment extends Fragment {
 
-    private static final String TAG = PlaybarFragment.class.getName();
+    private static final String TAG = PlaybarFragment.class.getSimpleName();
     
     private BroadcastRegistrar registrar;
     
     private ServiceLocator<PlaylistService> playlistServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
-    private ImageButton playPause;
+    private ImageButton playPause, skip;
     private boolean boundToPlaylistService;
     private TextView songTitle;
 
@@ -96,6 +97,7 @@ public class PlaybarFragment extends Fragment {
         
         songTitle = (TextView) view.findViewById(R.id.text_now_playing);
         playPause = ((ImageButton) view.findViewById(R.id.btn_play_pause));
+        skip = (ImageButton) view.findViewById(R.id.btn_skip);
         
         if(boundToPlaylistService){
             updateView();
@@ -129,19 +131,20 @@ public class PlaybarFragment extends Fragment {
             }
 
         });
+        playPause.setContentDescription(ContentDescriptionUtils.PLAY_PAUSE);
 
-        ((ImageButton) view.findViewById(R.id.btn_skip))
-            .setOnClickListener(new OnClickListener() {
-    
+        skip.setOnClickListener(new OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
                     PlaylistService service = getPlaylistService();
-                    if(service != null){
+                    if (service != null) {
                         service.skip();
                         tracker.trackSkipEvent();
                     }
                 }
             });
+        skip.setContentDescription(ContentDescriptionUtils.SKIP);
 
         return view;
     }
@@ -169,7 +172,7 @@ public class PlaybarFragment extends Fragment {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-            .addAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
@@ -182,21 +185,21 @@ public class PlaybarFragment extends Fragment {
                     }
                 }
             })
-            .addAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPauseImage();
                 }
             })
-            .addAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     setPlayImage();
                 }
             })
-            .addAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
+            .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

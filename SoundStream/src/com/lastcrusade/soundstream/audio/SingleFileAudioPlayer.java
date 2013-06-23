@@ -28,12 +28,11 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
 import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
 import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 
 /**
  * A simple audio player that expects an audio file to be located in an
@@ -43,11 +42,16 @@ import com.lastcrusade.soundstream.util.BroadcastIntent;
  * 
  * @author Jesse Rosalia
  */
-public class SingleFileAudioPlayer implements IPlayer {
+public class SingleFileAudioPlayer implements IPlayer, IDuckable {
 
     public static final String ACTION_SONG_FINISHED = SingleFileAudioPlayer.class.getName() + ".action.SongFinished";
 
     private static final String TAG = SingleFileAudioPlayer.class.getName();
+
+    private static final float DUCK_VOLUME = 0.1f;
+
+    private static final float NORMAL_VOLUME = 1.0f;
+
     private PlaylistEntry entry;
     private MediaPlayer player;
 
@@ -64,7 +68,7 @@ public class SingleFileAudioPlayer implements IPlayer {
         player.setOnCompletionListener(
                 new OnCompletionListener(){
                     @Override public void onCompletion(MediaPlayer mp) {
-                        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(SingleFileAudioPlayer.this.context);
+                        new LocalBroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(SingleFileAudioPlayer.this.context);
                     }
         });
     }
@@ -80,7 +84,7 @@ public class SingleFileAudioPlayer implements IPlayer {
     public void setSong(PlaylistEntry song) {
         this.entry = song;
         //This is sending a playlist entry not a SongMetadata
-        new BroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
+        new LocalBroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
             .putExtra(PlaylistService.EXTRA_SONG, this.entry)
             .send(this.context);
     }
@@ -158,12 +162,14 @@ public class SingleFileAudioPlayer implements IPlayer {
         this.setSong(null);
         //TODO revisit the decision to treat stop the same as pause
         //indicate the system is paused
-        new BroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
+        new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
         try {
             //FIXME this causes crashes
-            this.messagingService
-                .getService()
-                .sendPlayStatusMessage(this.entry, false);
+            if (this.entry != null) {
+                this.messagingService
+                    .getService()
+                    .sendPlayStatusMessage(this.entry, false);
+            }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
@@ -187,11 +193,27 @@ public class SingleFileAudioPlayer implements IPlayer {
             player.stop();
         }
         //send this action to move to the next song
-        new BroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this.context);
+        new LocalBroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this.context);
         paused = false;
     }
 
     public boolean isPaused() {
         return paused;
+    }
+    
+    /* (non-Javadoc)
+     * @see com.lastcrusade.soundstream.audio.IDuckable#duck()
+     */
+    @Override
+    public void duck() {
+        player.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+    }
+    
+    /* (non-Javadoc)
+     * @see com.lastcrusade.soundstream.audio.IDuckable#unduck()
+     */
+    @Override
+    public void unduck() {
+        player.setVolume(NORMAL_VOLUME, NORMAL_VOLUME);
     }
 }

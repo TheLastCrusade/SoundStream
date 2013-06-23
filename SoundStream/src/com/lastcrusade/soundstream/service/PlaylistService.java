@@ -42,9 +42,10 @@ import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.util.BroadcastIntent;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.lastcrusade.soundstream.util.LogUtil;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 import com.lastcrusade.soundstream.util.Toaster;
 
@@ -114,7 +115,7 @@ public class PlaylistService extends Service {
     public static final String ACTION_SONG_PLAYING     = PlaylistService.class + ".action.SongPlaying";
     public static final String EXTRA_SONG              = PlaylistService.class + ".extra.Song";
 
-    private static final String TAG = PlaylistService.class.getName();
+    private static final String TAG = PlaylistService.class.getSimpleName();
 
     /**
      * Class for clients to access. Because we know this service always runs in
@@ -179,7 +180,7 @@ public class PlaylistService extends Service {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
-        .addAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
+        .addLocalAction(SingleFileAudioPlayer.ACTION_SONG_FINISHED, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -195,10 +196,10 @@ public class PlaylistService extends Service {
                 if (!mThePlayer.isPaused()) {
                     play();
                 }
-                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
-        .addAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -212,7 +213,7 @@ public class PlaylistService extends Service {
                 stopDataManager();
             }
         })
-        .addAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -222,34 +223,34 @@ public class PlaylistService extends Service {
                 startDataManager();
             }
         })
-        .addAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
+        .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
-        .addAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 pause();
             }
         })
-        .addAction(MessagingService.ACTION_PLAY_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_PLAY_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 play();
             }
         })
-        .addAction(MessagingService.ACTION_SKIP_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_SKIP_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 skip();
             }
         })
-        .addAction(MessagingService.ACTION_ADD_TO_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_ADD_TO_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -268,7 +269,7 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(MessagingService.ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_BUMP_SONG_ON_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -290,7 +291,7 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(MessagingService.ACTION_REMOVE_FROM_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_REMOVE_FROM_PLAYLIST_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -312,7 +313,7 @@ public class PlaylistService extends Service {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
-        .addAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
 
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -325,10 +326,10 @@ public class PlaylistService extends Service {
                 for (PlaylistEntry entry : newList) {
                     mPlaylist.add(entry);
                 }
-                new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
         })
-        .addAction(MessagingService.ACTION_SONG_STATUS_MESSAGE, new IBroadcastActionHandler() {
+        .addLocalAction(MessagingService.ACTION_SONG_STATUS_MESSAGE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -348,7 +349,7 @@ public class PlaylistService extends Service {
                         entry.setLoaded(loaded);
                         entry.setPlayed(played);
                         // send an intent to the fragments that the playlist is updated
-                        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
+                        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
                     } else {
                         Log.e(TAG, "Attempting to update information about a song that is not in our playlist: " + song);
                     }
@@ -357,14 +358,14 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(PlaylistService.ACTION_PAUSE, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_PAUSE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 pause();
             }
         })
-        .addAction(PlaylistService.ACTION_PLAY_PAUSE, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_PLAY_PAUSE, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
@@ -375,18 +376,11 @@ public class PlaylistService extends Service {
                 }
             }
         })
-        .addAction(PlaylistService.ACTION_SKIP, new IBroadcastActionHandler() {
+        .addLocalAction(PlaylistService.ACTION_SKIP, new IBroadcastActionHandler() {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 skip();
-            }
-        })
-        .addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY, new IBroadcastActionHandler() {
-
-            @Override
-            public void onReceiveAction(Context context, Intent intent) {
-                pause();
             }
         })
         .register(this);
@@ -498,7 +492,7 @@ public class PlaylistService extends Service {
     public void clearPlaylist() {
         mPlaylist.clear();
         currentEntry = null;
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
 
     public void pause() {
@@ -521,11 +515,11 @@ public class PlaylistService extends Service {
         if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
         }
-        new BroadcastIntent(ACTION_SONG_ADDED)
+        new LocalBroadcastIntent(ACTION_SONG_ADDED)
             .putExtra(EXTRA_SONG, entry)
             .send(this);
         // send an intent to the fragments that the playlist is updated
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
 
         if (isLocalPlayer) {
             //send a message to the guests with the new playlist
@@ -541,12 +535,12 @@ public class PlaylistService extends Service {
         if (entry != null) {
             mPlaylist.remove(entry);
             //broadcast the fact that a song has been removed
-            new BroadcastIntent(ACTION_SONG_REMOVED)
+            new LocalBroadcastIntent(ACTION_SONG_REMOVED)
                 .putExtra(EXTRA_SONG, entry)
                 .send(this);
             
             //broadcast the fact that the playlist has been updated
-            new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+            new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     
             if (isLocalPlayer) {
                 //send a message to the guests with the new playlist
@@ -577,7 +571,7 @@ public class PlaylistService extends Service {
     public void bumpSong(PlaylistEntry entry){
         mPlaylist.bumpSong(entry);
         
-        new BroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
         
         if (isLocalPlayer) {
             //send a message to the guests with the new playlist

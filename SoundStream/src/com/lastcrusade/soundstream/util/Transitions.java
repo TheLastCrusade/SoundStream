@@ -80,7 +80,7 @@ public class Transitions {
         
         activity.getSupportFragmentManager().beginTransaction()
             .replace(R.id.content, fragment)
-            .addToBackStack(null).commit();
+            .commit();
         activity.showContent();
         String title = activity.getResources().getString(((ITitleable)fragment).getTitle());
         activity.setTitle(title);

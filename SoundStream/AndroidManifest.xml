@@ -47,9 +47,11 @@
             
         <service android:exported="false" android:label="@string/music_library" android:name=".service.MusicLibraryService"/>
         
+        <!-- TODO: investigate if we can register this dynamically, like all of our other broadcast receivers -->
         <receiver android:name=".components.ExternalMusicControlHandler">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
             </intent-filter>
         </receiver>
     </application>
