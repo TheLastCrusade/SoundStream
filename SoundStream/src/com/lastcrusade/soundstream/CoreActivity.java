@@ -46,6 +46,7 @@ import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
+import com.lastcrusade.soundstream.util.Trackable;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
@@ -53,7 +54,7 @@ import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
-public class CoreActivity extends SlidingFragmentActivity{
+public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     private final String TAG = CoreActivity.class.getSimpleName();
 
     private Fragment menu;
