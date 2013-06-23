@@ -36,6 +36,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -68,9 +69,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private static String TAG = NetworkFragment.class.getSimpleName();
     
     private BroadcastRegistrar broadcastRegistrar;
-    private Button addMembersButton, disconnect, disband;
     private UserListAdapter userAdapter;
-    private LinearLayout userView;
+    private LinearLayout addMembersButton, userView, disconnectDisband;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
@@ -84,7 +84,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
             @Override
             public void onServiceBound() {
-                setDisconnectDisbandVisibility();
+                setDisconnectDisbandBtn();
             }
         });
 
@@ -109,27 +109,61 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_network, container,false);
         
-        this.addMembersButton = (Button)v.findViewById(R.id.add_members);
+        this.addMembersButton = (LinearLayout)v.findViewById(R.id.add_members);
         this.addMembersButton.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 addMembersButton.setEnabled(false);
-                //TODO: add some kind of visual indicator while discovering...seconds until discovery is finished, number of clients found, etc
+                //TODO: add a better indicator while discovering
+                //...seconds until discovery is finished, number of clients found, etc
+                addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
+                addMembersButton.findViewById(R.id.image_background)
+                    .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+                
                 getConnectionService().findNewGuests();
             }
         });
 
-        disconnect = (Button)v.findViewById(R.id.disconnect_btn);
-        disband = (Button)v.findViewById(R.id.disband_btn);
+        disconnectDisband = (LinearLayout)v.findViewById(R.id.disconnect_disband_btn);
 
         userView = (LinearLayout) v.findViewById(R.id.connected_users);
         updateUserView();
 
         //TODO react to changing state
-        setDisconnectDisbandVisibility();
+        setDisconnectDisbandBtn();
+        
+        LinearLayout joinDifferentNetwork = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
+        joinDifferentNetwork.setOnClickListener(new OnClickListener() {
 
-        disconnect.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getConnectionService().broadcastSelfAsGuest(getActivity());
+            }
+        });
+        return v;
+    }
+
+    private void setDisconnectDisbandBtn() {
+        //if there is a guest connected, then we are the host and we want the button
+        //to function as a disband button
+        if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
+            if(disconnectDisband != null){
+                setDisbandFunction();
+            }
+        } else{
+            if(disconnectDisband != null){
+                setDisconnectFunction();
+            }
+        } 
+    }
+    
+    private void setDisconnectFunction(){
+        ((TextView)disconnectDisband.findViewById(R.id.disconnect_disband_label))
+            .setText(R.string.disconnect);
+        
+        //set the button to disconnect when pressed
+        disconnectDisband.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(getActivity())
@@ -148,7 +182,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .show();
             }
         });
-        disband.setOnClickListener(new OnClickListener() {
+    }
+    
+    private void setDisbandFunction(){
+        ((TextView)disconnectDisband.findViewById(R.id.disconnect_disband_label))
+            .setText(R.string.disband);
+        
+        disconnectDisband.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(getActivity())
@@ -166,41 +206,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .show();
             }
         });
-        
-        Button connect = (Button)v.findViewById(R.id.connect_btn);
-        connect.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                getConnectionService().broadcastSelfAsGuest(getActivity());
-            }
-        });
-        return v;
-    }
-
-    private void setDisconnectDisbandVisibility() {
-        //TODO @bryan sills clean this code up
-        if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
-            if(disconnect != null){
-                disconnect.setVisibility(View.INVISIBLE);
-            }
-            if(disband != null){
-                disband.setVisibility(View.VISIBLE);
-            }
-        } else if (getConnectionService() != null && getConnectionService().isHostConnected()) {
-            if(disconnect != null){
-                disconnect.setVisibility(View.VISIBLE);
-            }
-            disband.setVisibility(View.INVISIBLE);
-        } else {
-            //if no one is connected, hide both buttons
-            if(disconnect != null){
-                disconnect.setVisibility(View.INVISIBLE);
-            }
-            if(disband != null){
-                disband.setVisibility(View.INVISIBLE);
-            }
-        }
     }
 
     @Override
@@ -258,13 +263,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    setDisconnectDisbandVisibility();
+                    setDisconnectDisbandBtn();
                 }
             })
             .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    setDisconnectDisbandVisibility();
+                    setDisconnectDisbandBtn();
                 }
             })
             .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
@@ -345,7 +350,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private void onFindFinished(Intent intent) {
         //first thing...reenable the add members button
         addMembersButton.setEnabled(true);
-        
+        addMembersButton.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
+        addMembersButton.findViewById(R.id.image_background)
+            .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
         //locally initiated device discovery...pop up a dialog for the user
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
         

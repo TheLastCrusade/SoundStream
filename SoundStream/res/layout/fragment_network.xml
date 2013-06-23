@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- 
+<!--
     Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
     
     This file is part of SoundStream.
@@ -16,74 +15,176 @@
     GNU General Public License for more details.
     
     You should have received a copy of the GNU General Public License
-    along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
+    along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+-->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="match_parent"
-	 android:layout_height="match_parent"
-    >
-	<LinearLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" 
-	    android:orientation="vertical"
-	    >
-	
-	    <Button 
-	        android:id="@+id/add_members"
-	        android:text="@string/add_members"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        />
-	
-	    <TextView 
-	        android:id="@+id/connected_users_label"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:text="@string/cur_member_label"
-	        android:layout_margin="8dp"
-	        android:textSize="20sp"
-	        />
-	    <LinearLayout
-	        android:id="@+id/connected_users"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:paddingLeft="10dp"
-	        android:divider="@color/transparent"
-	        android:orientation="vertical"
-	        />
-	
-	    <Button
-	        android:id="@+id/disconnect_btn"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:background="@color/red"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="10dp"
-	        android:layout_marginBottom="10dp"
-	        android:text="@string/disconnect"
-	        android:textColor="@color/white"
-	        />
-	    <Button
-	        android:id="@+id/disband_btn"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:background="@color/red"
-	        android:visibility="invisible"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="10dp"
-	        android:layout_marginBottom="10dp"
-	        android:text="@string/disband"
-	        android:textColor="@color/white"
-	        />
-	    <Button
-	        android:id="@+id/connect_btn"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_marginLeft="10dp"
-	        android:layout_marginRight="10dp"
-	        android:layout_marginBottom="10dp"
-	        android:text="@string/join_different_network"
-	        />
-	</LinearLayout>
-</ScrollView>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/connected_users_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/cur_member_label"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/connected_users"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@color/transparent"
+            android:orientation="vertical"
+            android:paddingBottom="20dp"
+            android:paddingLeft="10dp" />
+
+        <!-- add new memebers -->
+
+        <LinearLayout
+            android:id="@+id/add_members"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@color/gray" >
+
+            <LinearLayout
+                android:id="@+id/image_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:background="@color/white"
+                android:orientation="vertical" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/add_new_members" />
+
+                    <RelativeLayout
+                        android:id="@+id/searching"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:background="@color/white"
+                        android:padding="10dp"
+                        android:visibility="invisible" >
+
+                        <ProgressBar
+                            android:id="@+id/progress"
+                            style="@style/Widget.Sherlock.Light.ProgressBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                           />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="5dp"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@id/progress"
+                            android:text="@string/searching"
+                             />
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <!-- Text at the bottom of image -->                   
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/accent_blue"
+                    android:padding="6dp"
+                    android:text="@string/add_members"
+                    android:textSize="16sp" 
+                	/>
+                      
+               
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:baselineAligned="false" >
+
+            <!-- Disconnect -->
+
+            <LinearLayout
+                android:id="@+id/disconnect_disband_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@color/gray" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:background="@color/white"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:padding="10dp"
+                        android:src="@drawable/disconnect" />
+
+                    <!-- Text at the bottom of image -->
+                    <TextView
+                        android:id="@+id/disconnect_disband_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/accent_blue"
+                        android:padding="6dp"
+                        android:text="@string/disconnect"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/join_different_network_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/gray" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:background="@color/white"
+                    android:orientation="vertical" >
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:padding="10dp"
+                        android:src="@drawable/soundstream_launcher" />
+
+                    <!-- Text at the bottom of image -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/accent_blue"
+                        android:padding="6dp"
+                        android:text="@string/join_different_network"
+                        android:textSize="16sp" />
+                
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
