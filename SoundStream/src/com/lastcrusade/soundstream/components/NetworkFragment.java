@@ -115,8 +115,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             @Override
             public void onClick(View v) {
                 addMembersButton.setEnabled(false);
-                //TODO: add some kind of visual indicator while discovering
+                //TODO: add a better indicator while discovering
                 //...seconds until discovery is finished, number of clients found, etc
+                addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
+                addMembersButton.findViewById(R.id.image_background)
+                    .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+                
                 getConnectionService().findNewGuests();
             }
         });
@@ -346,7 +350,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private void onFindFinished(Intent intent) {
         //first thing...reenable the add members button
         addMembersButton.setEnabled(true);
-        
+        addMembersButton.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
+        addMembersButton.findViewById(R.id.image_background)
+            .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
         //locally initiated device discovery...pop up a dialog for the user
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
         

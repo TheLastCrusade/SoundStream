@@ -36,29 +36,17 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
 	        android:src="@drawable/host"
-        />
+        	/>
         
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" 
-            android:layout_alignParentBottom="true">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_alignParentBottom="true"
-                android:alpha=".18"
-                android:background="@color/accent_blue" />
-
-            <TextView 
-	            android:text="@string/create_network"
-	            android:textSize="18sp"
-	            android:padding="6dp"
-	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentBottom="true" />
-            
-        </RelativeLayout>
+        <TextView 
+	        android:text="@string/create_network"
+	        android:textSize="18sp"
+	        android:padding="6dp"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true" 
+	        android:background="@color/accent_blue"
+         	/>
 	    
     </RelativeLayout>
     
@@ -76,31 +64,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/guest"
-        />
+        	/>
         
-        <RelativeLayout
+        <TextView 
+            android:id="@+id/join_network_id"
+            android:text="@string/join_network"
+            android:textSize="18sp"
+            android:padding="6dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" 
-            android:layout_alignParentBottom="true">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_alignParentBottom="true"
-                android:alpha=".18"
-                android:background="@color/accent_blue"/>
-
-            <TextView 
-                android:id="@+id/join_network_id"
-                android:text="@string/join_network"
-                android:textSize="18sp"
-                android:padding="6dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                />
-            
-        </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/accent_blue"
+            />
         
     </RelativeLayout> 
       

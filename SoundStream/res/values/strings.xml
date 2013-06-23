@@ -37,7 +37,7 @@
     <string name="connect">Select</string>
     <string name="create_network">Create</string>
     <string name="join_network">Join as \"%1$s\"</string>
-    <string name="join_different_network">Join A Different Network</string>
+    <string name="join_different_network">Switch Networks</string>
     
     
     <!-- text labels -->
@@ -65,6 +65,7 @@
     <string name="disband">Disband</string>
     <string name="dialog_disband">Are you sure you want to disband? This will boot all connected users.</string>
 
+    <string name="searching">Searching...</string>
     <!-- default values -->
     <string name="default_mac">00:08:67:53:09</string>
     <string name="default_name">Indiana Jones</string>
