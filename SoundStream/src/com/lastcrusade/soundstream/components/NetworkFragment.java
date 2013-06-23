@@ -57,6 +57,7 @@ import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Toaster;
+import com.lastcrusade.soundstream.util.TrackerAPI;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.lastcrusade.soundstream.util.UserListAdapter;
 
@@ -75,6 +76,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
 
+    private TrackerAPI tracker;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +91,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
+        tracker = new TrackerAPI((CoreActivity)getActivity());
         userAdapter = new UserListAdapter(getActivity(), new UserList(), false);
         userView = new LinearLayout(getActivity());
         
@@ -122,6 +126,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
                 
                 getConnectionService().findNewGuests();
+                tracker.trackAddMembersEvent();
             }
         });
 
@@ -171,12 +176,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "Disconnecting...");
+                                tracker.trackDisconnectEvent(true);
                                 disconnect();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
+                                tracker.trackDisconnectEvent(false);
                             }
                         })
                         .show();
@@ -196,11 +202,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 disband();
+                                tracker.trackDisbandEvent(true);
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
+                                tracker.trackDisbandEvent(false);
                             }
                         })
                         .show();
@@ -385,6 +392,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                                 @Override
                                 public void onItemsClick(
                                         List<FoundGuest> foundGuests) {
+                                    tracker.trackFoundGuestsEvent(foundGuests.size());
                                     getConnectionService().connectToGuests(foundGuests);
                                 }
                             })
