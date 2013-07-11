@@ -19,7 +19,10 @@
 
 package com.lastcrusade.soundstream;
 
+import java.lang.ref.WeakReference;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,10 +33,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
+
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -48,10 +54,6 @@ import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Trackable;
 import com.lastcrusade.soundstream.util.Transitions;
-import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
-import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity implements Trackable {
@@ -65,6 +67,8 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     private ServiceLocator<MessagingService>      messagingServiceLocator;
     private GoogleAnalytics mGaInstance;
     private Tracker mGaTracker;
+    
+    private Set<WeakReference<Fragment>> fragList = new HashSet<WeakReference<Fragment>>();
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -295,5 +299,21 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
 
     public Tracker getTracker(){
         return mGaTracker;
+    }
+    
+    @Override
+    public void onAttachFragment (Fragment fragment) {
+        fragList.add(new WeakReference<Fragment>(fragment));
+    }
+
+    public Set<Fragment> getAttachedFragments() {
+        Set<Fragment> ret = new HashSet<Fragment>();
+        for(WeakReference<Fragment> ref : fragList) {
+            Fragment f = ref.get();
+            if(f != null) {
+                ret.add(f);
+            }
+        }
+        return ret;
     }
 }
