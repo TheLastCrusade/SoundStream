@@ -3,8 +3,6 @@
 	<name>SoundStream</name>
 	<comment></comment>
 	<projects>
-		<project>ABSLibrary</project>
-		<project>SlidingMenuLibrary</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
