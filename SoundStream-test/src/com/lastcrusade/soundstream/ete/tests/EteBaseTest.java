@@ -22,7 +22,9 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.jayway.android.robotium.solo.Solo;
 import com.lastcrusade.soundstream.CoreActivity;
+import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.ete.harnesses.SoundStreamHarness;
+import com.squareup.spoon.Spoon;
 
 /**
  * Base End-to-End test, which sets up robotium, and makes a default base Sound
@@ -50,6 +52,12 @@ public abstract class EteBaseTest extends
 
 		solo.waitForActivity(CoreActivity.class); // Wait for activity to start
 													// fully
+		
+		//Handle if welcome screen is up
+		boolean welcomeUp = solo.searchText("Welcome to SoundStream!");
+		if (welcomeUp) {
+			solo.clickOnButton("Ok");
+		}
 	}
 
 	@Override
