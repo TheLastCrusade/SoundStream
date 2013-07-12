@@ -33,12 +33,14 @@
         
         <ImageView
 	        android:contentDescription="@string/create_network"
+	        android:id="@+id/create_Img"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
 	        android:src="@drawable/host"
         	/>
         
-        <TextView 
+        <TextView
+            android:id="@+id/create_network_id"
 	        android:text="@string/create_network"
 	        android:textSize="18sp"
 	        android:padding="6dp"
@@ -61,6 +63,7 @@
         
         <ImageView
             android:contentDescription="@string/join_network"
+	        android:id="@+id/join_Img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/guest"

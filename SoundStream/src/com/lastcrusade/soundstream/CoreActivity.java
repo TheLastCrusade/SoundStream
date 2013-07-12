@@ -21,9 +21,7 @@ package com.lastcrusade.soundstream;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
