@@ -26,6 +26,7 @@ import com.lastcrusade.soundstream.components.MusicLibraryFragment;
 import com.lastcrusade.soundstream.components.NetworkFragment;
 import com.lastcrusade.soundstream.components.PlaylistFragment;
 import com.lastcrusade.soundstream.util.EteUtils;
+import com.squareup.spoon.Spoon;
 
 /**
  * Automation harness for the MenuFragment. Contains all methods necessary
@@ -53,6 +54,7 @@ public class MenuHarness extends AbstractHarness{
 		solo.clickOnButton("Playlist");
 		assertVisible(false);
 		assertFragmentVisible(PlaylistFragment.class, true);
+		Spoon.screenshot(solo.getCurrentActivity(), "Changed_to_Playlist");
 	}
 	
 	public void openMusicLibrary(){
@@ -60,6 +62,7 @@ public class MenuHarness extends AbstractHarness{
 		solo.clickOnButton("Music Library");
 		assertVisible(false);
 		assertFragmentVisible(MusicLibraryFragment.class, true);
+		Spoon.screenshot(solo.getCurrentActivity(), "Changed_to_Music_Library");
 	}
 	
 	public void openAbout(){
@@ -67,6 +70,7 @@ public class MenuHarness extends AbstractHarness{
 		solo.clickOnButton("About");
 		assertVisible(false);
 		assertFragmentVisible(AboutFragment.class, true);
+		Spoon.screenshot(solo.getCurrentActivity(), "Changed_to_About");
 	}
 	
 	public void openNetwork(){
@@ -74,6 +78,7 @@ public class MenuHarness extends AbstractHarness{
 		solo.clickOnButton("Network");
 		assertVisible(false);
 		assertFragmentVisible(NetworkFragment.class, true);
+		Spoon.screenshot(solo.getCurrentActivity(), "Changed_to_Network");
 	}
 	
 	public void assertVisible(boolean expected){
