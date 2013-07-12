@@ -18,38 +18,35 @@
  */
 package com.lastcrusade.soundstream.ete.tests;
 
-import com.lastcrusade.soundstream.components.AboutFragment;
-import com.lastcrusade.soundstream.components.MenuFragment;
-import com.lastcrusade.soundstream.components.MusicLibraryFragment;
-import com.lastcrusade.soundstream.components.NetworkFragment;
-import com.lastcrusade.soundstream.components.PlaylistFragment;
-
 /**
- * @author Taylor
- *
+ * Smoke test to assure that core functionality of the application is retained.
+ * 
+ * @author Taylor Wrobel
+ * 
  */
 public class SmokeTest extends EteBaseTest {
 
-	public void testOpenAllFragments() throws Exception {
+	/**
+	 * This test simply opens all fragments that can be opened from a single
+	 * phone network.
+	 * 
+	 */
+	public void testOpenAllFragments() {
 		ssh.hConnect().assertVisible(true);
-		ssh.assertFragmentVisible(MenuFragment.class, false);
+		ssh.hMenu().assertVisible(false);
 
 		ssh.hConnect().pressCreateButton();
-		
+
 		ssh.hMenu().openPlaylist();
-		ssh.assertFragmentVisible(PlaylistFragment.class, true);
-		
+
 		ssh.hMenu().openMusicLibrary();
-		ssh.assertFragmentVisible(MusicLibraryFragment.class, true);
-		
+
 		ssh.hMenu().openAbout();
-		ssh.assertFragmentVisible(AboutFragment.class, true);
-		
+
 		ssh.hMenu().openNetwork();
-		ssh.assertFragmentVisible(NetworkFragment.class, true);
 
 		solo.clickOnText("Disconnect");
 		solo.clickOnText("Disconnect");
 	}
-	
+
 }

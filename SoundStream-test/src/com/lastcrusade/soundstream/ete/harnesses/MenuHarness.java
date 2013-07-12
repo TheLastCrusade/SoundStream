@@ -19,12 +19,19 @@
 package com.lastcrusade.soundstream.ete.harnesses;
 
 import com.jayway.android.robotium.solo.Solo;
+import com.lastcrusade.soundstream.components.AboutFragment;
 import com.lastcrusade.soundstream.components.ConnectFragment;
 import com.lastcrusade.soundstream.components.MenuFragment;
+import com.lastcrusade.soundstream.components.MusicLibraryFragment;
+import com.lastcrusade.soundstream.components.NetworkFragment;
+import com.lastcrusade.soundstream.components.PlaylistFragment;
 import com.lastcrusade.soundstream.util.EteUtils;
 
 /**
- * @author Taylor
+ * Automation harness for the MenuFragment. Contains all methods necessary
+ * for interacting with and verifying the state of the fragment.
+ * 
+ * @author Taylor Wrobel
  *
  */
 public class MenuHarness extends AbstractHarness{
@@ -45,24 +52,28 @@ public class MenuHarness extends AbstractHarness{
 		navigateTo();
 		solo.clickOnButton("Playlist");
 		assertVisible(false);
+		assertFragmentVisible(PlaylistFragment.class, true);
 	}
 	
 	public void openMusicLibrary(){
 		navigateTo();
 		solo.clickOnButton("Music Library");
 		assertVisible(false);
+		assertFragmentVisible(MusicLibraryFragment.class, true);
 	}
 	
 	public void openAbout(){
 		navigateTo();
 		solo.clickOnButton("About");
 		assertVisible(false);
+		assertFragmentVisible(AboutFragment.class, true);
 	}
 	
 	public void openNetwork(){
 		navigateTo();
 		solo.clickOnButton("Network");
 		assertVisible(false);
+		assertFragmentVisible(NetworkFragment.class, true);
 	}
 	
 	public void assertVisible(boolean expected){

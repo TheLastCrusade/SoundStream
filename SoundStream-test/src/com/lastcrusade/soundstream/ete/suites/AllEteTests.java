@@ -25,16 +25,20 @@ import com.lastcrusade.soundstream.ete.tests.ConnectFragmentTest;
 import com.lastcrusade.soundstream.ete.tests.SmokeTest;
 
 /**
- * @author Taylor
- *
+ * A collection of all end to end test written for SoundStream. This should
+ * serve as the main class run through JUnit, as it contains the suite of all
+ * other test classes.
+ * 
+ * @author Taylor Wrobel
+ * 
  */
 public class AllEteTests extends TestCase {
 
-	public static TestSuite suite(){
+	public static TestSuite suite() {
 		TestSuite suite = new TestSuite();
 		suite.addTestSuite(SmokeTest.class);
 		suite.addTestSuite(ConnectFragmentTest.class);
 		return suite;
 	}
-	
+
 }

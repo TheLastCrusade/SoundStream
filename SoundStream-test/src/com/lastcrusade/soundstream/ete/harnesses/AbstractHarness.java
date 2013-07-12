@@ -27,7 +27,9 @@ import com.jayway.android.robotium.solo.Solo;
 import com.lastcrusade.soundstream.util.EteUtils;
 
 /**
- * @author Taylor
+ * An abstract harness that covers core harness functionality.
+ * 
+ * @author Taylor Wrobel
  *
  */
 public abstract class AbstractHarness extends Assert{

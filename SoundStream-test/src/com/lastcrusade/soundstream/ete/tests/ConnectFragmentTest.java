@@ -23,24 +23,26 @@ import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 
 /**
- * @author Taylor
- *
+ * A set of tests to verify functionality of the ConnectFragment
+ * 
+ * @author Taylor Wrobel
+ * 
  */
-public class ConnectFragmentTest extends EteBaseTest{
-	
-	public void testConnectText(){
+public class ConnectFragmentTest extends EteBaseTest {
+
+	public void testConnectText() {
 		ssh.assertFragmentVisible(ConnectFragment.class, true);
 		ssh.hConnect().assertCreateText("Create");
 		String localname = BluetoothUtils.getLocalBluetoothName();
 		ssh.hConnect().assertJoinText("Join as \"" + localname + "\"");
 	}
-	
-	public void testCreateNetwork(){
+
+	public void testCreateNetwork() {
 		ssh.hConnect().assertVisible(true);
 		ssh.hConnect().assertCreateButtonEnabled(true);
 		ssh.hConnect().pressCreateButton();
 		ssh.assertFragmentVisible(MenuFragment.class, true);
 		ssh.hConnect().assertVisible(false);
 	}
-	
+
 }

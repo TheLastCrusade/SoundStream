@@ -23,8 +23,12 @@ import android.widget.ImageView;
 import com.jayway.android.robotium.solo.Solo;
 
 /**
- * @author Taylor
- *
+ * The base harness for the soundstream application. Contains all methods
+ * necessary for interacting with and verifying the state of the application as
+ * a whole, including handles to all sub harnesses.
+ * 
+ * @author Taylor Wrobel
+ * 
  */
 public class SoundStreamHarness extends AbstractHarness {
 	

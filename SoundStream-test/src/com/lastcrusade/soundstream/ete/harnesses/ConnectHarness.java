@@ -29,7 +29,10 @@ import com.lastcrusade.soundstream.components.ConnectFragment;
 import com.lastcrusade.soundstream.util.EteUtils;
 
 /**
- * @author Taylor
+ * Automation harness for the ConnectFragment. Contains all methods necessary
+ * for interacting with and verifying the state of the fragment.
+ * 
+ * @author Taylor Wrobel
  * 
  */
 public class ConnectHarness extends AbstractHarness {
@@ -56,7 +59,7 @@ public class ConnectHarness extends AbstractHarness {
 
 	public void answerBluetoothDialog(boolean respondYes) {
 		// FIXME: Doesn't work
-//		assertBluetoothDialogShowing(true);
+		// assertBluetoothDialogShowing(true);
 		solo.clickOnButton(respondYes ? "Yes" : "No");
 	}
 
@@ -69,7 +72,7 @@ public class ConnectHarness extends AbstractHarness {
 		Condition con = new Condition() {
 			@Override
 			public boolean isSatisfied() {
-				//FIXME: Doesn't work
+				// FIXME: Doesn't work
 				return solo.getText("Bluetooth permission request").isShown() == expected;
 			}
 		};
@@ -85,7 +88,7 @@ public class ConnectHarness extends AbstractHarness {
 		assertTrue("Found view of type that isn't ImageView",
 				createBtn instanceof ImageView);
 		assertEquals("Create incorrectly enabled/disabled", expected,
-				((ImageView)createBtn).isEnabled());
+				((ImageView) createBtn).isEnabled());
 	}
 
 	public void assertJoinButtonEnabled(final boolean expected) {
@@ -93,7 +96,7 @@ public class ConnectHarness extends AbstractHarness {
 		assertTrue("Found view of type that isn't ImageView",
 				joinBtn instanceof ImageView);
 		assertEquals("Join incorrectly enabled/disabled", expected,
-				((ImageView)joinBtn).isEnabled());
+				((ImageView) joinBtn).isEnabled());
 	}
 
 	public void assertCreateText(final String expected) {
@@ -111,8 +114,8 @@ public class ConnectHarness extends AbstractHarness {
 		assertEquals("Create button text different than expected.", expected,
 				((TextView) createText).getText().toString());
 	}
-	
-	public void assertVisible(boolean expected){
+
+	public void assertVisible(boolean expected) {
 		assertFragmentVisible(ConnectFragment.class, expected);
 	}
 }

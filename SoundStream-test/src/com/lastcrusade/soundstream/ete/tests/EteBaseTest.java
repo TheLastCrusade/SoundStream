@@ -25,10 +25,14 @@ import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.ete.harnesses.SoundStreamHarness;
 
 /**
- * @author Taylor
- *
+ * Base End-to-End test, which sets up robotium, and makes a default base Sound
+ * Stream Harness for use in further automation.
+ * 
+ * @author Taylor Wrobel
+ * 
  */
-public abstract class EteBaseTest extends ActivityInstrumentationTestCase2<CoreActivity> {
+public abstract class EteBaseTest extends
+		ActivityInstrumentationTestCase2<CoreActivity> {
 
 	protected Solo solo;
 	protected SoundStreamHarness ssh;
@@ -39,19 +43,21 @@ public abstract class EteBaseTest extends ActivityInstrumentationTestCase2<CoreA
 
 	@Override
 	public void setUp() throws Exception {
-		//setUp() is run before a test case is started. 
-		//This is where the solo object is created.
+		// setUp() is run before a test case is started.
+		// This is where the solo object is created.
 		solo = new Solo(getInstrumentation(), getActivity());
 		ssh = new SoundStreamHarness(solo);
 
-		solo.waitForActivity(CoreActivity.class); // Wait for activity to start fully
+		solo.waitForActivity(CoreActivity.class); // Wait for activity to start
+													// fully
 	}
 
 	@Override
 	public void tearDown() throws Exception {
-		//tearDown() is run after a test case has finished. 
-		//finishOpenedActivities() will finish all the activities that have been opened during the test execution.
+		// tearDown() is run after a test case has finished.
+		// finishOpenedActivities() will finish all the activities that have
+		// been opened during the test execution.
 		solo.finishOpenedActivities();
 	}
-	
+
 }

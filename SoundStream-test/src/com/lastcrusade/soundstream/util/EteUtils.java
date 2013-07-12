@@ -20,7 +20,6 @@ package com.lastcrusade.soundstream.util;
 
 import android.support.v4.app.Fragment;
 
-import com.google.analytics.tracking.android.Log;
 import com.jayway.android.robotium.solo.Solo;
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.components.MenuFragment;

@@ -20,15 +20,13 @@
 package com.lastcrusade.soundstream.net.message;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.junit.Test;
 
 import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.net.message.UserListMessage;
 
 public class UserListMessageTest extends SerializationTest<UserListMessage> {
 		
