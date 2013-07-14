@@ -51,19 +51,17 @@
 	<string name="network">Network</string>
 	<string name="music_library">Music Library</string>
 	<string name="playlist">Playlist</string>
-    <string name="disconnect">Disconnect</string>
 	
 	<!-- other things -->
 	<string name="add_to_playlist">Add To Playlist</string>
 	<string name="remove_from_playlist">Remove From Playlist</string>
     <string name="song_item_division">-</string>
-    <string name="dialog_disconnect">Are you sure that you want to disconnect?</string>
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
 
     <string name="no_songs_in_playlist">There are no songs in your playlist! Quick, go add some from the music library!</string>
     <string name="disband">Disband</string>
-    <string name="dialog_disband">Are you sure you want to disband? This will boot all connected users.</string>
+    <string name="dialog_disband">Are you sure you want to disband? This will boot any connected users.</string>
 
     <string name="searching">Searching...</string>
     <!-- default values -->

@@ -121,7 +121,7 @@
             <!-- Disconnect -->
 
             <LinearLayout
-                android:id="@+id/disconnect_disband_btn"
+                android:id="@+id/disband_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
@@ -139,17 +139,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
                         android:padding="10dp"
-                        android:src="@drawable/disconnect" />
+                        android:src="@drawable/disband" />
 
                     <!-- Text at the bottom of image -->
+
                     <TextView
-                        android:id="@+id/disconnect_disband_label"
+                        android:id="@+id/disband_label"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/accent_blue"
                         android:padding="6dp"
-                        android:text="@string/disconnect"
+                        android:text="@string/disband"
                         android:textSize="16sp" />
+
                 </LinearLayout>
             </LinearLayout>
 
