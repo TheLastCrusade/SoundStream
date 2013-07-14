@@ -302,7 +302,8 @@ public class PlaylistFragment extends MusicListFragment{
                 
                 animateDragging(dx);
                 
-                if(e2.getX() > ((View)getSelectedView().getParent()).getWidth()-100 && dx > 100){
+                if( (e2.getX() > ((View)getSelectedView().getParent()).getWidth()-100 ||
+                        e2.getX() < 100) && Math.abs(dx) > 100){
                     if(getPlaylistService().getCurrentEntry()!= null && 
                             getPlaylistService().getCurrentEntry().equals(getSelectedEntry())){
                         getPlaylistService().skip();
