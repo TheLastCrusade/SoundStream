@@ -20,6 +20,7 @@
 package com.lastcrusade.soundstream.util;
 
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
@@ -77,10 +78,21 @@ public class Transitions {
     
     private static void switchFragment(int fragmentName, CoreActivity activity){
         Fragment fragment = getFragment(fragmentName);
+        Fragment previousFragment = activity.getSupportFragmentManager().findFragmentByTag("currentContent");
         
         activity.getSupportFragmentManager().beginTransaction()
-            .replace(R.id.content, fragment)
+            .replace(R.id.content, fragment, "currentContent")
             .commit();
+        
+        if(fragment instanceof ConnectFragment){
+            activity.disableSlidingMenu();
+            activity.hidePlaybar();
+        }
+        else if (previousFragment instanceof ConnectFragment){
+            activity.enableSlidingMenu();
+            activity.showPlaybar();
+        }
+        
         activity.showContent();
         String title = activity.getResources().getString(((ITitleable)fragment).getTitle());
         activity.setTitle(title);
