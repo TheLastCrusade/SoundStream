@@ -192,9 +192,14 @@ public class PlaylistService extends Service {
                         .sendSongStatusMessage(currentEntry);
                     currentEntry = null;
                 }
+                
+                
+                Log.i(TAG, "Song finished, player is paused: " + mThePlayer.isPaused());
                 // automatically play the next song, but only if we're not paused
                 if (!mThePlayer.isPaused()) {
                     play();
+                }else{
+                    setNextSong();    
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
