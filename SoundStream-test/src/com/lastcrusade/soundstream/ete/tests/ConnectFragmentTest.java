@@ -31,6 +31,7 @@ import com.lastcrusade.soundstream.util.BluetoothUtils;
 public class ConnectFragmentTest extends EteBaseTest {
 
 	public void testConnectText() {
+		ssh.spoonShot("Initial_State");
 		ssh.assertFragmentVisible(ConnectFragment.class, true);
 		ssh.hConnect().assertCreateText("Create");
 		String localname = BluetoothUtils.getLocalBluetoothName();
@@ -38,11 +39,18 @@ public class ConnectFragmentTest extends EteBaseTest {
 	}
 
 	public void testCreateNetwork() {
+		ssh.spoonShot("Initial_State");
 		ssh.hConnect().assertVisible(true);
 		ssh.hConnect().assertCreateButtonEnabled(true);
 		ssh.hConnect().pressCreateButton();
 		ssh.assertFragmentVisible(MenuFragment.class, true);
 		ssh.hConnect().assertVisible(false);
+		ssh.spoonShot("Network_Created");
+	}
+	
+	public void testConnectTitle(){
+		ssh.assertFragmentVisible(ConnectFragment.class, true);
+		ssh.assertTitleEquals("Select");
 	}
 
 }

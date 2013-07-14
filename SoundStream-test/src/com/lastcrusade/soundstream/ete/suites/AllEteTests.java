@@ -21,6 +21,7 @@ package com.lastcrusade.soundstream.ete.suites;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import com.lastcrusade.soundstream.ete.tests.AboutFragmentTest;
 import com.lastcrusade.soundstream.ete.tests.ConnectFragmentTest;
 import com.lastcrusade.soundstream.ete.tests.SmokeTest;
 
@@ -38,6 +39,7 @@ public class AllEteTests extends TestCase {
 		TestSuite suite = new TestSuite();
 		suite.addTestSuite(SmokeTest.class);
 		suite.addTestSuite(ConnectFragmentTest.class);
+		suite.addTestSuite(AboutFragmentTest.class);
 		return suite;
 	}
 

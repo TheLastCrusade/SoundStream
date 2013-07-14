@@ -18,9 +18,11 @@
  */
 package com.lastcrusade.soundstream.ete.harnesses;
 
-import android.widget.ImageView;
+import android.annotation.SuppressLint;
+import android.view.View;
 
 import com.jayway.android.robotium.solo.Solo;
+import com.squareup.spoon.Spoon;
 
 /**
  * The base harness for the soundstream application. Contains all methods
@@ -31,28 +33,44 @@ import com.jayway.android.robotium.solo.Solo;
  * 
  */
 public class SoundStreamHarness extends AbstractHarness {
-	
-	public SoundStreamHarness(Solo solo){
+
+	public SoundStreamHarness(Solo solo) {
 		super(solo);
 	}
 
 	public ConnectHarness hConnect() {
 		return new ConnectHarness(solo);
 	}
-	
+
 	public MenuHarness hMenu() {
 		return new MenuHarness(solo);
 	}
 
-	public void pressMenuButton(){
-		// FIXME: Find better way to ID button when pressing.  Currently works, but is sketchy.
-		solo.clickOnImage(0);
+	public AboutHarness hAbout() {
+		return new AboutHarness(solo);
 	}
-	
-	public void assertMenuButtonActive(boolean expected){
+
+	public void spoonShot(String tag) {
+		Spoon.screenshot(solo.getCurrentActivity(), tag);
+	}
+
+	@SuppressLint("InlinedApi")
+	public void pressMenuButton() {
+		solo.clickOnView(solo.getView(android.R.id.home));
+	}
+
+	public void assertMenuButtonActive(boolean expected) {
 		// FIXME: Doesn't work
-		ImageView menuButton = solo.getImage(0);
-		assertEquals("Menu not correctly enabled/disabled", expected, menuButton.isEnabled());
+		View menuButton = solo.getView(android.R.id.home);
+		assertEquals("Menu not correctly enabled/disabled", expected,
+				menuButton.isEnabled());
 	}
-	
+
+	public void assertTitleEquals(String expectedTitle) {
+		// FIXME: Doesn't grab title as it should. Should pull from UI directly.
+		String actual = solo.getCurrentActivity().getTitle().toString();
+		assertTrue("Title \"" + actual + "\" doesn't match expected \""
+				+ expectedTitle + "\"", expectedTitle.equals(actual));
+	}
+
 }

@@ -18,41 +18,25 @@
  */
 package com.lastcrusade.soundstream.ete.tests;
 
-
 /**
- * Smoke test to assure that core functionality of the application is retained.
- * 
- * @author Taylor Wrobel
- * 
+ * @author Taylor
+ *
  */
-public class SmokeTest extends EteBaseTest {
-	
-	/**
-	 * This test simply opens all fragments that can be opened from a single
-	 * phone network.
-	 * 
-	 */
-	public void testOpenAllFragments() {
-		ssh.spoonShot("Initial_State");
-		ssh.hConnect().assertVisible(true);
-		ssh.hMenu().assertVisible(false);
+public class AboutFragmentTest extends EteBaseTest{
 
+	public void testTitle(){
 		ssh.hConnect().pressCreateButton();
-
-		ssh.hMenu().openPlaylist();
-
-		ssh.hMenu().openMusicLibrary();
-
-		ssh.hMenu().openAbout();
-
-		ssh.hMenu().openNetwork();
-
-		solo.clickOnText("Disconnect");
-		solo.searchText("Are you sure that you want to disconnect?");
-		ssh.spoonShot("Disconnect_Pressed");
-		solo.clickOnText("Disconnect");
-		
-		ssh.hConnect().assertVisible(true);
+		ssh.hAbout().navigateTo();
+		ssh.spoonShot("About_Opened");
+		ssh.assertTitleEquals("About");
+		ssh.pressMenuButton();
+		ssh.spoonShot("About_Closed_Via_Home");
+		ssh.assertTitleEquals("SoundStream");
+		ssh.pressMenuButton();
+		ssh.hAbout().assertVisible(true);
+		ssh.hMenu().assertVisible(false);
+		ssh.spoonShot("About_Reopened_Via_Home");
+		ssh.assertTitleEquals("About");
 	}
-
+	
 }
