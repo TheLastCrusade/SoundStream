@@ -26,7 +26,6 @@ import java.util.List;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -42,10 +41,9 @@ import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 import com.lastcrusade.soundstream.util.Toaster;
 
@@ -204,7 +202,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (mThePlayer != null) {
-                    mThePlayer.cancel();
+                    mThePlayer.stop();
                 }
                 mThePlayer = new AudioPlayerWithEvents(
                         new RemoteAudioPlayer(
@@ -221,7 +219,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (mThePlayer != null) {
-                    mThePlayer.cancel();
+                    mThePlayer.stop();
                 }
                 mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
                 isLocalPlayer = true;
@@ -487,7 +485,7 @@ public class PlaylistService extends Service {
             if (song == null) {
                 //TODO: instead of this, we may want to repost a message to wait for the next song to be available
                 //stop the player
-                this.mAudioPlayer.stop();
+                this.mThePlayer.stop();
                 //pop up the notice
                 Toaster.iToast(this, getString(R.string.no_available_songs));
             } else {
@@ -522,6 +520,7 @@ public class PlaylistService extends Service {
     }
 
     public void clearPlaylist() {
+        mThePlayer.stop();
         mPlaylist.clear();
         currentEntry = null;
         new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);

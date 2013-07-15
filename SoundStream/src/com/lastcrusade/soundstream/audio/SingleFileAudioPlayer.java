@@ -73,11 +73,6 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
         });
     }
 
-    @Override
-    public void cancel() {
-        //NO OP for now
-    }
-
     /**
      * Set the song path and accompanying metadata to play.
      * 

@@ -85,13 +85,6 @@ public class AudioPlayerWithEvents implements IPlayer {
         externalControlClient.unregisterClient();
     }
 
-    public void cancel() {
-        this.player.cancel();
-        //NOTE: safe to do in all cases...in the case when we weren't registered, it will just
-        // ignore the unregister calls silently
-        releaseAudio();
-    }
-
     private void releaseAudio() {
         AudioManager myAudioManager = (AudioManager) this.context.getSystemService(Context.AUDIO_SERVICE);
         myAudioManager.abandonAudioFocus(this.focusChangeListener);
@@ -331,5 +324,12 @@ public class AudioPlayerWithEvents implements IPlayer {
     public void skip() {
         this.player.skip();
         new LocalBroadcastIntent(PlaylistService.ACTION_SKIPPING_AUDIO).send(this.context);
+    }
+
+    public void stop() {
+        this.player.stop();
+        //NOTE: safe to do in all cases...in the case when we weren't registered, it will just
+        // ignore the unregister calls silently
+        releaseAudio();
     }
 }
