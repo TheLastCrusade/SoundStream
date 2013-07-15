@@ -233,7 +233,9 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
-                getMessagingService().sendPlayStatusMessage(currentEntry, mThePlayer.isPlaying());
+                if (currentEntry != null) {
+                    getMessagingService().sendPlayStatusMessage(currentEntry, mThePlayer.isPlaying());
+                }
             }
         })
         .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
