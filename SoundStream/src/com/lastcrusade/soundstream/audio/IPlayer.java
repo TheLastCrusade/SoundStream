@@ -32,6 +32,13 @@ public interface IPlayer {
 
     public boolean isPlaying();
     
+    /**
+     * Cancel playback through this player.  This may involve releasing audio focus
+     * and freeing resources.
+     * 
+     */
+    public void cancel();
+    
     public void play();
 
     public void pause();

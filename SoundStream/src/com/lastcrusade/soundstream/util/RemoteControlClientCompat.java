@@ -409,7 +409,10 @@ public class RemoteControlClientCompat {
      */
     public void unregister() {
         if (sHasRemoteControlAPIs) {
-            RemoteControlHelper.unregisterRemoteControlClient(mRegisteredAudioManager, this);
+            //only unregister if we were previously registered
+            if (mRegisteredAudioManager != null) {
+                RemoteControlHelper.unregisterRemoteControlClient(mRegisteredAudioManager, this);
+            }
         } else {
             //nothing to do
         }

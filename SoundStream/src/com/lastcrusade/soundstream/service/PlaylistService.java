@@ -203,6 +203,9 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
+                if (mThePlayer != null) {
+                    mThePlayer.cancel();
+                }
                 mThePlayer = new AudioPlayerWithEvents(
                         new RemoteAudioPlayer(
                                 PlaylistService.this,
@@ -217,6 +220,9 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
+                if (mThePlayer != null) {
+                    mThePlayer.cancel();
+                }
                 mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
                 isLocalPlayer = true;
                 currentEntry = null;
@@ -227,6 +233,29 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+                getMessagingService().sendPlayStatusMessage(currentEntry, mThePlayer.isPlaying());
+            }
+        })
+        .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                boolean isPlaying = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
+                String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
+                int   entryId     = intent.getIntExtra(  MessagingService.EXTRA_ENTRY_ID, 0);
+              
+                PlaylistEntry entry = mPlaylist.findEntryByAddressIdAndEntry(macAddress, songId, entryId);
+                if (entry != null) {
+                    currentEntry = entry;
+                }
+
+                if (isPlaying) {
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(PlaylistService.this);
+                } else {
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(PlaylistService.this);
+                }
             }
         })
         .addLocalAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
@@ -342,6 +371,7 @@ public class PlaylistService extends Service {
                 boolean loaded    = intent.getBooleanExtra(MessagingService.EXTRA_LOADED, false);
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
+                //TODO: this may be done more efficiently by using mPlaylist.findEntryByAddressSongAndEntry
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 if (song != null) {
                     PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
