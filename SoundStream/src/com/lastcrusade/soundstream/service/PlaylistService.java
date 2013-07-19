@@ -26,7 +26,6 @@ import java.util.List;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -42,10 +41,9 @@ import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 import com.lastcrusade.soundstream.util.Toaster;
 
@@ -141,6 +139,8 @@ public class PlaylistService extends Service {
 
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
     private ServiceLocator<MessagingService> messagingServiceLocator;
+
+    private int lastEntryId = 0;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -358,6 +358,10 @@ public class PlaylistService extends Service {
                 mPlaylist.clear();
                 for (PlaylistEntry entry : newList) {
                     mPlaylist.add(entry);
+                    //if the entry has an id assigned, check to see if it's greater than
+                    // our last id...if so, we want to keep this updated because if we become
+                    // host (from guest), we need to make sure we don't reuse ids.
+                    lastEntryId = Math.max(lastEntryId, entry.getEntryId());
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -525,6 +529,7 @@ public class PlaylistService extends Service {
 
     public void clearPlaylist() {
         mPlaylist.clear();
+        lastEntryId = 0;
         currentEntry = null;
         new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
@@ -545,6 +550,7 @@ public class PlaylistService extends Service {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
         
+        entry.setEntryId(++lastEntryId);
         mPlaylist.add(entry);
         if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
