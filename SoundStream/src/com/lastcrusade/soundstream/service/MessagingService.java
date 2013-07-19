@@ -209,6 +209,7 @@ public class MessagingService extends Service implements IMessagingService {
                                 .putExtra(EXTRA_ADDRESS,
                                         message.getMacAddress())
                                 .putExtra(EXTRA_SONG_ID, message.getId())
+                                .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
                                 .send(MessagingService.this);
                     }
                 });
