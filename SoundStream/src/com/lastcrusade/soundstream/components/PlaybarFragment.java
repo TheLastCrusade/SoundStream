@@ -33,8 +33,8 @@ import android.widget.TextView;
 
 import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
+import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.lastcrusade.soundstream.service.PlaylistService;
@@ -176,19 +176,14 @@ public class PlaybarFragment extends Fragment {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    SongMetadata song = intent.getParcelableExtra(PlaylistService.EXTRA_SONG);
-                    if (song != null) {
-                        songTitle.setText(song.getTitle());
-                    } else {
-                        //TODO: what do we want to display when there are no songs to play?
-                        songTitle.setText("");
-                    }
+                    updateCurrentSongTitle((PlaylistEntry)intent.getParcelableExtra(PlaylistService.EXTRA_SONG));
                 }
             })
             .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    updateCurrentSongTitle(getPlaylistService().getCurrentEntry());
                     setPauseImage();
                 }
             })
@@ -196,43 +191,30 @@ public class PlaybarFragment extends Fragment {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    updateCurrentSongTitle(getPlaylistService().getCurrentEntry());
                     setPlayImage();
-                }
-            })
-            .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
-                
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                    long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
-                                                              SongMetadata.UNKNOWN_SONG);
-                    
-                    SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
-                    if(songTitle != null && song != null){
-                            songTitle.setText(song.getTitle());
-                    } else {
-                        Log.w(TAG, "songTitle or song were null");
-                    }
                 }
             })
             .register(this.getActivity());
     }
     
-    private MusicLibraryService getMusicLibraryService() {
-        MusicLibraryService musicLibraryService = null;
-        try {
-            musicLibraryService = this.musicLibraryLocator.getService();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return musicLibraryService;
-    }
-
-
     private void unregisterReceivers() {
         this.registrar.unregister();
     }
     
+    /**
+     * @param song
+     */
+    private void updateCurrentSongTitle(SongMetadata song) {
+        if (song != null) {
+            songTitle.setText(song.getTitle());
+        } else {
+            //when song is null, it means there is no current song, and no songs
+            // in the playlist...restore the default "Now Playing" text
+            songTitle.setText(R.string.now_playing);
+        }
+    }
+
     private PlaylistService getPlaylistService() {
         PlaylistService playlistService = null;
         try {

@@ -26,7 +26,6 @@ import java.util.List;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -42,10 +41,9 @@ import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.lastcrusade.soundstream.util.SongMetadataUtils;
 import com.lastcrusade.soundstream.util.Toaster;
 
@@ -142,6 +140,8 @@ public class PlaylistService extends Service {
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
     private ServiceLocator<MessagingService> messagingServiceLocator;
 
+    private int lastEntryId = 0;
+
     @Override
     public IBinder onBind(Intent intent) {
         messagingServiceLocator = new ServiceLocator<MessagingService>(
@@ -195,6 +195,8 @@ public class PlaylistService extends Service {
                 // automatically play the next song, but only if we're not paused
                 if (!mThePlayer.isPaused()) {
                     play();
+                }else{
+                    setNextSong();    
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -203,6 +205,9 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
+                if (mThePlayer != null) {
+                    mThePlayer.cancel();
+                }
                 mThePlayer = new AudioPlayerWithEvents(
                         new RemoteAudioPlayer(
                                 PlaylistService.this,
@@ -217,6 +222,9 @@ public class PlaylistService extends Service {
             
             @Override
             public void onReceiveAction(Context context, Intent intent) {
+                if (mThePlayer != null) {
+                    mThePlayer.cancel();
+                }
                 mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
                 isLocalPlayer = true;
                 currentEntry = null;
@@ -227,6 +235,31 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+                if (currentEntry != null) {
+                    getMessagingService().sendPlayStatusMessage(currentEntry, mThePlayer.isPlaying());
+                }
+            }
+        })
+        .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                boolean isPlaying = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
+                String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+                long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
+                                                          SongMetadata.UNKNOWN_SONG);
+                int   entryId     = intent.getIntExtra(  MessagingService.EXTRA_ENTRY_ID, 0);
+              
+                PlaylistEntry entry = mPlaylist.findEntryByAddressIdAndEntry(macAddress, songId, entryId);
+                if (entry != null) {
+                    currentEntry = entry;
+                }
+
+                if (isPlaying) {
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(PlaylistService.this);
+                } else {
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(PlaylistService.this);
+                }
             }
         })
         .addLocalAction(MessagingService.ACTION_PAUSE_MESSAGE, new IBroadcastActionHandler() {
@@ -326,6 +359,10 @@ public class PlaylistService extends Service {
                 mPlaylist.clear();
                 for (PlaylistEntry entry : newList) {
                     mPlaylist.add(entry);
+                    //if the entry has an id assigned, check to see if it's greater than
+                    // our last id...if so, we want to keep this updated because if we become
+                    // host (from guest), we need to make sure we don't reuse ids.
+                    lastEntryId = Math.max(lastEntryId, entry.getEntryId());
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -343,6 +380,7 @@ public class PlaylistService extends Service {
                 boolean loaded    = intent.getBooleanExtra(MessagingService.EXTRA_LOADED, false);
                 boolean played    = intent.getBooleanExtra(MessagingService.EXTRA_PLAYED, false);
 
+                //TODO: this may be done more efficiently by using mPlaylist.findEntryByAddressSongAndEntry
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 if (song != null) {
                     PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
@@ -492,6 +530,7 @@ public class PlaylistService extends Service {
 
     public void clearPlaylist() {
         mPlaylist.clear();
+        lastEntryId = 0;
         currentEntry = null;
         new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
@@ -512,21 +551,20 @@ public class PlaylistService extends Service {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
         
+        entry.setEntryId(++lastEntryId);
+        mPlaylist.add(entry);
         if (isLocalPlayer) {
-            mPlaylist.add(entry);
-            if (isLocalPlayer) {
-                mDataManager.addToLoadQueue(entry);
-            }
-            new LocalBroadcastIntent(ACTION_SONG_ADDED)
-                .putExtra(EXTRA_SONG, entry)
-                .send(this);
+            mDataManager.addToLoadQueue(entry);
+            new LocalBroadcastIntent(ACTION_SONG_ADDED).putExtra(EXTRA_SONG,
+                    entry).send(this);
             // send an intent to the fragments that the playlist is updated
             new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-            
-            //send a message to the guests with the new playlist
-            getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+
+            // send a message to the guests with the new playlist
+            getMessagingService().sendPlaylistMessage(
+                    mPlaylist.getSongsToPlay());
         } else {
-            //send a message to the host to add this song
+            // send a message to the host to add this song
             getMessagingService().sendAddToPlaylistMessage(entry);
         }
     }
