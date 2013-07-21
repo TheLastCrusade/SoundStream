@@ -342,8 +342,8 @@ public class PlaylistService extends Service {
                 if (!isCurrentEntry(entry)) {
                     removeSong(entry);
                 } else {
-                	skip();
-                	removeSong(entry);
+                    skip();
+                    removeSong(entry);
                 }
                 
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
