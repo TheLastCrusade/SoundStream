@@ -34,9 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -71,7 +69,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private BroadcastRegistrar broadcastRegistrar;
     private UserListAdapter userAdapter;
-    private LinearLayout addMembersButton, userView, disconnectDisband;
+    private LinearLayout addMembersButton, userView, disband;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
@@ -83,13 +81,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         super.onCreate(savedInstanceState);
         connectionServiceLocator = new ServiceLocator<ConnectionService>(
                 this.getActivity(), ConnectionService.class, ConnectionServiceBinder.class);
-
-        connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
-            @Override
-            public void onServiceBound() {
-                setDisconnectDisbandBtn();
-            }
-        });
 
         tracker = new TrackerAPI((CoreActivity)getActivity());
         userAdapter = new UserListAdapter(getActivity(), new UserList(), false);
@@ -130,78 +121,17 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
 
-        disconnectDisband = (LinearLayout)v.findViewById(R.id.disconnect_disband_btn);
-
-        userView = (LinearLayout) v.findViewById(R.id.connected_users);
-        updateUserView();
-
-        //TODO react to changing state
-        setDisconnectDisbandBtn();
+        disband = (LinearLayout)v.findViewById(R.id.disband_btn);
         
-        LinearLayout joinDifferentNetwork = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
-        joinDifferentNetwork.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                getConnectionService().broadcastSelfAsGuest(getActivity());
-            }
-        });
-        return v;
-    }
-
-    private void setDisconnectDisbandBtn() {
-        //if there is a guest connected, then we are the host and we want the button
-        //to function as a disband button
-        if (getConnectionService() != null && getConnectionService().isGuestConnected()) {
-            if(disconnectDisband != null){
-                setDisbandFunction();
-            }
-        } else{
-            if(disconnectDisband != null){
-                setDisconnectFunction();
-            }
-        } 
-    }
-    
-    private void setDisconnectFunction(){
-        ((TextView)disconnectDisband.findViewById(R.id.disconnect_disband_label))
-            .setText(R.string.disconnect);
-        
-        //set the button to disconnect when pressed
-        disconnectDisband.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(getActivity())
-                        .setMessage(R.string.dialog_disconnect)
-                        .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG, "Disconnecting...");
-                                tracker.trackDisconnectEvent(true);
-                                disconnect();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                tracker.trackDisconnectEvent(false);
-                            }
-                        })
-                        .show();
-            }
-        });
-    }
-    
-    private void setDisbandFunction(){
-        ((TextView)disconnectDisband.findViewById(R.id.disconnect_disband_label))
-            .setText(R.string.disband);
-        
-        disconnectDisband.setOnClickListener(new OnClickListener() {
+        disband.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(getActivity())
                         .setMessage(R.string.dialog_disband)
                         .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                disband();
+                            	getConnectionService().disconnectAllGuests();
+                                cleanUpAfterDisband();
                                 tracker.trackDisbandEvent(true);
                             }
                         })
@@ -213,6 +143,19 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                         .show();
             }
         });
+
+        userView = (LinearLayout) v.findViewById(R.id.connected_users);
+        updateUserView();
+        
+        LinearLayout joinDifferentNetwork = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
+        joinDifferentNetwork.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getConnectionService().broadcastSelfAsGuest(getActivity());
+            }
+        });
+        return v;
     }
 
     @Override
@@ -267,24 +210,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     updateUserView();
                 }
             })
-            .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    setDisconnectDisbandBtn();
-                }
-            })
-            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    setDisconnectDisbandBtn();
-                }
-            })
             .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     Log.i(TAG, "Host Disconnected");
                     //after the host has been disconnected, wipe everything and start fresh
-                    cleanUpAfterDisconnect();
+                    cleanUpAfterDisband();
                 }
             })
             .register(this.getActivity());
@@ -294,14 +225,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         this.broadcastRegistrar.unregister();
     }
 
-    private void disconnect() {
-        //Disconnect from the host
-        getConnectionService().disconnectHost();
-        //Reset all variables
-        cleanUpAfterDisconnect();
-    }
-
-    private void cleanUpAfterDisconnect() {
+    private void cleanUpAfterDisband() {
         final ServiceLocator<PlaylistService> playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
 
@@ -341,11 +265,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         
         //Send the user to a page where they can start a network or join a different network
         Transitions.transitionToConnect((CoreActivity) getActivity());
-    }
-
-    private void disband() {
-        getConnectionService().disconnectAllGuests();
-        cleanUpAfterDisconnect();
     }
 
     /**
