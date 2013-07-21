@@ -19,9 +19,8 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.net.message.LibraryMessage;
 
 public class LibraryMessageTest extends SerializationTest<LibraryMessage> {
 	

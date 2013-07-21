@@ -33,12 +33,14 @@
         
         <ImageView
 	        android:contentDescription="@string/create_network"
+	        android:id="@+id/create_Img"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
 	        android:src="@drawable/host"
         	/>
         
-        <TextView 
+        <TextView
+            android:id="@+id/create_network_id"
 	        android:text="@string/create_network"
 	        android:textSize="18sp"
 	        android:padding="6dp"
@@ -61,6 +63,7 @@
         
         <ImageView
             android:contentDescription="@string/join_network"
+	        android:id="@+id/join_Img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/guest"
@@ -76,6 +79,34 @@
             android:layout_alignParentBottom="true"
             android:background="@color/accent_blue"
             />
+        
+        <RelativeLayout
+	        android:id="@+id/searching"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerInParent="true"
+	        android:background="@color/searching_gray"
+	        android:padding="10dp"
+	        android:visibility="invisible" >
+	
+	        <ProgressBar
+	            android:id="@+id/progress"
+	            style="@style/Widget.Sherlock.Light.ProgressBar"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	           />
+	
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="18sp"
+	            android:paddingLeft="5dp"
+	            android:layout_centerVertical="true"
+	            android:layout_toRightOf="@id/progress"
+	            android:text="@string/searching"
+	             />
+	    </RelativeLayout>
+        
         
     </RelativeLayout> 
       

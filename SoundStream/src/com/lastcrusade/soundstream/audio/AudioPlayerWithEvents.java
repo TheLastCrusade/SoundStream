@@ -61,6 +61,11 @@ public class AudioPlayerWithEvents implements IPlayer {
         this.duckable = ClassUtils.getIfAvailable(player, IDuckable.class);
         this.context = context;
         this.externalControlClient = new SoundStreamExternalControlClient(this.context);
+        if (hasFocus) {
+            Log.e(TAG, "AudioPlayerWithEvents created on a system with audio focus." +
+            		   "  This means that the previous focusChangedListener is still active," +
+            		   " and will cause undesirable play/pause behavior");
+        }
         hasFocus = false;
         
         this.focusChangeListener = new OnAudioFocusChangeListener() {
@@ -113,7 +118,6 @@ public class AudioPlayerWithEvents implements IPlayer {
      * @param focusChange
      */
     private void handleAudioFocusChange(int focusChange) {
-        //TODO: duck audio or pause in other cases where focus has changed.
         switch (focusChange) {
         //handle loss of focus, which includes when a phonecall is coming in
         case AudioManager.AUDIOFOCUS_LOSS:
@@ -247,7 +251,7 @@ public class AudioPlayerWithEvents implements IPlayer {
      * Duck the volume of the player, if the player supports
      * audio ducking.
      */
-    protected void duck() {
+    private void duck() {
         if (this.duckable != null) {
             this.duckable.duck();
         }
@@ -257,7 +261,7 @@ public class AudioPlayerWithEvents implements IPlayer {
      * Unduck the volume of the player, if the player supports
      * audio ducking.
      */
-    protected void unduck() {
+    private void unduck() {
         if (this.duckable != null) {
             this.duckable.unduck();
         }
@@ -320,5 +324,12 @@ public class AudioPlayerWithEvents implements IPlayer {
     public void skip() {
         this.player.skip();
         new LocalBroadcastIntent(PlaylistService.ACTION_SKIPPING_AUDIO).send(this.context);
+    }
+
+    public void stop() {
+        this.player.stop();
+        //NOTE: safe to do in all cases...in the case when we weren't registered, it will just
+        // ignore the unregister calls silently
+        releaseAudio();
     }
 }

@@ -19,10 +19,6 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-
 import org.junit.Test;
 
 public class AddToPlaylistMessageTest

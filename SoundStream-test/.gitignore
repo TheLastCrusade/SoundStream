@@ -23,3 +23,6 @@ local.properties
 
 # Error logs
 *.log
+
+# Test Output
+spoon-output/

@@ -35,7 +35,8 @@ import com.lastcrusade.soundstream.net.wire.Messenger;
 
 public class SerializationTest<T extends IMessage> {
     
-    public T testSerializeMessage(T message) throws Exception {
+    @SuppressWarnings("unchecked")
+	public T testSerializeMessage(T message) throws Exception {
         Messenger messenger = new Messenger(getTempFolder());
         
         InputStream is = messenger.serializeMessage(message);
@@ -56,7 +57,8 @@ public class SerializationTest<T extends IMessage> {
         return (T)rcvMessage;
     }
     
-    public T testDeserializeMessage(T message) throws Exception {
+    @SuppressWarnings("unchecked")
+	public T testDeserializeMessage(T message) throws Exception {
         Messenger messenger = new Messenger(getTempFolder());
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -89,7 +91,8 @@ public class SerializationTest<T extends IMessage> {
      * @param baos
      * @throws IOException
      */
-    private void appendMessage(String className,
+    @SuppressWarnings("unused")
+	private void appendMessage(String className,
             String testMessage, ByteArrayOutputStream baos) throws IOException {
         //only write the length bytes the first time through
         int start = baos.size();

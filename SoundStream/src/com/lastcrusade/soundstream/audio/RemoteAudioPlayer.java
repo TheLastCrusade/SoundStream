@@ -106,23 +106,31 @@ public class RemoteAudioPlayer implements IPlayer {
         }
     }
     
+    @Override
+    public void stop() {
+        //NO OP
+    }
+
     private void registerReceivers() {
     	this.registrar = new BroadcastRegistrar();
-    	this.registrar.addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE,
-    			new IBroadcastActionHandler() {
-			
-			@Override
-			public void onReceiveAction(Context context, Intent intent) {
-				playing = intent.getBooleanExtra(MessagingService.EXTRA_IS_PLAYING, false);
-				if(playing) {
-				    paused = false;
-					new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(context);
-				}
-				else {
-				    paused = true;
-					new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(context);
-				}
-			}
-		}).register(this.context);
+    	//update the internal state when we've received a change
+    	this.registrar
+    	.addLocalAction(PlaylistService.ACTION_PAUSED_AUDIO, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                paused = true;
+                playing = false;
+            }
+        })
+        .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+            
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                paused = false;
+                playing = true;
+            }
+        })
+        .register(this.context);
     }
 }

@@ -26,8 +26,6 @@ import java.util.List;
 
 import android.util.Log;
 
-import com.lastcrusade.soundstream.util.SongMetadataUtils;
-
 /**
  * A data structure for holding the playlist.  It keeps track of two queues of PlaylistEntry
  * objects; the seam between them represents the current play position.
@@ -39,8 +37,6 @@ public class Playlist {
     
     private final static String TAG = Playlist.class.getName();
     
-    private static int lastEntryId;
-    
     private Deque<PlaylistEntry> playedList;
     private Deque<PlaylistEntry> musicList;
 
@@ -50,25 +46,35 @@ public class Playlist {
     }
 
     public void add(PlaylistEntry entry) {
-        entry.setEntryId(++lastEntryId);
         musicList.add(entry);
     }
 
     public void clear() {
         playedList.clear();
         musicList.clear();
-        lastEntryId = 0;
     }
     
-    public PlaylistEntry findEntryBySongAndId(SongMetadata song, int entryId){
+    /**
+     * @param macAddress The address of the device that owns the song.
+     * @param songId The id of the song on the owner device.
+     * @param entryId The playlist entry id.
+     * @return 
+     */
+    public PlaylistEntry findEntryByAddressIdAndEntry(String macAddress, long songId, int entryId) {
         PlaylistEntry found = null;
         for(PlaylistEntry entry: getSongsToPlay()){
-            if(SongMetadataUtils.isTheSameSong(entry, song) && entry.getEntryId() == entryId){
+            if(entry.getMacAddress().equals(macAddress)
+                    && entry.getId() == songId
+                    && entry.getEntryId() == entryId){
                 found = entry;
                 break;
             }
         }
         return found;
+    }
+
+    public PlaylistEntry findEntryBySongAndId(SongMetadata song, int entryId){
+        return findEntryByAddressIdAndEntry(song.getMacAddress(), song.getId(), entryId);
     }
 
     public PlaylistEntry remove(PlaylistEntry entry) {

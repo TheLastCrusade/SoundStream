@@ -12,5 +12,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/SoundStream-test/libs/robotium-solo-4.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="libs/spoon-client-1.0.5.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

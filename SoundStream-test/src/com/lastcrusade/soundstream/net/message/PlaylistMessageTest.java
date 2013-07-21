@@ -22,7 +22,6 @@ package com.lastcrusade.soundstream.net.message;
 import static com.lastcrusade.soundstream.util.CustomAssert.assertSongMetaEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -188,13 +188,8 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
 
     @Override
     public void skip() {
-        // since this is a single file player, skip == stop
-        if (player.isPlaying()) {
-            player.stop();
-        }
         //send this action to move to the next song
         new LocalBroadcastIntent(SingleFileAudioPlayer.ACTION_SONG_FINISHED).send(this.context);
-        paused = false;
     }
 
     public boolean isPaused() {

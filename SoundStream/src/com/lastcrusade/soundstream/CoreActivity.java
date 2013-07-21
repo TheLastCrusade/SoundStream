@@ -21,9 +21,7 @@ package com.lastcrusade.soundstream;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -39,6 +37,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
+import com.lastcrusade.soundstream.components.ConnectFragment;
 import com.lastcrusade.soundstream.components.MenuFragment;
 import com.lastcrusade.soundstream.components.PlaybarFragment;
 import com.lastcrusade.soundstream.model.SongMetadata;
@@ -99,20 +98,12 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
             .replace(R.id.playbar, playbar)
             .commit();
         
+        
         //We want to start off at the connect page if this is the first time
         // the activity is created
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
-            getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-            hidePlaybar();
         }
-        else{
-            //if we're not entering for the first time, we want to make sure that 
-            //we still have access to the sliding menu
-            enableSlidingMenu();
-            showPlaybar();
-        }
-
         // setup the sliding bar
         setSlidingActionBarEnabled(false);
         getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
@@ -181,7 +172,8 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     
     public boolean onOptionsItemSelected(MenuItem item) {
         // home references the app icon
-        if (item.getItemId() == android.R.id.home) {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(Transitions.currentContent);
+        if (item.getItemId() == android.R.id.home && !(currentFragment instanceof ConnectFragment)) {
             toggle(); // toggles the state of the sliding menu
             if(getSlidingMenu().isMenuShowing() && menu.isAdded()){
                 setTitle(((ITitleable)menu).getTitle());
@@ -256,6 +248,11 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
 
     public void showContent(){
         getSlidingMenu().showContent();
+    }
+    
+    public void disableSlidingMenu(){
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
     }
     
     public void enableSlidingMenu(){
