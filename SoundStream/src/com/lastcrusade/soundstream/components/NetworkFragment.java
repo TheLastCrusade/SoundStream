@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -83,15 +82,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         connectionServiceLocator = new ServiceLocator<ConnectionService>(
                 this.getActivity(), ConnectionService.class, ConnectionServiceBinder.class);
 
-        connectionServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
-            @Override
-            public void onServiceBound() {
-            	if (disband != null) {
-        			setDisbandFunction();
-        		}
-            }
-        });
-
         tracker = new TrackerAPI((CoreActivity)getActivity());
         userAdapter = new UserListAdapter(getActivity(), new UserList(), false);
         userView = new LinearLayout(getActivity());
@@ -132,6 +122,27 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         });
 
         disband = (LinearLayout)v.findViewById(R.id.disband_btn);
+        
+        disband.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(R.string.dialog_disband)
+                        .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            	getConnectionService().disconnectAllGuests();
+                                cleanUpAfterDisband();
+                                tracker.trackDisbandEvent(true);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                tracker.trackDisbandEvent(false);
+                            }
+                        })
+                        .show();
+            }
+        });
 
         userView = (LinearLayout) v.findViewById(R.id.connected_users);
         updateUserView();
@@ -145,31 +156,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             }
         });
         return v;
-    }
-    
-    private void setDisbandFunction(){
-        ((TextView)disband.findViewById(R.id.disband_label))
-            .setText(R.string.disband);
-        
-        disband.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(getActivity())
-                        .setMessage(R.string.dialog_disband)
-                        .setPositiveButton(R.string.disband, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                disband();
-                                tracker.trackDisbandEvent(true);
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                tracker.trackDisbandEvent(false);
-                            }
-                        })
-                        .show();
-            }
-        });
     }
 
     @Override
@@ -222,22 +208,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     updateUserView();
-                }
-            })
-            .addLocalAction(ConnectionService.ACTION_GUEST_CONNECTED, new IBroadcastActionHandler() {
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    if (disband != null) {
-            			setDisbandFunction();
-            		}
-                }
-            })
-            .addLocalAction(ConnectionService.ACTION_HOST_CONNECTED, new IBroadcastActionHandler() {
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                	if (disband != null) {
-            			setDisbandFunction();
-            		}
                 }
             })
             .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
@@ -295,11 +265,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         
         //Send the user to a page where they can start a network or join a different network
         Transitions.transitionToConnect((CoreActivity) getActivity());
-    }
-
-    private void disband() {
-        getConnectionService().disconnectAllGuests();
-        cleanUpAfterDisband();
     }
 
     /**
