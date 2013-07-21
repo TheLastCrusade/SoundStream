@@ -176,6 +176,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                     @Override
                     public void onReceiveAction(Context context, Intent intent) {
                         joinView.setEnabled(true);
+                        joinView.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
                         //switch 
                         Transitions.transitionToHome((CoreActivity)getActivity());
                         ((CoreActivity)getActivity()).enableSlidingMenu();
@@ -194,14 +195,17 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                         switch(mode){
                         case BluetoothAdapter.SCAN_MODE_NONE:
                             joinView.setEnabled(true);
+                            joinView.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
                             joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
                             break;
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
                             joinView.setEnabled(true);
+                            joinView.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
                             joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
                             break;
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
                             joinView.setEnabled(false);
+                            joinView.findViewById(R.id.searching).setVisibility(View.VISIBLE);
                             joinView.setBackgroundColor(getResources().getColor(R.color.gray));
                             break;
                         default:
