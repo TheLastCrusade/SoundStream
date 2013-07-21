@@ -23,7 +23,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.test.ServiceTestCase;
 
-public class AServiceTest<T extends Service> extends ServiceTestCase {
+public class AServiceTest<T extends Service> extends ServiceTestCase<T> {
 
     private Class<T> serviceClass;
 

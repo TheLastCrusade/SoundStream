@@ -51,15 +51,6 @@ public class MusicLibraryServiceTest extends AServiceTest<MusicLibraryService> {
         }
     }
 
-    private class InappropriateActionTestHandler implements
-            IBroadcastActionHandler {
-
-        @Override
-        public void onReceiveAction(Context context, Intent intent) {
-            fail(intent.getAction() + " action should not be sent.");
-        }
-    }
-
     public MusicLibraryServiceTest() {
         super(MusicLibraryService.class);
     }
