@@ -336,14 +336,17 @@ public class PlaylistService extends Service {
                                                           SongMetadata.UNKNOWN_SONG);
                 int entryId         = intent.getIntExtra( MessagingService.EXTRA_ENTRY_ID, 0);
                 
-                //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
 
                 if (!isCurrentEntry(entry)) {
                     removeSong(entry);
+                } else {
+                    skip();
+                    removeSong(entry);
                 }
+                
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
