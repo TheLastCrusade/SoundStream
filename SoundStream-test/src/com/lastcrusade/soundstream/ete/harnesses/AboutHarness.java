@@ -16,16 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lastcrusade.soundstream.ete.harnesses;
 
-package com.lastcrusade.soundstream.net.message;
+import com.jayway.android.robotium.solo.Solo;
+import com.lastcrusade.soundstream.components.AboutFragment;
+import com.lastcrusade.soundstream.util.EteUtils;
 
-import org.junit.Test;
+/**
+ * @author Taylor
+ *
+ */
+public class AboutHarness extends AbstractHarness {
 
-public class FindNewGuestsMessageTest extends SerializationTest<FindNewGuestsMessage> {
-
-    @Test
-    public void testSerializeFindNewGuestsMessage() throws Exception {
-        //NOTE: no fields to check, and the base class will ensure we create the right class.
-        super.testSerializeMessage(new FindNewGuestsMessage());
-    }
+	public AboutHarness(Solo solo){
+		super(solo);
+	}
+	
+	public void navigateTo(){
+		if(!EteUtils.isFragmentVisible(solo, AboutFragment.class)){
+			new SoundStreamHarness(solo).hMenu().openAbout();
+		}
+	}
+	
+	public void assertVisible(boolean expected){
+		assertFragmentVisible(AboutFragment.class, expected);
+	}	
+	
 }

@@ -19,15 +19,11 @@
 
 package com.lastcrusade.soundstream.net.message;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
-
-import static com.lastcrusade.soundstream.util.CustomAssert.*;
+import static com.lastcrusade.soundstream.util.CustomAssert.assertChecksumsMatch;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -42,6 +38,7 @@ public class TransferSongMessageTest extends SerializationTest<TransferSongMessa
         long songId = 132452L;
         TransferSongMessage oldMessage = new TransferSongMessage(songId, file.getName(), file.getCanonicalPath());
         TransferSongMessage newMessage = super.testSerializeMessage(oldMessage);
+        fis.close();
 
         //compare the song information
         assertEquals(oldMessage.getSongId(),       newMessage.getSongId());

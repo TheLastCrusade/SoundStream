@@ -21,7 +21,6 @@ package com.lastcrusade.soundstream.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.test.ServiceTestCase;
 import android.util.Log;
 
@@ -29,11 +28,10 @@ import com.lastcrusade.soundstream.net.message.IMessage;
 import com.lastcrusade.soundstream.net.message.PauseMessage;
 import com.lastcrusade.soundstream.net.message.PlayMessage;
 import com.lastcrusade.soundstream.net.message.SkipMessage;
-import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 
-public class MessagingServiceTest extends ServiceTestCase {
+public class MessagingServiceTest extends ServiceTestCase<MessagingService> {
 
     private static final String TAG = MessagingServiceTest.class.getName();
     

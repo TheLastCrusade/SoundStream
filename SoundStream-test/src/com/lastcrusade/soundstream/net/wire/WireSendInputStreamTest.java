@@ -51,6 +51,7 @@ public class WireSendInputStreamTest {
         InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
         WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, null);
         assertEquals(computeExpectedSize(test.available(), packetSize), input.available());
+        input.close();
     }
 
     /**
@@ -75,11 +76,13 @@ public class WireSendInputStreamTest {
         InputStream test = MessageTestUtil.getTestStream(packetSize * 2);
         File file = MessageTestUtil.getTempTestFile(100);
         InputStream fileStream = new FileInputStream(file);
+        WireSendInputStream input = null;
         try {
-            WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, fileStream);
+            input = new WireSendInputStream(packetSize, messageNo, test, fileStream);
             int expectedBytes = test.available() + fileStream.available() + AComplexDataType.SIZEOF_INTEGER;
             assertEquals(computeExpectedSize(expectedBytes, packetSize), input.available());
         } finally {
+            input.close();
             file.delete();
         }
     }
@@ -138,8 +141,9 @@ public class WireSendInputStreamTest {
         File file = MessageTestUtil.getTempTestFile(fileSize);
         
         InputStream fileStream = new FileInputStream(file);
+        WireSendInputStream input = null;
         try {
-            WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, test, fileStream);
+            input = new WireSendInputStream(packetSize, messageNo, test, fileStream);
             int expectedBytes = test.available() + fileStream.available() + AComplexDataType.SIZEOF_INTEGER;
             assertEquals(computeExpectedSize(expectedBytes, packetSize), input.available());
             byte[] buf = new byte[packetSize];
@@ -149,8 +153,8 @@ public class WireSendInputStreamTest {
             }
             //it should be 18 packets exactly
             assertEquals(0, input.available());
-            
         } finally {
+            input.close();
             file.delete();
         }
     }
@@ -324,6 +328,8 @@ public class WireSendInputStreamTest {
         //this should be the last one
         assertEquals(0, input.available());
         assertEquals(-1, input.read());
+        
+        input.close();
     }
 
     /**
@@ -379,10 +385,11 @@ public class WireSendInputStreamTest {
         InputStream expected = MessageTestUtil.getTestStream(packetSize * 2);
         InputStream actual   = MessageTestUtil.getTestStream(packetSize * 2);
         File testFile = MessageTestUtil.getTempTestFile(100);
+        WireSendInputStream input = null;
         try {
             InputStream expectedFile  = new FileInputStream(testFile);
             InputStream actualFile    = new FileInputStream(testFile);
-            WireSendInputStream input = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
+            input = new WireSendInputStream(packetSize, messageNo, actual, actualFile);
     
             int expectedBytes = computeExpectedSize(expected.available() + expectedFile.available() + AComplexDataType.SIZEOF_INTEGER, packetSize);
             int bytesLeft = expectedBytes;
@@ -417,6 +424,7 @@ public class WireSendInputStreamTest {
             assertEquals(0, input.available());
             assertEquals(-1, input.read());
         } finally {
+        	input.close();
             testFile.delete();
         }
     }
