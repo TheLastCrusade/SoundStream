@@ -206,7 +206,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (mThePlayer != null) {
-                    mThePlayer.cancel();
+                    mThePlayer.stop();
                 }
                 mThePlayer = new AudioPlayerWithEvents(
                         new RemoteAudioPlayer(
@@ -223,7 +223,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (mThePlayer != null) {
-                    mThePlayer.cancel();
+                    mThePlayer.stop();
                 }
                 mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
                 isLocalPlayer = true;
@@ -494,7 +494,7 @@ public class PlaylistService extends Service {
             if (song == null) {
                 //TODO: instead of this, we may want to repost a message to wait for the next song to be available
                 //stop the player
-                this.mAudioPlayer.stop();
+                this.mThePlayer.stop();
                 //pop up the notice
                 Toaster.iToast(this, getString(R.string.no_available_songs));
             } else {
@@ -529,6 +529,7 @@ public class PlaylistService extends Service {
     }
 
     public void clearPlaylist() {
+        mThePlayer.stop();
         mPlaylist.clear();
         lastEntryId = 0;
         currentEntry = null;
