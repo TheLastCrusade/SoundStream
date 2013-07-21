@@ -51,11 +51,6 @@ public class RemoteAudioPlayer implements IPlayer {
     }
 
     @Override
-    public void cancel() {
-        //NO OP
-    }
-
-    @Override
     public boolean isPaused() {
         return this.paused;
     }
@@ -111,6 +106,11 @@ public class RemoteAudioPlayer implements IPlayer {
         }
     }
     
+    @Override
+    public void stop() {
+        //NO OP
+    }
+
     private void registerReceivers() {
     	this.registrar = new BroadcastRegistrar();
     	//update the internal state when we've received a change
