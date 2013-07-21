@@ -29,6 +29,7 @@
     <color name="dark_gray">#333333</color>
     <color name="light_gray">#BBBBBB</color>
     <color name="white">#FFFFFF</color>
+    <color name="searching_gray">#FAFAFA</color>
     <color name="playbar">#DEDEDE</color>
     <color name="accent_blue">#33008AA6</color>
     <color name="medium_gray">#EEEEEE</color>

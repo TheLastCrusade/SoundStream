@@ -19,7 +19,11 @@
 
 package com.lastcrusade.soundstream;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,6 +34,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
+
 import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -49,8 +54,6 @@ import com.lastcrusade.soundstream.util.ITitleable;
 import com.lastcrusade.soundstream.util.Trackable;
 import com.lastcrusade.soundstream.util.Transitions;
 import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.SlidingMenu.OnClosedListener;
-import com.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
@@ -65,6 +68,8 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     private ServiceLocator<MessagingService>      messagingServiceLocator;
     private GoogleAnalytics mGaInstance;
     private Tracker mGaTracker;
+    
+    private List<WeakReference<Fragment>> fragSet = new ArrayList<WeakReference<Fragment>>();
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -295,5 +300,21 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
 
     public Tracker getTracker(){
         return mGaTracker;
+    }
+    
+    @Override
+    public void onAttachFragment (Fragment fragment) {
+        fragSet.add(new WeakReference<Fragment>(fragment));
+    }
+
+    public List<Fragment> getAttachedFragments() {
+        List<Fragment> ret = new ArrayList<Fragment>();
+        for(WeakReference<Fragment> ref : fragSet) {
+            Fragment f = ref.get();
+            if(f != null) {
+                ret.add(f);
+            }
+        }
+        return ret;
     }
 }

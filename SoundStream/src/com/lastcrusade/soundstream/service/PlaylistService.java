@@ -140,6 +140,8 @@ public class PlaylistService extends Service {
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
     private ServiceLocator<MessagingService> messagingServiceLocator;
 
+    private int lastEntryId = 0;
+
     @Override
     public IBinder onBind(Intent intent) {
         messagingServiceLocator = new ServiceLocator<MessagingService>(
@@ -193,6 +195,8 @@ public class PlaylistService extends Service {
                 // automatically play the next song, but only if we're not paused
                 if (!mThePlayer.isPaused()) {
                     play();
+                }else{
+                    setNextSong();    
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -354,6 +358,10 @@ public class PlaylistService extends Service {
                 mPlaylist.clear();
                 for (PlaylistEntry entry : newList) {
                     mPlaylist.add(entry);
+                    //if the entry has an id assigned, check to see if it's greater than
+                    // our last id...if so, we want to keep this updated because if we become
+                    // host (from guest), we need to make sure we don't reuse ids.
+                    lastEntryId = Math.max(lastEntryId, entry.getEntryId());
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -522,6 +530,7 @@ public class PlaylistService extends Service {
     public void clearPlaylist() {
         mThePlayer.stop();
         mPlaylist.clear();
+        lastEntryId = 0;
         currentEntry = null;
         new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
     }
@@ -542,6 +551,7 @@ public class PlaylistService extends Service {
         //NOTE: the entries are shared between the playlist and the data loader...the loader
         // will load data into the same objects that are held in the playlist
         
+        entry.setEntryId(++lastEntryId);
         mPlaylist.add(entry);
         if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
