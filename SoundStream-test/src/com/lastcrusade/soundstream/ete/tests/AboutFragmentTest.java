@@ -16,16 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lastcrusade.soundstream.ete.tests;
 
-package com.lastcrusade.soundstream.net.message;
+/**
+ * @author Taylor
+ *
+ */
+public class AboutFragmentTest extends EteBaseTest{
 
-import org.junit.Test;
-
-public class FindNewGuestsMessageTest extends SerializationTest<FindNewGuestsMessage> {
-
-    @Test
-    public void testSerializeFindNewGuestsMessage() throws Exception {
-        //NOTE: no fields to check, and the base class will ensure we create the right class.
-        super.testSerializeMessage(new FindNewGuestsMessage());
-    }
+	public void testTitle(){
+		ssh.hConnect().pressCreateButton();
+		ssh.hAbout().navigateTo();
+		ssh.spoonShot("About_Opened");
+		ssh.assertTitleEquals("About");
+		ssh.pressMenuButton();
+		ssh.spoonShot("About_Closed_Via_Home");
+		ssh.assertTitleEquals("SoundStream");
+		ssh.pressMenuButton();
+		ssh.hAbout().assertVisible(true);
+		ssh.hMenu().assertVisible(false);
+		ssh.spoonShot("About_Reopened_Via_Home");
+		ssh.assertTitleEquals("About");
+	}
+	
 }

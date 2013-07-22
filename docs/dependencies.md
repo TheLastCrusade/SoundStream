@@ -66,5 +66,26 @@ Because we use new Android Gesture Detection, we need to have the most recent ve
 1. Download the [Analytics SDK](https://developers.google.com/analytics/devguides/collection/android/resources)
 2. Unzip and copy libGoogleAnalyticsV2.jar into libs folder
 
+##Testing Libraries
+
+###Robotium
+
+1. Download the [Robotium Library](https://code.google.com/p/robotium/), version 4.2
+2. Create a libs directory in the project SoundStream-test, and place the jar in there
+3. Right click the project in eclipse, and go click on properties
+4. Go to the build path option, and click on the Libraries tab
+5. Click "Add JARs..." and select the robotium jar
+6. Go to the Order and Export tab, and click on the check box next to the robotium jar
+
+###Spoon
+
+1. Download the spoon runner and client from (http://square.github.io/spoon/#download)
+2. Move the Spoon Runner jar into the third_party directory
+2. Move the client jar to the libs directory in the SoundStream-test project
+3. Right click the project in eclipse, and go click on properties
+4. Go to the build path option, and click on the Libraries tab
+5. Click "Add JARs..." and select the Spoon Client jar
+6. Go to the Order and Export tab, and click on the check box next to the Spoon Client jar
+
 ###Finished!
 Everything should be set up just fine now :]

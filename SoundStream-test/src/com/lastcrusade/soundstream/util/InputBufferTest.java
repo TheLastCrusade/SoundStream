@@ -47,6 +47,7 @@ public class InputBufferTest {
         byte[] bytes = buffer.toByteArray();
         assertEquals('b', bytes[0]);
         assertEquals('c', bytes[1]);
+        buffer.close();
     }
     
     /**
@@ -66,5 +67,6 @@ public class InputBufferTest {
         byte[] bytes = buffer.toByteArray();
         assertEquals(-1, bytes[0]);
         assertEquals('c', bytes[1]);
+        buffer.close();
     }
 }
