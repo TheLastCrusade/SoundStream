@@ -287,11 +287,6 @@ public class PlaylistFragment extends MusicListFragment{
             if(selectedIndex != -1 && isSwipe(e1, e2, velocityX, velocityY)){
                 animateDragging((int)e2.getX());
                 
-                if(getPlaylistService().getCurrentEntry()!= null && 
-                        getPlaylistService().getCurrentEntry().equals(getSelectedEntry()) ){
-                    getPlaylistService().skip();
-                }
-                
                 getPlaylistService().removeSong(getSelectedEntry());
                 selectedIndex = -1;
                 swipe=true;
@@ -311,10 +306,6 @@ public class PlaylistFragment extends MusicListFragment{
                 
                 if( (e2.getX() > ((View)getSelectedView().getParent()).getWidth()-100 ||
                         e2.getX() < 100) && Math.abs(dx) > 100){
-                    if(getPlaylistService().getCurrentEntry()!= null && 
-                            getPlaylistService().getCurrentEntry().equals(getSelectedEntry())){
-                        getPlaylistService().skip();
-                    }
                     getPlaylistService().removeSong(getSelectedEntry());
                     selectedIndex = -1;
                 }

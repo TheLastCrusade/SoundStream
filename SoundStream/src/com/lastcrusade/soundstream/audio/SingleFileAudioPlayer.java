@@ -74,6 +74,15 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
     }
 
     /**
+     * Clear the song that is currently playing.  This is called
+     * when stopping and tearing down the player.
+     * 
+     */
+    private void clearSong() {
+        setEntryAndNotify(null);
+    }
+
+    /**
      * Set the song path and accompanying metadata to play.
      * 
      * NOTE: these can be null, to clear the currently playing song.
@@ -82,7 +91,17 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
      * @param song
      */
     public void setSong(PlaylistEntry song) {
-        this.entry = song;
+        setEntryAndNotify(song);
+    }
+
+    /**
+     * A helper method to set entry and send a broadcast intent
+     * to notify listeners of the song change.
+     * 
+     * @param entry The entry to set, or null (note that a broadcast intent goes out in either case).
+     */
+    private void setEntryAndNotify(PlaylistEntry entry) {
+        this.entry = entry;
         //This is sending a playlist entry not a SongMetadata
         new LocalBroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
             .putExtra(PlaylistService.EXTRA_SONG, this.entry)
@@ -139,12 +158,16 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
         }
         this.paused = true;
 
-        try {
-            this.messagingService
-                .getService()
-                .sendPlayStatusMessage(this.entry, false);
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
+        if (this.entry != null) {
+            try {
+                this.messagingService
+                    .getService()
+                    .sendPlayStatusMessage(this.entry, false);
+            } catch (ServiceNotBoundException e) {
+                Log.wtf(TAG, e);
+            }
+        } else {
+            Log.wtf(TAG, "pause called without playing song.  This isnt right.");
         }
     }
 
@@ -158,31 +181,33 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
      */
     public void stop() {
         this.paused = false;
-        this.player.stop();
-        this.setSong(null);
-        //TODO revisit the decision to treat stop the same as pause
-        //indicate the system is paused
-        new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
-        try {
-            //FIXME this causes crashes
-            if (this.entry != null) {
+        if (player.isPlaying()) {
+            player.stop();
+        }
+        if (this.entry != null) {
+            try {
                 this.messagingService
                     .getService()
                     .sendPlayStatusMessage(this.entry, false);
+            } catch (ServiceNotBoundException e) {
+                Log.wtf(TAG, e);
             }
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
         }
+        this.clearSong();
     }
 
     @Override
     public void resume() {
         player.start();
         paused = false;
-        try {
-            this.messagingService.getService().sendPlayStatusMessage(this.entry, true);
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
+        if (this.entry != null) {
+            try {
+                this.messagingService.getService().sendPlayStatusMessage(this.entry, true);
+            } catch (ServiceNotBoundException e) {
+                Log.wtf(TAG, e);
+            }
+        } else {
+            Log.wtf(TAG, "resume called without paused song.  This isnt right.");
         }
     }
 

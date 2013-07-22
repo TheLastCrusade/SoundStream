@@ -195,6 +195,14 @@ public class PlaybarFragment extends Fragment {
                     setPlayImage();
                 }
             })
+            
+            .addLocalAction(PlaylistService.ACTION_PLAYLIST_UPDATED, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    updateCurrentSongTitle(getPlaylistService().getCurrentEntry());
+                }
+            })
             .register(this.getActivity());
     }
     

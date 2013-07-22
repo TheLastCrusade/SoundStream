@@ -328,6 +328,11 @@ public class AudioPlayerWithEvents implements IPlayer {
 
     public void stop() {
         this.player.stop();
+
+        //TODO revisit the decision to treat stop the same as pause...this may cause some weird
+        // race conditions when clearing entries in the playlist
+        new LocalBroadcastIntent(PlaylistService.ACTION_PAUSED_AUDIO).send(this.context);
+        
         //NOTE: safe to do in all cases...in the case when we weren't registered, it will just
         // ignore the unregister calls silently
         releaseAudio();
