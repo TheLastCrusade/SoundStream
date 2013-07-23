@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,6 +44,8 @@ import com.lastcrusade.soundstream.CoreActivity;
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.model.FoundGuest;
 import com.lastcrusade.soundstream.model.UserList;
+import com.lastcrusade.soundstream.net.BluetoothNotEnabledException;
+import com.lastcrusade.soundstream.net.BluetoothNotSupportedException;
 import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.lastcrusade.soundstream.service.MusicLibraryService;
@@ -53,6 +56,7 @@ import com.lastcrusade.soundstream.service.ServiceLocator;
 import com.lastcrusade.soundstream.service.ServiceNotBoundException;
 import com.lastcrusade.soundstream.service.UserListService;
 import com.lastcrusade.soundstream.service.UserListService.UserListServiceBinder;
+import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.BroadcastRegistrar;
 import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.lastcrusade.soundstream.util.ITitleable;
@@ -118,16 +122,35 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
             @Override
             public void onClick(View v) {
-                addMembersButton.setEnabled(false);
-                //TODO: add a better indicator while discovering
-                //...seconds until discovery is finished, number of clients found, etc
-                addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
-                addMembersButton.findViewById(R.id.image_background)
-                    .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
-                
-                getConnectionService().findNewGuests();
-                tracker.trackAddMembersEvent();
-            }
+                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                if (adapter != null) {
+                    boolean bluetoothEnabled = false;
+                    try {
+                        BluetoothUtils.checkAndEnableBluetooth(getActivity(), adapter);
+                        bluetoothEnabled = true;
+                    } catch (BluetoothNotEnabledException e){
+                        Toaster.iToast(getActivity().getBaseContext(), R.string.enable_bt_fail);
+                        e.printStackTrace();
+                    } catch (BluetoothNotSupportedException e) {
+                        Toaster.eToast(getActivity().getBaseContext(), R.string.no_bt_support);
+                        e.printStackTrace();
+                    }
+                    if (bluetoothEnabled) {
+                        addMembersButton.setEnabled(false);
+
+                        //TODO: add a better indicator while discovering
+                        //...seconds until discovery is finished, number of clients found, etc
+                        addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
+                        addMembersButton.findViewById(R.id.image_background)
+                            .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+
+                        getConnectionService().findNewGuests();
+                        tracker.trackAddMembersEvent();
+                    }
+                } else {
+                    Toaster.iToast(getActivity(), R.string.no_bt_support);
+                }
+           }
         });
 
         disconnectDisband = (LinearLayout)v.findViewById(R.id.disconnect_disband_btn);
