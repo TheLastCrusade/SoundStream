@@ -186,6 +186,11 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
             if(getSlidingMenu().isMenuShowing() && menu.isAdded()){
                 setTitle(((ITitleable)menu).getTitle());
             }
+            else{
+                Fragment cur =  getSupportFragmentManager()
+                        .findFragmentByTag(Transitions.currentContent); 
+                setTitle(((ITitleable)cur).getTitle());
+            }
             return true;
         }
         return false;
