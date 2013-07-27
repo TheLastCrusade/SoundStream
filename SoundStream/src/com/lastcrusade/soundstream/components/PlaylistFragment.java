@@ -286,6 +286,7 @@ public class PlaylistFragment extends MusicListFragment{
             // horizontal left to right fling
             if(selectedIndex != -1 && isSwipe(e1, e2, velocityX, velocityY)){
                 animateDragging((int)e2.getX());
+
                 getPlaylistService().removeSong(getSelectedEntry());
                 selectedIndex = -1;
                 swipe=true;
