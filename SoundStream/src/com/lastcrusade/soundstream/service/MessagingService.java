@@ -421,6 +421,9 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     public void sendPlayStatusMessage(PlaylistEntry currentSong, boolean isPlaying) {
+        if (currentSong == null) {
+            throw new IllegalArgumentException("currentSong is null");
+        }
         PlayStatusMessage msg =
                 new PlayStatusMessage(currentSong.getMacAddress(), currentSong.getId(), currentSong.getEntryId(), isPlaying);
     	//send the message to the guests

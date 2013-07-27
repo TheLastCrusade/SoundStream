@@ -103,6 +103,13 @@ public class Playlist {
         return songsToPlay;
     }
 
+    /**
+     * @return True if the playlist is empty, false if not.
+     */
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
     public int size(){
         return playedList.size() + musicList.size();
     }

@@ -195,8 +195,12 @@ public class PlaylistService extends Service {
                 // automatically play the next song, but only if we're not paused
                 if (!mThePlayer.isPaused()) {
                     play();
-                }else{
-                    setNextSong();    
+                } else {
+                    if (mPlaylist.isEmpty()) {
+                        Toaster.iToast(PlaylistService.this, getString(R.string.playlist_empty));
+                    } else {
+                        setNextSong();    
+                    }
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -339,14 +343,9 @@ public class PlaylistService extends Service {
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
-
-                if (!isCurrentEntry(entry)) {
-                    removeSong(entry);
-                } else {
-                    skip();
-                    removeSong(entry);
-                }
-                
+                //call removeSong in all cases...it will handle the case where the song to be removed
+                // is the current song
+                removeSong(entry);
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
@@ -366,6 +365,9 @@ public class PlaylistService extends Service {
                     // our last id...if so, we want to keep this updated because if we become
                     // host (from guest), we need to make sure we don't reuse ids.
                     lastEntryId = Math.max(lastEntryId, entry.getEntryId());
+                }
+                if (mPlaylist.isEmpty()) {
+                    stop();
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
             }
@@ -460,16 +462,20 @@ public class PlaylistService extends Service {
     }
 
     public void play() {
-        if (this.mThePlayer.isPaused()) {
-            this.mThePlayer.resume();
+        if (mPlaylist.isEmpty()) {
+            Toaster.iToast(this, getString(R.string.playlist_empty));
         } else {
-            boolean play = true;
-            if(isLocalPlayer) {
-                play = setNextSong();
-            }
-            //we have stuff to play...play it and send a notification
-            if (play) {
-                this.mThePlayer.play();
+            if (this.mThePlayer.isPaused()) {
+                this.mThePlayer.resume();
+            } else {
+                boolean play = true;
+                if(isLocalPlayer) {
+                    play = setNextSong();
+                }
+                //we have stuff to play...play it and send a notification
+                if (play) {
+                    this.mThePlayer.play();
+                }
             }
         }
     }
@@ -477,14 +483,20 @@ public class PlaylistService extends Service {
     /**
      * Helper method to manage all of the things we need to do to set a song
      * to play locally (e.g. on the host).
+     * 
+     * NOTE: The calling code is responsible for checking to see if the playlist is empty
+     * and alerting the user.
      */
     private boolean setNextSong() {
         if (!isLocalPlayer) {
             throw new IllegalStateException("Cannot call setSong when using a remote player");
         }
         boolean songSet = false;
-        //only 
-        if (mPlaylist.size() > 0) {
+        if (mPlaylist.isEmpty()) {
+            //this shouldnt happen...print an error message to alert developers
+            // that they should check this before calling
+            Log.e(TAG, "Cannot set next song.  Playlist is empty");
+        } else {
             PlaylistEntry song = mPlaylist.getNextAvailableSong();
             //we've reached the end of the playlist...reset it to the beginning and try again
             if (song == null) {
@@ -507,8 +519,6 @@ public class PlaylistService extends Service {
                 //the song has been set...indicate this in the return value
                 songSet = true;
             }
-        } else {
-            Toaster.iToast(this, getString(R.string.playlist_empty));
         }
         return songSet;
     }
@@ -547,6 +557,20 @@ public class PlaylistService extends Service {
         this.mThePlayer.skip();
     }
 
+    /**
+     * Stop the music.
+     * 
+     * NOTE: stop will tear down the player and other structures
+     * so it should only be used when we are out of things to play,
+     * or are restarting/clearing the playlist.
+     * 
+     * In all other causes, use pause.
+     */
+    public void stop() {
+        this.currentEntry = null;
+        this.mThePlayer.stop();
+    }
+
     public void addSong(SongMetadata metadata) {
         addSong(new PlaylistEntry(metadata));
     }
@@ -576,16 +600,24 @@ public class PlaylistService extends Service {
     public void removeSong(PlaylistEntry entry) {
        
         if (entry != null) {
+            //remove the entry in all cases, to make sure the local app reflects the user's choice
+            mPlaylist.remove(entry);
+            //broadcast the fact that a song has been removed
+            new LocalBroadcastIntent(ACTION_SONG_REMOVED)
+                .putExtra(EXTRA_SONG, entry)
+                .send(this);
+            
+            //broadcast the fact that the playlist has been updated
+            new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+            
             if (isLocalPlayer) {
-                mPlaylist.remove(entry);
-                //broadcast the fact that a song has been removed
-                new LocalBroadcastIntent(ACTION_SONG_REMOVED)
-                    .putExtra(EXTRA_SONG, entry)
-                    .send(this);
-                
-                //broadcast the fact that the playlist has been updated
-                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-                
+                //if the playlist is empty, stop playback
+                if (mPlaylist.isEmpty()) {
+                    stop();
+                } else if (isCurrentEntry(entry)) {
+                    //otherwise, we may need to just skip the current entry (if it was removed)
+                    skip();
+                }
                 //send a message to the guests with the new playlist
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             } else {
