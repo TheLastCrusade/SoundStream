@@ -38,7 +38,8 @@ public class MessageTestUtil {
      * @return
      */
     public static InputStream getTestStream(int byteCount) {
-        InputBuffer buffer = new InputBuffer();
+        @SuppressWarnings("resource")
+		InputBuffer buffer = new InputBuffer();
         for (int ii = 0; ii < byteCount; ii++) {
             buffer.write(ii);
         }

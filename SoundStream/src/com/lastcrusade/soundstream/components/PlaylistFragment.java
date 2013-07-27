@@ -154,7 +154,14 @@ public class PlaylistFragment extends MusicListFragment{
             public void onReceiveAction(Context context, Intent intent) {
                 updatePlaylist();
             }
-        }).addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
+        })
+        .addLocalAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                updatePlaylist();
+            }
+        })
+        .addLocalAction(PlaylistService.ACTION_PLAYING_AUDIO, new IBroadcastActionHandler() {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //when the playlist starts playing a song, we want to make sure that we are
@@ -279,12 +286,6 @@ public class PlaylistFragment extends MusicListFragment{
             // horizontal left to right fling
             if(selectedIndex != -1 && isSwipe(e1, e2, velocityX, velocityY)){
                 animateDragging((int)e2.getX());
-                
-                if(getPlaylistService().getCurrentEntry()!= null && 
-                        getPlaylistService().getCurrentEntry().equals(getSelectedEntry()) ){
-                    getPlaylistService().skip();
-                }
-                
                 getPlaylistService().removeSong(getSelectedEntry());
                 selectedIndex = -1;
                 swipe=true;
@@ -304,10 +305,6 @@ public class PlaylistFragment extends MusicListFragment{
                 
                 if( (e2.getX() > ((View)getSelectedView().getParent()).getWidth()-100 ||
                         e2.getX() < 100) && Math.abs(dx) > 100){
-                    if(getPlaylistService().getCurrentEntry()!= null && 
-                            getPlaylistService().getCurrentEntry().equals(getSelectedEntry())){
-                        getPlaylistService().skip();
-                    }
                     getPlaylistService().removeSong(getSelectedEntry());
                     selectedIndex = -1;
                 }

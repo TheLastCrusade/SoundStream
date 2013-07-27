@@ -206,7 +206,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (mThePlayer != null) {
-                    mThePlayer.cancel();
+                    mThePlayer.stop();
                 }
                 mThePlayer = new AudioPlayerWithEvents(
                         new RemoteAudioPlayer(
@@ -223,7 +223,7 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (mThePlayer != null) {
-                    mThePlayer.cancel();
+                    mThePlayer.stop();
                 }
                 mThePlayer = new AudioPlayerWithEvents(mAudioPlayer, PlaylistService.this);
                 isLocalPlayer = true;
@@ -329,20 +329,24 @@ public class PlaylistService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 if (!isLocalPlayer) {
-                    Log.wtf(TAG, "Received AddToPlaylistMessage on guest...these messages are only for hosts");
+                    Log.wtf(TAG, "Received RemoveFromPlaylistMessage on guest...these messages are only for hosts");
                 }
                 String macAddress = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                 long   songId     = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID,
                                                           SongMetadata.UNKNOWN_SONG);
                 int entryId         = intent.getIntExtra( MessagingService.EXTRA_ENTRY_ID, 0);
                 
-                //NOTE: only remove if its not the currently playing song.
                 //TODO: may need a better message back to the remote fan
                 SongMetadata song = getMusicLibraryService().lookupSongByAddressAndId(macAddress, songId);
                 PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
+
                 if (!isCurrentEntry(entry)) {
                     removeSong(entry);
+                } else {
+                    skip();
+                    removeSong(entry);
                 }
+                
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
@@ -493,7 +497,7 @@ public class PlaylistService extends Service {
             if (song == null) {
                 //TODO: instead of this, we may want to repost a message to wait for the next song to be available
                 //stop the player
-                this.mAudioPlayer.stop();
+                this.mThePlayer.stop();
                 //pop up the notice
                 Toaster.iToast(this, getString(R.string.no_available_songs));
             } else {
@@ -528,6 +532,7 @@ public class PlaylistService extends Service {
     }
 
     public void clearPlaylist() {
+        mThePlayer.stop();
         mPlaylist.clear();
         lastEntryId = 0;
         currentEntry = null;
@@ -554,18 +559,16 @@ public class PlaylistService extends Service {
         mPlaylist.add(entry);
         if (isLocalPlayer) {
             mDataManager.addToLoadQueue(entry);
-        }
-        new LocalBroadcastIntent(ACTION_SONG_ADDED)
-            .putExtra(EXTRA_SONG, entry)
-            .send(this);
-        // send an intent to the fragments that the playlist is updated
-        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+            new LocalBroadcastIntent(ACTION_SONG_ADDED).putExtra(EXTRA_SONG,
+                    entry).send(this);
+            // send an intent to the fragments that the playlist is updated
+            new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
 
-        if (isLocalPlayer) {
-            //send a message to the guests with the new playlist
-            getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+            // send a message to the guests with the new playlist
+            getMessagingService().sendPlaylistMessage(
+                    mPlaylist.getSongsToPlay());
         } else {
-            //send a message to the host to add this song
+            // send a message to the host to add this song
             getMessagingService().sendAddToPlaylistMessage(entry);
         }
     }
@@ -573,16 +576,16 @@ public class PlaylistService extends Service {
     public void removeSong(PlaylistEntry entry) {
        
         if (entry != null) {
-            mPlaylist.remove(entry);
-            //broadcast the fact that a song has been removed
-            new LocalBroadcastIntent(ACTION_SONG_REMOVED)
-                .putExtra(EXTRA_SONG, entry)
-                .send(this);
-            
-            //broadcast the fact that the playlist has been updated
-            new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-    
             if (isLocalPlayer) {
+                mPlaylist.remove(entry);
+                //broadcast the fact that a song has been removed
+                new LocalBroadcastIntent(ACTION_SONG_REMOVED)
+                    .putExtra(EXTRA_SONG, entry)
+                    .send(this);
+                
+                //broadcast the fact that the playlist has been updated
+                new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
+                
                 //send a message to the guests with the new playlist
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             } else {
@@ -609,15 +612,14 @@ public class PlaylistService extends Service {
     }
 
     public void bumpSong(PlaylistEntry entry){
-        mPlaylist.bumpSong(entry);
-        
-        new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
-        
         if (isLocalPlayer) {
+            mPlaylist.bumpSong(entry);
+            
+            new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(this);
             //send a message to the guests with the new playlist
             getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
         } else {
-            //send a message to the host to remove this song
+            //send a message to the host to bump this song
             getMessagingService().sendBumpSongOnPlaylistMessage(entry);
         }
     }
