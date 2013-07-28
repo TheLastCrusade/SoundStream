@@ -175,14 +175,13 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(Transitions.currentContent);
         if (item.getItemId() == android.R.id.home && !(currentFragment instanceof ConnectFragment)) {
             toggle(); // toggles the state of the sliding menu
+            
+            int title = ((ITitleable)currentFragment).getTitle();
             if(getSlidingMenu().isMenuShowing() && menu.isAdded()){
-                setTitle(((ITitleable)menu).getTitle());
+                title = ((ITitleable)menu).getTitle();
             }
-            else{
-                Fragment cur =  getSupportFragmentManager()
-                        .findFragmentByTag(Transitions.currentContent); 
-                setTitle(((ITitleable)cur).getTitle());
-            }
+            setTitle(title);
+            
             return true;
         }
         return false;
