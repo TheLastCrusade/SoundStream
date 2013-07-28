@@ -37,6 +37,7 @@ import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
@@ -124,6 +125,15 @@ public class PlaylistDataManager implements Runnable {
         } catch (InterruptedException e) {
         }
     }
+    
+    private void cleanRemotelyLoadedFiles(String disconnectedUserMac){
+        for(PlaylistEntry entry : remotelyLoaded) {
+            if(!entry.isLoaded() && entry.getMacAddress().equals(disconnectedUserMac)){
+                remotelyLoaded.remove(entry);
+                //loadQueue.remove(entry);
+            }
+        }
+    }
 
     /**
      * 
@@ -169,6 +179,15 @@ public class PlaylistDataManager implements Runnable {
                         getMessagingService().sendSongStatusMessage(entry);
                         new LocalBroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                     }
+                }
+            })
+            .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    String guestMac = (String) intent.getExtras().get(ConnectionService.EXTRA_GUEST_ADDRESS);
+                    cleanRemotelyLoadedFiles(guestMac);
+                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                 }
             })
             .register(this.context);
