@@ -104,6 +104,9 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
         }
+        else{
+            enableSlidingMenu();
+        }
         // setup the sliding bar
         setSlidingActionBarEnabled(false);
         getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
