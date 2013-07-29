@@ -43,7 +43,7 @@ import com.lastcrusade.soundstream.util.RemoteControlClientCompat;
  *  Registering the MEDIA_BUTTON handler
  *  Registering a RemoteControlClient object (for lock screen remote control on ICS +)
  * 
- * @author thejenix
+ * @author Jesse Rosalia
  *
  */
 public class SoundStreamExternalControlClient {
@@ -112,7 +112,7 @@ public class SoundStreamExternalControlClient {
                     setPlaying();
                 }
             })
-            .addLocalAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_CURRENT_SONG, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {

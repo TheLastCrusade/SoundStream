@@ -110,7 +110,10 @@ public class PlaylistService extends Service {
     public static final String ACTION_SONG_ADDED     = PlaylistService.class + ".action.SongAdded";
     
 
-    public static final String ACTION_SONG_PLAYING     = PlaylistService.class + ".action.SongPlaying";
+    /**
+     * Broadcast action sent to indicate the current song
+     */
+    public static final String ACTION_CURRENT_SONG     = PlaylistService.class + ".action.CurrentSong";
     public static final String EXTRA_SONG              = PlaylistService.class + ".extra.Song";
 
     private static final String TAG = PlaylistService.class.getSimpleName();
@@ -127,7 +130,7 @@ public class PlaylistService extends Service {
     }
 
     private BroadcastRegistrar    registrar;
-    private IPlayer               mThePlayer;
+    private AudioPlayerWithEvents mThePlayer;
     private SingleFileAudioPlayer mAudioPlayer; //TODO remove this when we add stop to IPlayer
     private Playlist              mPlaylist;
 
@@ -259,6 +262,19 @@ public class PlaylistService extends Service {
                     currentEntry = entry;
                 }
 
+                //tell the player to request audio focus, without actually playing something
+                // locally.
+                //TODO: we should refactor the player and separate the audio focus code into
+                // a separate class, that listens to all of the intents being slung around.
+                mThePlayer.requestAudioFocus();
+
+                //send the ACTION_CURRENT_SONG message, to indicate the current song
+                //..this is used by the playbar fragment and the external control client
+                new LocalBroadcastIntent(PlaylistService.ACTION_CURRENT_SONG)
+                    .putExtra(PlaylistService.EXTRA_SONG, currentEntry)
+                    .send(PlaylistService.this);
+
+                //then send the specific message
                 if (isPlaying) {
                     new LocalBroadcastIntent(PlaylistService.ACTION_PLAYING_AUDIO).send(PlaylistService.this);
                 } else {
