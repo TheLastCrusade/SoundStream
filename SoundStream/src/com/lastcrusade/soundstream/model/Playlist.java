@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import android.util.Log;
 
@@ -94,6 +95,11 @@ public class Playlist {
             removeEntry = null;
         }
         return removeEntry;
+    }
+    
+    public void removeAll(Set<PlaylistEntry> entrySet){
+        playedList.removeAll(entrySet);
+        musicList.removeAll(entrySet);
     }
 
     public List<PlaylistEntry> getSongsToPlay() {

@@ -54,7 +54,7 @@ public class PlaylistDataManager implements Runnable {
 
     private Context context;
     private ServiceLocator<MessagingService> messagingServiceLocator;
-    private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
+    private Queue<PlaylistEntry> toLoadQueue = new LinkedList<PlaylistEntry>();
     private Queue<PlaylistEntry> remotelyLoaded = new LinkedList<PlaylistEntry>();
     private Thread stoppingThread;
     private boolean running;
@@ -83,9 +83,9 @@ public class PlaylistDataManager implements Runnable {
 
                 boolean loaded = false;
                 //next, see if we can start loading any additional files
-                while (!loadQueue.isEmpty() &&
-                        loadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
-                    PlaylistEntry entry = loadQueue.poll();
+                while (!toLoadQueue.isEmpty() &&
+                        toLoadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
+                    PlaylistEntry entry = toLoadQueue.poll();
                     if (entry.isLocalFile()) {
                         //if its local, just load the file path and remove the entry
                         loadLocal(entry);
@@ -126,13 +126,29 @@ public class PlaylistDataManager implements Runnable {
         }
     }
     
-    private void cleanRemotelyLoadedFiles(String disconnectedUserMac){
+    public void cleanRemotelyLoadedFiles(String disconnectedUserMac){
+        //Remove songs from mac that are in the process of transfering
+        Set<PlaylistEntry> toRemoveForRemoteLoad = new HashSet<PlaylistEntry>();
         for(PlaylistEntry entry : remotelyLoaded) {
-            if(!entry.isLoaded() && entry.getMacAddress().equals(disconnectedUserMac)){
-                remotelyLoaded.remove(entry);
-                //loadQueue.remove(entry);
+            synchronized(entryMutex){
+                if(!entry.isLoaded() && entry.getMacAddress().equals(disconnectedUserMac)){
+                    toRemoveForRemoteLoad.add(entry);
+                }
             }
         }
+        remotelyLoaded.removeAll(toRemoveForRemoteLoad);
+        
+        //Remove songs from mac that are queued to be transfered. 
+        Set<PlaylistEntry> toRemoveForToLoad = new HashSet<PlaylistEntry>();
+        for (PlaylistEntry entry : toLoadQueue) {
+            synchronized(entryMutex) {
+                if (entry.getMacAddress().equals(disconnectedUserMac)) {
+                    entry.setLoaded(false);
+                    toRemoveForToLoad.add(entry);
+                }
+            }
+        }
+        toLoadQueue.removeAll(toRemoveForToLoad);
     }
 
     /**
@@ -179,15 +195,6 @@ public class PlaylistDataManager implements Runnable {
                         getMessagingService().sendSongStatusMessage(entry);
                         new LocalBroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                     }
-                }
-            })
-            .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
-
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    String guestMac = (String) intent.getExtras().get(ConnectionService.EXTRA_GUEST_ADDRESS);
-                    cleanRemotelyLoadedFiles(guestMac);
-                    new LocalBroadcastIntent(PlaylistService.ACTION_PLAYLIST_UPDATED).send(context);
                 }
             })
             .register(this.context);
@@ -254,8 +261,8 @@ public class PlaylistDataManager implements Runnable {
         //NOTE: if it is loaded, we can assume its already in remotelyLoaded
         synchronized(entryMutex) {
             if (!entry.isLoaded()) {
-                if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
-                    this.loadQueue.add(entry);
+                if (!this.toLoadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
+                    this.toLoadQueue.add(entry);
                 } else {
                     Log.d(TAG, "Adding a song that's already loaded: " + entry.toString());
                 }

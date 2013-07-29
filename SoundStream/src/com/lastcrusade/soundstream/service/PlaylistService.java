@@ -21,7 +21,9 @@ package com.lastcrusade.soundstream.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import android.app.Service;
 import android.content.Context;
@@ -242,6 +244,20 @@ public class PlaylistService extends Service {
                 if (currentEntry != null) {
                     getMessagingService().sendPlayStatusMessage(currentEntry, mThePlayer.isPlaying());
                 }
+            }
+        })
+        .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
+            @Override
+            public void onReceiveAction(Context context, Intent intent){
+                String guestMac = (String) intent.getExtras().get(ConnectionService.EXTRA_GUEST_ADDRESS);
+                mDataManager.cleanRemotelyLoadedFiles(guestMac);
+                Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
+                for (PlaylistEntry entry : mPlaylist.getSongsToPlay()){
+                    if (!entry.isLoaded() && entry.getMacAddress().equals(guestMac)){
+                        toRemove.add(entry);
+                    }
+                }
+                mPlaylist.removeAll(toRemove);
             }
         })
         .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
