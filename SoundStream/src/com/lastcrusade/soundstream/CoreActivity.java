@@ -104,6 +104,9 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         if(savedInstanceState == null) {
             Transitions.transitionToConnect(this);
         }
+        else{
+            enableSlidingMenu();
+        }
         // setup the sliding bar
         setSlidingActionBarEnabled(false);
         getSlidingMenu().setBehindWidthRes(R.dimen.show_menu);
@@ -175,9 +178,13 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(Transitions.currentContent);
         if (item.getItemId() == android.R.id.home && !(currentFragment instanceof ConnectFragment)) {
             toggle(); // toggles the state of the sliding menu
+            
+            int title = ((ITitleable)currentFragment).getTitle();
             if(getSlidingMenu().isMenuShowing() && menu.isAdded()){
-                setTitle(((ITitleable)menu).getTitle());
+                title = ((ITitleable)menu).getTitle();
             }
+            setTitle(title);
+            
             return true;
         }
         return false;
