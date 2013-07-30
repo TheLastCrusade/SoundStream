@@ -149,17 +149,16 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
 
     private void setDisconnectDisbandBtn() {
-		// The only time a host should be connected is if we are a guest. In
-		// this case, it should be a disband function, otherwise (when we are
-		// host) it should be be a disconnect function.
-		if (getConnectionService() == null
-				|| getConnectionService().isHostConnected()) {
-			setDisconnectFunction();
-    	} else {
-    		setDisbandFunction();
-    	}
+        // The only time a host should be connected is if we are a guest. In
+        // this case, it should be a disband function, otherwise (when we are
+        // host) it should be be a disconnect function.
+        if (getConnectionService() == null || getConnectionService().isHostConnected()) {
+            setDisconnectFunction();
+        } else {
+            setDisbandFunction();
+        }
     }
-    
+
     private void setDisconnectFunction(){
         ((TextView)disconnectDisband.findViewById(R.id.disconnect_disband_label))
             .setText(R.string.disconnect);
