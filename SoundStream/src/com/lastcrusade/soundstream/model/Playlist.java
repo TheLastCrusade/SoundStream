@@ -21,6 +21,7 @@ package com.lastcrusade.soundstream.model;
 
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -97,9 +98,19 @@ public class Playlist {
         return removeEntry;
     }
     
-    public void removeAll(Set<PlaylistEntry> entrySet){
+    private void removeAll(Set<PlaylistEntry> entrySet){
         playedList.removeAll(entrySet);
         musicList.removeAll(entrySet);
+    }
+    
+    public void removeSongsByMac(String mac){
+        Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
+        for (PlaylistEntry entry : getSongsToPlay()){
+            if (!entry.isLoaded() && entry.getMacAddress().equals(mac)){
+                toRemove.add(entry);
+            }
+        }
+        removeAll(toRemove);
     }
 
     public List<PlaylistEntry> getSongsToPlay() {

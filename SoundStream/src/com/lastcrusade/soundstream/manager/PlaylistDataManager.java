@@ -128,27 +128,27 @@ public class PlaylistDataManager implements Runnable {
     
     public void cleanRemotelyLoadedFiles(String disconnectedUserMac){
         //Remove songs from mac that are in the process of transfering
-        Set<PlaylistEntry> toRemoveForRemoteLoad = new HashSet<PlaylistEntry>();
+        Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
         for(PlaylistEntry entry : remotelyLoaded) {
             synchronized(entryMutex){
                 if(!entry.isLoaded() && entry.getMacAddress().equals(disconnectedUserMac)){
-                    toRemoveForRemoteLoad.add(entry);
+                    toRemove.add(entry);
                 }
             }
         }
-        remotelyLoaded.removeAll(toRemoveForRemoteLoad);
+        remotelyLoaded.removeAll(toRemove);
         
         //Remove songs from mac that are queued to be transfered. 
-        Set<PlaylistEntry> toRemoveForToLoad = new HashSet<PlaylistEntry>();
+        toRemove = new HashSet<PlaylistEntry>(); //Clear previous entrys
         for (PlaylistEntry entry : toLoadQueue) {
             synchronized(entryMutex) {
                 if (entry.getMacAddress().equals(disconnectedUserMac)) {
                     entry.setLoaded(false);
-                    toRemoveForToLoad.add(entry);
+                    toRemove.add(entry);
                 }
             }
         }
-        toLoadQueue.removeAll(toRemoveForToLoad);
+        toLoadQueue.removeAll(toRemove);
     }
 
     /**

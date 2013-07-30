@@ -251,13 +251,7 @@ public class PlaylistService extends Service {
             public void onReceiveAction(Context context, Intent intent){
                 String guestMac = (String) intent.getExtras().get(ConnectionService.EXTRA_GUEST_ADDRESS);
                 mDataManager.cleanRemotelyLoadedFiles(guestMac);
-                Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
-                for (PlaylistEntry entry : mPlaylist.getSongsToPlay()){
-                    if (!entry.isLoaded() && entry.getMacAddress().equals(guestMac)){
-                        toRemove.add(entry);
-                    }
-                }
-                mPlaylist.removeAll(toRemove);
+                mPlaylist.removeSongsByMac(guestMac);
             }
         })
         .addLocalAction(MessagingService.ACTION_PLAY_STATUS_MESSAGE, new IBroadcastActionHandler() {
