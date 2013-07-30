@@ -103,7 +103,7 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
     private void setEntryAndNotify(PlaylistEntry entry) {
         this.entry = entry;
         //This is sending a playlist entry not a SongMetadata
-        new LocalBroadcastIntent(PlaylistService.ACTION_SONG_PLAYING)
+        new LocalBroadcastIntent(PlaylistService.ACTION_CURRENT_SONG)
             .putExtra(PlaylistService.EXTRA_SONG, this.entry)
             .send(this.context);
     }
