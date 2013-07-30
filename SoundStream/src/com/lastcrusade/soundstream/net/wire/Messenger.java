@@ -184,7 +184,7 @@ public class Messenger {
                     transfer = new WireRecvOutputStream(this.tempFolder);
                     this.activeTransfers.put(packet.getMessageNo(), transfer);
                 }
-    
+                
                 transfer.write(packet.getBytes());
                 received = transfer.attemptReceive();
                 //if we've received the full message, remove it from our active
