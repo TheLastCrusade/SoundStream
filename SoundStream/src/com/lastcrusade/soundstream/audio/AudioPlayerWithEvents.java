@@ -110,6 +110,18 @@ public class AudioPlayerWithEvents implements IPlayer {
         }
     }
 
+    /**
+     * A public method to request audio focus.  This is
+     * used on the guest, when they receive a message
+     * that a song is playing (vs actually pressing play
+     * on the device).
+     * 
+     * NOTE: this is a bandaid that will be fixed after
+     * beta is launched.
+     */
+    public void requestAudioFocus() {
+    	requestAudio();
+    }
 
     /**
      * Called from the AudioFocusChangeListener to handle the different stages
