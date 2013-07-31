@@ -37,6 +37,7 @@ import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.PlaylistEntry;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.service.ConnectionService;
 import com.lastcrusade.soundstream.service.IMessagingService;
 import com.lastcrusade.soundstream.service.MessagingService;
 import com.lastcrusade.soundstream.service.PlaylistService;
@@ -53,7 +54,7 @@ public class PlaylistDataManager implements Runnable {
 
     private Context context;
     private ServiceLocator<MessagingService> messagingServiceLocator;
-    private Queue<PlaylistEntry> loadQueue = new LinkedList<PlaylistEntry>();
+    private Queue<PlaylistEntry> toLoadQueue = new LinkedList<PlaylistEntry>();
     private Queue<PlaylistEntry> remotelyLoaded = new LinkedList<PlaylistEntry>();
     private Thread stoppingThread;
     private boolean running;
@@ -82,9 +83,9 @@ public class PlaylistDataManager implements Runnable {
 
                 boolean loaded = false;
                 //next, see if we can start loading any additional files
-                while (!loadQueue.isEmpty() &&
-                        loadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
-                    PlaylistEntry entry = loadQueue.poll();
+                while (!toLoadQueue.isEmpty() &&
+                        toLoadQueue.peek().getFileSize() < (maxBytesToLoad - bytesRequested)) {
+                    PlaylistEntry entry = toLoadQueue.poll();
                     if (entry.isLocalFile()) {
                         //if its local, just load the file path and remove the entry
                         loadLocal(entry);
@@ -123,6 +124,31 @@ public class PlaylistDataManager implements Runnable {
             Thread.sleep(pauseInMS);
         } catch (InterruptedException e) {
         }
+    }
+    
+    public void cleanRemotelyLoadedFiles(String disconnectedUserMac){
+        //Remove songs from mac that are in the process of transfering
+        Set<PlaylistEntry> toRemove = new HashSet<PlaylistEntry>();
+        for(PlaylistEntry entry : remotelyLoaded) {
+            synchronized(entryMutex){
+                if(!entry.isLoaded() && entry.getMacAddress().equals(disconnectedUserMac)){
+                    toRemove.add(entry);
+                }
+            }
+        }
+        remotelyLoaded.removeAll(toRemove);
+        
+        //Remove songs from mac that are queued to be transfered. 
+        toRemove = new HashSet<PlaylistEntry>(); //Clear previous entrys
+        for (PlaylistEntry entry : toLoadQueue) {
+            synchronized(entryMutex) {
+                if (entry.getMacAddress().equals(disconnectedUserMac)) {
+                    entry.setLoaded(false);
+                    toRemove.add(entry);
+                }
+            }
+        }
+        toLoadQueue.removeAll(toRemove);
     }
 
     /**
@@ -235,8 +261,8 @@ public class PlaylistDataManager implements Runnable {
         //NOTE: if it is loaded, we can assume its already in remotelyLoaded
         synchronized(entryMutex) {
             if (!entry.isLoaded()) {
-                if (!this.loadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
-                    this.loadQueue.add(entry);
+                if (!this.toLoadQueue.contains(entry) && !this.remotelyLoaded.contains(entry)) {
+                    this.toLoadQueue.add(entry);
                 } else {
                     Log.d(TAG, "Adding a song that's already loaded: " + entry.toString());
                 }
