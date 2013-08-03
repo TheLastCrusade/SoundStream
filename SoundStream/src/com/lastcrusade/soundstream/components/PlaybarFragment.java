@@ -171,8 +171,11 @@ public class PlaybarFragment extends Fragment {
      */
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
+        //TODO: this is almost exactly like what we have implemented in the external control client
+        //...we should find a way to merge these 2 pieces of code, because they should behave
+        // exactly the same -- Jesse, 07/29/13
         this.registrar
-            .addLocalAction(PlaylistService.ACTION_SONG_PLAYING, new IBroadcastActionHandler() {
+            .addLocalAction(PlaylistService.ACTION_CURRENT_SONG, new IBroadcastActionHandler() {
                 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
