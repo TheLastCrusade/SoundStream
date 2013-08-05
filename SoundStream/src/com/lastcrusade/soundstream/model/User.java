@@ -60,7 +60,7 @@ public class User {
     @Override
     public boolean equals(Object obj){
         boolean result;
-        if (obj == null) {
+        if ((obj == null) || !(obj instanceof User)) {
             result = false;
         } else {
             User other = (User) obj;
