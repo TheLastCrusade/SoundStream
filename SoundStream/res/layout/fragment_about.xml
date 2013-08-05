@@ -93,7 +93,7 @@
 	            android:background="@color/accent_blue" />
 	        
 	       <TextView
-	            android:id="@+id/thanks"
+	            android:id="@+id/troy_thanks"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_marginLeft="10dp"
@@ -101,6 +101,16 @@
 	            android:layout_below="@id/thanks_line"
 	            android:textSize="16sp"
 	            />
+	       
+	       <TextView
+	       	   android:id="@+id/third_party_thanks"
+	       	   android:layout_width="wrap_content"
+	       	   android:layout_height="wrap_content"
+	       	   android:layout_marginLeft="10dp"
+	       	   android:text="@string/thank_third_parties"
+	       	   android:layout_below="@id/troy_thanks"
+	       	   android:textSize="16sp"
+	       	   />
 	       
 	    </RelativeLayout>
 	</LinearLayout>
