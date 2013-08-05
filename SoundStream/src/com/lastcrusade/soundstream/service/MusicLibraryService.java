@@ -162,6 +162,10 @@ public class MusicLibraryService extends Service {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    /*
+                     *  When we get a updated user list message we calculate the users that were removed.
+                     *  Here we loop through the removed users and remove any songs that belong to disconnected users.
+                    */
                     UserList removedUsers = (UserList) intent.getParcelableExtra(UserList.EXTRA_REMOVED_USERS);
                     if(removedUsers != null) {
                         for(String mac : removedUsers.getMacAddresses()){
