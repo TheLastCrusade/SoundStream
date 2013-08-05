@@ -61,6 +61,8 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
 
     private Context context;
 
+	private boolean entryChanged = false;
+
     public SingleFileAudioPlayer(Context context, ServiceLocator<MessagingService> messagingServiceLocator) {
         this.player = new MediaPlayer();
         this.context = context;
@@ -102,6 +104,7 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
      */
     private void setEntryAndNotify(PlaylistEntry entry) {
         this.entry = entry;
+        this.entryChanged = true;
         //This is sending a playlist entry not a SongMetadata
         new LocalBroadcastIntent(PlaylistService.ACTION_CURRENT_SONG)
             .putExtra(PlaylistService.EXTRA_SONG, this.entry)
@@ -119,6 +122,7 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
                 if (player.isPlaying()) {
                     player.stop();
                 }
+                this.entryChanged = false;
                 this.paused = false;
                 player.reset();
                 //changed to use the underlying file descriptor, because this doesnt want
@@ -198,17 +202,21 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
 
     @Override
     public void resume() {
-        player.start();
-        paused = false;
-        if (this.entry != null) {
-            try {
-                this.messagingService.getService().sendPlayStatusMessage(this.entry, true);
-            } catch (ServiceNotBoundException e) {
-                Log.wtf(TAG, e);
-            }
-        } else {
-            Log.wtf(TAG, "resume called without paused song.  This isnt right.");
-        }
+    	if (this.entryChanged) {
+    		play();
+    	} else {
+	        player.start();
+	        paused = false;
+	        if (this.entry != null) {
+	            try {
+	                this.messagingService.getService().sendPlayStatusMessage(this.entry, true);
+	            } catch (ServiceNotBoundException e) {
+	                Log.wtf(TAG, e);
+	            }
+	        } else {
+	            Log.wtf(TAG, "resume called without paused song.  This isnt right.");
+	        }
+    	}
     }
 
     @Override

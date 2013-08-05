@@ -184,6 +184,16 @@ public class PlaylistFragment extends MusicListFragment{
                 //place to do so
             }
         })
+        .addLocalAction(PlaylistService.ACTION_CURRENT_SONG, new IBroadcastActionHandler() {
+
+			@Override
+			public void onReceiveAction(Context context, Intent intent) {
+				//the current song has changed...notify the adapter that we must
+				// rerender the rows
+				mPlayListAdapter.notifyDataSetChanged();
+			}
+        	
+        })
         .register(this.getActivity());
     }
 
