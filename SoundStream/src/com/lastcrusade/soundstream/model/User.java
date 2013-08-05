@@ -55,5 +55,15 @@ public class User {
         }
         return macAddress;
 
-    }  
+    }
+
+    public boolean equals(User other){
+        boolean result;
+        if (other == null) {
+            result = false;
+        } else {
+            result = macAddress.equals(other.getMacAddress()) && bluetoothID.equals(other.getBluetoothID());
+        }
+        return result;
+    }
 }

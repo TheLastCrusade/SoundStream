@@ -40,6 +40,7 @@ import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.library.MediaStoreWrapper;
 import com.lastcrusade.soundstream.library.SongNotFoundException;
 import com.lastcrusade.soundstream.model.SongMetadata;
+import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.lastcrusade.soundstream.util.AlphabeticalComparator;
@@ -157,11 +158,24 @@ public class MusicLibraryService extends Service {
                     }
                 }
             })
+            .addLocalAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
+
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    UserList removedUsers = (UserList) intent.getParcelableExtra(UserList.EXTRA_REMOVED_USERS);
+                    if(removedUsers != null) {
+                        for(String mac : removedUsers.getMacAddresses()){
+                            removeLibraryForAddress(mac, true);
+                        }
+                    }
+                }
+            })
             .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     String macAddress = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
+                    Log.w(TAG, macAddress +" disconnected");
                     removeLibraryForAddress(macAddress, true);
                 }
             })

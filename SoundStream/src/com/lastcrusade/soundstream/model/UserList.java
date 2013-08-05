@@ -35,6 +35,7 @@ public class UserList implements Parcelable{
 
     
     public static final String ACTION_USER_LIST_UPDATE = UserList.class.getName() + ".action.UserList";
+    public static final String EXTRA_REMOVED_USERS = UserList.class.getName() + "extra.RemovedUsers";
 
     private List<User> connectedUsers;    
     private UserColors userColors;
