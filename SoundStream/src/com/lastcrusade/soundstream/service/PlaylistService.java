@@ -21,9 +21,7 @@ package com.lastcrusade.soundstream.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import android.app.Service;
 import android.content.Context;
@@ -34,7 +32,6 @@ import android.util.Log;
 
 import com.lastcrusade.soundstream.R;
 import com.lastcrusade.soundstream.audio.AudioPlayerWithEvents;
-import com.lastcrusade.soundstream.audio.IPlayer;
 import com.lastcrusade.soundstream.audio.RemoteAudioPlayer;
 import com.lastcrusade.soundstream.audio.SingleFileAudioPlayer;
 import com.lastcrusade.soundstream.manager.PlaylistDataManager;
@@ -198,13 +195,12 @@ public class PlaylistService extends Service {
                     currentEntry = null;
                 }
                 // automatically play the next song, but only if we're not paused
-                if (!mThePlayer.isPaused()) {
-                    play();
+                if (mPlaylist.isEmpty()) {
+                    Toaster.iToast(PlaylistService.this, getString(R.string.playlist_empty));
                 } else {
-                    if (mPlaylist.isEmpty()) {
-                        Toaster.iToast(PlaylistService.this, getString(R.string.playlist_empty));
-                    } else {
-                        setNextSong();    
+                    setNextSong();
+                    if (!mThePlayer.isPaused()) {
+                        play();
                     }
                 }
                 new LocalBroadcastIntent(ACTION_PLAYLIST_UPDATED).send(PlaylistService.this);
@@ -496,7 +492,13 @@ public class PlaylistService extends Service {
             } else {
                 boolean play = true;
                 if(isLocalPlayer) {
-                    play = setNextSong();
+                    //handle any skipping when paused
+                    if (this.currentEntry != null) {
+                        this.mAudioPlayer.setSong(this.currentEntry);
+                    } else {
+                        //play the next song
+                        play = setNextSong();
+                    }
                 }
                 //we have stuff to play...play it and send a notification
                 if (play) {
@@ -542,6 +544,8 @@ public class PlaylistService extends Service {
                 //we have a song available to play...play it!
                 this.currentEntry = song;
                 this.mAudioPlayer.setSong(song);
+                //notify the guests that a new song has been selected
+                getMessagingService().sendPlayStatusMessage(song, mThePlayer.isPlaying());
                 //the song has been set...indicate this in the return value
                 songSet = true;
             }
@@ -580,6 +584,11 @@ public class PlaylistService extends Service {
     }
 
     public void skip() {
+    	//TODO: I'm not sure I like this...the player ends up sending the same intent
+    	// for when a song is "finished", which is handled above, which calls setNextSong
+    	//...this presents an unobvious execution path, and conflates the acts of
+    	// skipping to the next song, and finishing playing the next song, and has
+    	// led to some unobvious bugs -- Jesse 08/04/13
         this.mThePlayer.skip();
     }
 
