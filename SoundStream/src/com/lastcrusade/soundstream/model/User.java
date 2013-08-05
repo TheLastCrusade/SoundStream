@@ -55,5 +55,17 @@ public class User {
         }
         return macAddress;
 
-    }  
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        boolean result;
+        if ((obj == null) || !(obj instanceof User)) {
+            result = false;
+        } else {
+            User other = (User) obj;
+            result = macAddress.equals(other.getMacAddress()) && bluetoothID.equals(other.getBluetoothID());
+        }
+        return result;
+    }
 }
