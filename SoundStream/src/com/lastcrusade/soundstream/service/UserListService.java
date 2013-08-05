@@ -25,6 +25,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.lastcrusade.soundstream.model.User;
 import com.lastcrusade.soundstream.model.UserList;
 import com.lastcrusade.soundstream.util.BluetoothUtils;
 import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
@@ -35,7 +36,7 @@ public class UserListService extends Service {
     private static final String TAG = UserListService.class.getSimpleName();
     
     private BroadcastRegistrar registrar;
-    private UserList userList;
+    private UserList curUserList;
     private ServiceLocator<MessagingService> messagingServiceLocator;
     private String myMac;
     private String myName;
@@ -57,7 +58,7 @@ public class UserListService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        userList = new UserList();
+        curUserList = new UserList();
 
         messagingServiceLocator = new ServiceLocator<MessagingService>(
                 this, MessagingService.class, MessagingService.MessagingServiceBinder.class);
@@ -86,7 +87,7 @@ public class UserListService extends Service {
             public void onReceiveAction(Context context, Intent intent) {
                 String bluetoothID = intent.getStringExtra(ConnectionService.EXTRA_GUEST_NAME);
                 String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
-                userList.addUser(bluetoothID, macAddress);
+                curUserList.addUser(bluetoothID, macAddress);
                 notifyUserListUpdate();
             }
         })
@@ -95,7 +96,7 @@ public class UserListService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
-                userList.removeUser(macAddress);
+                curUserList.removeUser(macAddress);
                 notifyUserListUpdate();
             }
         })
@@ -104,29 +105,46 @@ public class UserListService extends Service {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //extract the new user list from the intent
-                userList.copyFrom((UserList) intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST));
-                addSelfToUserList();
-                Log.i(TAG, "New userlist with length" + userList.getUsers().size());
+                UserList newUserList = (UserList) intent.getParcelableExtra(MessagingService.EXTRA_USER_LIST);
+                addSelfToUserList(newUserList);
+
+                //Create list of removed users
+                UserList removedUsers = new UserList();
+                for(User user : curUserList.getUsers()) {
+                    if(!newUserList.getUsers().contains(user)){
+                        removedUsers.addUser(user.getBluetoothID(), user.getMacAddress());
+                    }
+                }
+
+                //Replace current userlist
+                curUserList.copyFrom(newUserList);
+                Log.i(TAG, "New userlist with length" + curUserList.getUsers().size());
                 //tell app to update the user list in all the UI
-                new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
+                new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE)
+                .putExtra(UserList.EXTRA_REMOVED_USERS, removedUsers)
+                .send(UserListService.this);
             }
         })
         .register(this);
     }
 
     public void clearExternalUsers() {
-        this.userList.clear();
+        this.curUserList.clear();
         addSelfToUserList();
         new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(UserListService.this);
     }
 
     private void notifyUserListUpdate() {
         new LocalBroadcastIntent(UserList.ACTION_USER_LIST_UPDATE).send(this);
-        getMessagingService().sendUserListMessage(userList);
+        getMessagingService().sendUserListMessage(curUserList);
     }
 
     private void addSelfToUserList() {
-        userList.addUser(myName, myMac);
+        addSelfToUserList(curUserList);
+    }
+
+    private void addSelfToUserList(UserList list){
+        list.addUser(myName, myMac);
     }
 
     private void unregisterReceivers() {
@@ -145,7 +163,7 @@ public class UserListService extends Service {
     }
 
     public UserList getUserList(){
-        return userList;
+        return curUserList;
     }
 
     public String getMyMac() {
