@@ -57,11 +57,13 @@ public class User {
 
     }
 
-    public boolean equals(User other){
+    @Override
+    public boolean equals(Object obj){
         boolean result;
-        if (other == null) {
+        if (obj == null) {
             result = false;
         } else {
+            User other = (User) obj;
             result = macAddress.equals(other.getMacAddress()) && bluetoothID.equals(other.getBluetoothID());
         }
         return result;
