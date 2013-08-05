@@ -419,7 +419,12 @@ public class ConnectionService extends Service {
     }
 
     public void disconnectAllGuests() {
-        for (MessageThread thread : this.guests) {
+        //copy the contents into separate array...the cancel/disconnect procedure
+        // will remove each thread from the guests array, and this will avoid
+        // a ConcurrentModificationException
+        List<MessageThread> toCancel = new ArrayList<MessageThread>(this.guests);
+        Log.d(TAG, String.format("Disconnecting %d guests...", toCancel.size()));
+        for (MessageThread thread : toCancel) {
             thread.cancel();
         }
     }
