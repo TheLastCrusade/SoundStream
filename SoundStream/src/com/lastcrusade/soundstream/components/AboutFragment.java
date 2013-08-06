@@ -54,13 +54,17 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         listenToHttpLink(SlidingMenuLinkText, "https://github.com/jfeinstein10/SlidingMenu");
         listenToHttpLink(ABSLinkText, "https://github.com/JakeWharton/ActionBarSherlock");
         
+        /*listenToHttpLink(repoLinkText, getString(R.string.repo_link));
+        listenToHttpLink(SlidingMenuLinkText, getString(R.string.sliding_menu_link));
+        listenToHttpLink(ABSLinkText, getString(R.string.ABS_link));*/
+        
         emailLinkText.setOnClickListener(new AdapterView.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "SoundStreamHelp@gmail.com", null));
-				i.putExtra(Intent.EXTRA_SUBJECT, "[SoundStream Beta]");
-				startActivity(Intent.createChooser(i, "Send email..."));
+				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "SoundStreamHelp@gmail.com", null));
+				emailIntent.putExtra(Intent.EXTRA_SUBJECT, "[SoundStream Beta]");
+				startActivity(Intent.createChooser(emailIntent, "Send email..."));
 			}
         });
 
@@ -90,8 +94,8 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-				startActivity(i);				
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				startActivity(browserIntent);				
 			}
     	});
     }
