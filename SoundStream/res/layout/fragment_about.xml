@@ -161,6 +161,27 @@
                 android:layout_below="@id/contact_us_line"
                 android:textSize="16sp"
                 />
+	    	
+	    	<TextView
+	    		android:id="@+id/beta_help_instructions"
+	    		android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="@string/beta_help_instructions"
+                android:layout_below="@id/repo_link"
+                android:textSize="16sp"
+	    		/>
+	    	
+	    	<TextView
+	    		android:id="@+id/email_link"
+	    		android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="@string/email_link_text"
+                android:textColor="@color/link_blue"
+                android:layout_below="@id/beta_help_instructions"
+                android:textSize="16sp"
+	    		/>
 	    		    	
 	    </RelativeLayout>
 	</LinearLayout>

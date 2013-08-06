@@ -47,12 +47,23 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         final TextView 
         	repoLinkText = (TextView)v.findViewById(R.id.repo_link),
         	SlidingMenuLinkText = (TextView)v.findViewById(R.id.thanks_SlidingMenu),
-        	ABSLinkText = (TextView)v.findViewById(R.id.thanks_ABS);
+        	ABSLinkText = (TextView)v.findViewById(R.id.thanks_ABS),
+        	emailLinkText = (TextView)v.findViewById(R.id.email_link);
         
         listenToHttpLink(repoLinkText, "https://github.com/TheLastCrusade/SoundStream");
         listenToHttpLink(SlidingMenuLinkText, "https://github.com/jfeinstein10/SlidingMenu");
         listenToHttpLink(ABSLinkText, "https://github.com/JakeWharton/ActionBarSherlock");
         
+        emailLinkText.setOnClickListener(new AdapterView.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "SoundStreamHelp@gmail.com", null));
+				i.putExtra(Intent.EXTRA_SUBJECT, "[SoundStream Beta]");
+				startActivity(Intent.createChooser(i, "Send email..."));
+			}
+        });
+
         return v;
     }
 
