@@ -50,20 +50,18 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         	ABSLinkText = (TextView)v.findViewById(R.id.thanks_ABS),
         	emailLinkText = (TextView)v.findViewById(R.id.email_link);
         
-        listenToHttpLink(repoLinkText, "https://github.com/TheLastCrusade/SoundStream");
-        listenToHttpLink(SlidingMenuLinkText, "https://github.com/jfeinstein10/SlidingMenu");
-        listenToHttpLink(ABSLinkText, "https://github.com/JakeWharton/ActionBarSherlock");
-        
-        /*listenToHttpLink(repoLinkText, getString(R.string.repo_link));
+        listenToHttpLink(repoLinkText, getString(R.string.repo_link));
         listenToHttpLink(SlidingMenuLinkText, getString(R.string.sliding_menu_link));
-        listenToHttpLink(ABSLinkText, getString(R.string.ABS_link));*/
+        listenToHttpLink(ABSLinkText, getString(R.string.ABS_link));
         
         emailLinkText.setOnClickListener(new AdapterView.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "SoundStreamHelp@gmail.com", null));
-				emailIntent.putExtra(Intent.EXTRA_SUBJECT, "[SoundStream Beta]");
+				Intent emailIntent = new Intent(
+						Intent.ACTION_SENDTO, 
+						Uri.fromParts("mailto", getString(R.string.email_support_address), null));
+				emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject_tag));
 				startActivity(Intent.createChooser(emailIntent, "Send email..."));
 			}
         });
