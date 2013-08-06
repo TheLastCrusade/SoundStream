@@ -91,27 +91,73 @@
 	            android:layout_marginBottom="10dp"
 	            android:layout_below="@id/special_thanks_label"
 	            android:background="@color/accent_blue" />
-	        
+
 	       <TextView
-	            android:id="@+id/troy_thanks"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginLeft="10dp"
-	            android:text="@string/thank_troy"
-	            android:layout_below="@id/thanks_line"
-	            android:textSize="16sp"
-	            />
-	       
-	       <TextView
-	       	   android:id="@+id/third_party_thanks"
+	       	   android:id="@+id/thanks_ABS"
 	       	   android:layout_width="wrap_content"
 	       	   android:layout_height="wrap_content"
 	       	   android:layout_marginLeft="10dp"
-	       	   android:text="@string/thank_third_parties"
-	       	   android:layout_below="@id/troy_thanks"
+	       	   android:text="@string/thanks_ABS"
+	       	   android:layout_below="@id/thanks_line"
 	       	   android:textSize="16sp"
 	       	   />
 	       
+	       <TextView
+               android:id="@+id/thanks_SlidingMenu"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="10dp"
+               android:text="@string/thanks_SlidingMenu"
+               android:layout_below="@id/thanks_ABS"
+               android:textSize="16sp"
+               />
+	       
+	       <TextView
+               android:id="@+id/thanks_Troy"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="10dp"
+               android:text="@string/thanks_Troy"
+               android:layout_below="@id/thanks_SlidingMenu"
+               android:textSize="16sp"
+               />
+	       
+	    </RelativeLayout>
+	    
+	    <RelativeLayout 
+	    	android:id="@+id/contact_us"
+	    	android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" 
+	    	>
+	    	
+	    	<TextView
+	    		android:id="@+id/contact_us_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contact_us_label"
+                android:textSize="18sp"
+                />
+	    	
+	    	<View
+                android:id="@+id/contact_us_line"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="10dp"
+                android:layout_below="@id/contact_us_label"
+                android:background="@color/accent_blue" 
+                />
+	    	
+	    	<TextView
+                android:id="@+id/repo_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/repo_link_text"
+                android:layout_below="@id/contact_us_line"
+                android:textSize="18sp"
+                />
+	    		    	
 	    </RelativeLayout>
 	</LinearLayout>
 </ScrollView>

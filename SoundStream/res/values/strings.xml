@@ -72,11 +72,14 @@
 
     <!-- about things -->
     <string name="about">About</string>
-    <string name="meet_label">Meet The Team</string>
+    <string name="meet_label">Meet the Team</string>
     <string name="team">Reid Baker\nDavid Greenhalgh\nElizabeth Johnson\nJesse Rosalia\nTaylor Wrobel</string>
     <string name="thanks_label">Special Thanks</string>
-    <string name="thank_troy"> Troy Peace - A super sponsor, without whom this never could have happened\n</string>
-    <string name="thank_third_parties">Thanks to our third party libraries:\nActionBarSherlock\nSlidingMenu</string>
+    <string name="thanks_ABS">ActionBarSherlock</string>
+    <string name="thanks_SlidingMenu">SlidingMenu</string>
+    <string name="thanks_Troy">Troy Peace - a super sponsor, without whom none of this would be possible</string>
+    <string name="contact_us_label">Contact Us</string>
+    <string name="repo_link_text">Our GitHub repo</string>
 
     <string name="welcome">Welcome to SoundStream!\n\nCreate a new network by pressing Create, or join an existing network by pressing Join and asking a friend to let you in.\n\nAdd music to your playlist through the Music page.\n\nIf there is no music there, check out the SoundStream wiki for information on how to add music to your phone.\n\nGo to the Network page to add people to your network.</string>
 </resources>
