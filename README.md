@@ -4,7 +4,7 @@
 
 This product is currently in beta, so please keep an eye out for bugs! If you come across a scenario which you think may be a bug, please [create a new issue](https://github.com/TheLastCrusade/SoundStream/issues/new) or email us at SoundStreamHelp@gmail.com.
 
-If you have other questions, we'll be adding to our [wiki](https://github.com/TheLastCrusade/SoundStream/wiki) over time. You can suggest feature requests and see what we've got coming down the pipeline. 
+If you have other questions, we'll be adding to our [wiki](https://github.com/TheLastCrusade/SoundStream/wiki) over time. You can suggest feature requests and see what we've got coming down the pipeline! 
 
 Feel free to direct any other questions to ContactLastCrusade@gmail.com!
 
