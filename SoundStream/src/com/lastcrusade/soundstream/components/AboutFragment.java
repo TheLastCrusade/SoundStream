@@ -44,16 +44,14 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_about, container, false);
         
-        final TextView repoLinkText = (TextView)v.findViewById(R.id.repo_link);
+        final TextView 
+        	repoLinkText = (TextView)v.findViewById(R.id.repo_link),
+        	SlidingMenuLinkText = (TextView)v.findViewById(R.id.thanks_SlidingMenu),
+        	ABSLinkText = (TextView)v.findViewById(R.id.thanks_ABS);
         
-        repoLinkText.setOnClickListener(new AdapterView.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.github.com/TheLastCrusade/SoundStream"));
-		        startActivity(i);
-			}
-		});
+        listenToHttpLink(repoLinkText, "https://github.com/TheLastCrusade/SoundStream");
+        listenToHttpLink(SlidingMenuLinkText, "https://github.com/jfeinstein10/SlidingMenu");
+        listenToHttpLink(ABSLinkText, "https://github.com/JakeWharton/ActionBarSherlock");
         
         return v;
     }
@@ -75,4 +73,15 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         return R.string.about;
     }
 
+    public void listenToHttpLink(TextView linkText, final String url)
+    {
+    	linkText.setOnClickListener(new AdapterView.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				startActivity(i);				
+			}
+    	});
+    }
 }

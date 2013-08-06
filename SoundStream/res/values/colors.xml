@@ -33,5 +33,6 @@
     <color name="playbar">#DEDEDE</color>
     <color name="accent_blue">#33008AA6</color>
     <color name="medium_gray">#EEEEEE</color>
+    <color name="link_blue">#5858F8</color>
     
 </resources>

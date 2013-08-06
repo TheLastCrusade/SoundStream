@@ -98,6 +98,7 @@
 	       	   android:layout_height="wrap_content"
 	       	   android:layout_marginLeft="10dp"
 	       	   android:text="@string/thanks_ABS"
+	       	   android:textColor="@color/link_blue"
 	       	   android:layout_below="@id/thanks_line"
 	       	   android:textSize="16sp"
 	       	   />
@@ -108,6 +109,7 @@
                android:layout_height="wrap_content"
                android:layout_marginLeft="10dp"
                android:text="@string/thanks_SlidingMenu"
+               android:textColor="@color/link_blue"
                android:layout_below="@id/thanks_ABS"
                android:textSize="16sp"
                />
@@ -153,9 +155,11 @@
                 android:id="@+id/repo_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
                 android:text="@string/repo_link_text"
+                android:textColor="@color/link_blue"
                 android:layout_below="@id/contact_us_line"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 />
 	    		    	
 	    </RelativeLayout>
