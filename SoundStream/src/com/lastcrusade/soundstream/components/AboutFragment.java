@@ -18,10 +18,14 @@
  */
 package com.lastcrusade.soundstream.components;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.lastcrusade.soundstream.CoreActivity;
@@ -40,6 +44,28 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_about, container, false);
         
+        final TextView 
+        	repoLinkText = (TextView)v.findViewById(R.id.repo_link),
+        	SlidingMenuLinkText = (TextView)v.findViewById(R.id.thanks_SlidingMenu),
+        	ABSLinkText = (TextView)v.findViewById(R.id.thanks_ABS),
+        	emailLinkText = (TextView)v.findViewById(R.id.email_link);
+        
+        listenToHttpLink(repoLinkText, getString(R.string.repo_link));
+        listenToHttpLink(SlidingMenuLinkText, getString(R.string.sliding_menu_link));
+        listenToHttpLink(ABSLinkText, getString(R.string.ABS_link));
+        
+        emailLinkText.setOnClickListener(new AdapterView.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent emailIntent = new Intent(
+						Intent.ACTION_SENDTO, 
+						Uri.fromParts("mailto", getString(R.string.email_support_address), null));
+				emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject_tag));
+				startActivity(Intent.createChooser(emailIntent, "Send email..."));
+			}
+        });
+
         return v;
     }
 
@@ -60,4 +86,15 @@ public class AboutFragment extends SherlockFragment implements ITitleable {
         return R.string.about;
     }
 
+    public void listenToHttpLink(TextView linkText, final String url)
+    {
+    	linkText.setOnClickListener(new AdapterView.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				startActivity(browserIntent);				
+			}
+    	});
+    }
 }
