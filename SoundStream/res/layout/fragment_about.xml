@@ -66,6 +66,66 @@
 	            />
 	        
 	    </RelativeLayout>
+	    
+	    <!-- Contact Us -->
+	    <RelativeLayout 
+            android:id="@+id/contact_us"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" 
+            >
+            
+            <TextView
+                android:id="@+id/contact_us_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contact_us_label"
+                android:textSize="18sp"
+                />
+            
+            <View
+                android:id="@+id/contact_us_line"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="10dp"
+                android:layout_below="@id/contact_us_label"
+                android:background="@color/accent_blue" 
+                />
+            
+            <TextView
+                android:id="@+id/repo_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="@string/repo_link_text"
+                android:textColor="@color/link_blue"
+                android:layout_below="@id/contact_us_line"
+                android:textSize="16sp"
+                />
+            
+            <TextView
+                android:id="@+id/beta_help_instructions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="@string/beta_help_instructions"
+                android:layout_below="@id/repo_link"
+                android:textSize="16sp"
+                />
+            
+            <TextView
+                android:id="@+id/email_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="@string/email_link_text"
+                android:textColor="@color/link_blue"
+                android:layout_below="@id/beta_help_instructions"
+                android:textSize="16sp"
+                />
+                        
+        </RelativeLayout>
 	
 	    <!-- Special Thanks -->
 	    <RelativeLayout
@@ -90,20 +150,58 @@
 	            android:layout_marginTop="3dp"
 	            android:layout_marginBottom="10dp"
 	            android:layout_below="@id/special_thanks_label"
-	            android:background="@color/accent_blue" />
-
+	            android:background="@color/accent_blue" 
+	            />
+       
 	       <TextView
-	       	   android:id="@+id/thanks_ABS"
-	       	   android:layout_width="wrap_content"
-	       	   android:layout_height="wrap_content"
-	       	   android:layout_marginLeft="10dp"
-	       	   android:text="@string/thanks_ABS"
-	       	   android:textColor="@color/link_blue"
-	       	   android:layout_below="@id/thanks_line"
-	       	   android:textSize="16sp"
-	       	   />
+               android:id="@+id/thanks_Troy"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="10dp"
+               android:text="@string/thanks_Troy"
+               android:layout_below="@id/thanks_line"
+               android:textSize="16sp"
+               />
 	       
-	       <TextView
+	    </RelativeLayout>
+	    
+	    <!-- Credit -->
+	    <RelativeLayout
+	    	android:id="@+id/credit "
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            >
+	       
+	    	<TextView
+                android:id="@+id/credit_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/credit_label"
+                android:textSize="18sp"/>
+    
+            <View
+                android:id="@+id/credit_line"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="10dp"
+                android:layout_below="@id/credit_label"
+                android:background="@color/accent_blue" 
+                />
+	       
+	    	<TextView
+               android:id="@+id/thanks_ABS"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_marginLeft="10dp"
+               android:text="@string/thanks_ABS"
+               android:textColor="@color/link_blue"
+               android:layout_below="@id/credit_line"
+               android:textSize="16sp"
+               />
+           
+           <TextView
                android:id="@+id/thanks_SlidingMenu"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
@@ -113,76 +211,8 @@
                android:layout_below="@id/thanks_ABS"
                android:textSize="16sp"
                />
-	       
-	       <TextView
-               android:id="@+id/thanks_Troy"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginLeft="10dp"
-               android:text="@string/thanks_Troy"
-               android:layout_below="@id/thanks_SlidingMenu"
-               android:textSize="16sp"
-               />
-	       
 	    </RelativeLayout>
 	    
-	    <RelativeLayout 
-	    	android:id="@+id/contact_us"
-	    	android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp" 
-	    	>
-	    	
-	    	<TextView
-	    		android:id="@+id/contact_us_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/contact_us_label"
-                android:textSize="18sp"
-                />
-	    	
-	    	<View
-                android:id="@+id/contact_us_line"
-                android:layout_width="fill_parent"
-                android:layout_height="2dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="10dp"
-                android:layout_below="@id/contact_us_label"
-                android:background="@color/accent_blue" 
-                />
-	    	
-	    	<TextView
-                android:id="@+id/repo_link"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/repo_link_text"
-                android:textColor="@color/link_blue"
-                android:layout_below="@id/contact_us_line"
-                android:textSize="16sp"
-                />
-	    	
-	    	<TextView
-	    		android:id="@+id/beta_help_instructions"
-	    		android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/beta_help_instructions"
-                android:layout_below="@id/repo_link"
-                android:textSize="16sp"
-	    		/>
-	    	
-	    	<TextView
-	    		android:id="@+id/email_link"
-	    		android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/email_link_text"
-                android:textColor="@color/link_blue"
-                android:layout_below="@id/beta_help_instructions"
-                android:textSize="16sp"
-	    		/>
-	    		    	
-	    </RelativeLayout>
+	    
 	</LinearLayout>
 </ScrollView>
