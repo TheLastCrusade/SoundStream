@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net.message;
+package com.thelastcrusade.soundstream.net.message;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lastcrusade.soundstream.model.FoundGuest;
+import com.thelastcrusade.soundstream.model.FoundGuest;
 
 public class FoundGuestsMessage extends ADataMessage {
 

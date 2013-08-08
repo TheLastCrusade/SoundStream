@@ -17,13 +17,13 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.model;
+package com.thelastcrusade.soundstream.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
+import com.thelastcrusade.soundstream.util.BluetoothUtils;
+import com.thelastcrusade.soundstream.util.DefaultParcelableCreator;
 
 public class SongMetadata implements Parcelable{
 

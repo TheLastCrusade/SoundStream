@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.message;
+package com.thelastcrusade.soundstream.net.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,10 +25,10 @@ import java.io.OutputStream;
 
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.core.AComplexDataType;
-import com.lastcrusade.soundstream.net.core.ISerializable;
-import com.lastcrusade.soundstream.net.wire.MessageNotCompleteException;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.net.core.AComplexDataType;
+import com.thelastcrusade.soundstream.net.core.ISerializable;
+import com.thelastcrusade.soundstream.net.wire.MessageNotCompleteException;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * A format for all messages.  All messages consists of:

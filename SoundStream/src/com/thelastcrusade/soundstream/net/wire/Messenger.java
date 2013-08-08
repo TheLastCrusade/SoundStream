@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net.wire;
+package com.thelastcrusade.soundstream.net.wire;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,11 +31,11 @@ import java.util.Map;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.message.IFileMessage;
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.MessageFormat;
-import com.lastcrusade.soundstream.util.InputBuffer;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.net.message.IFileMessage;
+import com.thelastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.net.message.MessageFormat;
+import com.thelastcrusade.soundstream.util.InputBuffer;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * This class is the main entry point to send and receive messages in Sound Stream.  It implements a protocol

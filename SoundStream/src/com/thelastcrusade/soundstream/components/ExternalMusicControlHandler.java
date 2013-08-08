@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -26,10 +26,10 @@ import android.media.AudioManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * Handle external music control events that the Android OS may

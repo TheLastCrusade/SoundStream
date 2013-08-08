@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,10 +27,10 @@ import java.util.PriorityQueue;
 
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.TransferSongMessage;
-import com.lastcrusade.soundstream.net.wire.Messenger;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.net.message.TransferSongMessage;
+import com.thelastcrusade.soundstream.net.wire.Messenger;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * A class to manage writing messages from the MessageThread.  This class

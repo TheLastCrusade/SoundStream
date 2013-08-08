@@ -17,15 +17,15 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.content.Context;
 import android.content.Intent;
 
 public class ConnectionUtils {
 
-    public static final String ACTION_CONNECTED    = "com.lastcrusade.soundstream.action.CONNECTED";
-    public static final String ACTION_DISCONNECTED = "com.lastcrusade.soundstream.action.DISCONNECTED";
+    public static final String ACTION_CONNECTED    = "com.thelastcrusade.soundstream.action.CONNECTED";
+    public static final String ACTION_DISCONNECTED = "com.thelastcrusade.soundstream.action.DISCONNECTED";
 
     /**
      * Notify the UI or any listeners that the socket is connected 

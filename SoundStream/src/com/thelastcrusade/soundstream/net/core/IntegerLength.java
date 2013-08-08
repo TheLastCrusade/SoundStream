@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.core;
+package com.thelastcrusade.soundstream.net.core;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.lastcrusade.soundstream.net.wire.MessageNotCompleteException;
+import com.thelastcrusade.soundstream.net.wire.MessageNotCompleteException;
 
 /**
  * A complex data type for serializing/deserializing integer length

@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 /**
  * Exception thrown when Bluetooth is not supported on a platform.

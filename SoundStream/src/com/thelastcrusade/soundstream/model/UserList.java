@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.model;
+package com.thelastcrusade.soundstream.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
+import com.thelastcrusade.soundstream.util.DefaultParcelableCreator;
 
 public class UserList implements Parcelable{
 

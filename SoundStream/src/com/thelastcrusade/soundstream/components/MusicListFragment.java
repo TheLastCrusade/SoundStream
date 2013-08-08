@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,8 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.util.ITitleable;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.util.ITitleable;
 
 public abstract class MusicListFragment extends SherlockListFragment implements ITitleable{
     

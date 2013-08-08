@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.util.Log;
 

@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import java.util.List;
 

@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.app.PendingIntent;
 import android.graphics.Bitmap;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -28,9 +28,9 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.util.ITitleable;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.util.ITitleable;
 
 /**
  * @author Elizabeth

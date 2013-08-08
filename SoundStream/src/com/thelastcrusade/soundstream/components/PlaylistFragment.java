@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,21 +34,21 @@ import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.UserListService;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.MusicListAdapter;
-import com.lastcrusade.soundstream.util.SongGestureListener;
-import com.lastcrusade.soundstream.util.Toaster;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.PlaylistEntry;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.MusicListAdapter;
+import com.thelastcrusade.soundstream.util.SongGestureListener;
+import com.thelastcrusade.soundstream.util.Toaster;
 
 public class PlaylistFragment extends MusicListFragment{
     //for testing purposes so we have songs to show
@@ -267,7 +267,7 @@ public class PlaylistFragment extends MusicListFragment{
         }
         
         /* (non-Javadoc)
-         * @see com.lastcrusade.soundstream.util.MusicListAdapter#updateMusic(java.util.List)
+         * @see com.thelastcrusade.soundstream.util.MusicListAdapter#updateMusic(java.util.List)
          */
         @Override
         public void updateMusic(List<PlaylistEntry> metadataList) {

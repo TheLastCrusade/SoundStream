@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.wire;
+package com.thelastcrusade.soundstream.net.wire;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.lastcrusade.soundstream.net.core.AComplexDataType;
-import com.lastcrusade.soundstream.net.core.ISerializable;
+import com.thelastcrusade.soundstream.net.core.AComplexDataType;
+import com.thelastcrusade.soundstream.net.core.ISerializable;
 
 /**
  * This file represents the format for a packet sent across the wire.

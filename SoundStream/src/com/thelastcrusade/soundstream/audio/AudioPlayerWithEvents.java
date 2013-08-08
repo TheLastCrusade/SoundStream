@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.audio;
+package com.thelastcrusade.soundstream.audio;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,11 +27,11 @@ import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.SoundStreamExternalControlClient;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.ClassUtils;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.SoundStreamExternalControlClient;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.util.ClassUtils;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 
 public class AudioPlayerWithEvents implements IPlayer {

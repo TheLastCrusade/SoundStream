@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -33,21 +33,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
-import com.lastcrusade.soundstream.service.IMessagingService;
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.ITitleable;
-import com.lastcrusade.soundstream.util.Transitions;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.service.ConnectionService;
+import com.thelastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
+import com.thelastcrusade.soundstream.service.IMessagingService;
+import com.thelastcrusade.soundstream.service.MessagingService;
+import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.util.BluetoothUtils;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.ContentDescriptionUtils;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.ITitleable;
+import com.thelastcrusade.soundstream.util.Transitions;
 
 /*
  * This fragment should be what is first presented to the user when

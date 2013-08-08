@@ -17,19 +17,19 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.audio;
+package com.thelastcrusade.soundstream.audio;
 
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.service.MessagingService;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class RemoteAudioPlayer implements IPlayer {
 

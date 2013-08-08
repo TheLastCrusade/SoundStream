@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream;
+package com.thelastcrusade.soundstream;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
@@ -29,12 +29,12 @@ import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.os.Build;
 
-import com.lastcrusade.soundstream.components.ExternalMusicControlHandler;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.RemoteControlClientCompat;
+import com.thelastcrusade.soundstream.components.ExternalMusicControlHandler;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.RemoteControlClientCompat;
 
 /**
  * Manage the interface to Android's external music controls.

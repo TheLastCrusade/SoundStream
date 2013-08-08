@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.service;
+package com.thelastcrusade.soundstream.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,18 +36,18 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.library.MediaStoreWrapper;
-import com.lastcrusade.soundstream.library.SongNotFoundException;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
-import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
-import com.lastcrusade.soundstream.util.AlphabeticalComparator;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.SongMetadataUtils;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.library.MediaStoreWrapper;
+import com.thelastcrusade.soundstream.library.SongNotFoundException;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.thelastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
+import com.thelastcrusade.soundstream.util.AlphabeticalComparator;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.SongMetadataUtils;
 
 public class MusicLibraryService extends Service {
     

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.wire;
+package com.thelastcrusade.soundstream.net.wire;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,9 +25,9 @@ import java.io.InputStream;
 
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.core.AComplexDataType;
-import com.lastcrusade.soundstream.net.core.IntegerLength;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.net.core.AComplexDataType;
+import com.thelastcrusade.soundstream.net.core.IntegerLength;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * An input stream used for reading packets to send via a network.

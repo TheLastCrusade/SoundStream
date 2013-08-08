@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +31,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.wire.Messenger;
+import com.thelastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.net.wire.Messenger;
 
 /**
  * This thread is responsible for sending and receiving messages once the connection has been established.

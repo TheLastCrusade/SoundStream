@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.service;
+package com.thelastcrusade.soundstream.service;
 
 /**
  * A generic interface for local service binders.  Local service binders provide direct

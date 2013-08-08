@@ -17,18 +17,18 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream;
+package com.thelastcrusade.soundstream;
 
 import android.app.Application;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.service.ConnectionService;
+import com.thelastcrusade.soundstream.service.MessagingService;
+import com.thelastcrusade.soundstream.service.MusicLibraryService;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.UserListService;
 
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getSimpleName();

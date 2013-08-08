@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,21 +35,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.UserListService;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.MusicListAdapter;
-import com.lastcrusade.soundstream.util.SongGestureListener;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.service.MusicLibraryService;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.MusicListAdapter;
+import com.thelastcrusade.soundstream.util.SongGestureListener;
 
 public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getSimpleName();
@@ -116,7 +116,7 @@ public class MusicLibraryFragment extends MusicListFragment {
     }
 
     /* (non-Javadoc)
-     * @see com.lastcrusade.soundstream.components.MusicListFragment#onResume()
+     * @see com.thelastcrusade.soundstream.components.MusicListFragment#onResume()
      */
     @Override
     public void onResume() {

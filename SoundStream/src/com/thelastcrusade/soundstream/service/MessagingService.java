@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.service;
+package com.thelastcrusade.soundstream.service;
 
 import java.util.List;
 
@@ -27,27 +27,27 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.soundstream.net.message.AddToPlaylistMessage;
-import com.lastcrusade.soundstream.net.message.BumpSongOnPlaylistMessage;
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.LibraryMessage;
-import com.lastcrusade.soundstream.net.message.PauseMessage;
-import com.lastcrusade.soundstream.net.message.PlayMessage;
-import com.lastcrusade.soundstream.net.message.PlayStatusMessage;
-import com.lastcrusade.soundstream.net.message.PlaylistMessage;
-import com.lastcrusade.soundstream.net.message.RemoveFromPlaylistMessage;
-import com.lastcrusade.soundstream.net.message.RequestSongMessage;
-import com.lastcrusade.soundstream.net.message.SkipMessage;
-import com.lastcrusade.soundstream.net.message.SongStatusMessage;
-import com.lastcrusade.soundstream.net.message.TransferSongMessage;
-import com.lastcrusade.soundstream.net.message.UserListMessage;
-import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.model.PlaylistEntry;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch;
+import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.thelastcrusade.soundstream.net.message.AddToPlaylistMessage;
+import com.thelastcrusade.soundstream.net.message.BumpSongOnPlaylistMessage;
+import com.thelastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.net.message.LibraryMessage;
+import com.thelastcrusade.soundstream.net.message.PauseMessage;
+import com.thelastcrusade.soundstream.net.message.PlayMessage;
+import com.thelastcrusade.soundstream.net.message.PlayStatusMessage;
+import com.thelastcrusade.soundstream.net.message.PlaylistMessage;
+import com.thelastcrusade.soundstream.net.message.RemoveFromPlaylistMessage;
+import com.thelastcrusade.soundstream.net.message.RequestSongMessage;
+import com.thelastcrusade.soundstream.net.message.SkipMessage;
+import com.thelastcrusade.soundstream.net.message.SongStatusMessage;
+import com.thelastcrusade.soundstream.net.message.TransferSongMessage;
+import com.thelastcrusade.soundstream.net.message.UserListMessage;
+import com.thelastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 
 public class MessagingService extends Service implements IMessagingService {
 

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.service;
+package com.thelastcrusade.soundstream.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -25,12 +25,12 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.model.User;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.model.User;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.util.BluetoothUtils;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 
 public class UserListService extends Service {
     private static final String TAG = UserListService.class.getSimpleName();

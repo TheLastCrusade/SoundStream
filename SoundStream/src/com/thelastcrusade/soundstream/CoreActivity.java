@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream;
+package com.thelastcrusade.soundstream;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -37,21 +37,21 @@ import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
-import com.lastcrusade.soundstream.components.ConnectFragment;
-import com.lastcrusade.soundstream.components.MenuFragment;
-import com.lastcrusade.soundstream.components.PlaybarFragment;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.IMessagingService;
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.ITitleable;
-import com.lastcrusade.soundstream.util.Trackable;
-import com.lastcrusade.soundstream.util.Transitions;
+import com.thelastcrusade.soundstream.components.ConnectFragment;
+import com.thelastcrusade.soundstream.components.MenuFragment;
+import com.thelastcrusade.soundstream.components.PlaybarFragment;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.service.ConnectionService;
+import com.thelastcrusade.soundstream.service.IMessagingService;
+import com.thelastcrusade.soundstream.service.MessagingService;
+import com.thelastcrusade.soundstream.service.MusicLibraryService;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.ITitleable;
+import com.thelastcrusade.soundstream.util.Trackable;
+import com.thelastcrusade.soundstream.util.Transitions;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 

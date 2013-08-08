@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import android.content.Context;
 import android.content.Intent;
@@ -32,19 +32,19 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.UserListService;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.ContentDescriptionUtils;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.ITitleable;
-import com.lastcrusade.soundstream.util.Transitions;
-import com.lastcrusade.soundstream.util.UserListAdapter;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.ContentDescriptionUtils;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.ITitleable;
+import com.thelastcrusade.soundstream.util.Transitions;
+import com.thelastcrusade.soundstream.util.UserListAdapter;
 
 
 public class MenuFragment extends SherlockFragment implements ITitleable {

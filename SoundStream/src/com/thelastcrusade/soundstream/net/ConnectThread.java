@@ -17,12 +17,12 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 import java.io.IOException;
 import java.util.UUID;
 
-import com.lastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.R;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;

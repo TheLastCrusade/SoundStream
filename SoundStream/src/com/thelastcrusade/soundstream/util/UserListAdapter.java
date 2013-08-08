@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.content.Context;
 import android.util.Log;
@@ -27,9 +27,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.User;
-import com.lastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.User;
+import com.thelastcrusade.soundstream.model.UserList;
 
 public class UserListAdapter extends BaseAdapter {
     private static final String TAG = UserListAdapter.class.getSimpleName();

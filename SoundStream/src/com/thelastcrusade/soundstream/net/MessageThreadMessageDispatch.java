@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.net.message.IMessage;
 
 /**
  * An Android Handler used as a SoundStream network message dispatch.  This will receive

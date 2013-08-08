@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.graphics.Rect;
 import android.view.GestureDetector;
@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.lastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.R;
 
 /**
  * @author Elizabeth

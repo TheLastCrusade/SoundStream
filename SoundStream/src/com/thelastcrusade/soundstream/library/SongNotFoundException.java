@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.library;
+package com.thelastcrusade.soundstream.library;
 
 import java.io.IOException;
 

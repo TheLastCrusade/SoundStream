@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.components;
+package com.thelastcrusade.soundstream.components;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,30 +39,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.FoundGuest;
-import com.lastcrusade.soundstream.model.UserList;
-import com.lastcrusade.soundstream.net.BluetoothNotEnabledException;
-import com.lastcrusade.soundstream.net.BluetoothNotSupportedException;
-import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
-import com.lastcrusade.soundstream.service.MusicLibraryService;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.service.UserListService;
-import com.lastcrusade.soundstream.service.UserListService.UserListServiceBinder;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.ITitleable;
-import com.lastcrusade.soundstream.util.Toaster;
-import com.lastcrusade.soundstream.util.TrackerAPI;
-import com.lastcrusade.soundstream.util.Transitions;
-import com.lastcrusade.soundstream.util.UserListAdapter;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.FoundGuest;
+import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.net.BluetoothNotEnabledException;
+import com.thelastcrusade.soundstream.net.BluetoothNotSupportedException;
+import com.thelastcrusade.soundstream.service.ConnectionService;
+import com.thelastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
+import com.thelastcrusade.soundstream.service.MusicLibraryService;
+import com.thelastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.service.UserListService.UserListServiceBinder;
+import com.thelastcrusade.soundstream.util.BluetoothUtils;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.ITitleable;
+import com.thelastcrusade.soundstream.util.Toaster;
+import com.thelastcrusade.soundstream.util.TrackerAPI;
+import com.thelastcrusade.soundstream.util.Transitions;
+import com.thelastcrusade.soundstream.util.UserListAdapter;
 
 /**
  * This fragment handles the ability for members to add new members to 

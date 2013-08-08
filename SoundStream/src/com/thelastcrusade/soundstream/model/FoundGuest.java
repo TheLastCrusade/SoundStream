@@ -17,9 +17,9 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.model;
+package com.thelastcrusade.soundstream.model;
 
-import com.lastcrusade.soundstream.util.DefaultParcelableCreator;
+import com.thelastcrusade.soundstream.util.DefaultParcelableCreator;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.core;
+package com.thelastcrusade.soundstream.net.core;
 
 import java.io.IOException;
 import java.io.InputStream;

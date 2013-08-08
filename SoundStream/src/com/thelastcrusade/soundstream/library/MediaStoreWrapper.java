@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.library;
+package com.thelastcrusade.soundstream.library;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.model.SongMetadata;
 
 public class MediaStoreWrapper {
 

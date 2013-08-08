@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.wire;
+package com.thelastcrusade.soundstream.net.wire;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,11 +25,11 @@ import java.io.OutputStream;
 
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.message.IFileMessage;
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.net.message.MessageFormat;
-import com.lastcrusade.soundstream.util.InputBuffer;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.net.message.IFileMessage;
+import com.thelastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.net.message.MessageFormat;
+import com.thelastcrusade.soundstream.util.InputBuffer;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * An output stream for receiving incoming message data.  This

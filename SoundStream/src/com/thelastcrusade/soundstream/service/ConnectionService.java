@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.service;
+package com.thelastcrusade.soundstream.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,26 +34,26 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.FoundGuest;
-import com.lastcrusade.soundstream.net.AcceptThread;
-import com.lastcrusade.soundstream.net.BluetoothDiscoveryHandler;
-import com.lastcrusade.soundstream.net.BluetoothNotEnabledException;
-import com.lastcrusade.soundstream.net.BluetoothNotSupportedException;
-import com.lastcrusade.soundstream.net.ConnectThread;
-import com.lastcrusade.soundstream.net.MessageThread;
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch;
-import com.lastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
-import com.lastcrusade.soundstream.net.message.ConnectGuestsMessage;
-import com.lastcrusade.soundstream.net.message.FindNewGuestsMessage;
-import com.lastcrusade.soundstream.net.message.FoundGuestsMessage;
-import com.lastcrusade.soundstream.net.message.IMessage;
-import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
-import com.lastcrusade.soundstream.util.BluetoothUtils;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.Toaster;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.FoundGuest;
+import com.thelastcrusade.soundstream.net.AcceptThread;
+import com.thelastcrusade.soundstream.net.BluetoothDiscoveryHandler;
+import com.thelastcrusade.soundstream.net.BluetoothNotEnabledException;
+import com.thelastcrusade.soundstream.net.BluetoothNotSupportedException;
+import com.thelastcrusade.soundstream.net.ConnectThread;
+import com.thelastcrusade.soundstream.net.MessageThread;
+import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch;
+import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.thelastcrusade.soundstream.net.message.ConnectGuestsMessage;
+import com.thelastcrusade.soundstream.net.message.FindNewGuestsMessage;
+import com.thelastcrusade.soundstream.net.message.FoundGuestsMessage;
+import com.thelastcrusade.soundstream.net.message.IMessage;
+import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.thelastcrusade.soundstream.util.BluetoothUtils;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.Toaster;
 
 public class ConnectionService extends Service {
 

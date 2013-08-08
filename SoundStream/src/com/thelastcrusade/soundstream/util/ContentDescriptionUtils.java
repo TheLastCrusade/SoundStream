@@ -1,6 +1,6 @@
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
-import com.lastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.model.SongMetadata;
 
 public class ContentDescriptionUtils {
 

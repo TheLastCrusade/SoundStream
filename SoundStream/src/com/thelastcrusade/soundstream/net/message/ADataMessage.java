@@ -17,15 +17,15 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net.message;
+package com.thelastcrusade.soundstream.net.message;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.net.core.AComplexDataType;
+import com.thelastcrusade.soundstream.model.PlaylistEntry;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.net.core.AComplexDataType;
 
 /**
  * An abstract message class for messages that send and receive data.  This class contains

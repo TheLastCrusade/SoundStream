@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,10 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.model.FoundGuest;
-import com.lastcrusade.soundstream.service.ConnectionService;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.model.FoundGuest;
+import com.thelastcrusade.soundstream.service.ConnectionService;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 
 /**
  * A generic handler for discovering devices.  This handler will accumulate discovered devices and

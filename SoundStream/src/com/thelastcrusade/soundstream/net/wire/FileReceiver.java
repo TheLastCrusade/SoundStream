@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lastcrusade.soundstream.net.wire;
+package com.thelastcrusade.soundstream.net.wire;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,9 +30,9 @@ import java.util.UUID;
 
 import android.util.Log;
 
-import com.lastcrusade.soundstream.net.core.AComplexDataType;
-import com.lastcrusade.soundstream.net.message.IFileMessage;
-import com.lastcrusade.soundstream.util.LogUtil;
+import com.thelastcrusade.soundstream.net.core.AComplexDataType;
+import com.thelastcrusade.soundstream.net.message.IFileMessage;
+import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
  * This class manages receiving files.  It is not a serializable object

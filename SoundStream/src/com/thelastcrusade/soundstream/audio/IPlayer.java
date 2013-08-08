@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.audio;
+package com.thelastcrusade.soundstream.audio;
 
 /**
  * A generic media player interface.  This will be used both to implement the actual media player, and

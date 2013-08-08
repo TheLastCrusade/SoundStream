@@ -17,16 +17,16 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.net.BluetoothNotEnabledException;
-import com.lastcrusade.soundstream.net.BluetoothNotSupportedException;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.net.BluetoothNotEnabledException;
+import com.thelastcrusade.soundstream.net.BluetoothNotSupportedException;
 
 public class BluetoothUtils {
     /* All methods should be static */

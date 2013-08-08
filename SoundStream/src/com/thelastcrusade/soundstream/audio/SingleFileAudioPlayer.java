@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.audio;
+package com.thelastcrusade.soundstream.audio;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,12 +27,12 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.service.MessagingService;
-import com.lastcrusade.soundstream.service.PlaylistService;
-import com.lastcrusade.soundstream.service.ServiceLocator;
-import com.lastcrusade.soundstream.service.ServiceNotBoundException;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.model.PlaylistEntry;
+import com.thelastcrusade.soundstream.service.MessagingService;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.ServiceLocator;
+import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 
 /**
  * A simple audio player that expects an audio file to be located in an
@@ -230,7 +230,7 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
     }
     
     /* (non-Javadoc)
-     * @see com.lastcrusade.soundstream.audio.IDuckable#duck()
+     * @see com.thelastcrusade.soundstream.audio.IDuckable#duck()
      */
     @Override
     public void duck() {
@@ -238,7 +238,7 @@ public class SingleFileAudioPlayer implements IPlayer, IDuckable {
     }
     
     /* (non-Javadoc)
-     * @see com.lastcrusade.soundstream.audio.IDuckable#unduck()
+     * @see com.thelastcrusade.soundstream.audio.IDuckable#unduck()
      */
     @Override
     public void unduck() {

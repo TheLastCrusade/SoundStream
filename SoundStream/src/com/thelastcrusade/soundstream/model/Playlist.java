@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.model;
+package com.thelastcrusade.soundstream.model;
 
 import java.util.ArrayList;
 import java.util.Deque;

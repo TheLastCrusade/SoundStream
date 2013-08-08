@@ -17,18 +17,18 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.util;
+package com.thelastcrusade.soundstream.util;
 
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.CoreActivity;
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.components.AboutFragment;
-import com.lastcrusade.soundstream.components.ConnectFragment;
-import com.lastcrusade.soundstream.components.MusicLibraryFragment;
-import com.lastcrusade.soundstream.components.NetworkFragment;
-import com.lastcrusade.soundstream.components.PlaylistFragment;
+import com.thelastcrusade.soundstream.CoreActivity;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.components.AboutFragment;
+import com.thelastcrusade.soundstream.components.ConnectFragment;
+import com.thelastcrusade.soundstream.components.MusicLibraryFragment;
+import com.thelastcrusade.soundstream.components.NetworkFragment;
+import com.thelastcrusade.soundstream.components.PlaylistFragment;
 
 /**
  * Singleton class to manage transitions of the active content

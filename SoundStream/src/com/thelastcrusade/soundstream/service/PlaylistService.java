@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.service;
+package com.thelastcrusade.soundstream.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,21 +30,21 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.lastcrusade.soundstream.R;
-import com.lastcrusade.soundstream.audio.AudioPlayerWithEvents;
-import com.lastcrusade.soundstream.audio.RemoteAudioPlayer;
-import com.lastcrusade.soundstream.audio.SingleFileAudioPlayer;
-import com.lastcrusade.soundstream.manager.PlaylistDataManager;
-import com.lastcrusade.soundstream.model.Playlist;
-import com.lastcrusade.soundstream.model.PlaylistEntry;
-import com.lastcrusade.soundstream.model.SongMetadata;
-import com.lastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
-import com.lastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
-import com.lastcrusade.soundstream.util.BroadcastRegistrar;
-import com.lastcrusade.soundstream.util.IBroadcastActionHandler;
-import com.lastcrusade.soundstream.util.LocalBroadcastIntent;
-import com.lastcrusade.soundstream.util.SongMetadataUtils;
-import com.lastcrusade.soundstream.util.Toaster;
+import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.audio.AudioPlayerWithEvents;
+import com.thelastcrusade.soundstream.audio.RemoteAudioPlayer;
+import com.thelastcrusade.soundstream.audio.SingleFileAudioPlayer;
+import com.thelastcrusade.soundstream.manager.PlaylistDataManager;
+import com.thelastcrusade.soundstream.model.Playlist;
+import com.thelastcrusade.soundstream.model.PlaylistEntry;
+import com.thelastcrusade.soundstream.model.SongMetadata;
+import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.thelastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
+import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
+import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
+import com.thelastcrusade.soundstream.util.SongMetadataUtils;
+import com.thelastcrusade.soundstream.util.Toaster;
 
 /**
  * This service is responsible for holding the play queue and sending songs to

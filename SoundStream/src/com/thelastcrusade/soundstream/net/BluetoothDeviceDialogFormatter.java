@@ -17,11 +17,11 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net;
 
 import android.bluetooth.BluetoothDevice;
 
-import com.lastcrusade.soundstream.components.IDialogFormatter;
+import com.thelastcrusade.soundstream.components.IDialogFormatter;
 
 /**
  * Formatter for BluetoothDevice objects, to display the device correctly in the dialog
