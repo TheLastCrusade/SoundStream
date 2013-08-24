@@ -66,6 +66,8 @@
     <string name="dialog_disband">Are you sure you want to disband? This will boot any connected users.</string>
 
     <string name="searching">Searching...</string>
+   <string name="join_instructions">Make sure someone in the network has pressed \'Add Members to Network\'</string>
+   <string name="add_instructions">Make sure the person you are trying to add has pressed \'Join\'</string>
     <!-- default values -->
     <string name="default_mac">00:08:67:53:09</string>
     <string name="default_name">Indiana Jones</string>
