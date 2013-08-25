@@ -19,7 +19,7 @@
     along with SoundStream.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lastcrusade.soundstream.test"
+    package="com.thelastcrusade.soundstream.test"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -29,7 +29,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.lastcrusade.soundstream" />
+        android:targetPackage="com.thelastcrusade.soundstream" />
 
     <application
         android:icon="@drawable/ic_launcher"
