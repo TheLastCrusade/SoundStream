@@ -38,6 +38,7 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
 import com.thelastcrusade.soundstream.components.ConnectFragment;
+import com.thelastcrusade.soundstream.components.InstructionsDialog;
 import com.thelastcrusade.soundstream.components.MenuFragment;
 import com.thelastcrusade.soundstream.components.PlaybarFragment;
 import com.thelastcrusade.soundstream.model.SongMetadata;
@@ -129,16 +130,8 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
             
             prefs.edit().putBoolean("firstrun", false).commit();
 
-            new AlertDialog.Builder(this)
-                .setMessage(R.string.welcome)
-                .setPositiveButton("Ok",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,int which) {
-                            //do nothing
-                        }
-                     }).show();
+            new InstructionsDialog(this).show();
         }
-
     }
 
 

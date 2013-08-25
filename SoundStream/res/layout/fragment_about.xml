@@ -26,6 +26,47 @@
 	    android:layout_height="wrap_content"
 	    android:orientation="vertical"
 	    >
+	    <!-- Instructions -->
+	    <RelativeLayout
+	        android:id="@+id/instructions"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="10dp" 
+	        >
+	
+	
+	        <TextView 
+	            android:id="@+id/instructions_label"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/instructions_label"
+	            android:textSize="18sp"
+	            
+	            />
+	        
+	        <View
+	            android:id="@+id/instructions_line"
+	            android:layout_width="fill_parent"
+	            android:layout_height="2dp"
+	            android:layout_marginTop="3dp"
+	            android:layout_marginBottom="10dp"
+	            android:layout_below="@id/instructions_label"
+	            android:background="@color/accent_blue" 
+	            />
+	
+	        <TextView 
+	            android:id="@+id/instructions_text"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_below="@id/instructions_line"
+	            android:layout_marginLeft="10dp"
+	            android:textSize="16sp"
+	            android:textColor="@color/link_blue"
+	            android:text="@string/instructions"
+	            />
+	        
+	    </RelativeLayout>
+	
 	
 	    <!-- Meet the Crusaders -->
 	    <RelativeLayout
