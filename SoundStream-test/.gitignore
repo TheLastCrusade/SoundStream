@@ -26,3 +26,6 @@ local.properties
 
 # Test Output
 spoon-output/
+
+# Libraries
+libs/

@@ -1,2 +1,5 @@
 # Ignore file used to sign apk's
 grail-diary/*
+
+# Ignore third party libraries added as well
+third_party/
