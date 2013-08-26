@@ -267,6 +267,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                 @Override
                 public void onClick(View v) {
                     SongMetadata meta = getItem((Integer) v.getTag());
+                    Log.d(TAG, "Adding " + meta + " to playlist");
                     getPlaylistService().addSong(meta);
                     
                     //change the color of the view for a small period of time to indicate that the add 

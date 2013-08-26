@@ -24,7 +24,10 @@
     <string name="app_name">Sound Stream</string>
     <string name="app_name_no_spaces">SoundStream</string>
     
-    <string name="enable_bluetooth">Enabling Bluetooth&#x2026;</string>
+    <string name="enable">Enable</string>
+    <string name="enable_bluetooth">Enable Bluetooth&#x2026;</string>
+    <string name="ask_enable_bluetooth">SoundStream needs to enable Bluetooth to continue.  Press Enable to enable Bluetooth.</string>
+    <string name="enabling_bluetooth">Enabling Bluetooth&#x2026;</string>
     <string name="finding_new_guests">Finding new guests&#x2026;</string>
     <string name="found_guests">Found guests</string>
     <string name="select_guests">Select guests&#x2026;</string>
