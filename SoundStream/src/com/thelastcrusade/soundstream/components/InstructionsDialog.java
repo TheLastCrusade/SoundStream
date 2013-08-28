@@ -32,24 +32,26 @@ public class InstructionsDialog {
     private Activity activity;
     private static final int[] MESSAGEIDS = {R.string.welcome, R.string.welcome_connection, 
             R.string.welcome_music, R.string.welcome_network };
+    private static final int WELCOME_INDEX = 0;
     
     public InstructionsDialog(Activity activity){
         this.activity = activity;
     }
     public void show(){
-        showInstructions(0);
+        showInstructions(WELCOME_INDEX);
     }
     
     private void showInstructions(final int messageIndex){
         String positiveString = messageIndex < MESSAGEIDS.length-1?  "Next" : "Done";
-        String negativeString = messageIndex > 0 ?  "Back" : "Skip";
+        String negativeString = messageIndex > WELCOME_INDEX ?  "Back" : "Skip";
         
         new AlertDialog.Builder(activity)
             .setMessage(MESSAGEIDS[messageIndex])
             .setPositiveButton(positiveString,
             new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog,int which) {
-                    if(messageIndex < MESSAGEIDS.length-1){
+                    //as long as we haven't hit the last message, we should move to the next one
+                    if(messageIndex < MESSAGEIDS.length-1){ 
                         showInstructions(messageIndex+1);    
                     }
                 }
@@ -58,7 +60,7 @@ public class InstructionsDialog {
             
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(messageIndex > 0 ){
+                if(messageIndex > WELCOME_INDEX ){
                     showInstructions(messageIndex-1);    
                 }  
             }
