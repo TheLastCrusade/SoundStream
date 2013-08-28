@@ -19,6 +19,10 @@
 
 package com.thelastcrusade.soundstream;
 
+import org.acra.ACRA;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
+
 import android.app.Application;
 import android.util.Log;
 
@@ -30,6 +34,20 @@ import com.thelastcrusade.soundstream.service.ServiceLocator;
 import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
 import com.thelastcrusade.soundstream.service.UserListService;
 
+@ReportsCrashes(
+        formKey = "",
+        formUri = "https://thelastcrusade.cloudant.com/acra-soundstream/_design/acra-storage/_update/report",
+        reportType = org.acra.sender.HttpSender.Type.JSON,
+        httpMethod = org.acra.sender.HttpSender.Method.PUT,
+        formUriBasicAuthLogin="fustraboolstaccoquieston",
+        formUriBasicAuthPassword="4cei1qacQakOPHEWeQbiOqaF",
+        // Your usual ACRA configuration
+        mode = ReportingInteractionMode.DIALOG,
+        resDialogText = R.string.crash_dialog_text,
+        resDialogTitle = R.string.crash_dialog_title,
+        resDialogCommentPrompt = R.string.crash_dialog_comment_prompt,
+        resDialogOkToast = R.string.crash_dialog_ok_toast
+        )
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getSimpleName();
     
@@ -46,7 +64,7 @@ public class CustomApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        
+        ACRA.init(this);        
         createServiceLocators();
     }
     
