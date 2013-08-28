@@ -81,6 +81,8 @@ public class WithBluetoothEnabled {
                             }
                         }
                     })
+                    //NOTE: even though this is a NO OP, it is required to show a cancel button
+                    // (as seen on a Nexus 4 running Jelly Bean)
                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 
                         @Override
