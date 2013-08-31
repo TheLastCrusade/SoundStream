@@ -19,6 +19,9 @@
 
 package com.thelastcrusade.soundstream.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,16 +32,38 @@ public class Toaster {
     private static int duration = Toast.LENGTH_SHORT;
     private static int methodDepth = 3;
 
-    public static void iToast(Context context, String s) {
-        Log.i(Thread.currentThread().getStackTrace()[methodDepth].toString(), s);
-        toastWorker(context, s);
+    //LENGTH_SHORT can be any length so this is our best guess at the
+    // maximum time we want to go before adding a new toast
+    private static final int CHECK_DELTA = 2000; //Magic number
+    private static final Map<Object, Long> lastShown = new HashMap<Object, Long>();
+
+    private static boolean isRecent(Object obj) {
+        Long last = lastShown.get(obj);
+        if (last == null) {
+            return false;
+        }
+        long now = System.currentTimeMillis();
+        if (last + CHECK_DELTA < now) {
+            return false;
+        }
+        return true;
     }
 
-    private static void toastWorker(Context context, String s) {
+    public static synchronized void toastWorker(Context context, String s) {
+        if (isRecent(s)) {
+            return;
+        }
+        lastShown.clear(); // Keep our map from growing in size
+        lastShown.put(s, System.currentTimeMillis());
         Context ac = context.getApplicationContext();
         Toast toast = Toast.makeText(ac, s, duration);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    public static void iToast(Context context, String s) {
+        Log.i(Thread.currentThread().getStackTrace()[methodDepth].toString(), s);
+        toastWorker(context, s);
     }
 
     public static void iToast(Context context, int resId) {
