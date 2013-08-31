@@ -19,7 +19,13 @@
 
 package com.thelastcrusade.soundstream;
 
+import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
+
 import android.app.Application;
+import android.content.res.AssetManager;
 import android.util.Log;
 
 import com.thelastcrusade.soundstream.service.ConnectionService;
@@ -29,9 +35,24 @@ import com.thelastcrusade.soundstream.service.PlaylistService;
 import com.thelastcrusade.soundstream.service.ServiceLocator;
 import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
 import com.thelastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.util.SoundStreamPrefs;
 
+@ReportsCrashes(
+        formKey = "",
+        formUri = "https://thelastcrusade.cloudant.com/acra-soundstream/_design/acra-storage/_update/report",
+        reportType = org.acra.sender.HttpSender.Type.JSON,
+        httpMethod = org.acra.sender.HttpSender.Method.PUT,
+        // Your usual ACRA configuration
+        mode = ReportingInteractionMode.DIALOG,
+        resDialogText = R.string.crash_dialog_text,
+        resDialogTitle = R.string.crash_dialog_title,
+        resDialogCommentPrompt = R.string.crash_dialog_comment_prompt,
+        resDialogOkToast = R.string.crash_dialog_ok_toast
+        )
 public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getSimpleName();
+    
+    private static AssetManager assetManager;
     
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
     private ServiceLocator<MessagingService>    messagingServiceLocator;
@@ -46,8 +67,18 @@ public class CustomApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        
+        assetManager = getResources().getAssets();
+        ACRAConfig();
         createServiceLocators();
+    }
+    
+    private void ACRAConfig(){
+        ACRAConfiguration conf = ACRA.getNewDefaultConfig(this);
+        conf.setFormUriBasicAuthLogin(SoundStreamPrefs.getAcraUsername());
+        conf.setFormUriBasicAuthPassword(SoundStreamPrefs.getAcraPassword());
+        ACRA.setConfig(conf);
+
+        ACRA.init(this);
     }
     
     @Override
@@ -83,5 +114,9 @@ public class CustomApp extends Application {
             Log.wtf(TAG, e);
         }
         return playlistService;
+    }
+    
+    public static AssetManager getAssetManager(){
+        return assetManager;
     }
 }
