@@ -96,4 +96,10 @@
 	<string name="welcome_network">To view information about the network, go the the Network page.\n\n From there you can add members to the network, disconnect, or switch networks. </string>
 	<string name="instructions_label">Instructions</string>
 	<string name="instructions">View the startup instructions again</string>
+
+	<!-- Crash reporting -->
+	<string name="crash_dialog_title">That\'s not right…</string>
+	<string name="crash_dialog_text">You seem to have hit a snag with SoundStream.  Is it cool if we take some error data to help fix it?</string>
+	<string name="crash_dialog_comment_prompt">Want to fill us in on what happened? (Optional)</string>
+	<string name="crash_dialog_ok_toast">We appreciate it!</string>
 </resources>

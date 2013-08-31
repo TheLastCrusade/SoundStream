@@ -66,6 +66,11 @@ Because we use new Android Gesture Detection, we need to have the most recent ve
 1. Download the [Analytics SDK](https://developers.google.com/analytics/devguides/collection/android/resources)
 2. Unzip and copy libGoogleAnalyticsV2.jar into libs folder
 
+##ACRA (for crash reporting)
+
+1. Download the [Acra Library](https://oss.sonatype.org/content/groups/public/ch/acra/acra/4.5.0/)
+2. Unzip and copy the jar from the acra build folder into the project libs folder
+
 ##Testing Libraries
 
 ###Robotium
