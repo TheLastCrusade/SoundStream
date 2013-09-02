@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -50,9 +49,9 @@ import com.thelastcrusade.soundstream.net.message.FoundGuestsMessage;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.thelastcrusade.soundstream.util.BluetoothUtils;
-import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.thelastcrusade.soundstream.util.Toaster;
 
 public class ConnectionService extends Service {
@@ -118,17 +117,8 @@ public class ConnectionService extends Service {
         super.onCreate();
         
         this.adapter = BluetoothAdapter.getDefaultAdapter();
-        try {
-            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
-        } catch (BluetoothNotEnabledException e) {
-            Toaster.iToast(this, R.string.enable_bt_fail);
-            e.printStackTrace();
-            return;
-        } catch (BluetoothNotSupportedException e) {
-            Toaster.eToast(this, R.string.no_bt_support);
-            e.printStackTrace();
-        }
-        
+        Log.d(TAG, "MAC Address: " + this.adapter.getAddress());
+
         registerReceivers();
         
         this.bluetoothDiscoveryHandler = new BluetoothDiscoveryHandler(this, adapter);
@@ -247,13 +237,25 @@ public class ConnectionService extends Service {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
-                    bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                    //if this has already been called, don't call it again (see below
+                    // ...this is to handle any weird race conditions)
+                    if (!bluetoothDiscoveryHandler.isDiscoveryStarted()) {
+                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                    }
                 }
             })
            .addGlobalAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED, new IBroadcastActionHandler() {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    //NOTE: if we start discovery immediately after enabling bluetooth,
+                    // we MAY not get the ACTION_DISCOVERY_STARTED intent...in that case,
+                    // "fake it" by calling onDiscoveryStarted, so that our internal
+                    // member variables are set up.  this will only happen if no guests
+                    // are found, but we want to be internally consistent.
+                    if (!bluetoothDiscoveryHandler.isDiscoveryStarted()) {
+                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                    }
                     bluetoothDiscoveryHandler.onDiscoveryFinished();
                 }
             })
@@ -261,6 +263,13 @@ public class ConnectionService extends Service {
 
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
+                    //NOTE: if we start discovery immediately after enabling bluetooth,
+                    // we MAY not get the ACTION_DISCOVERY_STARTED intent...in that case,
+                    // "fake it" by calling onDiscoveryStarted, so that our internal
+                    // member variables are set up to record a found guest
+                    if (!bluetoothDiscoveryHandler.isDiscoveryStarted()) {
+                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                    }
                     bluetoothDiscoveryHandler.onDiscoveryFound(
                             (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
                 }
@@ -358,6 +367,19 @@ public class ConnectionService extends Service {
 
     public void findNewGuests() {
         Log.w(TAG, "Starting Discovery");
+        //check and enable bluetooth if needed
+        try {
+            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
+        } catch (BluetoothNotEnabledException e) {
+            Toaster.iToast(this, R.string.enable_bt_fail);
+            e.printStackTrace();
+            return;
+        } catch (BluetoothNotSupportedException e) {
+            Toaster.eToast(this, R.string.no_bt_support);
+            e.printStackTrace();
+            return;
+        }
+        
         if (isHostConnected()) {
             //NOTE: this does not originate at the messaging service...consumer code doesn't need to worry about
             // how new guests are found, and this is a mechanism that applies directly to how connection
@@ -539,5 +561,32 @@ public class ConnectionService extends Service {
 
         //announce that we're connected
         new LocalBroadcastIntent(ACTION_HOST_CONNECTED).send(this);
+    }
+
+    /**
+     * @return
+     */
+    public boolean isNetworkEnabled() {
+        return adapter.isEnabled();
+    }
+
+    /**
+     * @return
+     */
+    public boolean enableNetwork() {
+        boolean bluetoothEnabled = false;
+        try {
+            BluetoothUtils.checkAndEnableBluetooth(this, adapter);
+            bluetoothEnabled = true;
+        } catch (BluetoothNotEnabledException e) {
+            Toaster.iToast(this.getBaseContext(),
+                    R.string.enable_bt_fail);
+            e.printStackTrace();
+        } catch (BluetoothNotSupportedException e) {
+            Toaster.eToast(this.getBaseContext(),
+                    R.string.no_bt_support);
+            e.printStackTrace();
+        }
+        return bluetoothEnabled;
     }
 }

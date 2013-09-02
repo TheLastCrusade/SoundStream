@@ -41,11 +41,10 @@ public class BluetoothUtils {
     /* The maximum number of seconds to put the device in discoverable mode */
     private static final int DISCOVERABLE_SECONDS = 30;
 
-
     public static void checkAndEnableBluetooth(Context context, BluetoothAdapter adapter) throws BluetoothNotEnabledException, BluetoothNotSupportedException {
         if (adapter != null) {
             if (!adapter.isEnabled()) {
-                Toaster.iToast(context, R.string.enable_bluetooth);
+                Toaster.iToast(context, R.string.enabling_bluetooth);
                 //start the adapter
                 boolean enableStarted = adapter.enable();
                 boolean enabled = false;

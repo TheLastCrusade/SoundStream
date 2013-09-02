@@ -116,7 +116,13 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
 
             @Override
             public void onClick(View v) {
-                getConnectionService().broadcastSelfAsGuest(getActivity());
+                new WithBluetoothEnabled(getActivity(), getConnectionService()).run(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        getConnectionService().broadcastSelfAsGuest(getActivity());
+                    }
+                });
             }
         });
         joinView.setContentDescription(ContentDescriptionUtils.CONNECT);
