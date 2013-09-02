@@ -19,7 +19,11 @@
 
 package com.thelastcrusade.soundstream.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -29,16 +33,55 @@ public class Toaster {
     private static int duration = Toast.LENGTH_SHORT;
     private static int methodDepth = 3;
 
-    public static void iToast(Context context, String s) {
-        Log.i(Thread.currentThread().getStackTrace()[methodDepth].toString(), s);
-        toastWorker(context, s);
+    //LENGTH_SHORT can be any length so this is our best guess at the
+    // maximum time we want to go before adding a new toast
+    private static final int CHECK_DELTA = 2000; //Magic number
+    private static final Map<Object, Long> lastShown = new HashMap<Object, Long>();
+
+    private static boolean isShown(Object obj) {
+        Long last = lastShown.get(obj);
+        if (last == null) {
+            return false;
+        }
+        return true;
     }
 
-    private static void toastWorker(Context context, String s) {
+    public static synchronized void toastWorker(Context context, final String s) {
+        if (isShown(s)) {
+            return;
+        }
+        lastShown.put(s, System.currentTimeMillis());
         Context ac = context.getApplicationContext();
+        //this enables us to send more toasts, in some time
+        setResetEvent(ac, s);
+        
+        //toast the toast!
         Toast toast = Toast.makeText(ac, s, duration);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    /**
+     * Post an event to the main loop to remove s from the map, allowing more
+     * toasts of that type to come through.
+     * 
+     * @param context
+     * @param s
+     */
+    private static void setResetEvent(Context context, final String s) {
+        Handler handler = new Handler(context.getMainLooper());
+        handler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                lastShown.remove(s);
+            }
+        }, CHECK_DELTA);
+    }
+
+    public static void iToast(Context context, String s) {
+        Log.i(Thread.currentThread().getStackTrace()[methodDepth].toString(), s);
+        toastWorker(context, s);
     }
 
     public static void iToast(Context context, int resId) {

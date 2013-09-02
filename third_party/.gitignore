@@ -2,4 +2,5 @@
 ABSLibrary/
 AndroidViewClient/
 SlidingMenuLibrary/
-newrelic-android-*/*
+*.jar
+
