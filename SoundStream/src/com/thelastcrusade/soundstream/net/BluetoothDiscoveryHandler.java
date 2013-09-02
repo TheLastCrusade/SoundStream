@@ -20,14 +20,12 @@
 package com.thelastcrusade.soundstream.net;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.util.Log;
 
-import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.model.FoundGuest;
 import com.thelastcrusade.soundstream.service.ConnectionService;
 import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
@@ -50,9 +48,18 @@ public class BluetoothDiscoveryHandler {
 
     private boolean remoteInitiated;
 
+    private boolean discoveryStarted;
+
     public BluetoothDiscoveryHandler(Context context, BluetoothAdapter adapter) {
         this.context = context;
         this.adapter = adapter;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isDiscoveryStarted() {
+        return this.discoveryStarted;
     }
 
     /**
@@ -61,6 +68,7 @@ public class BluetoothDiscoveryHandler {
      */
     public void onDiscoveryStarted(boolean remoteInitiated) {
         Log.w(TAG, "Discovery started");
+        this.discoveryStarted = true;
         this.remoteInitiated = remoteInitiated;
         this.discoveredGuests = new ArrayList<FoundGuest>();
     }
@@ -78,6 +86,10 @@ public class BluetoothDiscoveryHandler {
         new LocalBroadcastIntent(action)
             .putParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS, this.discoveredGuests)
             .send(this.context);
+        
+        //reinit the handler, for the next time
+        this.discoveredGuests = new ArrayList<FoundGuest>();
+        this.discoveryStarted = false;
     }
 
     /**

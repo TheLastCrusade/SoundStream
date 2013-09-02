@@ -25,10 +25,12 @@ import java.util.List;
 import java.util.Set;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -123,29 +125,22 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             public void onClick(View v) {
                 BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
                 if (adapter != null) {
-                    boolean bluetoothEnabled = false;
-                    try {
-                        BluetoothUtils.checkAndEnableBluetooth(getActivity(), adapter);
-                        bluetoothEnabled = true;
-                    } catch (BluetoothNotEnabledException e){
-                        Toaster.iToast(getActivity().getBaseContext(), R.string.enable_bt_fail);
-                        e.printStackTrace();
-                    } catch (BluetoothNotSupportedException e) {
-                        Toaster.eToast(getActivity().getBaseContext(), R.string.no_bt_support);
-                        e.printStackTrace();
-                    }
-                    if (bluetoothEnabled) {
-                        addMembersButton.setEnabled(false);
+                    new WithBluetoothEnabled(getActivity(), getConnectionService()).run(new Runnable() {
 
-                        //TODO: add a better indicator while discovering
-                        //...seconds until discovery is finished, number of clients found, etc
-                        addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
-                        addMembersButton.findViewById(R.id.image_background)
-                            .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+                        @Override
+                        public void run() {
+                            addMembersButton.setEnabled(false);
 
-                        getConnectionService().findNewGuests();
-                        tracker.trackAddMembersEvent();
-                    }
+                            //TODO: add a better indicator while discovering
+                            //...seconds until discovery is finished, number of clients found, etc
+                            addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
+                            addMembersButton.findViewById(R.id.image_background)
+                                .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+
+                            getConnectionService().findNewGuests();
+                            tracker.trackAddMembersEvent();
+                        }
+                    });
                 } else {
                     Toaster.iToast(getActivity(), R.string.no_bt_support);
                 }
@@ -165,7 +160,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
             @Override
             public void onClick(View v) {
-                getConnectionService().broadcastSelfAsGuest(getActivity());
+                new WithBluetoothEnabled(getActivity(), getConnectionService()).run(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        getConnectionService().broadcastSelfAsGuest(getActivity());
+                    }
+                });
             }
         });
         return v;
