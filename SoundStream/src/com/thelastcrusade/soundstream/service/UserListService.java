@@ -28,9 +28,9 @@ import android.util.Log;
 import com.thelastcrusade.soundstream.model.User;
 import com.thelastcrusade.soundstream.model.UserList;
 import com.thelastcrusade.soundstream.util.BluetoothUtils;
-import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 
 public class UserListService extends Service {
     private static final String TAG = UserListService.class.getSimpleName();
@@ -89,6 +89,15 @@ public class UserListService extends Service {
                 String macAddress  = intent.getStringExtra(ConnectionService.EXTRA_GUEST_ADDRESS);
                 curUserList.addUser(bluetoothID, macAddress);
                 notifyUserListUpdate();
+            }
+        })
+        .addLocalAction(ConnectionService.ACTION_ADAPTER_ENABLED, new IBroadcastActionHandler() {
+
+            @Override
+            public void onReceiveAction(Context context, Intent intent) {
+                myName = intent.getStringExtra(ConnectionService.EXTRA_MY_NAME);
+                myMac  = intent.getStringExtra(ConnectionService.EXTRA_MY_ADDRESS);
+                clearExternalUsers(); //clear the list and reload "self"
             }
         })
         .addLocalAction(ConnectionService.ACTION_GUEST_DISCONNECTED, new IBroadcastActionHandler() {

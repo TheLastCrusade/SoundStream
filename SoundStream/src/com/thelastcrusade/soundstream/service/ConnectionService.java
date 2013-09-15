@@ -88,6 +88,10 @@ public class ConnectionService extends Service {
     public static final String ACTION_HOST_CONNECTED       = ConnectionService.class.getName() + ".action.HostConnected";
     public static final String ACTION_HOST_DISCONNECTED    = ConnectionService.class.getName() + ".action.HostDisconnected";
 
+    public static final String ACTION_ADAPTER_ENABLED      = ConnectionService.class.getName() + ".action.AdapterEnabled";
+    public static final String EXTRA_MY_NAME               = ConnectionService.class.getName() + ".extra.MyName";
+    public static final String EXTRA_MY_ADDRESS            = ConnectionService.class.getName() + ".extra.MyAddress";
+
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -117,7 +121,7 @@ public class ConnectionService extends Service {
         super.onCreate();
         
         this.adapter = BluetoothAdapter.getDefaultAdapter();
-        Log.d(TAG, "MAC Address: " + this.adapter.getAddress());
+        Log.d(TAG, "MAC Address: " + BluetoothUtils.getLocalBluetoothMAC());
 
         registerReceivers();
         
@@ -577,6 +581,14 @@ public class ConnectionService extends Service {
         boolean bluetoothEnabled = false;
         try {
             BluetoothUtils.checkAndEnableBluetooth(this, adapter);
+            //broadcast that the adapter has been enabled.  this may be watched
+            // by the user list or other components that expect a bluetooth
+            // mac address in order to make sure the held address is correct
+            new LocalBroadcastIntent(ConnectionService.ACTION_ADAPTER_ENABLED)
+                .putExtra(EXTRA_MY_ADDRESS, BluetoothUtils.getLocalBluetoothMAC())
+                .putExtra(EXTRA_MY_NAME,    BluetoothUtils.getLocalBluetoothName())
+                .send(this);
+
             bluetoothEnabled = true;
         } catch (BluetoothNotEnabledException e) {
             Toaster.iToast(this.getBaseContext(),
