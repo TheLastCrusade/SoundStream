@@ -95,7 +95,8 @@ public class BluetoothUtils {
         if(mBluetoothAdapter!=null) {
             name = mBluetoothAdapter.getName();
             if(name == null){
-                name = mBluetoothAdapter.getAddress();
+                Log.wtf(TAG, "Name is null...using MAC address");
+                name = getLocalBluetoothMAC();
             }
         }
         else{
