@@ -151,7 +151,7 @@
 
                     <ImageView
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="68dp"
                         android:padding="10dp"
                         android:src="@drawable/disconnect" />
 
@@ -176,7 +176,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/gray" >
-
+                    
                 <LinearLayout
                     android:id="@id/image_background"
                     android:layout_width="match_parent"
@@ -185,43 +185,49 @@
                     android:background="@color/white"
                     android:orientation="vertical" >
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:padding="10dp"
-                        android:src="@drawable/soundstream_launcher" />
-
-                    <RelativeLayout
-                        android:id="@id/searching"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:alpha=".95"
-                        android:background="@color/searching_gray"
-                        android:padding="10dp"
-                        android:visibility="invisible" >
-
-                        <RelativeLayout
-                            android:id="@id/searching_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true" >
-
-                            <ProgressBar
-                                android:id="@id/progress"
-                                style="@style/Widget.Sherlock.Light.ProgressBar"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_toRightOf="@id/progress"
-                                android:paddingLeft="5dp"
-                                android:text="@string/searching"
-                                android:textSize="18sp" />
-                        </RelativeLayout>
+					<RelativeLayout
+	                    android:layout_width="match_parent"
+	                    android:layout_height="match_parent" >
+                        
+	                    <ImageView
+	                        android:layout_width="match_parent"
+	                        android:layout_height="68dp"
+	                        android:padding="10dp"
+	                        android:src="@drawable/soundstream_launcher" />
+	
+	                    <RelativeLayout
+	                        android:id="@id/searching"
+	                        android:layout_width="wrap_content"
+	                        android:layout_height="wrap_content"
+	                        android:layout_centerInParent="true"
+	                        android:alpha=".95"
+	                        android:background="@color/searching_gray"
+	                        android:padding="10dp"
+	                        android:visibility="invisible" >
+	
+	                        <RelativeLayout
+	                            android:id="@id/searching_text"
+	                            android:layout_width="wrap_content"
+	                            android:layout_height="wrap_content"
+	                            android:layout_centerHorizontal="true"
+	                            >
+	
+	                            <ProgressBar
+	                                android:id="@id/progress"
+	                                style="@style/Widget.Sherlock.Light.ProgressBar"
+	                                android:layout_width="wrap_content"
+	                                android:layout_height="wrap_content" />
+	
+	                            <TextView
+	                                android:layout_width="wrap_content"
+	                                android:layout_height="wrap_content"
+	                                android:layout_centerVertical="true"
+	                                android:layout_toRightOf="@id/progress"
+	                                android:paddingLeft="5dp"
+	                                android:text="@string/searching"
+	                                android:textSize="14sp" />
+	                        </RelativeLayout>
+	                    </RelativeLayout>
                     </RelativeLayout>
 
                     <!-- Text at the bottom of image -->

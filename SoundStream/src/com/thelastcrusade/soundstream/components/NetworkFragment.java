@@ -162,9 +162,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     @Override
                     public void run() {
                         getConnectionService().broadcastSelfAsGuest(getActivity());
-                        
-                        setButtonToSearchingState(joinDifferentNetworkButton);
-                        isSearchingJoinDifferent = true;
                     }
                 });
             }
@@ -329,6 +326,35 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     cleanUpAfterDisconnect();
                 }
             })
+            .addGlobalAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    int mode = intent.getIntExtra(
+                            BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
+                    
+                    if(joinDifferentNetworkButton != null){
+                        switch(mode){
+                        case BluetoothAdapter.SCAN_MODE_NONE:
+                            setButtonToDefaultState(joinDifferentNetworkButton);
+                            isSearchingJoinDifferent = false;
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                            setButtonToDefaultState(joinDifferentNetworkButton);
+                            isSearchingJoinDifferent = false;
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                            setButtonToSearchingState(joinDifferentNetworkButton);
+                            isSearchingJoinDifferent = true;
+                            break;
+                        default:
+                            Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                            break;
+                        }
+                    }
+                    
+                }
+            })
             .register(this.getActivity());
     }
 
@@ -395,6 +421,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         button.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
         button.findViewById(R.id.image_background)
             .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
+        
     }
     
     private void setButtonToSearchingState(LinearLayout button){
@@ -417,9 +444,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         //first thing...reenable the add members button
         setButtonToDefaultState(addMembersButton);
         isSearchingAdd = false;
-        
-        setButtonToDefaultState(joinDifferentNetworkButton);
-        isSearchingJoinDifferent = false;
         
         //locally initiated device discovery...pop up a dialog for the user
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
