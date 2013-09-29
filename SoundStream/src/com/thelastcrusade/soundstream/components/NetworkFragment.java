@@ -76,12 +76,14 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private BroadcastRegistrar broadcastRegistrar;
     private UserListAdapter userAdapter;
-    private LinearLayout addMembersButton, userView, disconnectDisband;
+    private LinearLayout addMembersButton, userView, disconnectDisband, joinDifferentNetworkButton;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
 
     private TrackerAPI tracker;
+    
+    private boolean isSearchingAdd, isSearchingJoinDifferent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         View v = inflater.inflate(R.layout.fragment_network, container,false);
         
         this.addMembersButton = (LinearLayout)v.findViewById(R.id.add_members);
+
         this.addMembersButton.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -129,14 +132,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
                         @Override
                         public void run() {
-                            addMembersButton.setEnabled(false);
-
-                            //TODO: add a better indicator while discovering
-                            //...seconds until discovery is finished, number of clients found, etc
-                            addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
-                            addMembersButton.findViewById(R.id.image_background)
-                                .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
-
+                            setButtonToSearchingState(addMembersButton);
+                            isSearchingAdd = true;
+                            
                             getConnectionService().findNewGuests();
                             tracker.trackAddMembersEvent();
                         }
@@ -155,9 +153,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         //TODO react to changing state
         setDisconnectDisbandBtn();
         
-        LinearLayout joinDifferentNetwork = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
-        joinDifferentNetwork.setOnClickListener(new OnClickListener() {
-
+        this.joinDifferentNetworkButton = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
+        joinDifferentNetworkButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new WithBluetoothEnabled(getActivity(), getConnectionService()).run(new Runnable() {
@@ -165,10 +162,24 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     @Override
                     public void run() {
                         getConnectionService().broadcastSelfAsGuest(getActivity());
+                        
+                        setButtonToSearchingState(joinDifferentNetworkButton);
+                        isSearchingJoinDifferent = true;
                     }
                 });
             }
         });
+        
+        if(savedInstanceState != null){
+            isSearchingAdd = savedInstanceState.getBoolean("isSearchingAdd");
+            isSearchingJoinDifferent = savedInstanceState.getBoolean("isSearchingJoinDifferent");
+            
+            if(isSearchingAdd)
+                setButtonToSearchingState(addMembersButton);
+            
+            if(isSearchingJoinDifferent)
+                setButtonToSearchingState(joinDifferentNetworkButton);
+        }
         return v;
     }
 
@@ -249,6 +260,17 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
             updateUserView();
         }
         getActivity().setTitle(getTitle());
+    }
+    
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isSearchingAdd", isSearchingAdd);
+        outState.putBoolean("isSearchingJoinDifferent", isSearchingJoinDifferent);
     }
     
     @Override
@@ -367,6 +389,23 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         getConnectionService().disconnectAllGuests();
         cleanUpAfterDisconnect();
     }
+    
+    private void setButtonToDefaultState(LinearLayout button){
+        button.setEnabled(true);
+        button.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
+        button.findViewById(R.id.image_background)
+            .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
+    }
+    
+    private void setButtonToSearchingState(LinearLayout button){
+        button.setEnabled(false);
+
+        //TODO: add a better indicator while discovering
+        //...seconds until discovery is finished, number of clients found, etc
+        button.findViewById(R.id.searching).setVisibility(View.VISIBLE);
+        button.findViewById(R.id.image_background)
+            .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+    }
 
     /**
      * Called to handle a find finished method.  This may be to pop up a dialog
@@ -376,10 +415,12 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
      */
     private void onFindFinished(Intent intent) {
         //first thing...reenable the add members button
-        addMembersButton.setEnabled(true);
-        addMembersButton.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
-        addMembersButton.findViewById(R.id.image_background)
-            .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
+        setButtonToDefaultState(addMembersButton);
+        isSearchingAdd = false;
+        
+        setButtonToDefaultState(joinDifferentNetworkButton);
+        isSearchingJoinDifferent = false;
+        
         //locally initiated device discovery...pop up a dialog for the user
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
         
