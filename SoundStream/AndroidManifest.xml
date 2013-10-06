@@ -43,7 +43,7 @@
         android:excludeFromRecents="true"
         android:finishOnTaskLaunch="true" />
         
-        <activity android:name=".SearchActivity">            
+        <activity android:name=".SearchActivity" android:theme="@style/Theme.Sherlock.Light" android:noHistory="true">            
             <intent-filter>                
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

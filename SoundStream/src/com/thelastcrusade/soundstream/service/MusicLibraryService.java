@@ -192,10 +192,36 @@ public class MusicLibraryService extends Service {
     /** Methods for clients */
 
     public List<SongMetadata> getLibrary() {
+        return getLibrary(null);
+    }
+    
+    public List<SongMetadata> getLibrary(String query) {     
+        ArrayList<SongMetadata> filtered = new ArrayList<SongMetadata>();
+        
         synchronized(metadataMutex) {
-            //unmodifiable copy, for safety
-            return Collections.unmodifiableList(new ArrayList<SongMetadata>(metadataList));
+            if (query == null) {
+                //unmodifiable copy, for safety
+                filtered = new ArrayList<SongMetadata>(metadataList);
+            } else {
+                for(SongMetadata data : metadataList) {
+                    if(songMatchesQuery(query, data)) {
+                        filtered.add(data);
+                    } 
+                }                    
+            }
+            return Collections.unmodifiableList(filtered);
         }
+    }
+
+    /**
+     * @param query
+     * @param data
+     * @return
+     */
+    private boolean songMatchesQuery(String query, SongMetadata data) {
+        return data.getTitle().toLowerCase().contains(query.toLowerCase())
+           || data.getAlbum().toLowerCase().contains(query.toLowerCase())
+           || data.getArtist().toLowerCase().contains(query.toLowerCase());
     }
 
     public List<SongMetadata> getMyLibrary() {

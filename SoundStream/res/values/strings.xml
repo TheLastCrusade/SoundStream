@@ -103,7 +103,7 @@
 	<string name="instructions">View the startup instructions again</string>
 	
 	<!-- search things -->
-	<string name="search_hint">Search SoundStream for music</string>
+	<string name="search_hint">Search Music</string>
 
 	<!-- Crash reporting -->
 	<string name="crash_dialog_title">That\'s not right…</string>

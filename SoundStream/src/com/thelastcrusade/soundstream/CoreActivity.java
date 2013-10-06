@@ -177,23 +177,30 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
-        MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.search_menu, menu);
+        getSupportMenuInflater().inflate(R.menu.search_menu, menu);
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) searchItem.getActionView();
-//
+        
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchActivity.class)));
-        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        searchView.setIconifiedByDefault(true);
+        
+        if (isConnectActive()) {
+            searchItem.setVisible(false);
+        }
 
         return true;
     }
     
+    private boolean isConnectActive(){
+        return getSupportFragmentManager().findFragmentByTag(Transitions.CURRENT_CONTENT) instanceof ConnectFragment;
+    }
+    
     public boolean onOptionsItemSelected(MenuItem item) {
         // home references the app icon
-        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(Transitions.currentContent);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(Transitions.CURRENT_CONTENT);
         if (item.getItemId() == android.R.id.home && !(currentFragment instanceof ConnectFragment)) {
             toggle(); // toggles the state of the sliding menu
             

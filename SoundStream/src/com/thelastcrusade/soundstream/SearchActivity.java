@@ -18,10 +18,17 @@
  */
 package com.thelastcrusade.soundstream;
 
-import com.thelastcrusade.soundstream.util.Toaster;
-
-import android.app.ListActivity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+import com.thelastcrusade.soundstream.components.MusicLibraryFragment;
 import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -29,23 +36,55 @@ import android.os.Bundle;
  * @author reid
  *
  */
-public class SearchActivity extends ListActivity {
+public class SearchActivity extends SherlockFragmentActivity {
+    
+    private static final String TAG = SearchActivity.class.getSimpleName();
+    public static final String QUERY_KEY = "query_key";
+    private String query;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list);
-
+        setContentView(R.layout.content_frame);
+        
+        ActionBar bar = getSupportActionBar();
+        bar.show();
+                
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-          String query = intent.getStringExtra(SearchManager.QUERY);
-          doMySearch(query);
+          query = intent.getStringExtra(SearchManager.QUERY);
+        }
+        
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+            .add(R.id.content, getMusicLibraryFragment(query)).commit();
         }
     }
     
-    private void doMySearch(String query) {
-        Toaster.iToast(this, query);
-    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the options menu from XML
+        getSupportMenuInflater().inflate(R.menu.search_menu, menu);
 
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
+
+        return true;
+    }
+    
+    private MusicLibraryFragment getMusicLibraryFragment(String query) {
+        Bundle bundle = new Bundle();
+        bundle.putString(QUERY_KEY, query);
+        MusicLibraryFragment fragment = new MusicLibraryFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+    
+    
 }
