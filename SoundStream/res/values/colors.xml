@@ -24,8 +24,8 @@
     <color name="cornflower_blue">#6495ed</color>
     <color name="gray">#CCCCCC</color>
     <color name="transparent">#00000000</color>
-    <color name="loading">#22000000</color>
-    <color name="used">#55000000</color>
+    <color name="loading">#E0E0E0</color>
+    <color name="used">#A0A0A0</color>
     <color name="dark_gray">#333333</color>
     <color name="light_gray">#BBBBBB</color>
     <color name="white">#FFFFFF</color>
