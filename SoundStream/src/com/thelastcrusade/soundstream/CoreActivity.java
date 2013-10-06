@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,7 +35,11 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
@@ -73,6 +79,9 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        
+        ActionBar bar = getSupportActionBar();
+        bar.show();
 
         //Get the GoogleAnalytics singleton. Note that the SDK uses
         // the application context to avoid leaking the current context.
@@ -165,6 +174,22 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         
     }
     
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the options menu from XML
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+//
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchActivity.class)));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+        return true;
+    }
     
     public boolean onOptionsItemSelected(MenuItem item) {
         // home references the app icon
