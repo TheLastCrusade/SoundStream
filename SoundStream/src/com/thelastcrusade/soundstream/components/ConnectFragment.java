@@ -56,6 +56,7 @@ import com.thelastcrusade.soundstream.util.Transitions;
 public class ConnectFragment extends SherlockFragment implements ITitleable{
     
     private static final String TAG = ConnectFragment.class.getSimpleName();
+    private final String SEARCHING_TAG = "isSearching";
 
     private BroadcastRegistrar broadcastRegistrar;
     private View joinView;
@@ -134,7 +135,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                          BluetoothUtils.getLocalBluetoothName()));
         
         if(savedInstanceState != null){
-            isSearching = savedInstanceState.getBoolean("isSearching");
+            isSearching = savedInstanceState.getBoolean(SEARCHING_TAG);
             if(isSearching)
                 setJoinToSearchingState();
         }
@@ -164,7 +165,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("isSearching", isSearching);
+        outState.putBoolean(SEARCHING_TAG, isSearching);
     }
     
     private ConnectionService getConnectionService() {
@@ -212,10 +213,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                             BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
                     if(joinView != null){
                         switch(mode){
-                        case BluetoothAdapter.SCAN_MODE_NONE:
-                            isSearching = false;
-                            setJoinToDefaultState();
-                            break;
+                        case BluetoothAdapter.SCAN_MODE_NONE: //fall through to connectable
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
                             isSearching = false;
                             setJoinToDefaultState();
@@ -235,15 +233,17 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     }
     
     private void setJoinToDefaultState(){
-        joinView.setEnabled(true);
-        joinView.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
-        joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
+        setJoinState(true, View.INVISIBLE, R.color.abs__background_holo_light);
     }
     
     private void setJoinToSearchingState(){
-        joinView.setEnabled(false);
-        joinView.findViewById(R.id.searching).setVisibility(View.VISIBLE);
-        joinView.setBackgroundColor(getResources().getColor(R.color.gray));
+        setJoinState(false, View.VISIBLE, R.color.gray);
+    }
+    
+    private void setJoinState(boolean enabled, int visibility, int color){
+        joinView.setEnabled(enabled);
+        joinView.findViewById(R.id.searching).setVisibility(visibility);
+        joinView.setBackgroundColor(getResources().getColor(color));
     }
 
     private void unregisterReceivers() {

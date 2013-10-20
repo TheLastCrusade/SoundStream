@@ -73,6 +73,8 @@ import com.thelastcrusade.soundstream.util.UserListAdapter;
 public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private static String TAG = NetworkFragment.class.getSimpleName();
+    private final String SEARCHING_JOIN__DIFFERENT_TAG = "isSearchingJoinDifferent";
+    private final String SEARCHING_ADD_TAG = "isSearchingAdd";
     
     private BroadcastRegistrar broadcastRegistrar;
     private UserListAdapter userAdapter;
@@ -168,8 +170,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         });
         
         if(savedInstanceState != null){
-            isSearchingAdd = savedInstanceState.getBoolean("isSearchingAdd");
-            isSearchingJoinDifferent = savedInstanceState.getBoolean("isSearchingJoinDifferent");
+            isSearchingAdd = savedInstanceState.getBoolean(SEARCHING_ADD_TAG);
+            isSearchingJoinDifferent = savedInstanceState.getBoolean(SEARCHING_JOIN__DIFFERENT_TAG);
             
             if(isSearchingAdd)
                 setButtonToSearchingState(addMembersButton);
@@ -259,15 +261,11 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         getActivity().setTitle(getTitle());
     }
     
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onSaveInstanceState(android.os.Bundle)
-     */
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        // TODO Auto-generated method stub
         super.onSaveInstanceState(outState);
-        outState.putBoolean("isSearchingAdd", isSearchingAdd);
-        outState.putBoolean("isSearchingJoinDifferent", isSearchingJoinDifferent);
+        outState.putBoolean(SEARCHING_ADD_TAG, isSearchingAdd);
+        outState.putBoolean(SEARCHING_JOIN__DIFFERENT_TAG, isSearchingJoinDifferent);
     }
     
     @Override
@@ -336,9 +334,6 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     if(joinDifferentNetworkButton != null){
                         switch(mode){
                         case BluetoothAdapter.SCAN_MODE_NONE:
-                            setButtonToDefaultState(joinDifferentNetworkButton);
-                            isSearchingJoinDifferent = false;
-                            break;
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
                             setButtonToDefaultState(joinDifferentNetworkButton);
                             isSearchingJoinDifferent = false;
