@@ -17,15 +17,14 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.thelastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net.bt;
 
-import java.io.IOException;
+/**
+ * Exception thrown when Bluetooth is not or cannot be enabled.
+ * 
+ * @author Jesse Rosalia
+ *
+ */
+public class BluetoothNotEnabledException extends Exception {
 
-public class UnableToCreateSocketException extends IOException {
-
-    private static final long serialVersionUID = 1L;
-
-    public UnableToCreateSocketException(Throwable tr) {
-        super(tr);
-    }
 }

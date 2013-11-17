@@ -16,15 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.thelastcrusade.soundstream.net;
 
+import com.thelastcrusade.soundstream.net.message.IMessage;
+
 /**
- * Exception thrown when Bluetooth is not or cannot be enabled.
- * 
+ * An interface for connections that defines internal constants and callback methods for
+ * connection objects.
+ *  
  * @author Jesse Rosalia
  *
  */
-public class BluetoothNotEnabledException extends Exception {
+public interface IConnectionInternal {
 
+    public static final int MESSAGE_READ = 1;
+    public static final String EXTRA_ADDRESS = ConnectionReader.class.getName() + ".extra.Address";
+    
+    public void messageReceived(IMessage message, String remoteAddress);
+    public void messageTransferFinished(int messageNo);
+    
 }

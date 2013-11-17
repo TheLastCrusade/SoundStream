@@ -17,22 +17,14 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.thelastcrusade.soundstream.net;
-
-import android.bluetooth.BluetoothDevice;
-
-import com.thelastcrusade.soundstream.components.IDialogFormatter;
+package com.thelastcrusade.soundstream.net.bt;
 
 /**
- * Formatter for BluetoothDevice objects, to display the device correctly in the dialog
+ * Exception thrown when Bluetooth is not supported on a platform.
  * 
  * @author Jesse Rosalia
  *
  */
-public class BluetoothDeviceDialogFormatter implements IDialogFormatter<BluetoothDevice> {
+public class BluetoothNotSupportedException extends Exception {
 
-    @Override
-    public String format(BluetoothDevice device) {
-        return device.getName() + " (" + device.getAddress() + ")";
-    }
 }
