@@ -47,6 +47,13 @@ public abstract class MessageThread extends Thread {
 
     public static final String EXTRA_ADDRESS = MessageThread.class.getName() + ".extra.Address";
 
+    /**
+     * Let canceled messages live for 5 min, to allow clients to fully process the message.
+     * NOTE 5 min should definitely be overkill, but the process is low overhead,
+     * and we can use this functionality in the future for partial transfers/restarts.
+     */
+    private static final int CANCELED_MESSAGES_TTL_MINUTES = 5;
+    
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
@@ -80,7 +87,7 @@ public abstract class MessageThread extends Thread {
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
         
-        mmMessenger = new Messenger(context.getCacheDir());
+        mmMessenger = new Messenger(context.getCacheDir(), CANCELED_MESSAGES_TTL_MINUTES);
         mmWriter    = new MessageThreadWriter(mmMessenger, mmOutStream);
         mmWriteThreadRunning = true;
         mmWriteThread = new Thread(new Runnable() {
@@ -139,6 +146,7 @@ public abstract class MessageThread extends Thread {
                         sendMessageToHandler(message, remoteDevice.getAddress());
                     }
                     
+                    mmMessenger.clearCanceledMessagesAfter(CANCELED_MESSAGES_TTL_MINUTES);
                     mmMessenger.clearReceivedMessages();
                 }
             } catch (IOException e) {
@@ -195,6 +203,9 @@ public abstract class MessageThread extends Thread {
         mmWriter.enqueue(mmOutMessageNumber++, message);
     }
  
+    public synchronized void cancelMessage(IMessage message) throws IOException {
+        
+    }
     /* Call this from the main activity to shutdown the connection */
     public void cancel() {
         try {

@@ -134,6 +134,10 @@ public class WireSendInputStream extends InputStream {
     }
 
     /**
+     * If needed, load in the next packet.
+     * 
+     * NOTE: This will set packet to null if there are no bytes left to send.
+     * 
      * @throws IOException 
      * 
      */

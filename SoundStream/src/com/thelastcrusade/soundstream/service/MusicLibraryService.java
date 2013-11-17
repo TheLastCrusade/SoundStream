@@ -19,9 +19,6 @@
 
 package com.thelastcrusade.soundstream.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,9 +41,9 @@ import com.thelastcrusade.soundstream.model.UserList;
 import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
 import com.thelastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
 import com.thelastcrusade.soundstream.util.AlphabeticalComparator;
-import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
+import com.thelastcrusade.soundstream.util.LocalBroadcastIntent;
 import com.thelastcrusade.soundstream.util.SongMetadataUtils;
 
 public class MusicLibraryService extends Service {
@@ -142,20 +139,6 @@ public class MusicLibraryService extends Service {
                 public void onReceiveAction(Context context, Intent intent) {
                     List<SongMetadata> remoteMetas = intent.getParcelableArrayListExtra(MessagingService.EXTRA_SONG_METADATA);
                     updateLibrary(remoteMetas, true);
-                }
-            })
-            .addLocalAction(MessagingService.ACTION_REQUEST_SONG_MESSAGE, new IBroadcastActionHandler() {
-                
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
-
-                    if (songId == SongMetadata.UNKNOWN_SONG) {
-                        Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
-                    } else {
-                        sendSongData(fromAddr, songId);
-                    }
                 }
             })
             .addLocalAction(UserList.ACTION_USER_LIST_UPDATE, new IBroadcastActionHandler() {
@@ -334,18 +317,18 @@ public class MusicLibraryService extends Service {
             return inx != null ? metadataList.get(inx) : null;
         }
     }
-    private void sendSongData(String fromAddr, long songId) {
+
+    /**
+     * Get the path on the local file system for the song identified by songId
+     * 
+     * @param songId
+     * @return A string path to the song
+     * @throws SongNotFoundException 
+     */
+    public String getSongFilePath(long songId) throws SongNotFoundException {
         MediaStoreWrapper msw = new  MediaStoreWrapper(MusicLibraryService.this);
-        try {
-            SongMetadata song = lookupMySongById(songId);
-            String filePath   = msw.getSongFilePath(song);
-            File   songFile   = new File(filePath);
-            getMessagingService().sendTransferSongMessage(fromAddr, songId, songFile.getName(), songFile.getCanonicalPath());
-        } catch (SongNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SongMetadata song = lookupMySongById(songId);
+        return msw.getSongFilePath(song);
     }
 
     private String getMyMac(){
@@ -368,13 +351,6 @@ public class MusicLibraryService extends Service {
             Log.w(TAG, "UserListService not bound");
         }
         return userService;
-    }
-
-    private byte[] loadFile(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        byte[] bytes = new byte[fis.available()];
-        fis.read(bytes);
-        return bytes;
     }
 
     private IMessagingService getMessagingService() {

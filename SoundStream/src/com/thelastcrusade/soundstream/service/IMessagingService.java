@@ -71,9 +71,39 @@ public interface IMessagingService {
 
     public void sendSongStatusMessage(PlaylistEntry currentSong);
 
+    /**
+     * Send a request to transfer song data
+     * 
+     * From host to guest
+     * 
+     * @param address Address of the guest
+     * @param songId Id of the song being requested
+     */
     public void sendRequestSongMessage(String address, long songId);
 
-    public void sendTransferSongMessage(String address, long songId, String fileName, String filePath);
+    /**
+     * Send song data in response to a request.  This message may be sent
+     * in multiple parts.
+     * 
+     * From guest to host
+     * 
+     * @param address
+     * @param songId
+     * @param fileName
+     * @param filePath
+     * @return The message number of this message.  This is used for canceling messages.
+     */
+    public long sendTransferSongMessage(String address, long songId, String fileName, String filePath);
+
+    /**
+     * Send a cancellation message, to instruct the guest that the song is no
+     * longer needed
+     * 
+     * From host to guest
+     * 
+     * @param song
+     */
+    public void sendCancelSongMessage(String address, long songId);
 
     public void sendUserListMessage(UserList userlist);
 }

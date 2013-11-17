@@ -89,6 +89,7 @@ public class MessageThreadWriter {
     public void enqueue(int messageNo, IMessage message) throws IOException {
         QueueEntry qe = new QueueEntry();
         qe.messageNo     = messageNo;
+        qe.key           = message.getKey();
         qe.score         = computeMessageScore(messageNo, message);
         qe.messageClass  = message.getClass();
         qe.messageStream = messenger.serializeMessage(message);

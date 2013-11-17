@@ -43,6 +43,7 @@ import com.thelastcrusade.soundstream.net.ConnectThread;
 import com.thelastcrusade.soundstream.net.MessageThread;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.thelastcrusade.soundstream.net.message.CancelSongMessage;
 import com.thelastcrusade.soundstream.net.message.ConnectGuestsMessage;
 import com.thelastcrusade.soundstream.net.message.FindNewGuestsMessage;
 import com.thelastcrusade.soundstream.net.message.FoundGuestsMessage;
@@ -142,6 +143,7 @@ public class ConnectionService extends Service {
         registerFindNewGuestsHandler();
         registerFoundGuestsHandler();
         registerConnectGuestsHandler();
+        registerCancelSongHandler();
         //register a handler to route all other messages to
         // the messaging service
         registerMessagingServiceHandler();
@@ -197,6 +199,17 @@ public class ConnectionService extends Service {
         });
     }
 
+    private void registerCancelSongHandler() {
+        this.messageDispatch.registerHandler(CancelSongMessage.class, new IMessageHandler<CancelSongMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo, CancelSongMessage message,
+                    String fromAddr) {
+                MessageThread mt = findMessageThreadByAddress(fromAddr);
+                mt.cancelMessage(message);
+            }
+        });
+    }
     /**
      * Register a handler to route all unhandled messages to
      * the messaging service
@@ -414,10 +427,10 @@ public class ConnectionService extends Service {
     }
 
     public void sendMessageToGuest(String address, IMessage msg) {
-        MessageThread fan = findMessageThreadByAddress(address);
-        if (fan != null) {
+        MessageThread guest = findMessageThreadByAddress(address);
+        if (guest != null) {
             try {
-                fan.write(msg);
+                guest.write(msg);
             } catch (IOException e) {
                 Log.wtf(TAG, e);
                 Toaster.eToast(this, "Unable to enqueue message " + msg.getClass().getSimpleName());

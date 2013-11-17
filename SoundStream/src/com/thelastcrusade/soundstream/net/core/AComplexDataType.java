@@ -33,8 +33,10 @@ import java.nio.ByteBuffer;
  */
 public class AComplexDataType {
 
-    public static final int SIZEOF_INTEGER = 4;
+    public static final int SIZEOF_BOOLEAN = 1;
 
+    public static final int SIZEOF_INTEGER = 4;
+    
     protected void writeByte(byte theByte, OutputStream output)
             throws IOException {
         output.write(theByte);
@@ -60,6 +62,22 @@ public class AComplexDataType {
         return bytes;
     }
 
+    protected void writeBoolean(boolean bool, OutputStream output)
+            throws IOException {
+        ByteBuffer bb = ByteBuffer.allocate(SIZEOF_BOOLEAN);
+        bb.put((byte)(bool ? 1 : 0));
+        output.write(bb.array());
+    }
+
+    protected boolean readBoolean(InputStream input) throws IOException {
+        byte[] in = new byte[SIZEOF_BOOLEAN];
+        for (int ii = 0; ii < SIZEOF_BOOLEAN; ii++) {
+            in[ii] = (byte) input.read();
+        }
+        ByteBuffer bb = ByteBuffer.wrap(in);
+        return bb.get() != 1;        
+    }
+    
     protected void writeInteger(int integer, OutputStream output)
             throws IOException {
         ByteBuffer bb = ByteBuffer.allocate(SIZEOF_INTEGER);

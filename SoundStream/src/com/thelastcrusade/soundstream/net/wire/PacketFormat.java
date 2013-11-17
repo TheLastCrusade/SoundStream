@@ -42,10 +42,11 @@ import com.thelastcrusade.soundstream.net.core.ISerializable;
  */
 public class PacketFormat extends AComplexDataType implements ISerializable {
 
-    public  static int HEADER_LEN = 2 * SIZEOF_INTEGER;
+    public  static int HEADER_LEN = 2 * SIZEOF_INTEGER + SIZEOF_BOOLEAN;
 
     private int packetLength;
     private int messageNo;
+    private boolean startingPacket;
     private byte[] bytes;
 
     public PacketFormat() {
@@ -55,17 +56,19 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      * @param messageNo
      * @param nextBytes
      */
-    public PacketFormat(int messageNo, byte[] bytes) {
-        this.packetLength = bytes.length + SIZEOF_INTEGER; //for message no
+    public PacketFormat(int messageNo, byte[] bytes, boolean startingPacket) {
+        this.packetLength = bytes.length + getMessageNoOverhead(); //for message no
         this.messageNo = messageNo;
+        this.startingPacket = startingPacket;
         this.bytes = bytes;
     }
 
     public static int getLengthOverhead() {
         return SIZEOF_INTEGER;
     }
+
     public static int getMessageNoOverhead() {
-        return SIZEOF_INTEGER;
+        return HEADER_LEN - SIZEOF_INTEGER;
     }
 
     public static int getOverhead() {
@@ -78,15 +81,17 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
         if (input.available() < this.packetLength) {
             throw new MessageNotCompleteException();
         }
-        this.messageNo = readInteger(input);
-        this.bytes     = readBytes(input, this.packetLength - SIZEOF_INTEGER);
+        this.messageNo      = readInteger(input);
+        this.startingPacket = readBoolean(input);
+        this.bytes     = readBytes(input, this.packetLength - getMessageNoOverhead());
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        writeInteger(packetLength,   output);
-        writeInteger(this.messageNo, output);
-        writeBytes(  this.bytes,     output);
+        writeInteger(packetLength,        output);
+        writeInteger(this.messageNo,      output);
+        writeBoolean(this.startingPacket, output);
+        writeBytes(  this.bytes,          output);
     }
     
     /**
@@ -107,5 +112,13 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      */
     public int getPacketLength() {
         return packetLength;
+    }
+    
+    /**
+     * True if this is the starting packet in a sequence of packets, false if not
+     * @return the startingPacket
+     */
+    public boolean isStartingPacket() {
+        return startingPacket;
     }
 }

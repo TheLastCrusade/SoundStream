@@ -474,6 +474,13 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     @Override
+    public void sendCancelSongMessage(String address, long songId) {
+        RequestSongMessage msg = new RequestSongMessage(songId);
+        //send the message to the guests
+        sendMessageToGuest(address, msg);
+    }
+
+    @Override
     public void sendRequestSongMessage(String address, long songId) {
         RequestSongMessage msg = new RequestSongMessage(songId);
         //send the message to the guests

@@ -368,6 +368,7 @@ public class PlaylistService extends Service {
                 //call removeSong in all cases...it will handle the case where the song to be removed
                 // is the current song
                 removeSong(entry);
+                getMessagingService().sendCancelSongMessage(song.getMacAddress(), song.getId());
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
