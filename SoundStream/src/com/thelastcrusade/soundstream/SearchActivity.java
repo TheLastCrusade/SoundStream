@@ -1,0 +1,90 @@
+/*
+ * Copyright 2013 The Last Crusade ContactLastCrusade@gmail.com
+ * 
+ * This file is part of SoundStream.
+ * 
+ * SoundStream is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * SoundStream is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.thelastcrusade.soundstream;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+import com.thelastcrusade.soundstream.components.MusicLibraryFragment;
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+
+/**
+ * @author reid
+ *
+ */
+public class SearchActivity extends SherlockFragmentActivity {
+    
+    private static final String TAG = SearchActivity.class.getSimpleName();
+    public static final String QUERY_KEY = "query_key";
+    private String query;
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.content_frame);
+        
+        ActionBar bar = getSupportActionBar();
+        bar.show();
+                
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+          query = intent.getStringExtra(SearchManager.QUERY);
+        }
+        
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+            .add(R.id.content, getMusicLibraryFragment(query)).commit();
+        }
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the options menu from XML
+        getSupportMenuInflater().inflate(R.menu.search_menu, menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
+
+        return true;
+    }
+    
+    private MusicLibraryFragment getMusicLibraryFragment(String query) {
+        Bundle bundle = new Bundle();
+        bundle.putString(QUERY_KEY, query);
+        MusicLibraryFragment fragment = new MusicLibraryFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+    
+    
+}
