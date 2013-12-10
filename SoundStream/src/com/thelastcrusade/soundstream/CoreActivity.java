@@ -23,26 +23,25 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.SearchView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.Tracker;
+import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingFragmentActivity;
 import com.thelastcrusade.soundstream.components.ConnectFragment;
 import com.thelastcrusade.soundstream.components.InstructionsDialog;
 import com.thelastcrusade.soundstream.components.MenuFragment;
@@ -59,8 +58,6 @@ import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.thelastcrusade.soundstream.util.ITitleable;
 import com.thelastcrusade.soundstream.util.Trackable;
 import com.thelastcrusade.soundstream.util.Transitions;
-import com.slidingmenu.lib.SlidingMenu;
-import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
 
 public class CoreActivity extends SlidingFragmentActivity implements Trackable {
@@ -80,7 +77,7 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         
-        ActionBar bar = getSupportActionBar();
+        ActionBar bar = getActionBar();
         bar.show();
 
         //Get the GoogleAnalytics singleton. Note that the SDK uses
@@ -125,7 +122,7 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     }
     
     /* (non-Javadoc)
-     * @see android.support.v4.app.FragmentActivity#onResume()
+     * @see android..v4.app.FragmentActivity#onResume()
      */
     @Override
     protected void onResume() {
@@ -177,7 +174,7 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
-        getSupportMenuInflater().inflate(R.menu.search_menu, menu);
+        getMenuInflater().inflate(R.menu.search_menu, menu);
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -195,7 +192,8 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     }
     
     private boolean isConnectActive(){
-        return getSupportFragmentManager().findFragmentByTag(Transitions.CURRENT_CONTENT) instanceof ConnectFragment;
+        return true;
+//        return getSupportFragmentManager().findFragmentByTag(Transitions.CURRENT_CONTENT) instanceof ConnectFragment;
     }
     
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -283,13 +281,13 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     }
     
     public void disableSlidingMenu(){
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getActionBar().setDisplayHomeAsUpEnabled(false);
         getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
     }
     
     public void enableSlidingMenu(){
      // enables the icon to act as the up
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
     }
     

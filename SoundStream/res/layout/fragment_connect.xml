@@ -29,7 +29,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clickable="true"
-        android:background="@color/abs__background_holo_light" >
+        android:background="@color/holo_light"
+        >
         
         <ImageView
 	        android:contentDescription="@string/create_network"
@@ -59,7 +60,7 @@
         android:layout_weight="1"
         android:layout_margin="2sp"
         android:clickable="true"
-        android:background="@color/abs__background_holo_light" >
+        android:background="@color/holo_light" >
         
         <ImageView
             android:contentDescription="@string/join_network"
@@ -96,9 +97,9 @@
 			    android:layout_width="wrap_content"
 	        	android:layout_height="wrap_content"
 	        	>
+	        	<!-- TODO style progress bar -->
 			    <ProgressBar
 	            android:id="@+id/progress"
-	            style="@style/Widget.Sherlock.Light.ProgressBar"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	           />

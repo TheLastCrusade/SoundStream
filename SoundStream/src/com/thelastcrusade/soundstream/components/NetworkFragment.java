@@ -32,6 +32,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +41,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.model.FoundGuest;
@@ -70,7 +70,7 @@ import com.thelastcrusade.soundstream.util.UserListAdapter;
  * This fragment handles the ability for members to add new members to 
  * the network and to view the currently connected members
  */
-public class NetworkFragment extends SherlockFragment implements ITitleable {
+public class NetworkFragment extends Fragment implements ITitleable {
     
     private static String TAG = NetworkFragment.class.getSimpleName();
     private final String SEARCHING_JOIN__DIFFERENT_TAG = "isSearchingJoinDifferent";
