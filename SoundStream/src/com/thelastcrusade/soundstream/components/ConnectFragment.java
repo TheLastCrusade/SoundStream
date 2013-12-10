@@ -56,9 +56,11 @@ import com.thelastcrusade.soundstream.util.Transitions;
 public class ConnectFragment extends SherlockFragment implements ITitleable{
     
     private static final String TAG = ConnectFragment.class.getSimpleName();
+    private final String SEARCHING_TAG = "isSearching";
 
     private BroadcastRegistrar broadcastRegistrar;
     private View joinView;
+    private boolean isSearching;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
 
@@ -131,6 +133,12 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         joinText.setText(String.format(
                          getString(R.string.join_network),
                          BluetoothUtils.getLocalBluetoothName()));
+        
+        if(savedInstanceState != null){
+            isSearching = savedInstanceState.getBoolean(SEARCHING_TAG);
+            if(isSearching)
+                setJoinToSearchingState();
+        }
         return v;
     }
 
@@ -152,6 +160,12 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
         this.connectionServiceLocator.unbind();
         this.messagingServiceLocator.unbind();
         super.onDestroy();
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SEARCHING_TAG, isSearching);
     }
     
     private ConnectionService getConnectionService() {
@@ -199,20 +213,14 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                             BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
                     if(joinView != null){
                         switch(mode){
-                        case BluetoothAdapter.SCAN_MODE_NONE:
-                            joinView.setEnabled(true);
-                            joinView.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
-                            joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
-                            break;
+                        case BluetoothAdapter.SCAN_MODE_NONE: //fall through to connectable
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-                            joinView.setEnabled(true);
-                            joinView.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
-                            joinView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
+                            isSearching = false;
+                            setJoinToDefaultState();
                             break;
                         case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-                            joinView.setEnabled(false);
-                            joinView.findViewById(R.id.searching).setVisibility(View.VISIBLE);
-                            joinView.setBackgroundColor(getResources().getColor(R.color.gray));
+                            isSearching = true;
+                            setJoinToSearchingState();
                             break;
                         default:
                             Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
@@ -222,6 +230,20 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
                 }
             })
             .register(this.getActivity());
+    }
+    
+    private void setJoinToDefaultState(){
+        setJoinState(true, View.INVISIBLE, R.color.abs__background_holo_light);
+    }
+    
+    private void setJoinToSearchingState(){
+        setJoinState(false, View.VISIBLE, R.color.gray);
+    }
+    
+    private void setJoinState(boolean enabled, int visibility, int color){
+        joinView.setEnabled(enabled);
+        joinView.findViewById(R.id.searching).setVisibility(visibility);
+        joinView.setBackgroundColor(getResources().getColor(color));
     }
 
     private void unregisterReceivers() {

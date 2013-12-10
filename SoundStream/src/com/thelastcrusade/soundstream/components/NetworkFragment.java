@@ -73,15 +73,19 @@ import com.thelastcrusade.soundstream.util.UserListAdapter;
 public class NetworkFragment extends SherlockFragment implements ITitleable {
     
     private static String TAG = NetworkFragment.class.getSimpleName();
+    private final String SEARCHING_JOIN__DIFFERENT_TAG = "isSearchingJoinDifferent";
+    private final String SEARCHING_ADD_TAG = "isSearchingAdd";
     
     private BroadcastRegistrar broadcastRegistrar;
     private UserListAdapter userAdapter;
-    private LinearLayout addMembersButton, userView, disconnectDisband;
+    private LinearLayout addMembersButton, userView, disconnectDisband, joinDifferentNetworkButton;
 
     private ServiceLocator<ConnectionService> connectionServiceLocator;
     private ServiceLocator<UserListService>   userListServiceLocator;
 
     private TrackerAPI tracker;
+    
+    private boolean isSearchingAdd, isSearchingJoinDifferent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,6 +123,7 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         View v = inflater.inflate(R.layout.fragment_network, container,false);
         
         this.addMembersButton = (LinearLayout)v.findViewById(R.id.add_members);
+
         this.addMembersButton.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -129,14 +134,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
 
                         @Override
                         public void run() {
-                            addMembersButton.setEnabled(false);
-
-                            //TODO: add a better indicator while discovering
-                            //...seconds until discovery is finished, number of clients found, etc
-                            addMembersButton.findViewById(R.id.searching).setVisibility(View.VISIBLE);
-                            addMembersButton.findViewById(R.id.image_background)
-                                .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
-
+                            setButtonToSearchingState(addMembersButton);
+                            isSearchingAdd = true;
+                            
                             getConnectionService().findNewGuests();
                             tracker.trackAddMembersEvent();
                         }
@@ -155,9 +155,8 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         //TODO react to changing state
         setDisconnectDisbandBtn();
         
-        LinearLayout joinDifferentNetwork = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
-        joinDifferentNetwork.setOnClickListener(new OnClickListener() {
-
+        this.joinDifferentNetworkButton = (LinearLayout)v.findViewById(R.id.join_different_network_btn);
+        joinDifferentNetworkButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new WithBluetoothEnabled(getActivity(), getConnectionService()).run(new Runnable() {
@@ -169,6 +168,17 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                 });
             }
         });
+        
+        if(savedInstanceState != null){
+            isSearchingAdd = savedInstanceState.getBoolean(SEARCHING_ADD_TAG);
+            isSearchingJoinDifferent = savedInstanceState.getBoolean(SEARCHING_JOIN__DIFFERENT_TAG);
+            
+            if(isSearchingAdd)
+                setButtonToSearchingState(addMembersButton);
+            
+            if(isSearchingJoinDifferent)
+                setButtonToSearchingState(joinDifferentNetworkButton);
+        }
         return v;
     }
 
@@ -252,6 +262,13 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
     }
     
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SEARCHING_ADD_TAG, isSearchingAdd);
+        outState.putBoolean(SEARCHING_JOIN__DIFFERENT_TAG, isSearchingJoinDifferent);
+    }
+    
+    @Override
     public void onDestroy() {
         unregisterReceivers();
         this.connectionServiceLocator.unbind();
@@ -305,6 +322,32 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
                     Log.i(TAG, "Host Disconnected");
                     //after the host has been disconnected, wipe everything and start fresh
                     cleanUpAfterDisconnect();
+                }
+            })
+            .addGlobalAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    int mode = intent.getIntExtra(
+                            BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.SCAN_MODE_NONE);
+                    
+                    if(joinDifferentNetworkButton != null){
+                        switch(mode){
+                        case BluetoothAdapter.SCAN_MODE_NONE:
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                            setButtonToDefaultState(joinDifferentNetworkButton);
+                            isSearchingJoinDifferent = false;
+                            break;
+                        case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                            setButtonToSearchingState(joinDifferentNetworkButton);
+                            isSearchingJoinDifferent = true;
+                            break;
+                        default:
+                            Log.wtf(TAG, "Recieved scan mode changed with unknown mode");
+                            break;
+                        }
+                    }
+                    
                 }
             })
             .register(this.getActivity());
@@ -367,6 +410,24 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
         getConnectionService().disconnectAllGuests();
         cleanUpAfterDisconnect();
     }
+    
+    private void setButtonToDefaultState(LinearLayout button){
+        button.setEnabled(true);
+        button.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
+        button.findViewById(R.id.image_background)
+            .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
+        
+    }
+    
+    private void setButtonToSearchingState(LinearLayout button){
+        button.setEnabled(false);
+
+        //TODO: add a better indicator while discovering
+        //...seconds until discovery is finished, number of clients found, etc
+        button.findViewById(R.id.searching).setVisibility(View.VISIBLE);
+        button.findViewById(R.id.image_background)
+            .setBackgroundColor(getActivity().getResources().getColor(R.color.gray));
+    }
 
     /**
      * Called to handle a find finished method.  This may be to pop up a dialog
@@ -376,10 +437,9 @@ public class NetworkFragment extends SherlockFragment implements ITitleable {
      */
     private void onFindFinished(Intent intent) {
         //first thing...reenable the add members button
-        addMembersButton.setEnabled(true);
-        addMembersButton.findViewById(R.id.searching).setVisibility(View.INVISIBLE);
-        addMembersButton.findViewById(R.id.image_background)
-            .setBackgroundColor(getActivity().getResources().getColor(R.color.white));
+        setButtonToDefaultState(addMembersButton);
+        isSearchingAdd = false;
+        
         //locally initiated device discovery...pop up a dialog for the user
         List<FoundGuest> guests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
         
