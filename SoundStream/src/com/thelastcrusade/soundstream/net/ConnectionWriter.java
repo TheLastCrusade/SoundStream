@@ -40,7 +40,7 @@ import com.thelastcrusade.soundstream.util.LogUtil;
  * @author Jesse Rosalia
  *
  */
-public class MessageThreadWriter {
+public class ConnectionWriter {
 
     /**
      * The normal multiplier uses the score as is.
@@ -53,7 +53,7 @@ public class MessageThreadWriter {
      */
     private static final int TRANSFER_SONG_SCORE_MULTIPLIER = 100;
 
-    private static String TAG = MessageThreadWriter.class.getSimpleName();
+    private static String TAG = ConnectionWriter.class.getSimpleName();
 
     /**
      * Maximum size in bytes to write to a socket at a time.
@@ -79,17 +79,23 @@ public class MessageThreadWriter {
     private OutputStream outStream;
 
     private Messenger messenger;
+
+    private IConnectionInternal connection;
+
+    private String remoteAddress;
     
-    public MessageThreadWriter(Messenger messenger, OutputStream outStream) {
+    public ConnectionWriter(Messenger messenger, OutputStream outStream, IConnectionInternal connection, String remoteAddress) {
         this.outStream = outStream;
         this.messenger = messenger;
+        this.connection = connection;
+        this.remoteAddress = remoteAddress;
         this.outBytes = new byte[messenger.getSendPacketSize()];
     }
 
-    public void enqueue(int messageNo, IMessage message) throws IOException {
+    public int enqueue(int messageNo, IMessage message) throws IOException {
         QueueEntry qe = new QueueEntry();
         qe.messageNo     = messageNo;
-        qe.score         = computeMessageScore(messageNo, message);
+        qe.score         = computeMessageScore(qe.messageNo, message);
         qe.messageClass  = message.getClass();
         qe.messageStream = messenger.serializeMessage(message);
         if (LogUtil.isLogAvailable()) {
@@ -102,6 +108,7 @@ public class MessageThreadWriter {
                         + newExpectedQueueSize + " entries in the queue");
         }
         queue.add(qe);
+        return qe.messageNo;
     }
 
     /**
@@ -160,6 +167,7 @@ public class MessageThreadWriter {
                 }
                 queue.add(qe);
             } else {
+                this.connection.messageTransferFinished(qe.messageNo);
                 //otherwise, we're done
                 if (LogUtil.isLogAvailable()) {
                     Log.i(TAG, "Message " + qe.messageNo + " finished writing");
