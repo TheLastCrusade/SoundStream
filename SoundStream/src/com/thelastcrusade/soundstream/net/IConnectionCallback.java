@@ -27,12 +27,8 @@ import com.thelastcrusade.soundstream.net.message.IMessage;
  * @author Jesse Rosalia
  *
  */
-public interface IConnectionInternal {
+public interface IConnectionCallback {
 
-    public static final int MESSAGE_READ = 1;
-    public static final String EXTRA_ADDRESS = ConnectionReader.class.getName() + ".extra.Address";
-    
     public void messageReceived(IMessage message, String remoteAddress);
-    public void messageTransferFinished(int messageNo);
-    
+    public void messageTransferFinished(int messageNo, String remoteAddress);
 }

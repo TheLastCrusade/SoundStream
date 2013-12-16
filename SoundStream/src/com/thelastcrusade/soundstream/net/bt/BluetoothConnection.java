@@ -20,8 +20,6 @@
 package com.thelastcrusade.soundstream.net.bt;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -31,10 +29,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.thelastcrusade.soundstream.net.ConnectionWriteThread;
-import com.thelastcrusade.soundstream.net.IConnectionInternal;
+import com.thelastcrusade.soundstream.net.ConnectionConstants;
 import com.thelastcrusade.soundstream.net.ConnectionReader;
+import com.thelastcrusade.soundstream.net.ConnectionWriteThread;
 import com.thelastcrusade.soundstream.net.ConnectionWriter;
+import com.thelastcrusade.soundstream.net.IConnectionCallback;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.wire.Messenger;
 
@@ -45,7 +44,7 @@ import com.thelastcrusade.soundstream.net.wire.Messenger;
  * @author Jesse Rosalia
  *
  */
-public abstract class BluetoothConnection extends Thread implements IConnectionInternal {
+public abstract class BluetoothConnection extends Thread implements IConnectionCallback {
     private final String TAG = BluetoothConnection.class.getSimpleName();
 
     private final BluetoothSocket mmSocket;
@@ -130,6 +129,10 @@ public abstract class BluetoothConnection extends Thread implements IConnectionI
         }
     }
     
+    private Message obtainAndroidMessage(int type, Object obj) {
+        return mmHandler.obtainMessage(type, this.mmInMessageNumber++, 0, obj);
+    }
+    
     /**
      * Send the network message to the appropriate handler.
      * 
@@ -137,14 +140,18 @@ public abstract class BluetoothConnection extends Thread implements IConnectionI
      * @param remoteAddr
      */
     public void messageReceived(IMessage message, String remoteAddr) {
-        Message androidMsg = mmHandler.obtainMessage(MESSAGE_READ, this.mmInMessageNumber++, 0, message);
+        Message androidMsg = obtainAndroidMessage(ConnectionConstants.MESSAGE_READ, message);
         Bundle bundle = new Bundle();
-        bundle.putString(IConnectionInternal.EXTRA_ADDRESS, remoteAddr);
+        bundle.putString(ConnectionConstants.EXTRA_ADDRESS, remoteAddr);
         androidMsg.setData(bundle);
         androidMsg.sendToTarget();
     }
-    
-    public void messageTransferFinished(int messageNo) {
-        
+
+    public void messageTransferFinished(int messageNo, String remoteAddr) {
+        Message androidMsg = obtainAndroidMessage(ConnectionConstants.MESSAGE_FINISHED, messageNo);
+        Bundle bundle = new Bundle();
+        bundle.putString(ConnectionConstants.EXTRA_ADDRESS, remoteAddr);
+        androidMsg.setData(bundle);
+        androidMsg.sendToTarget();
     }
 }

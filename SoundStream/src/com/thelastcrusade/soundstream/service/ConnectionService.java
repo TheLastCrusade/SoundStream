@@ -359,6 +359,7 @@ public class ConnectionService extends Service {
                         .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
                         .send(ConnectionService.this);
                 }
+
             };
             newMessageThread.start();
             this.guests.add(newMessageThread);

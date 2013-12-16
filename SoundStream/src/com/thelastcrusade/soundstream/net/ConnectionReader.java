@@ -30,7 +30,7 @@ public class ConnectionReader {
 
     private InputStream inStream;
     private Messenger messenger;
-    private IConnectionInternal connection;
+    private IConnectionCallback connection;
     private String remoteAddress;
 
     /**
@@ -38,7 +38,7 @@ public class ConnectionReader {
      * @param mmMessenger
      * @param mmInStream
      */
-    public ConnectionReader(Messenger messenger, InputStream inStream, IConnectionInternal connection, String remoteAddress) {
+    public ConnectionReader(Messenger messenger, InputStream inStream, IConnectionCallback connection, String remoteAddress) {
         this.messenger = messenger;
         this.inStream = inStream;
         this.connection = connection;

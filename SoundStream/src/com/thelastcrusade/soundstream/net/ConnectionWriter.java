@@ -80,11 +80,11 @@ public class ConnectionWriter {
 
     private Messenger messenger;
 
-    private IConnectionInternal connection;
+    private IConnectionCallback connection;
 
     private String remoteAddress;
     
-    public ConnectionWriter(Messenger messenger, OutputStream outStream, IConnectionInternal connection, String remoteAddress) {
+    public ConnectionWriter(Messenger messenger, OutputStream outStream, IConnectionCallback connection, String remoteAddress) {
         this.outStream = outStream;
         this.messenger = messenger;
         this.connection = connection;
@@ -167,7 +167,7 @@ public class ConnectionWriter {
                 }
                 queue.add(qe);
             } else {
-                this.connection.messageTransferFinished(qe.messageNo);
+                this.connection.messageTransferFinished(qe.messageNo, this.remoteAddress);
                 //otherwise, we're done
                 if (LogUtil.isLogAvailable()) {
                     Log.i(TAG, "Message " + qe.messageNo + " finished writing");

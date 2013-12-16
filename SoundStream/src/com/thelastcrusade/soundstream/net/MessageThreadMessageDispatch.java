@@ -85,11 +85,13 @@ public class MessageThreadMessageDispatch extends Handler {
         int             messageNo = 0;
         String          fromAddr  = null;
         
-        if (msg.what == IConnectionInternal.MESSAGE_READ) {
+        if (msg.what == ConnectionConstants.MESSAGE_READ) {
             messageNo = msg.arg1;
             message   = (IMessage)msg.obj;
-            fromAddr  = msg.getData().getString(IConnectionInternal.EXTRA_ADDRESS);
+            fromAddr  = msg.getData().getString(ConnectionConstants.EXTRA_ADDRESS);
             handleMessage(messageNo, message, fromAddr);
+        } else if (msg.what == ConnectionConstants.MESSAGE_FINISHED) {
+            //TODO: NYI
         } else {
             // default...call the base class
             super.handleMessage(msg);
