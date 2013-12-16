@@ -24,6 +24,7 @@ import java.util.List;
 import com.thelastcrusade.soundstream.model.PlaylistEntry;
 import com.thelastcrusade.soundstream.model.SongMetadata;
 import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.net.MessageFuture;
 
 public interface IMessagingService {
 
@@ -91,9 +92,9 @@ public interface IMessagingService {
      * @param songId
      * @param fileName
      * @param filePath
-     * @return The message number of this message.  This is used for canceling messages.
+     * @return 
      */
-    public long sendTransferSongMessage(String address, long songId, String fileName, String filePath);
+    public MessageFuture sendTransferSongMessage(String address, long songId, String fileName, String filePath);
 
     /**
      * Send a cancellation message, to instruct the guest that the song is no

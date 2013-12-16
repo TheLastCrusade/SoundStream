@@ -20,7 +20,8 @@ package com.thelastcrusade.soundstream.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Service;
 import android.content.Context;
@@ -29,13 +30,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.thelastcrusade.soundstream.R;
-import com.thelastcrusade.soundstream.library.MediaStoreWrapper;
 import com.thelastcrusade.soundstream.library.SongNotFoundException;
 import com.thelastcrusade.soundstream.model.SongMetadata;
-import com.thelastcrusade.soundstream.model.UserList;
-import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
-import com.thelastcrusade.soundstream.service.ServiceLocator.IOnBindListener;
+import com.thelastcrusade.soundstream.net.MessageFuture;
+import com.thelastcrusade.soundstream.net.MessageFuture.IFinishedHandler;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -54,6 +52,8 @@ public class TransferService extends Service {
 
     private ServiceLocator<MessagingService> messagingServiceLocator;
     private ServiceLocator<MusicLibraryService> musicLibraryServiceLocator;
+
+    private Map<String, MessageFuture> messageFutures = new HashMap<String, MessageFuture>();
 
     public class TransferServiceBinder extends Binder implements
             ILocalBinder<TransferService> {
@@ -112,28 +112,33 @@ public class TransferService extends Service {
                 public void onReceiveAction(Context context, Intent intent) {
                     String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                     long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+
+                    try {
+                        if (songId == SongMetadata.UNKNOWN_SONG) {
+                            Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
+                        } else {
+                            MessageFuture transfer = messageFutures.get(makeKey(fromAddr, songId));
+                            transfer.cancel();
+                        }
+                    } catch (IOException e) {
+                        Log.wtf(TAG, e);
+                    }
+                }
+            })
+//            .addLocalAction(MessagingService.ACTION_MESSAGE_FINISHED, new IBroadcastActionHandler() {
+//
+//                @Override
+//                public void onReceiveAction(Context context, Intent intent) {
+//                    String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
+//                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
 //
 //                    if (songId == SongMetadata.UNKNOWN_SONG) {
 //                        Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
 //                    } else {
 //                        sendSongData(fromAddr, songId);
 //                    }
-                }
-            })
-            .addLocalAction(MessagingService.ACTION_MESSAGE_FINISHED, new IBroadcastActionHandler() {
-
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
-
-                    if (songId == SongMetadata.UNKNOWN_SONG) {
-                        Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
-                    } else {
-                        sendSongData(fromAddr, songId);
-                    }
-                }
-            })
+//                }
+//            })
 
             .register(this);
     }
@@ -142,12 +147,26 @@ public class TransferService extends Service {
         this.registrar.unregister();
     }
     
+    private String makeKey(String requestAddr, long songId) {
+        return requestAddr + "_" + songId;
+    }
+
     private void sendSongData(String requestAddr, long songId) {
+        MessageFuture future = null;
         try {
             String filePath = getMusicLibraryService().getSongFilePath(songId);
             File songFile = new File(filePath);
             //send the transfer song message back to the requester
-            getMessagingService().sendTransferSongMessage(requestAddr, songId, songFile.getName(), songFile.getCanonicalPath());
+            future = getMessagingService().sendTransferSongMessage(requestAddr, songId, songFile.getName(), songFile.getCanonicalPath());
+            final String key = makeKey(requestAddr, songId);
+            this.messageFutures.put(key, future);
+            future.setFinishedHandler(new IFinishedHandler() {
+
+                @Override
+                public void finished() {
+                    messageFutures.remove(key);
+                }
+            });
         } catch (SongNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

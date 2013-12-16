@@ -16,16 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.thelastcrusade.soundstream.net;
 
-import java.io.IOException;
+/**
+ * @author Jesse Rosalia
+ *
+ */
+public class ConnectionConstants {
 
-public class UnableToCreateSocketException extends IOException {
+    public static final int MESSAGE_READ = 1;
+    public static final int MESSAGE_FINISHED = 2;
 
-    private static final long serialVersionUID = 1L;
-
-    public UnableToCreateSocketException(Throwable tr) {
-        super(tr);
-    }
+    public static final String EXTRA_ADDRESS = ConnectionReader.class.getName() + ".extra.Address";
+    
 }

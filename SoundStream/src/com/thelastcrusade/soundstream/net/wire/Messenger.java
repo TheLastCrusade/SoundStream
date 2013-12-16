@@ -34,6 +34,7 @@ import android.util.Log;
 import com.thelastcrusade.soundstream.net.message.IFileMessage;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.message.MessageFormat;
+import com.thelastcrusade.soundstream.net.wire.PacketFormat.ControlCode;
 import com.thelastcrusade.soundstream.util.InputBuffer;
 import com.thelastcrusade.soundstream.util.LogUtil;
 
@@ -87,6 +88,8 @@ public class Messenger {
 
     private int canceledMessagesTtlMinutes;
     
+    private static final Object activeTransferLock = new Object();
+
     public Messenger(File tempFolder) {
         this(tempFolder, CANCELED_MESSAGES_TTL_MINUTES_DEFAULT);
     }
@@ -205,15 +208,19 @@ public class Messenger {
                         transfer = new WireRecvOutputStream(this.tempFolder);
                         this.activeTransfers.put(packet.getMessageNo(), transfer);
                     }
-                    
-                    transfer.write(packet.getBytes());
-                    received = transfer.attemptReceive();
-                    //if we've received the full message, remove it from our active
-                    // transfer array and add the underlying message to the received messages list
-                    if (received) {
+                    if (packet.isControlCodeSet(ControlCode.Cancelled)) {
                         this.activeTransfers.remove(packet.getMessageNo());
-                        this.receivedMessages.add(transfer.getReceivedMessage());
-                    }
+//                        this.canceledMessages.put(t, value)
+                    } else {
+                        transfer.write(packet.getBytes());
+                        received = transfer.attemptReceive();
+                        //if we've received the full message, remove it from our active
+                        // transfer array and add the underlying message to the received messages list
+                        if (received) {
+                            this.activeTransfers.remove(packet.getMessageNo());
+                            this.receivedMessages.add(transfer.getReceivedMessage());
+                        }
+                    } 
                 }
             }
         } catch (MessageNotCompleteException ex) {

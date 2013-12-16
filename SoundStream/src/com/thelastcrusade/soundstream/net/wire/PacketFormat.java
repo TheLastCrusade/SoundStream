@@ -42,11 +42,22 @@ import com.thelastcrusade.soundstream.net.core.ISerializable;
  */
 public class PacketFormat extends AComplexDataType implements ISerializable {
 
+    //an enumeration of control codes...the ordinal value is used as bit positions
+    // in controlCodes where 1 indicates that code is present
+    public enum ControlCode {
+        Cancelled //2^0 => 0x1
+        ;
+
+        public int bitPosition() {
+            return (int)Math.pow(2, this.ordinal());
+        }
+    }
+
     public  static int HEADER_LEN = 2 * SIZEOF_INTEGER + SIZEOF_BOOLEAN;
 
+    private int controlCodes;
     private int packetLength;
     private int messageNo;
-    private boolean startingPacket;
     private byte[] bytes;
 
     public PacketFormat() {
@@ -56,10 +67,9 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      * @param messageNo
      * @param nextBytes
      */
-    public PacketFormat(int messageNo, byte[] bytes, boolean startingPacket) {
+    public PacketFormat(int messageNo, byte[] bytes) {
         this.packetLength = bytes.length + getMessageNoOverhead(); //for message no
         this.messageNo = messageNo;
-        this.startingPacket = startingPacket;
         this.bytes = bytes;
     }
 
@@ -77,23 +87,35 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
 
     @Override
     public void deserialize(InputStream input) throws IOException, MessageNotCompleteException {
+        this.controlCodes     = readInteger(input);
         this.packetLength     = readInteger(input);
         if (input.available() < this.packetLength) {
             throw new MessageNotCompleteException();
         }
-        this.messageNo      = readInteger(input);
-        this.startingPacket = readBoolean(input);
+        this.messageNo = readInteger(input);
         this.bytes     = readBytes(input, this.packetLength - getMessageNoOverhead());
     }
 
     @Override
     public void serialize(OutputStream output) throws IOException {
+        writeInteger(this.controlCodes,   output);
         writeInteger(packetLength,        output);
         writeInteger(this.messageNo,      output);
-        writeBoolean(this.startingPacket, output);
         writeBytes(  this.bytes,          output);
     }
     
+    public void addControlCode(ControlCode code) {
+        this.controlCodes |= code.bitPosition();
+    }
+
+    public void clearControlCodes() {
+        this.controlCodes = 0;
+    }
+    
+    public boolean isControlCodeSet(ControlCode code) {
+        return (this.controlCodes & code.bitPosition()) != 0;
+    }
+
     /**
      * @return the bytes
      */
@@ -112,13 +134,5 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      */
     public int getPacketLength() {
         return packetLength;
-    }
-    
-    /**
-     * True if this is the starting packet in a sequence of packets, false if not
-     * @return the startingPacket
-     */
-    public boolean isStartingPacket() {
-        return startingPacket;
-    }
+    }    
 }
