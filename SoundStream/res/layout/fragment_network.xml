@@ -84,9 +84,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true" >
-                            <!-- TODO Style progress bar -->
                             <ProgressBar
                                 android:id="@+id/progress"
+                                style="@style/Widget.AppCompat.Light.ProgressBar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
 

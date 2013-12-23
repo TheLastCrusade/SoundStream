@@ -30,7 +30,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application android:allowBackup="true" android:icon="@drawable/soundstream_launcher" android:label="@string/app_name" android:name=".CustomApp" android:theme="@style/AppTheme">
-        <activity android:label="@string/app_name" android:name=".CoreActivity"> <!-- TODO add back theme -->
+        <activity android:label="@string/app_name" android:name=".CoreActivity" android:theme="@style/Theme.AppCompat.Light" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -43,8 +43,7 @@
         android:excludeFromRecents="true"
         android:finishOnTaskLaunch="true" />
         
-        <!-- TODO add back theme -->
-        <activity android:name=".SearchActivity" android:noHistory="true">            
+        <activity android:name=".SearchActivity" android:theme="@style/Theme.AppCompat.Light" android:noHistory="true">            
             <intent-filter>                
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

@@ -105,9 +105,10 @@
         android:paddingLeft = "16dp" 
         android:src="@drawable/speaker"
         android:visibility="invisible" />
-     <!-- TODO style progress bar -->
+
      <ProgressBar 
          android:id="@+id/progress"
+         style="@style/Widget.AppCompat.Light.ProgressBar"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:paddingRight="16dp"
