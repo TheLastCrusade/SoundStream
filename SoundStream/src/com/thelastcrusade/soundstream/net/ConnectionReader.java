@@ -57,6 +57,7 @@ public class ConnectionReader {
             }
             
             messenger.clearReceivedMessages();
+            messenger.clearExpiredCanceledMessages();
         }
     }    
 }

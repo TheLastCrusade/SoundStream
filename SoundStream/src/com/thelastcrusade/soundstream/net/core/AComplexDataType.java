@@ -53,7 +53,8 @@ public class AComplexDataType {
 
     protected byte[] readBytes(InputStream input, int length)
             throws IOException {
-        if (length <= 0) {
+        //length == 0 allows sending control codes only
+        if (length < 0) {
             throw new RuntimeException("Length is invalid: " + length);
         }
         // TODO: protection for laaaaaarge byte lengths

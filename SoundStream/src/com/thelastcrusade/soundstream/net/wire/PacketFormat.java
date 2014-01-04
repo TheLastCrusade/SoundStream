@@ -53,7 +53,7 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
         }
     }
 
-    public  static int HEADER_LEN = 2 * SIZEOF_INTEGER + SIZEOF_BOOLEAN;
+    public  static int HEADER_LEN = 3 * SIZEOF_INTEGER;
 
     private int controlCodes;
     private int packetLength;
@@ -73,12 +73,16 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
         this.bytes = bytes;
     }
 
+    public static int getControlCodeOverhead() {
+        return SIZEOF_INTEGER;
+    }
+
     public static int getLengthOverhead() {
         return SIZEOF_INTEGER;
     }
 
     public static int getMessageNoOverhead() {
-        return HEADER_LEN - SIZEOF_INTEGER;
+        return HEADER_LEN - getControlCodeOverhead() - getLengthOverhead();
     }
 
     public static int getOverhead() {

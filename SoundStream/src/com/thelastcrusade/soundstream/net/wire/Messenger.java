@@ -78,7 +78,8 @@ public class Messenger {
 
     private static final int MAX_WRITE_SIZE_BYTES = 4096;
 
-    private static final int CANCELED_MESSAGES_TTL_MINUTES_DEFAULT = 1;
+    //default is 1 hour, which should be plenty of time
+    private static final int CANCELED_MESSAGES_TTL_MINUTES_DEFAULT = 60;
 
     private int sendPacketSize;
 
@@ -196,10 +197,12 @@ public class Messenger {
                 //consume this message in the input buffer
                 inputBuffer.consume();
     
+                //debugging measure...discard future packets for canceled message
                 if (shouldDiscardPacket(packet)) {
                     if (LogUtil.isLogAvailable() && Log.isLoggable(TAG, Log.DEBUG)) {
                         Log.d(TAG, "Packet for canceled message (number " + packet.getMessageNo() + ") discarded");
                     }
+                    continue;
                 }
 
                 synchronized (activeTransferLock) {
@@ -208,17 +211,19 @@ public class Messenger {
                         transfer = new WireRecvOutputStream(this.tempFolder);
                         this.activeTransfers.put(packet.getMessageNo(), transfer);
                     }
+                    //canceled implies the message is totally gone (no chance of restarting)
                     if (packet.isControlCodeSet(ControlCode.Cancelled)) {
-                        this.activeTransfers.remove(packet.getMessageNo());
-//                        this.canceledMessages.put(t, value)
+                        if (LogUtil.isLogAvailable() && Log.isLoggable(TAG, Log.DEBUG)) {
+                            Log.d(TAG, "Cancellation received for message (number " + packet.getMessageNo() + ")");
+                        }
+                        cancelMessage(packet.getMessageNo());
                     } else {
                         transfer.write(packet.getBytes());
                         received = transfer.attemptReceive();
                         //if we've received the full message, remove it from our active
                         // transfer array and add the underlying message to the received messages list
                         if (received) {
-                            this.activeTransfers.remove(packet.getMessageNo());
-                            this.receivedMessages.add(transfer.getReceivedMessage());
+                            receiveMessage(packet.getMessageNo());
                         }
                     } 
                 }
@@ -298,6 +303,11 @@ public class Messenger {
         return this.canceledMessages.containsKey(packet.getMessageNo());
     }
 
+    private void cancelMessage(int messageNo) {
+        this.activeTransfers.remove(messageNo);
+        this.canceledMessages.put(messageNo, System.currentTimeMillis());
+    }
+
     /**
      * @param canceledMessagesTtlMinutes
      */
@@ -318,6 +328,18 @@ public class Messenger {
         receivedMessages = new LinkedList<IMessage>();
     }
     
+    private void receiveMessage(int messageNo) {
+        WireRecvOutputStream transfer = this.activeTransfers.remove(messageNo);
+        this.receivedMessages.add(transfer.getReceivedMessage());
+    }
+
+    /**
+     * @return
+     */
+    public int getActiveTransferCount() {
+        return this.activeTransfers.size();
+    }
+
     /**
      * Get the last received message processed by this messenger.
      * 
@@ -333,4 +355,5 @@ public class Messenger {
     public int getSendPacketSize() {
         return this.sendPacketSize;
     }
+
 }
