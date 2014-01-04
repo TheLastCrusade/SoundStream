@@ -117,8 +117,9 @@ public class TransferService extends Service {
                         if (songId == SongMetadata.UNKNOWN_SONG) {
                             Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
                         } else {
-                            MessageFuture transfer = messageFutures.get(makeKey(fromAddr, songId));
-                            transfer.cancel();
+                            MessageFuture future = messageFutures.remove(makeKey(fromAddr, songId));
+                            future.cancel();
+                            
                         }
                     } catch (IOException e) {
                         Log.wtf(TAG, e);
