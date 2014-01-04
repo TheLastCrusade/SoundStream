@@ -35,11 +35,25 @@ import com.thelastcrusade.soundstream.net.core.AComplexDataType;
 import com.thelastcrusade.soundstream.util.MessageTestUtil;
 
 /**
- * @author thejenix
+ * TODO: This class amalgamates the test for PacketFormat and WireSendInputStream.
+ *       Should break those apart, and rewrite this to use PacketFormat (simpler)
+ * 
+ * @author Jesse Rosalia
  *
  */
 public class WireSendInputStreamTest {
 
+    class PacketSizes {
+        int controlCodeSize;
+        int payloadSize;
+        int dataSize;
+
+        public PacketSizes(int bytes) {
+            this.controlCodeSize = bytes - PacketFormat.getControlCodeOverhead();
+            this.payloadSize     = controlCodeSize - PacketFormat.getLengthOverhead();
+            this.dataSize        = payloadSize - PacketFormat.getMessageNoOverhead();
+        }
+    }
     /**
      * Test method for {@link com.lastcrusade.soundstream.net.wire.WireSendInputStream#available()}.
      * @throws IOException 
@@ -174,8 +188,8 @@ public class WireSendInputStreamTest {
         assertEquals(bytesLeft, input.available());
 
         for (; bytesLeft > 0; ) {
-            int toRead = Math.min(packetSize, bytesLeft);
-            int payloadSize = toRead - PacketFormat.getLengthOverhead();
+            int toRead      = Math.min(packetSize, bytesLeft);
+            int payloadSize = toRead - PacketFormat.getControlCodeOverhead() - PacketFormat.getLengthOverhead();
             int dataSize    = payloadSize - PacketFormat.getMessageNoOverhead();
             verifyPacket(input, expected, messageNo, payloadSize, dataSize);
             
@@ -237,6 +251,10 @@ public class WireSendInputStreamTest {
      */
     private void verifyPacketFormat(int length, int messageNo, InputStream is)
             throws IOException {
+        //first, skip the control codes
+        for (int ii = 0; ii < AComplexDataType.SIZEOF_INTEGER; ii++) {
+            is.read();
+        }
         byte[] in = new byte[AComplexDataType.SIZEOF_INTEGER];
         for (int ii = 0; ii < AComplexDataType.SIZEOF_INTEGER; ii++) {
             in[ii] = (byte) is.read();
@@ -276,12 +294,12 @@ public class WireSendInputStreamTest {
         for (; bytesLeft > 0; ) {
             int toRead = Math.min(packetSize, bytesLeft);
             if (bytesLeft <= fileBytes) {
-                int payloadSize = toRead - PacketFormat.getLengthOverhead();
+                int payloadSize = toRead - PacketFormat.getControlCodeOverhead() - PacketFormat.getLengthOverhead();
                 int dataSize    = payloadSize - PacketFormat.getMessageNoOverhead();
                 verifyPacket(input, expectedFile, messageNo, payloadSize, dataSize);
             } else {
                 int partialToRead = Math.min(toRead, bytesLeft - fileBytes);
-                int payloadSize = toRead - PacketFormat.getLengthOverhead();
+                int payloadSize = toRead - PacketFormat.getControlCodeOverhead() - PacketFormat.getLengthOverhead();
                 int dataSize    = partialToRead - PacketFormat.getOverhead();
                 verifyPacket(input, expected, messageNo, payloadSize, dataSize);
                 int rest = toRead - partialToRead;
@@ -317,7 +335,7 @@ public class WireSendInputStreamTest {
             int read = input.read(buf, 0, buf.length);
             //verify the same way as testRead
             ByteArrayInputStream bais = new ByteArrayInputStream(buf, 0, read);
-            int payloadSize = read - PacketFormat.getLengthOverhead();
+            int payloadSize = read - PacketFormat.getControlCodeOverhead() - PacketFormat.getLengthOverhead();
             int dataSize    = payloadSize - PacketFormat.getMessageNoOverhead();
             verifyPacket(bais, expected, messageNo, payloadSize, dataSize);
 
@@ -403,12 +421,12 @@ public class WireSendInputStreamTest {
                 //verify the same way as testRead
                 ByteArrayInputStream bais = new ByteArrayInputStream(buf, 0, read);
                 if (bytesLeft <= fileBytes) {
-                    int payloadSize = read - PacketFormat.getLengthOverhead();
+                    int payloadSize = read - PacketFormat.getControlCodeOverhead() - PacketFormat.getLengthOverhead();
                     int dataSize    = payloadSize - PacketFormat.getMessageNoOverhead();
                     verifyPacket(bais, expectedFile, messageNo, payloadSize, dataSize);
                 } else {
                     int partialToRead = Math.min(read, bytesLeft - fileBytes);
-                    int payloadSize = read - PacketFormat.getLengthOverhead();
+                    int payloadSize = read - PacketFormat.getControlCodeOverhead() - PacketFormat.getLengthOverhead();
                     int dataSize    = partialToRead - PacketFormat.getOverhead();
                     verifyPacket(bais, expected, messageNo, payloadSize, dataSize);
                     int rest = read - partialToRead;
