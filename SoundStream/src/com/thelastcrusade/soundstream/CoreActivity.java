@@ -192,8 +192,7 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     }
     
     private boolean isConnectActive(){
-        return true;
-//        return getSupportFragmentManager().findFragmentByTag(Transitions.CURRENT_CONTENT) instanceof ConnectFragment;
+        return getSupportFragmentManager().findFragmentByTag(Transitions.CURRENT_CONTENT) instanceof ConnectFragment;
     }
     
     public boolean onOptionsItemSelected(MenuItem item) {
