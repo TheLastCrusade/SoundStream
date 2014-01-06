@@ -296,7 +296,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                     
                     //change the color of the view for a small period of time to indicate that the add 
                     //button has been pressed
-                    v.setBackgroundColor(getResources().getColor(R.color.abs__holo_blue_light));
+                    v.setBackgroundColor(getResources().getColor(R.color.holo_blue_light));
                     Timer colorTimer = new Timer();
                     colorTimer.schedule(new ColorTimerTask(v),200);
                 }
@@ -340,7 +340,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                     @Override
                     public void run() {
                         view.setBackgroundColor(
-                                getResources().getColor(R.color.abs__background_holo_light));
+                                getResources().getColor(R.color.holo_light));
                         
                     }
                 });

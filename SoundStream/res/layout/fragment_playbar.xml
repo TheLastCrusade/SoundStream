@@ -47,7 +47,7 @@
         android:paddingTop="12dp"
     	android:paddingBottom="12dp"
         android:text="@string/now_playing"
-        android:textColor="@color/abs__primary_text_holo_light"
+        android:textColor="@color/primary_text_holo_light"
         android:singleLine="true"
         android:ellipsize="marquee"
         android:textAppearance="?android:attr/textAppearanceMedium" 

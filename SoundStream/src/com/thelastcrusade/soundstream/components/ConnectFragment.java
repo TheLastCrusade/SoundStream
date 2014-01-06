@@ -23,6 +23,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -32,7 +33,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.service.ConnectionService;
@@ -53,7 +53,7 @@ import com.thelastcrusade.soundstream.util.Transitions;
  * This fragment should be what is first presented to the user when
  * they enter the app and are not connected to any network
  */
-public class ConnectFragment extends SherlockFragment implements ITitleable{
+public class ConnectFragment extends Fragment implements ITitleable{
     
     private static final String TAG = ConnectFragment.class.getSimpleName();
     private final String SEARCHING_TAG = "isSearching";
@@ -233,7 +233,7 @@ public class ConnectFragment extends SherlockFragment implements ITitleable{
     }
     
     private void setJoinToDefaultState(){
-        setJoinState(true, View.INVISIBLE, R.color.abs__background_holo_light);
+        setJoinState(true, View.INVISIBLE, R.color.holo_light);
     }
     
     private void setJoinToSearchingState(){

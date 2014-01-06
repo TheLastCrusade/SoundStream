@@ -22,6 +22,7 @@ package com.thelastcrusade.soundstream.components;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +32,6 @@ import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.model.UserList;
@@ -47,7 +47,7 @@ import com.thelastcrusade.soundstream.util.Transitions;
 import com.thelastcrusade.soundstream.util.UserListAdapter;
 
 
-public class MenuFragment extends SherlockFragment implements ITitleable {
+public class MenuFragment extends Fragment implements ITitleable {
     private static final String TAG = MenuFragment.class.getSimpleName();
     private BroadcastRegistrar registrar;
     private UserListAdapter userAdapter;

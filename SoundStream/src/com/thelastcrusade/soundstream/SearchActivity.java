@@ -18,25 +18,25 @@
  */
 package com.thelastcrusade.soundstream;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
+
 import com.thelastcrusade.soundstream.components.MusicLibraryFragment;
+
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.SearchView;
 
 /**
  * @author reid
  *
  */
-public class SearchActivity extends SherlockFragmentActivity {
+public class SearchActivity extends FragmentActivity {
     
     private static final String TAG = SearchActivity.class.getSimpleName();
     public static final String QUERY_KEY = "query_key";
@@ -47,7 +47,7 @@ public class SearchActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_frame);
         
-        ActionBar bar = getSupportActionBar();
+        ActionBar bar = getActionBar();
         bar.show();
                 
         // Get the intent, verify the action and get the query
@@ -65,7 +65,7 @@ public class SearchActivity extends SherlockFragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
-        getSupportMenuInflater().inflate(R.menu.search_menu, menu);
+        getMenuInflater().inflate(R.menu.search_menu, menu);
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
