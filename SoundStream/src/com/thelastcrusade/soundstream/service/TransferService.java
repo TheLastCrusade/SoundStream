@@ -34,6 +34,8 @@ import com.thelastcrusade.soundstream.library.SongNotFoundException;
 import com.thelastcrusade.soundstream.model.SongMetadata;
 import com.thelastcrusade.soundstream.net.MessageFuture;
 import com.thelastcrusade.soundstream.net.MessageFuture.IFinishedHandler;
+import com.thelastcrusade.soundstream.service.MessagingService.MessagingServiceBinder;
+import com.thelastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 
@@ -66,17 +68,19 @@ public class TransferService extends Service {
 
     @Override
     public void onCreate() {
-//        messagingServiceLocator = new ServiceLocator<MessagingService>(
-//                this, MessagingService.class, MessagingServiceBinder.class);
-//
+        messagingServiceLocator = new ServiceLocator<MessagingService>(
+                this, MessagingService.class, MessagingServiceBinder.class);
+        musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
         registerReceivers();
     }
     
     @Override
     public void onDestroy() {
         unregisterReceivers();
-//        messagingServiceLocator.unbind();
-//        userListServiceLocator.unbind();
+        messagingServiceLocator.unbind();
+        musicLibraryServiceLocator.unbind();
         super.onDestroy();
     }
 
@@ -98,6 +102,7 @@ public class TransferService extends Service {
                 public void onReceiveAction(Context context, Intent intent) {
                     String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                     long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                    Log.i(TAG, "Request Song Message received from " + fromAddr);
 
                     if (songId == SongMetadata.UNKNOWN_SONG) {
                         Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
@@ -112,6 +117,7 @@ public class TransferService extends Service {
                 public void onReceiveAction(Context context, Intent intent) {
                     String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
                     long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
+                    Log.i(TAG, "Cancel Song Message received from " + fromAddr);
 
                     try {
                         if (songId == SongMetadata.UNKNOWN_SONG) {

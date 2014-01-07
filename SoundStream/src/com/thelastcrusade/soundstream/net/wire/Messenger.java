@@ -194,7 +194,9 @@ public class Messenger {
             // to exit the loop when we've run out of full packets in our buffer
             while (inputBuffer.size() > 0) {
                 packet.deserialize(inputBuffer.getInputStream());
+                
                 //consume this message in the input buffer
+                //NOTE: only happens on successful deserialize (e.g. it doesnt throw a MessageNotCompleteException
                 inputBuffer.consume();
     
                 //debugging measure...discard future packets for canceled message

@@ -28,4 +28,6 @@ package com.thelastcrusade.soundstream.net.wire;
  */
 public class MessageNotCompleteException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
 }

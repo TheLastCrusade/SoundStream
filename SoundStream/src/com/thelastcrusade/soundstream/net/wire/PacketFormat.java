@@ -53,10 +53,8 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
         }
     }
 
-    public  static int HEADER_LEN = 3 * SIZEOF_INTEGER;
-
-    private int controlCodes;
     private int packetLength;
+    private int controlCodes;
     private int messageNo;
     private byte[] bytes;
 
@@ -68,7 +66,7 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      * @param nextBytes
      */
     public PacketFormat(int messageNo, byte[] bytes) {
-        this.packetLength = bytes.length + getMessageNoOverhead(); //for message no
+        this.packetLength = bytes.length + PacketFormat.getOverhead() - PacketFormat.getLengthOverhead(); //for message no
         this.messageNo = messageNo;
         this.bytes = bytes;
     }
@@ -82,28 +80,45 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
     }
 
     public static int getMessageNoOverhead() {
-        return HEADER_LEN - getControlCodeOverhead() - getLengthOverhead();
+        return SIZEOF_INTEGER;
     }
 
     public static int getOverhead() {
-        return HEADER_LEN;
+        return getControlCodeOverhead() + getLengthOverhead() + getMessageNoOverhead();
+    }
+
+    public static int getOverheadWithoutLength() {
+        return getOverhead() - getLengthOverhead();
+    }
+
+    /**
+     * @param input
+     * @param lengthOverhead
+     * @throws MessageNotCompleteException 
+     * @throws IOException 
+     */
+    private void checkAvailable(InputStream input, int required) throws IOException, MessageNotCompleteException {
+        if (input.available() < required) {
+            throw new MessageNotCompleteException();
+        }
     }
 
     @Override
     public void deserialize(InputStream input) throws IOException, MessageNotCompleteException {
-        this.controlCodes     = readInteger(input);
+        checkAvailable(input, getLengthOverhead());
         this.packetLength     = readInteger(input);
-        if (input.available() < this.packetLength) {
-            throw new MessageNotCompleteException();
-        }
-        this.messageNo = readInteger(input);
-        this.bytes     = readBytes(input, this.packetLength - getMessageNoOverhead());
+        checkAvailable(input, this.packetLength);
+
+        this.controlCodes = readInteger(input);
+        this.messageNo    = readInteger(input);
+        this.bytes        = readBytes(input, this.packetLength - getOverheadWithoutLength());
     }
+
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        writeInteger(this.controlCodes,   output);
         writeInteger(packetLength,        output);
+        writeInteger(this.controlCodes,   output);
         writeInteger(this.messageNo,      output);
         writeBytes(  this.bytes,          output);
     }

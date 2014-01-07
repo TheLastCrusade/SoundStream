@@ -63,6 +63,7 @@ public class WireSendInputStream extends InputStream {
         this.available = this.message.available();
         //create an input stream to hold the file length, only once (first time through)
         if (this.file != null && this.fileLengthStream == null) {
+            //SIZEOF_INTEGER is for file length
             this.available += file.available() + AComplexDataType.SIZEOF_INTEGER;
             IntegerLength length = new IntegerLength(file.available());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

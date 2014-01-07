@@ -61,6 +61,7 @@ public abstract class BluetoothConnection extends Thread {
     public BluetoothConnection(Context context, BluetoothSocket socket, Handler handler) throws IOException {
         super("MessageThread-" + safeSocketName(socket));
         mmSocket  = socket;
+        mmHandler = handler;
 
         mmMessenger = new Messenger(context.getCacheDir());
         BluetoothDevice remoteDevice = mmSocket.getRemoteDevice();
