@@ -215,7 +215,7 @@ public class Messenger {
                     }
                     //canceled implies the message is totally gone (no chance of restarting)
                     if (packet.isControlCodeSet(ControlCode.Cancelled)) {
-                        if (LogUtil.isLogAvailable() && Log.isLoggable(TAG, Log.DEBUG)) {
+                        if (LogUtil.isLogAvailable()) {
                             Log.d(TAG, "Cancellation received for message (number " + packet.getMessageNo() + ")");
                         }
                         cancelMessage(packet.getMessageNo());

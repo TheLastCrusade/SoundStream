@@ -58,14 +58,18 @@ public class InputBuffer extends ByteArrayOutputStream {
             if (available() <= 0) {
                 return -1;
             }
+            //NOTE: there may not be length bytes available..and that's ok.  code that uses
+            // this stream will check this case and react appropriately
             int toCopy = Math.min(length, available());
             System.arraycopy(buf, index, buffer, offset, toCopy);
             index += toCopy;
             return toCopy;
         }
+        
         @Override
         public int read() throws IOException {
-            return index < size() ? buf[index++] : -1;
+            //read returns an integer between 0 and 255, or -1
+            return index < size() ? (int) buf[index++] & 0xFF : -1;
         }
     }
     

@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import android.util.Log;
 
@@ -89,6 +91,8 @@ public class ConnectionWriter {
         }
     });
 
+    private Set<Integer> canceled = new HashSet<Integer>();
+
     private OutputStream outStream;
 
     private Messenger messenger;
@@ -102,15 +106,8 @@ public class ConnectionWriter {
     public void cancel(int messageNo) throws IOException {
         //to cancel a message, we replace the message stream with a canceled
         // packet
-        QueueEntry found = removeQueueEntry(messageNo);
-        if (found != null) {
-            PacketFormat cancelPacket = new PacketFormat(messageNo, new byte[0]);
-            cancelPacket.addControlCode(ControlCode.Cancelled);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            cancelPacket.serialize(baos);
-            found.messageStream = new ByteArrayInputStream(baos.toByteArray());
-            found.score = messageNo * CANCEL_TRANSFER_SCORE_MULTIPLIER;
-            queue.add(found);
+        synchronized(this.queueLock) {
+            this.canceled.add(messageNo);
         }
     }
 
@@ -184,6 +181,28 @@ public class ConnectionWriter {
         return found;
     }
 
+    private void processCanceled() throws IOException {
+        Set<Integer> canceled = new HashSet<Integer>();
+        synchronized(queueLock) {
+            canceled.addAll(this.canceled);
+            this.canceled.clear();
+        }
+        for (int messageNo : canceled) {
+            QueueEntry found = removeQueueEntry(messageNo);
+            if (found != null) {
+                if (LogUtil.isLogAvailable()) {
+                    Log.d(TAG, "Message " + messageNo + " canceled");
+                }
+                PacketFormat cancelPacket = new PacketFormat(messageNo, new byte[0]);
+                cancelPacket.addControlCode(ControlCode.Cancelled);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                cancelPacket.serialize(baos);
+                found.messageStream = new ByteArrayInputStream(baos.toByteArray());
+                found.score = messageNo * CANCEL_TRANSFER_SCORE_MULTIPLIER;
+                queue.add(found);
+            }
+        }
+    }
     /**
      * Write one message (or part of a message) to the connected output stream.
      * 
@@ -198,6 +217,10 @@ public class ConnectionWriter {
      * @throws IOException
      */
     public void writeOne() throws IOException {
+        //process canceled entires first
+        processCanceled();
+
+        //then process the next entry to be sent
         QueueEntry qe = nextQueueEntry();
         if (qe != null) {
             int read = qe.messageStream.read(outBytes);

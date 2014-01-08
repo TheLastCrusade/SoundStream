@@ -124,7 +124,9 @@ public class TransferService extends Service {
                             Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
                         } else {
                             MessageFuture future = messageFutures.remove(makeKey(fromAddr, songId));
-                            future.cancel();
+                            if (future != null) {
+                                future.cancel();
+                            }
                             
                         }
                     } catch (IOException e) {

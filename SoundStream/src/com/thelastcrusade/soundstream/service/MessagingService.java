@@ -35,6 +35,7 @@ import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.thelastcrusade.soundstream.net.message.AddToPlaylistMessage;
 import com.thelastcrusade.soundstream.net.message.BumpSongOnPlaylistMessage;
+import com.thelastcrusade.soundstream.net.message.CancelSongMessage;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.message.LibraryMessage;
 import com.thelastcrusade.soundstream.net.message.PauseMessage;
@@ -236,11 +237,11 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     private void registerCancelSongMessageHandler() {
-        this.messageDispatch.registerHandler(RequestSongMessage.class, new IMessageHandler<RequestSongMessage>() {
+        this.messageDispatch.registerHandler(CancelSongMessage.class, new IMessageHandler<CancelSongMessage>() {
 
             @Override
             public void handleMessage(int messageNo,
-                    RequestSongMessage message, String fromAddr) {
+                    CancelSongMessage message, String fromAddr) {
                 new LocalBroadcastIntent(ACTION_CANCEL_SONG_MESSAGE)
                     .putExtra(EXTRA_ADDRESS, fromAddr)
                     .putExtra(EXTRA_SONG_ID, message.getSongId())
@@ -498,7 +499,7 @@ public class MessagingService extends Service implements IMessagingService {
 
     @Override
     public void sendCancelSongMessage(String address, long songId) {
-        RequestSongMessage msg = new RequestSongMessage(songId);
+        CancelSongMessage msg = new CancelSongMessage(songId);
         //send the message to the guests
         sendMessageToGuest(address, msg);
     }

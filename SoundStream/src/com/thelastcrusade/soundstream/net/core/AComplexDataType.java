@@ -18,6 +18,7 @@
  */
 package com.thelastcrusade.soundstream.net.core;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,7 +60,11 @@ public class AComplexDataType {
         }
         // TODO: protection for laaaaaarge byte lengths
         byte[] bytes = new byte[length];
-        input.read(bytes);
+        int read = input.read(bytes);
+        //if we didn't read all we expected, throw an EOF exception.
+        if (read != length) {
+            throw new EOFException();
+        }
         return bytes;
     }
 
@@ -71,10 +76,7 @@ public class AComplexDataType {
     }
 
     protected boolean readBoolean(InputStream input) throws IOException {
-        byte[] in = new byte[SIZEOF_BOOLEAN];
-        for (int ii = 0; ii < SIZEOF_BOOLEAN; ii++) {
-            in[ii] = (byte) input.read();
-        }
+        byte[] in = readBytes(input, SIZEOF_BOOLEAN);
         ByteBuffer bb = ByteBuffer.wrap(in);
         return bb.get() != 1;        
     }
@@ -87,10 +89,7 @@ public class AComplexDataType {
     }
 
     protected int readInteger(InputStream input) throws IOException {
-        byte[] in = new byte[SIZEOF_INTEGER];
-        for (int ii = 0; ii < SIZEOF_INTEGER; ii++) {
-            in[ii] = (byte) input.read();
-        }
+        byte[] in = readBytes(input, SIZEOF_INTEGER);
         ByteBuffer bb = ByteBuffer.wrap(in);
         return bb.getInt();
     }
