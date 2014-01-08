@@ -111,7 +111,7 @@ public class ConnectionService extends Service {
     private ServiceLocator<MessagingService> messagingServiceLocator;
     private BluetoothDiscoveryHandler        bluetoothDiscoveryHandler;
 
-    private BluetoothConnection discoveryInitiator;
+    private String discoveryInitiatorAddress;
 
     private BroadcastRegistrar broadcastRegistrar;
 
@@ -245,7 +245,7 @@ public class ConnectionService extends Service {
                     //if this has already been called, don't call it again (see below
                     // ...this is to handle any weird race conditions)
                     if (!bluetoothDiscoveryHandler.isDiscoveryStarted()) {
-                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiatorAddress);
                     }
                 }
             })
@@ -256,10 +256,11 @@ public class ConnectionService extends Service {
                     //NOTE: if we start discovery immediately after enabling bluetooth,
                     // we MAY not get the ACTION_DISCOVERY_STARTED intent...in that case,
                     // "fake it" by calling onDiscoveryStarted, so that our internal
-                    // member variables are set up.  this will only happen if no guests
-                    // are found, but we want to be internally consistent.
+                    // member variables are set up.
+                    // NOTE: this specific case will only happen if no guests are found,
+                    // but we want to be internally consistent.
                     if (!bluetoothDiscoveryHandler.isDiscoveryStarted()) {
-                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiatorAddress);
                     }
                     bluetoothDiscoveryHandler.onDiscoveryFinished();
                 }
@@ -273,7 +274,7 @@ public class ConnectionService extends Service {
                     // "fake it" by calling onDiscoveryStarted, so that our internal
                     // member variables are set up to record a found guest
                     if (!bluetoothDiscoveryHandler.isDiscoveryStarted()) {
-                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiator != null);
+                        bluetoothDiscoveryHandler.onDiscoveryStarted(discoveryInitiatorAddress);
                     }
                     bluetoothDiscoveryHandler.onDiscoveryFound(
                             (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
@@ -287,12 +288,17 @@ public class ConnectionService extends Service {
                     List<FoundGuest> foundGuests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
                     FoundGuestsMessage msg = new FoundGuestsMessage(foundGuests);
                     try {
-                        discoveryInitiator.write(msg);
+                        BluetoothConnection initiatorGuest = findMessageThreadByAddress(discoveryInitiatorAddress);
+                        if (initiatorGuest != null) {
+                            initiatorGuest.write(msg);
+                        } else {
+                            Log.wtf(TAG, "Find finished, but guest is not found: " + discoveryInitiatorAddress);
+                        }
                     } catch (IOException e) {
                         Log.wtf(TAG, e);
                         Toaster.eToast(ConnectionService.this, "Unable to enqueue message " + msg.getClass().getSimpleName());
                     }
-                    discoveryInitiator = null; //clear the initiator to handle the next one
+                    discoveryInitiatorAddress = null; //clear the initiator to handle the next one
                 }
             })
            .register(this);
@@ -311,15 +317,14 @@ public class ConnectionService extends Service {
     private void handleFindNewGuestsMessage(final String remoteAddr) {
         Toaster.iToast(this, R.string.finding_new_guests);
 
-        BluetoothConnection found = findMessageThreadByAddress(remoteAddr);
-
-        if (found == null) {
-            Log.wtf(TAG, "Unknown remote device: " + remoteAddr);
+        //sanity check to make sure the guest is still connected before we go
+        if (findMessageThreadByAddress(remoteAddr) != null) {
+            this.discoveryInitiatorAddress = remoteAddr;
+            findNewGuests();
+        } else {
+            Log.wtf(TAG, "Find New Guests message recieved from unknown remote device: " + remoteAddr);
             return;
         }
-
-        this.discoveryInitiator = found;
-        findNewGuests();
     }
 
     /**

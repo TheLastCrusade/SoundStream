@@ -37,6 +37,7 @@ import android.widget.ImageButton;
 
 import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
+import com.thelastcrusade.soundstream.SearchActivity;
 import com.thelastcrusade.soundstream.model.SongMetadata;
 import com.thelastcrusade.soundstream.model.UserList;
 import com.thelastcrusade.soundstream.service.MusicLibraryService;
@@ -50,6 +51,7 @@ import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.thelastcrusade.soundstream.util.MusicListAdapter;
 import com.thelastcrusade.soundstream.util.SongGestureListener;
+import com.thelastcrusade.soundstream.util.Toaster;
 
 public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getSimpleName();
@@ -60,6 +62,8 @@ public class MusicLibraryFragment extends MusicListFragment {
     private ServiceLocator<MusicLibraryService> musicLibraryServiceLocator;
     
     private MusicAdapter mMusicAdapter;
+    
+    private volatile String mQuery;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -95,13 +99,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                 this.getActivity(),
                 MusicLibraryService.class,
                 MusicLibraryService.MusicLibraryServiceBinder.class
-        );
-        musicLibraryServiceLocator.setOnBindListener(new IOnBindListener() {
-            @Override
-            public void onServiceBound() {
-                mMusicAdapter.updateMusicFromLibrary();
-            }
-        });
+        );         
 
         registerReceivers();
     }
@@ -136,10 +134,32 @@ public class MusicLibraryFragment extends MusicListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         
+        
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
         
         setListAdapter(mMusicAdapter);
+                
+        if (getArguments() != null) {
+            String query = getArguments().getString(SearchActivity.QUERY_KEY);
+            if (query != null) {
+                mQuery = query;
+                //Most of the time the music library service will not be bound
+                // so this will not update the list
+                mMusicAdapter.updateMusicFromQuery(mQuery);
+            } else {
+                Log.w(TAG, "Fragment recieved arguments but no query");
+            }
+        }
+        
+        //Since most of the time the service will not be bound here set
+        // the onBindListenter with an update that has the proper query
+        musicLibraryServiceLocator.setOnBindListener(new IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                mMusicAdapter.updateMusicFromQuery(mQuery);
+            }
+        });
         
         return v;
     }
@@ -147,7 +167,7 @@ public class MusicLibraryFragment extends MusicListFragment {
     @Override
     public void onStart() {
         super.onStart();
-        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
+//        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
     }
 
     @Override
@@ -166,7 +186,7 @@ public class MusicLibraryFragment extends MusicListFragment {
             @Override
             public void onReceiveAction(Context context, Intent intent) {
                 //Update library shown when the library service gets an update
-                mMusicAdapter.updateMusicFromLibrary();
+                mMusicAdapter.updateMusicFromQuery(mQuery);
             }
         })
         .addLocalAction(PlaylistService.ACTION_SONG_ADDED, new IBroadcastActionHandler() {
@@ -210,19 +230,23 @@ public class MusicLibraryFragment extends MusicListFragment {
         }
         return musicLibraryService;
     }
+    
     private ArrayList<SongMetadata> getMusicLibraryFromService(){
+        return getMusicLibraryFromQuery(null);
+    }
+    
+    private ArrayList<SongMetadata> getMusicLibraryFromQuery(String query){
         ArrayList<SongMetadata> library;
         MusicLibraryService musicLibraryService = getMusicLibraryService();
         if(musicLibraryService != null){
-            library = new ArrayList<SongMetadata>(musicLibraryService.getLibrary());
+            library = new ArrayList<SongMetadata>(musicLibraryService.getLibrary(query));
         } else {
             library = new ArrayList<SongMetadata>();
             Log.i(TAG, "MusicLibarysService null, returning empty library");
         }
         return library;
     }
-
-
+    
     private UserList getUserListFromService(){
         UserList activeUsers = new UserList();
         UserListService userService = getUserListService();
@@ -272,7 +296,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                     
                     //change the color of the view for a small period of time to indicate that the add 
                     //button has been pressed
-                    v.setBackgroundColor(getResources().getColor(R.color.abs__holo_blue_light));
+                    v.setBackgroundColor(getResources().getColor(R.color.holo_blue_light));
                     Timer colorTimer = new Timer();
                     colorTimer.schedule(new ColorTimerTask(v),200);
                 }
@@ -284,10 +308,21 @@ public class MusicLibraryFragment extends MusicListFragment {
 
         /**
          * Update the list with music from the library
+         * @deprecated use {@link updateMusicFromQuery()} instead.
          */
+        @Deprecated
         private void updateMusicFromLibrary() {
             this.updateMusic(getMusicLibraryFromService());
             notifyDataSetChanged();
+        }
+        
+        private void updateMusicFromQuery(String query) {
+            if (query != null) {
+                this.updateMusic(getMusicLibraryFromQuery(query));
+                notifyDataSetChanged();    
+            } else {
+                updateMusicFromLibrary();
+            }
         }
         
         private class ColorTimerTask extends TimerTask{
@@ -305,7 +340,7 @@ public class MusicLibraryFragment extends MusicListFragment {
                     @Override
                     public void run() {
                         view.setBackgroundColor(
-                                getResources().getColor(R.color.abs__background_holo_light));
+                                getResources().getColor(R.color.holo_light));
                         
                     }
                 });

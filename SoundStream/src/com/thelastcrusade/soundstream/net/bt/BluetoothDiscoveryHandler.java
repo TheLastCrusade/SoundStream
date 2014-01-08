@@ -46,7 +46,7 @@ public class BluetoothDiscoveryHandler {
 
     private ArrayList<FoundGuest> discoveredGuests;
 
-    private boolean remoteInitiated;
+    private String remoteInitiatorAddress;
 
     private boolean discoveryStarted;
 
@@ -66,10 +66,10 @@ public class BluetoothDiscoveryHandler {
      * Call to indicate the start of discovery.  This MUST be called before devices are discovered.
      * 
      */
-    public void onDiscoveryStarted(boolean remoteInitiated) {
+    public void onDiscoveryStarted(String remoteInitiator) {
         Log.w(TAG, "Discovery started");
         this.discoveryStarted = true;
-        this.remoteInitiated = remoteInitiated;
+        this.remoteInitiatorAddress = remoteInitiator;
         this.discoveredGuests = new ArrayList<FoundGuest>();
     }
 
@@ -80,7 +80,7 @@ public class BluetoothDiscoveryHandler {
     public void onDiscoveryFinished() {
         Log.w(TAG, "Discovery finished");
         //if its remote initiated, we want to send a different action
-        String action = this.remoteInitiated
+        String action = this.remoteInitiatorAddress != null
                           ? ConnectionService.ACTION_REMOTE_FIND_FINISHED
                           : ConnectionService.ACTION_FIND_FINISHED;
         new LocalBroadcastIntent(action)
@@ -110,7 +110,10 @@ public class BluetoothDiscoveryHandler {
                 device = adapter.getRemoteDevice(bonded.getAddress());
             }
         }
-
-        this.discoveredGuests.add(new FoundGuest(device.getName(), device.getAddress(), known));
+        //only add the remote if they were not the initiator
+        //NOTE: handles null check inside equals
+        if (!device.getAddress().equals(this.remoteInitiatorAddress)) {
+            this.discoveredGuests.add(new FoundGuest(device.getName(), device.getAddress(), known));
+        }
     }
 }

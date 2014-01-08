@@ -21,6 +21,7 @@ package com.thelastcrusade.soundstream.components;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,7 +29,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.util.ITitleable;
@@ -37,7 +37,7 @@ import com.thelastcrusade.soundstream.util.ITitleable;
  * @author Elizabeth
  *
  */
-public class AboutFragment extends SherlockFragment implements ITitleable {
+public class AboutFragment extends Fragment implements ITitleable {
     private final String TAG = AboutFragment.class.getSimpleName();
 
     @Override

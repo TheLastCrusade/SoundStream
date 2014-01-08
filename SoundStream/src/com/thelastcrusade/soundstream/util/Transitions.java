@@ -51,7 +51,7 @@ public class Transitions {
     //Home is where you get sent after connecting to the network
     private final static int HOME = MUSIC_LIBRARY;
     
-    public final static String currentContent = "currentContent";
+    public final static String CURRENT_CONTENT = "currentContent";
     
     public static void transitionToHome(CoreActivity activity){
         switchFragment(HOME, activity);
@@ -80,10 +80,10 @@ public class Transitions {
     
     private static void switchFragment(int fragmentName, CoreActivity activity){
         Fragment fragment = getFragment(fragmentName);
-        Fragment previousFragment = activity.getSupportFragmentManager().findFragmentByTag(currentContent);
+        Fragment previousFragment = activity.getSupportFragmentManager().findFragmentByTag(CURRENT_CONTENT);
         
         activity.getSupportFragmentManager().beginTransaction()
-            .replace(R.id.content, fragment, currentContent)
+            .replace(R.id.content, fragment, CURRENT_CONTENT)
             .commit();
         
         if(fragment instanceof ConnectFragment){
@@ -98,6 +98,7 @@ public class Transitions {
         activity.showContent();
         String title = activity.getResources().getString(((ITitleable)fragment).getTitle());
         activity.setTitle(title);
+        activity.invalidateOptionsMenu();
     }
     
     private static Fragment getFragment(int fragmentInx) {

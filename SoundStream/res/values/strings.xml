@@ -101,6 +101,9 @@
 	<string name="welcome_network">To view information about the network, go the the Network page.\n\n From there you can add members to the network, disconnect, or switch networks. </string>
 	<string name="instructions_label">Instructions</string>
 	<string name="instructions">View the startup instructions again</string>
+	
+	<!-- search things -->
+	<string name="search_hint">Search Music</string>
 
 	<!-- Crash reporting -->
 	<string name="crash_dialog_title">That\'s not right…</string>

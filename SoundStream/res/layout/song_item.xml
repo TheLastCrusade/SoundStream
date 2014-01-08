@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@color/abs__background_holo_light">
+    android:background="@color/holo_light">
 
     <View
         android:id="@+id/user_color"
@@ -105,15 +105,15 @@
         android:paddingLeft = "16dp" 
         android:src="@drawable/speaker"
         android:visibility="invisible" />
-     
+
      <ProgressBar 
          android:id="@+id/progress"
+         style="@style/Widget.AppCompat.ProgressBar"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:paddingRight="16dp"
          android:layout_alignParentRight="true"
          android:layout_centerVertical="true"
-         style="@style/Widget.Sherlock.Light.ProgressBar"
          android:visibility="invisible" />
      
 </RelativeLayout>
