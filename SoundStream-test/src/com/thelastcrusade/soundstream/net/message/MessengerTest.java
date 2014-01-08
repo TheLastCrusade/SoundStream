@@ -102,6 +102,44 @@ public class MessengerTest {
     }
 
     @Test
+    public void testDeserializeFileMessagePartialReceive() throws Exception {
+        //get the temp folder, immediately expire canceled messages
+        Messenger messenger = new Messenger(File.createTempFile("test", "").getParentFile(), 0);
+        //we want 2 packets, so create a file slightly bigger than the single packet size
+        int packetSize = 512;
+        File tempFile = MessageTestUtil.getTempTestFile(packetSize + 1);
+        //build up a TestMessage object
+        FileMessage testMessage = new FileMessage();
+        testMessage.setFilePath(tempFile.getCanonicalPath());
+        List<PacketFormat> packets = simulateSendAndReceive(testMessage, packetSize);
+
+        //ensure we have 2 packets, or else the test isnt valid
+        assertEquals(2, packets.size());
+        assertEquals(0, messenger.getActiveTransferCount());
+
+        boolean received = false;
+        InputBuffer buffer = new InputBuffer();
+        InputBuffer buffer2 = new InputBuffer();
+        packets.get(0).serialize(buffer);
+        packets.get(1).serialize(buffer2);
+        //add in an extra byte...this would be a partial receive of the next packet
+        InputStream buffer2is = buffer2.getInputStream();
+        buffer.write(buffer2is.read());
+        received = messenger.deserializeMessage(buffer.getInputStream());
+        assertFalse(received);
+        assertEquals(1, messenger.getActiveTransferCount());
+        assertEquals(0, messenger.getReceivedMessages().size());
+
+        //send the second part of the message, which should be ignored
+        received = messenger.deserializeMessage(buffer2is);
+        assertTrue(received);
+
+        //should still have 0 active transfers and 0 received messages
+        assertEquals(0, messenger.getActiveTransferCount());
+        assertEquals(1, messenger.getReceivedMessages().size());
+    }
+    
+    @Test
     public void testDeserializeMessage() throws Exception {
         
         //test the simple case (one message within the stream)
