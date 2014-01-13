@@ -80,14 +80,12 @@
     <string name="meet_label">Meet the Team</string>
     <string name="team">Reid Baker\nDavid Greenhalgh\nElizabeth Johnson\nJesse Rosalia\nTaylor Wrobel</string>
     <string name="thanks_label">Special Thanks</string>
-    <string name="thanks_ABS"><u>ActionBarSherlock</u></string>
     <string name="thanks_SlidingMenu"><u>SlidingMenu</u></string>
     <string name="thanks_Troy">Troy Peace - a super sponsor, without whom none of this would be possible</string>
     <string name="contact_us_label">Contact Us</string>
     <string name="repo_link_text"><u>Our GitHub repo</u></string>
     <string name="repo_link">https://github.com/TheLastCrusade/SoundStream</string>
     <string name="sliding_menu_link">https://github.com/jfeinstein10/SlidingMenu</string>
-    <string name="ABS_link">https://github.com/JakeWharton/ActionBarSherlock</string>
     <string name="beta_help_instructions">SoundStream is currently in beta, so if you run into an issue, email us at:</string>
     <string name="email_link_text"><u>SoundStreamHelp@gmail.com</u></string>
     <string name="email_support_address">SoundStreamHelp@gmail.com</string>
