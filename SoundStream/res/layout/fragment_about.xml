@@ -246,7 +246,6 @@
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_marginLeft="10dp"
-               android:text="@string/thanks_ABS"
                android:textColor="@color/link_blue"
                android:layout_below="@id/brought_to_you_by"
                android:textSize="16sp"
