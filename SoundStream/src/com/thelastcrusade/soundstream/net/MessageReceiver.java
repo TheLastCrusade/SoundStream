@@ -25,6 +25,9 @@ import android.os.Message;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 
 /**
+ * A helper class to receive messages from the wire and dispatch them through the Android
+ * system.
+ * 
  * @author Jesse Rosalia
  *
  */

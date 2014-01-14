@@ -23,6 +23,11 @@ import java.io.IOException;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 
 /**
+ * A helper class to enqueue messages to be written by the connection writer.
+ * 
+ * This class also defines the behavior of the Future and the cancel method,
+ * for canceling outstanding messages.
+ * 
  * @author Jesse Rosalia
  *
  */
