@@ -33,23 +33,16 @@ import com.thelastcrusade.soundstream.net.message.IMessage;
  */
 public class MessageEnqueuer {
 
-    private int mmOutMessageNumber = 1;
+    private int outMessageNumber = 1;
     private ConnectionWriter writer;
 
-    /**
-     * 
-     */
     public MessageEnqueuer(ConnectionWriter writer) {
         this.writer = writer;
     }
-    /**
-     * @param message
-     * @return
-     * @throws IOException 
-     */
+
     public MessageFuture enqueueMessage(IMessage message) throws IOException {
         //enqueue this message
-        final int messageNo = mmOutMessageNumber++;
+        final int messageNo = this.outMessageNumber++;
         MessageFuture future = new MessageFuture() {
 
             @Override

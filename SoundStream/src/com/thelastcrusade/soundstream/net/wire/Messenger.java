@@ -146,7 +146,7 @@ public class Messenger {
      * @throws Exception If the message class does not exist, or is not defined properly, or
      * if the stream closes prematurely.
      */
-    public boolean deserializeMessage(InputStream input) throws Exception {
+    public boolean deserializeMessage(InputStream input) throws IOException {
         boolean processed = false;
         int read = 0;
         do {
@@ -325,7 +325,6 @@ public class Messenger {
         this.canceledMessages = toKeep;
     }
 
-    ///TODO
     public void clearReceivedMessages() {
         receivedMessages = new LinkedList<IMessage>();
     }

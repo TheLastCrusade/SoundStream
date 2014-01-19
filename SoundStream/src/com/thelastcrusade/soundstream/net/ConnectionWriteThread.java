@@ -20,12 +20,13 @@ package com.thelastcrusade.soundstream.net;
 
 import java.io.IOException;
 
-import com.thelastcrusade.soundstream.net.bt.BluetoothConnection;
-
 import android.util.Log;
 
 /**
- * @author theJenix
+ * A thread designed to asynchronously write (using the ConnectionWriteR)
+ * as fast as it can.
+ * 
+ * @author Jesse Rosalia
  *
  */
 public class ConnectionWriteThread extends Thread {
@@ -81,8 +82,12 @@ public class ConnectionWriteThread extends Thread {
         stoppingThread = Thread.currentThread();
         synchronized(stoppingThread) {
             try {
-                //wait for the thread to stop, or for 1 second.  This number may have to be adjusted
-                // as we test with larger and larger files.
+                //wait for the thread to stop, or for 1 second.
+                //NOTE: the goal is to wait for run() to complete.  The main
+                // call in the loop in that method is to writer.writeOne, which
+                // takes time proportional to the max number of bytes we can
+                // send at a time.  As we optimize that number, we'll have to make
+                // sure this still gives that loop ample time to close gracefully.
                 int waitTimeInMS = 1000;
                 stoppingThread.wait(waitTimeInMS);
             } catch (InterruptedException e) {
