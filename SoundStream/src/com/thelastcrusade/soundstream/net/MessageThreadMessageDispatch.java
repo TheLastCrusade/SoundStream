@@ -85,10 +85,10 @@ public class MessageThreadMessageDispatch extends Handler {
         int             messageNo = 0;
         String          fromAddr  = null;
         
-        if (msg.what == MessageThread.MESSAGE_READ) {
+        if (msg.what == ConnectionConstants.MESSAGE_READ) {
             messageNo = msg.arg1;
             message   = (IMessage)msg.obj;
-            fromAddr  = msg.getData().getString(MessageThread.EXTRA_ADDRESS);
+            fromAddr  = msg.getData().getString(ConnectionConstants.EXTRA_ADDRESS);
             handleMessage(messageNo, message, fromAddr);
         } else {
             // default...call the base class
@@ -96,8 +96,10 @@ public class MessageThreadMessageDispatch extends Handler {
         }
     }
 
-    public void handleMessage(int messageNo, IMessage message, String fromAddr) {
-        IMessageHandler handler   = dispatchMap.get(message.getClass());
+    public <T extends IMessage> void handleMessage(int messageNo, T message, String fromAddr) {
+        //NOTE: this is OK, because we enforce type safety when we register the handler
+        @SuppressWarnings("unchecked")
+        IMessageHandler<T> handler   = (IMessageHandler<T>) dispatchMap.get(message.getClass());
         
         if (handler != null) {
             Log.w(TAG, "Message received: " + messageNo + ", it's a " + message.getClass().getSimpleName());

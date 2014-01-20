@@ -367,8 +367,8 @@ public class PlaylistService extends Service {
                 PlaylistEntry entry = mPlaylist.findEntryBySongAndId(song, entryId);
                 //call removeSong in all cases...it will handle the case where the song to be removed
                 // is the current song
+                //NOTE: removeSong will take care of messaging for the guest(s)
                 removeSong(entry);
-                getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
             }
         })
         .addLocalAction(MessagingService.ACTION_PLAYLIST_UPDATED_MESSAGE, new IBroadcastActionHandler() {
@@ -655,6 +655,7 @@ public class PlaylistService extends Service {
                 }
                 //send a message to the guests with the new playlist
                 getMessagingService().sendPlaylistMessage(mPlaylist.getSongsToPlay());
+                getMessagingService().sendCancelSongMessage(entry.getMacAddress(), entry.getId());
             } else {
                 //send a message to the host to remove this song
                 getMessagingService().sendRemoveFromPlaylistMessage(entry);

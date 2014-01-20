@@ -30,10 +30,12 @@ import android.util.Log;
 import com.thelastcrusade.soundstream.model.PlaylistEntry;
 import com.thelastcrusade.soundstream.model.SongMetadata;
 import com.thelastcrusade.soundstream.model.UserList;
+import com.thelastcrusade.soundstream.net.MessageFuture;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
 import com.thelastcrusade.soundstream.net.message.AddToPlaylistMessage;
 import com.thelastcrusade.soundstream.net.message.BumpSongOnPlaylistMessage;
+import com.thelastcrusade.soundstream.net.message.CancelSongMessage;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.message.LibraryMessage;
 import com.thelastcrusade.soundstream.net.message.PauseMessage;
@@ -73,6 +75,7 @@ public class MessagingService extends Service implements IMessagingService {
     public static final String EXTRA_ADDRESS                      = MessagingService.class.getName() + ".extra.Address";
     public static final String EXTRA_SONG_ID                      = MessagingService.class.getName() + ".extra.SongId";
 
+    public static final String ACTION_CANCEL_SONG_MESSAGE         = MessagingService.class.getName() + ".action.CancelSongMessage";
     public static final String ACTION_TRANSFER_SONG_MESSAGE       = MessagingService.class.getName() + ".action.TransferSongMessage";
     //also uses ADDRESS and SONG_ID
     public static final String EXTRA_SONG_FILE_NAME               = MessagingService.class.getName() + ".extra.SongFileName";
@@ -164,6 +167,7 @@ public class MessagingService extends Service implements IMessagingService {
         registerPlaylistMessageHandler();
         registerPlayStatusMessageHandler();
         registerSongStatusMessageHandler();
+        registerCancelSongMessageHandler();
         registerRequestSongMessageHandler();
         registerTransferSongMessageHandler();
         registerUserListMessageHandler();
@@ -227,6 +231,20 @@ public class MessagingService extends Service implements IMessagingService {
                     .putExtra(EXTRA_ENTRY_ID, message.getEntryId())
                     .putExtra(EXTRA_LOADED,  message.isLoaded())
                     .putExtra(EXTRA_PLAYED,  message.isPlayed())
+                    .send(MessagingService.this);
+            }
+        });
+    }
+
+    private void registerCancelSongMessageHandler() {
+        this.messageDispatch.registerHandler(CancelSongMessage.class, new IMessageHandler<CancelSongMessage>() {
+
+            @Override
+            public void handleMessage(int messageNo,
+                    CancelSongMessage message, String fromAddr) {
+                new LocalBroadcastIntent(ACTION_CANCEL_SONG_MESSAGE)
+                    .putExtra(EXTRA_ADDRESS, fromAddr)
+                    .putExtra(EXTRA_SONG_ID, message.getSongId())
                     .send(MessagingService.this);
             }
         });
@@ -355,6 +373,7 @@ public class MessagingService extends Service implements IMessagingService {
         });
     }
 
+    //TODO: support MessageFuture, the next time we need to send a cancelable message to a guest
     private void sendMessageToGuest(String address, IMessage msg) {
         try {
             if (this.connectServiceLocator.getService().isGuestConnected(address)) {
@@ -365,6 +384,9 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
 
+    //TODO: support MessageFuture, the next time we need to send a cancelable message to all guests:
+    // cancel - should cancel all transmissions
+    // isFinished() - should be true once all guests receive the whole message
     private void sendMessageToGuests(IMessage msg) {
         try {
             if (this.connectServiceLocator.getService().isGuestConnected()) {
@@ -375,14 +397,16 @@ public class MessagingService extends Service implements IMessagingService {
         }
     }
 
-    private void sendMessageToHost(IMessage msg) {
+    private MessageFuture sendMessageToHost(IMessage msg) {
+        MessageFuture future = null;
         try {
             if (this.connectServiceLocator.getService().isHostConnected()) {
-                this.connectServiceLocator.getService().sendMessageToHost(msg);
+                future = this.connectServiceLocator.getService().sendMessageToHost(msg);
             }
         } catch (ServiceNotBoundException e) {
             Log.wtf(TAG, e);
         }
+        return future;
     }
 
     @Override
@@ -474,6 +498,13 @@ public class MessagingService extends Service implements IMessagingService {
     }
 
     @Override
+    public void sendCancelSongMessage(String address, long songId) {
+        CancelSongMessage msg = new CancelSongMessage(songId);
+        //send the message to the guests
+        sendMessageToGuest(address, msg);
+    }
+
+    @Override
     public void sendRequestSongMessage(String address, long songId) {
         RequestSongMessage msg = new RequestSongMessage(songId);
         //send the message to the guests
@@ -481,12 +512,11 @@ public class MessagingService extends Service implements IMessagingService {
     }
     
     @Override
-    public void sendTransferSongMessage(String address, long songId,
+    public MessageFuture sendTransferSongMessage(String address, long songId,
             String fileName, String filePath) {
         TransferSongMessage msg = new TransferSongMessage(songId, fileName, filePath);
         //send the message to the fans
-        sendMessageToHost(msg);
-        
+        return sendMessageToHost(msg);
     }
 
     //sends the user list out to everyone

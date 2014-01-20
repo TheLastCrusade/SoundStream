@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.thelastcrusade.soundstream.net;
 
 /**
- * Exception thrown when Bluetooth is not supported on a platform.
- * 
  * @author Jesse Rosalia
  *
  */
-public class BluetoothNotSupportedException extends Exception {
+public class ConnectionConstants {
 
+    public static final int MESSAGE_READ = 1;
+
+    public static final String EXTRA_ADDRESS = ConnectionReader.class.getName() + ".extra.Address";
+    
 }
