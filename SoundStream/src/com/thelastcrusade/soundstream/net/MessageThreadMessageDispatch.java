@@ -90,8 +90,6 @@ public class MessageThreadMessageDispatch extends Handler {
             message   = (IMessage)msg.obj;
             fromAddr  = msg.getData().getString(ConnectionConstants.EXTRA_ADDRESS);
             handleMessage(messageNo, message, fromAddr);
-        } else if (msg.what == ConnectionConstants.MESSAGE_FINISHED) {
-            //TODO: NYI
         } else {
             // default...call the base class
             super.handleMessage(msg);

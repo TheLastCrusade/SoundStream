@@ -18,12 +18,15 @@
  */
 package com.thelastcrusade.soundstream.net;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.wire.Messenger;
 
 /**
+ * Read from a connection and dispatch incoming messages to the supplied receiver.
+ * 
  * @author Jesse Rosalia
  */
 public class ConnectionReader {
@@ -32,22 +35,13 @@ public class ConnectionReader {
     private Messenger messenger;
     private String remoteAddress;
 
-    /**
-     * @param remoteDevice 
-     * @param mmMessenger
-     * @param mmInStream
-     */
     public ConnectionReader(Messenger messenger, InputStream inStream, String remoteAddress) {
         this.messenger = messenger;
         this.inStream = inStream;
         this.remoteAddress = remoteAddress;
     }
 
-    /**
-     * @throws Exception 
-     * 
-     */
-    public void readAvailable(MessageReceiver receiver) throws Exception {
+    public void readAvailable(MessageReceiver receiver) throws IOException {
         //attempt to deserialize from the socket input stream
         boolean messageRecvd = messenger.deserializeMessage(inStream);
         if (messageRecvd) {

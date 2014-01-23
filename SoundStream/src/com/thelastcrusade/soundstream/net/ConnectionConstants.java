@@ -25,7 +25,6 @@ package com.thelastcrusade.soundstream.net;
 public class ConnectionConstants {
 
     public static final int MESSAGE_READ = 1;
-    public static final int MESSAGE_FINISHED = 2;
 
     public static final String EXTRA_ADDRESS = ConnectionReader.class.getName() + ".extra.Address";
     

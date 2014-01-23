@@ -39,6 +39,9 @@ import com.thelastcrusade.soundstream.net.wire.Messenger;
 /**
  * This thread is responsible for sending and receiving messages once the connection has been established.
  * 
+ * TODO: this class can be further abstracted to use just ConnectionReader, ConnectionWriter and Messenger,
+ * provided we also introduce an abstraction over BluetoothSocket.  We should consider this when we consider
+ * supporting new communications methods.
  * 
  * @author Jesse Rosalia
  *
@@ -46,34 +49,34 @@ import com.thelastcrusade.soundstream.net.wire.Messenger;
 public abstract class BluetoothConnection extends Thread {
     private final String TAG = BluetoothConnection.class.getSimpleName();
 
-    private final BluetoothSocket mmSocket;
-    private final Messenger mmMessenger;
+    private final BluetoothSocket socket;
+    private final Messenger messenger;
 
-    private ConnectionWriter mmWriter;
-    private ConnectionReader mmReader;
+    private ConnectionWriter writer;
+    private ConnectionReader reader;
 
-    private Handler mmHandler;
+    private Handler handler;
 
-    private ConnectionWriteThread mmWriteThread;
+    private ConnectionWriteThread writeThread;
 
-    private MessageEnqueuer mmEnqueuer;
+    private MessageEnqueuer enqueuer;
 
     public BluetoothConnection(Context context, BluetoothSocket socket, Handler handler) throws IOException {
         super("MessageThread-" + safeSocketName(socket));
-        mmSocket  = socket;
-        mmHandler = handler;
+        this.socket  = socket;
+        this.handler = handler;
 
-        mmMessenger = new Messenger(context.getCacheDir());
-        BluetoothDevice remoteDevice = mmSocket.getRemoteDevice();
+        this.messenger = new Messenger(context.getCacheDir());
+        BluetoothDevice remoteDevice = socket.getRemoteDevice();
         //create a reader and writer, using the streams exposed by the socket
-        mmReader    = new ConnectionReader(mmMessenger, socket.getInputStream(), remoteDevice.getAddress());
-        mmWriter    = new ConnectionWriter(mmMessenger, socket.getOutputStream());
+        this.reader    = new ConnectionReader(messenger, socket.getInputStream(), remoteDevice.getAddress());
+        this.writer    = new ConnectionWriter(messenger, socket.getOutputStream());
 
-        mmEnqueuer    = new MessageEnqueuer(mmWriter);
+        this.enqueuer    = new MessageEnqueuer(writer);
         //start a thread to manage writing...this is because the bluetooth outputstream blocks on writes
         // which will cause the UI to hang.
-        mmWriteThread = new ConnectionWriteThread(this.getName(), mmWriter);
-        mmWriteThread.start();
+        this.writeThread = new ConnectionWriteThread(this.getName(), writer);
+        this.writeThread.start();
     }
 
     //NOTE: this is static so we can call it at the top of the constructor
@@ -82,48 +85,50 @@ public abstract class BluetoothConnection extends Thread {
     }
 
     public boolean isRemoteDevice(BluetoothDevice device) {
-        return mmSocket.getRemoteDevice().equals(device);
+        return this.socket.getRemoteDevice().equals(device);
     }
 
     public void run() {
         // Keep listening to the InputStream until an exception occurs
-        MessageReceiver receiver = new MessageReceiver(mmHandler);
-        while (true) { //TODO: need way to kill this thread normally
+        MessageReceiver receiver = new MessageReceiver(this.handler);
+        //NOTE: if we ever need to kill this thread without catching an IOException
+        // or other exception, we need to move this flag to a member variable.
+        // See ConnectionWriteThread for an example.
+        boolean running = true;
+        while (running) {
             try {
-                mmReader.readAvailable(receiver);
+                this.reader.readAvailable(receiver);
             } catch (IOException e) {
                 e.printStackTrace();
-                break;
-            } catch (Throwable t) {
-                t.printStackTrace();
-                break;
+            } finally {
+                running = false;
+                stopWriteThread();
+                //cancel and notify the handlers that the connection is dead
+                disconnect();
             }
         }
-        stopWriteThread();
-        //cancel and notify the handlers that the connection is dead
-        disconnect();
     }
  
     private void stopWriteThread() {
-        mmWriteThread.stopAndWait();
+        this.writeThread.stopAndWait();
     }
 
     public abstract void onDisconnected();
 
     public synchronized void cancel(int messageNo) throws IOException {
-        mmWriter.cancel(messageNo);
+        this.writer.cancel(messageNo);
     }
 
     /* Call this from the main activity to send data to the remote device */
     public synchronized MessageFuture write(IMessage message) throws IOException {
         Log.d(TAG, "MessageThread#write called from " + Thread.currentThread().getName());
-        return mmEnqueuer.enqueueMessage(message);
+        return this.enqueuer.enqueueMessage(message);
     }
  
     /* Call this from the main activity to shutdown the connection */
     public void disconnect() {
         try {
-            mmSocket.close();
+            this.socket.close();
         } catch (IOException e) {
             
         } finally {

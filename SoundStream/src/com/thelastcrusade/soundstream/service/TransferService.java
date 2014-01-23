@@ -91,7 +91,7 @@ public class TransferService extends Service {
 
 
     /**
-     * 
+     * Register intent receivers for transfer related actions.
      */
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
@@ -134,21 +134,6 @@ public class TransferService extends Service {
                     }
                 }
             })
-//            .addLocalAction(MessagingService.ACTION_MESSAGE_FINISHED, new IBroadcastActionHandler() {
-//
-//                @Override
-//                public void onReceiveAction(Context context, Intent intent) {
-//                    String fromAddr = intent.getStringExtra(MessagingService.EXTRA_ADDRESS);
-//                    long   songId   = intent.getLongExtra(  MessagingService.EXTRA_SONG_ID, SongMetadata.UNKNOWN_SONG);
-//
-//                    if (songId == SongMetadata.UNKNOWN_SONG) {
-//                        Log.wtf(TAG, "REQUEST_SONG_MESSAGE action received without a valid song id");    
-//                    } else {
-//                        sendSongData(fromAddr, songId);
-//                    }
-//                }
-//            })
-
             .register(this);
     }
 

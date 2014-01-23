@@ -33,18 +33,18 @@ import com.thelastcrusade.soundstream.net.message.IMessage;
  */
 public class MessageReceiver {
 
-    private int mmInMessageNumber  = 1;
-    private Handler mmHandler;
+    private int inMessageNumber  = 1;
+    private Handler handler;
 
     /**
      * 
      */
     public MessageReceiver(Handler handler) {
-        this.mmHandler = handler;
+        this.handler = handler;
     }
     
     private Message obtainAndroidMessage(int type, Object obj) {
-        return mmHandler.obtainMessage(type, this.mmInMessageNumber++, 0, obj);
+        return handler.obtainMessage(type, this.inMessageNumber++, 0, obj);
     }    
 
     /**
