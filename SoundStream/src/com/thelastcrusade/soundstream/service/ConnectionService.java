@@ -87,6 +87,7 @@ public class ConnectionService extends Service {
     public static final String ACTION_GUEST_DISCONNECTED   = ConnectionService.class.getName() + ".action.GuestDisconected";
 
     public static final String ACTION_HOST_CONNECTED       = ConnectionService.class.getName() + ".action.HostConnected";
+    public static final String ACTION_HOST_DISBANDED       = ConnectionService.class.getName() + ".action.HostDisbanded";
     public static final String ACTION_HOST_DISCONNECTED    = ConnectionService.class.getName() + ".action.HostDisconnected";
 
     public static final String ACTION_ADAPTER_ENABLED      = ConnectionService.class.getName() + ".action.AdapterEnabled";
@@ -455,6 +456,11 @@ public class ConnectionService extends Service {
 
     public boolean isHostConnected() {
         return this.host != null;
+    }
+
+    public void disbandHost() {
+        disconnectAllGuests();
+        new LocalBroadcastIntent(ACTION_HOST_DISBANDED).send(ConnectionService.this);
     }
 
     public void disconnectAllGuests() {
