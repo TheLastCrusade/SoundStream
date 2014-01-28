@@ -17,14 +17,14 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.thelastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net.bt;
 
 /**
- * Exception thrown when Bluetooth is not or cannot be enabled.
+ * Exception thrown when Bluetooth is not supported on a platform.
  * 
  * @author Jesse Rosalia
  *
  */
-public class BluetoothNotEnabledException extends Exception {
+public class BluetoothNotSupportedException extends Exception {
 
 }

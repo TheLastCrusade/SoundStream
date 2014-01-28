@@ -25,12 +25,10 @@ import java.util.List;
 import java.util.Set;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -45,8 +43,6 @@ import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.model.FoundGuest;
 import com.thelastcrusade.soundstream.model.UserList;
-import com.thelastcrusade.soundstream.net.BluetoothNotEnabledException;
-import com.thelastcrusade.soundstream.net.BluetoothNotSupportedException;
 import com.thelastcrusade.soundstream.service.ConnectionService;
 import com.thelastcrusade.soundstream.service.ConnectionService.ConnectionServiceBinder;
 import com.thelastcrusade.soundstream.service.MusicLibraryService;
@@ -57,7 +53,6 @@ import com.thelastcrusade.soundstream.service.ServiceLocator;
 import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
 import com.thelastcrusade.soundstream.service.UserListService;
 import com.thelastcrusade.soundstream.service.UserListService.UserListServiceBinder;
-import com.thelastcrusade.soundstream.util.BluetoothUtils;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.thelastcrusade.soundstream.util.ITitleable;
@@ -128,8 +123,7 @@ public class NetworkFragment extends Fragment implements ITitleable {
 
             @Override
             public void onClick(View v) {
-                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                if (adapter != null) {
+                if (getConnectionService().isNetworkSupported()) {
                     new WithBluetoothEnabled(getActivity(), getConnectionService()).run(new Runnable() {
 
                         @Override
@@ -316,14 +310,6 @@ public class NetworkFragment extends Fragment implements ITitleable {
                     setDisconnectDisbandBtn();
                 }
             })
-            .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
-                @Override
-                public void onReceiveAction(Context context, Intent intent) {
-                    Log.i(TAG, "Host Disconnected");
-                    //after the host has been disconnected, wipe everything and start fresh
-                    cleanUpAfterDisconnect();
-                }
-            })
             .addGlobalAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED, new IBroadcastActionHandler() {
                 
                 @Override
@@ -360,55 +346,10 @@ public class NetworkFragment extends Fragment implements ITitleable {
     private void disconnect() {
         //Disconnect from the host
         getConnectionService().disconnectHost();
-        //Reset all variables
-        cleanUpAfterDisconnect();
-    }
-
-    private void cleanUpAfterDisconnect() {
-        final ServiceLocator<PlaylistService> playlistServiceLocator = new ServiceLocator<PlaylistService>(
-                this.getActivity(), PlaylistService.class, PlaylistServiceBinder.class);
-
-        playlistServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
-            @Override
-            public void onServiceBound() {
-                try {
-                    playlistServiceLocator.getService().clearPlaylist();
-                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
-                    playlistServiceLocator.unbind();
-                } catch (ServiceNotBoundException e) {
-                    Log.wtf(TAG,"PlaylistService not bound");
-                }
-            }
-        });
-
-        final ServiceLocator<MusicLibraryService> musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
-                this.getActivity(), MusicLibraryService.class, MusicLibraryServiceBinder.class);
-
-        musicLibraryServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
-            @Override
-            public void onServiceBound() {
-                try {
-                    musicLibraryServiceLocator.getService().clearExternalMusic();
-                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
-                    musicLibraryServiceLocator.unbind();
-                } catch (ServiceNotBoundException e) {
-                    Log.wtf(TAG, "MusicLibraryService not bound");
-                }
-            }
-        });
-
-        UserListService userService = getUserListService();
-        if(userService != null){
-            userService.clearExternalUsers();
-        }
-        
-        //Send the user to a page where they can start a network or join a different network
-        Transitions.transitionToConnect((CoreActivity) getActivity());
     }
 
     private void disband() {
-        getConnectionService().disconnectAllGuests();
-        cleanUpAfterDisconnect();
+        getConnectionService().disbandHost();
     }
     
     private void setButtonToDefaultState(LinearLayout button){

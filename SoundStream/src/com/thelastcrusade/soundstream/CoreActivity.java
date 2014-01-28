@@ -31,11 +31,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SearchView;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -51,8 +51,13 @@ import com.thelastcrusade.soundstream.service.ConnectionService;
 import com.thelastcrusade.soundstream.service.IMessagingService;
 import com.thelastcrusade.soundstream.service.MessagingService;
 import com.thelastcrusade.soundstream.service.MusicLibraryService;
+import com.thelastcrusade.soundstream.service.MusicLibraryService.MusicLibraryServiceBinder;
+import com.thelastcrusade.soundstream.service.PlaylistService;
+import com.thelastcrusade.soundstream.service.PlaylistService.PlaylistServiceBinder;
 import com.thelastcrusade.soundstream.service.ServiceLocator;
 import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.UserListService;
+import com.thelastcrusade.soundstream.service.UserListService.UserListServiceBinder;
 import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.thelastcrusade.soundstream.util.ITitleable;
@@ -181,13 +186,14 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchActivity.class)));
-        searchView.setIconifiedByDefault(true);
-        
-        if (isConnectActive()) {
-            searchItem.setVisible(false);
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchActivity.class)));
+            searchView.setIconifiedByDefault(true);
+            
+            if (isConnectActive()) {
+                searchItem.setVisible(false);
+            }
         }
-
         return true;
     }
     
@@ -250,11 +256,22 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
     private void registerReceivers() {
         this.registrar = new BroadcastRegistrar();
         this.registrar
+            .addLocalAction(ConnectionService.ACTION_HOST_DISBANDED, new IBroadcastActionHandler() {
+                
+                @Override
+                public void onReceiveAction(Context context, Intent intent) {
+                    getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+                    cleanUpAfterDisconnect();
+                    //Send the user to a page where they can start a network or join a different network
+                    Transitions.transitionToConnect(CoreActivity.this);
+                }
+            })
             .addLocalAction(ConnectionService.ACTION_HOST_DISCONNECTED, new IBroadcastActionHandler() {
             
                 @Override
                 public void onReceiveAction(Context context, Intent intent) {
                     getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+                    cleanUpAfterDisconnect();
                     //Send the user to a page where they can start a network or join a different network
                     Transitions.transitionToConnect(CoreActivity.this);
                 }
@@ -273,6 +290,56 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
 
     private void unregisterReceivers() {
         this.registrar.unregister();
+    }
+
+    private void cleanUpAfterDisconnect() {
+        final ServiceLocator<PlaylistService> playlistServiceLocator = new ServiceLocator<PlaylistService>(
+                this, PlaylistService.class, PlaylistServiceBinder.class);
+
+        playlistServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                try {
+                    playlistServiceLocator.getService().clearPlaylist();
+                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                    playlistServiceLocator.unbind();
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG,"PlaylistService not bound");
+                }
+            }
+        });
+
+        final ServiceLocator<MusicLibraryService> musicLibraryServiceLocator = new ServiceLocator<MusicLibraryService>(
+                this, MusicLibraryService.class, MusicLibraryServiceBinder.class);
+
+        musicLibraryServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                try {
+                    musicLibraryServiceLocator.getService().clearExternalMusic();
+                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                    musicLibraryServiceLocator.unbind();
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, "MusicLibraryService not bound");
+                }
+            }
+        });
+
+        final ServiceLocator<UserListService> userListServiceLocator = new ServiceLocator<UserListService>(
+                this, UserListService.class, UserListServiceBinder.class);
+
+        userListServiceLocator.setOnBindListener(new ServiceLocator.IOnBindListener() {
+            @Override
+            public void onServiceBound() {
+                try {
+                    userListServiceLocator.getService().clearExternalUsers();
+                    //this is the only place where we bind and use the service, so we unbind as soon as we are done
+                    userListServiceLocator.unbind();
+                } catch (ServiceNotBoundException e) {
+                    Log.wtf(TAG, "MusicLibraryService not bound");
+                }
+            }
+        });
     }
 
     public void showContent(){

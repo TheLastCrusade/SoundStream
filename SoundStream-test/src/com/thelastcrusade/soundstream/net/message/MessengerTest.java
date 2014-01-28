@@ -39,6 +39,7 @@ import com.thelastcrusade.soundstream.net.core.AComplexDataType;
 import com.thelastcrusade.soundstream.net.wire.FileReceiver;
 import com.thelastcrusade.soundstream.net.wire.Messenger;
 import com.thelastcrusade.soundstream.net.wire.PacketFormat;
+import com.thelastcrusade.soundstream.net.wire.PacketFormat.ControlCode;
 import com.thelastcrusade.soundstream.util.CustomAssert;
 import com.thelastcrusade.soundstream.util.InputBuffer;
 import com.thelastcrusade.soundstream.util.MessageTestUtil;
@@ -51,6 +52,92 @@ import com.thelastcrusade.soundstream.util.MessageTestUtil;
 public class MessengerTest {
 
     //TODO: add tests for partial messages, to make sure we handle the case where data isn't all there yet
+    
+    @Test
+    public void testCancelMessage() throws Exception {
+        //get the temp folder, immediately expire canceled messages
+        Messenger messenger = new Messenger(File.createTempFile("test", "").getParentFile(), 0);
+        //we want 2 packets, so create a file slightly bigger than the single packet size
+        int packetSize = 512;
+        File tempFile = MessageTestUtil.getTempTestFile(packetSize + 1);
+        //build up a TestMessage object
+        FileMessage testMessage = new FileMessage();
+        testMessage.setFilePath(tempFile.getCanonicalPath());
+        List<PacketFormat> packets = simulateSendAndReceive(testMessage, packetSize);
+
+        //ensure we have 2 packets, or else the test isnt valid
+        assertEquals(2, packets.size());
+        assertEquals(0, messenger.getActiveTransferCount());
+
+        boolean received = false;
+        PacketFormat packet = packets.get(0);
+        InputBuffer buffer = new InputBuffer();
+        packet.serialize(buffer);
+        received = messenger.deserializeMessage(buffer.getInputStream());
+        assertFalse(received);
+        assertEquals(1, messenger.getActiveTransferCount());
+
+        //send the cancel packet
+        PacketFormat cancelPacket = new PacketFormat(packet.getMessageNo(), new byte[0]);
+        cancelPacket.addControlCode(ControlCode.Cancelled);
+        buffer = new InputBuffer();
+        cancelPacket.serialize(buffer);
+        received = messenger.deserializeMessage(buffer.getInputStream());
+        assertFalse(received);
+        
+        //make sure it cancels the active transfer, and doesnt "receive" anything
+        assertEquals(0, messenger.getActiveTransferCount());
+        assertEquals(0, messenger.getReceivedMessages().size());
+
+        //send the second part of the message, which should be ignored
+        packet = packets.get(1);
+        buffer = new InputBuffer();
+        packet.serialize(buffer);
+        received = messenger.deserializeMessage(buffer.getInputStream());
+        assertFalse(received);
+
+        //should still have 0 active transfers and 0 received messages
+        assertEquals(0, messenger.getActiveTransferCount());
+        assertEquals(0, messenger.getReceivedMessages().size());
+    }
+
+    @Test
+    public void testDeserializeFileMessagePartialReceive() throws Exception {
+        //get the temp folder, immediately expire canceled messages
+        Messenger messenger = new Messenger(File.createTempFile("test", "").getParentFile(), 0);
+        //we want 2 packets, so create a file slightly bigger than the single packet size
+        int packetSize = 512;
+        File tempFile = MessageTestUtil.getTempTestFile(packetSize + 1);
+        //build up a TestMessage object
+        FileMessage testMessage = new FileMessage();
+        testMessage.setFilePath(tempFile.getCanonicalPath());
+        List<PacketFormat> packets = simulateSendAndReceive(testMessage, packetSize);
+
+        //ensure we have 2 packets, or else the test isnt valid
+        assertEquals(2, packets.size());
+        assertEquals(0, messenger.getActiveTransferCount());
+
+        boolean received = false;
+        InputBuffer buffer = new InputBuffer();
+        InputBuffer buffer2 = new InputBuffer();
+        packets.get(0).serialize(buffer);
+        packets.get(1).serialize(buffer2);
+        //add in an extra byte...this would be a partial receive of the next packet
+        InputStream buffer2is = buffer2.getInputStream();
+        buffer.write(buffer2is.read());
+        received = messenger.deserializeMessage(buffer.getInputStream());
+        assertFalse(received);
+        assertEquals(1, messenger.getActiveTransferCount());
+        assertEquals(0, messenger.getReceivedMessages().size());
+
+        //send the second part of the message, which should be ignored
+        received = messenger.deserializeMessage(buffer2is);
+        assertTrue(received);
+
+        //should still have 0 active transfers and 0 received messages
+        assertEquals(0, messenger.getActiveTransferCount());
+        assertEquals(1, messenger.getReceivedMessages().size());
+    }
     
     @Test
     public void testDeserializeMessage() throws Exception {

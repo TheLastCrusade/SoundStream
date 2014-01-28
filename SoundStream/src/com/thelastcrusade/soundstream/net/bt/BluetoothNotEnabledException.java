@@ -16,18 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.thelastcrusade.soundstream.net.wire;
+
+package com.thelastcrusade.soundstream.net.bt;
 
 /**
- * This exception is thrown to indicate that a full message has not been
- * received.  It is expected in normal operation, and used as an
- * alternative to if/break or if/return blocks.
+ * Exception thrown when Bluetooth is not or cannot be enabled.
  * 
  * @author Jesse Rosalia
- * 
+ *
  */
-public class MessageNotCompleteException extends Exception {
-
-    private static final long serialVersionUID = 1L;
+public class BluetoothNotEnabledException extends Exception {
 
 }

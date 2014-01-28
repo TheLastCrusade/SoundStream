@@ -34,6 +34,7 @@ import com.thelastcrusade.soundstream.service.MusicLibraryService;
 import com.thelastcrusade.soundstream.service.PlaylistService;
 import com.thelastcrusade.soundstream.service.ServiceLocator;
 import com.thelastcrusade.soundstream.service.ServiceNotBoundException;
+import com.thelastcrusade.soundstream.service.TransferService;
 import com.thelastcrusade.soundstream.service.UserListService;
 import com.thelastcrusade.soundstream.util.SoundStreamPrefs;
 
@@ -53,12 +54,30 @@ public class CustomApp extends Application {
     private final String TAG = CustomApp.class.getSimpleName();
     
     private static AssetManager assetManager;
-    
+
+    //NOTE: These are not "UNUSED"...they're used to bind services globally
+    // to ensure they're started with the app
+    //TODO: move to XML file, using an intent filter, such as:
+    //  <service android:name=".PlaylistUpdaterService">
+    //      <intent-filter>
+    //          <action android:name="android.intent.action.MAIN" />
+    //          <category android:name="android.intent.category.LAUNCHER" />
+    //      </intent-filter>
+    //  </service>
+
+    @SuppressWarnings("unused")
     private ServiceLocator<ConnectionService>   connectionServiceLocator;
+    @SuppressWarnings("unused")
     private ServiceLocator<MessagingService>    messagingServiceLocator;
+    @SuppressWarnings("unused")
     private ServiceLocator<MusicLibraryService> musicLibraryLocator;
+    @SuppressWarnings("unused")
     private ServiceLocator<PlaylistService>     playlistServiceLocator;
+    @SuppressWarnings("unused")
+    private ServiceLocator<TransferService>     transferServiceLocator;
+    @SuppressWarnings("unused")
     private ServiceLocator<UserListService>     userListServiceLocator;
+
 
     public CustomApp() {
         super();
@@ -102,20 +121,13 @@ public class CustomApp extends Application {
         playlistServiceLocator = new ServiceLocator<PlaylistService>(
                 this, PlaylistService.class, PlaylistService.PlaylistServiceBinder.class);
 
+        transferServiceLocator = new ServiceLocator<TransferService>(
+                this, TransferService.class, TransferService.TransferServiceBinder.class);
+
         userListServiceLocator = new ServiceLocator<UserListService>(
                 this, UserListService.class, UserListService.UserListServiceBinder.class);
     }
 
-    private PlaylistService getPlaylistService() {
-        PlaylistService playlistService = null;
-        try{
-            playlistService = this.playlistServiceLocator.getService();
-        } catch (ServiceNotBoundException e) {
-            Log.wtf(TAG, e);
-        }
-        return playlistService;
-    }
-    
     public static AssetManager getAssetManager(){
         return assetManager;
     }

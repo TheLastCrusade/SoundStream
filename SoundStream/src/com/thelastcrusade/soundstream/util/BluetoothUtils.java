@@ -25,8 +25,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.thelastcrusade.soundstream.R;
-import com.thelastcrusade.soundstream.net.BluetoothNotEnabledException;
-import com.thelastcrusade.soundstream.net.BluetoothNotSupportedException;
+import com.thelastcrusade.soundstream.net.bt.BluetoothNotEnabledException;
+import com.thelastcrusade.soundstream.net.bt.BluetoothNotSupportedException;
 
 public class BluetoothUtils {
     /* All methods should be static */

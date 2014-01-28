@@ -48,10 +48,12 @@ public class AboutFragment extends Fragment implements ITitleable {
         final TextView 
         	repoLinkText = (TextView)v.findViewById(R.id.repo_link),
         	SlidingMenuLinkText = (TextView)v.findViewById(R.id.thanks_SlidingMenu),
+        	ABSLinkText = (TextView)v.findViewById(R.id.thanks_appcompat),
         	emailLinkText = (TextView)v.findViewById(R.id.email_link);
         
         listenToHttpLink(repoLinkText, getString(R.string.repo_link));
         listenToHttpLink(SlidingMenuLinkText, getString(R.string.sliding_menu_link));
+        listenToHttpLink(ABSLinkText, getString(R.string.appcompat_link));
         
         emailLinkText.setOnClickListener(new AdapterView.OnClickListener() {
 

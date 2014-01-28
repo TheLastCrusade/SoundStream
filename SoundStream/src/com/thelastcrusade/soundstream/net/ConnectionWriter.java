@@ -19,17 +19,23 @@
 
 package com.thelastcrusade.soundstream.net;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import android.util.Log;
 
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.message.TransferSongMessage;
 import com.thelastcrusade.soundstream.net.wire.Messenger;
+import com.thelastcrusade.soundstream.net.wire.PacketFormat;
+import com.thelastcrusade.soundstream.net.wire.PacketFormat.ControlCode;
 import com.thelastcrusade.soundstream.util.LogUtil;
 
 /**
@@ -40,7 +46,7 @@ import com.thelastcrusade.soundstream.util.LogUtil;
  * @author Jesse Rosalia
  *
  */
-public class MessageThreadWriter {
+public class ConnectionWriter {
 
     /**
      * The normal multiplier uses the score as is.
@@ -48,12 +54,18 @@ public class MessageThreadWriter {
     private static final int NORMAL_SCORE_MULTIPLIER = 1;
 
     /**
+     * The multiplier for cancel transfer messages.  Should
+     *  be a high priority.
+     */
+    private static final int CANCEL_TRANSFER_SCORE_MULTIPLIER = 1;
+
+    /**
      * A multiplier to lower the priority of transfer song messages,
      * so control messages will jump the queue to be sent quicker.
      */
     private static final int TRANSFER_SONG_SCORE_MULTIPLIER = 100;
 
-    private static String TAG = MessageThreadWriter.class.getSimpleName();
+    private static String TAG = ConnectionWriter.class.getSimpleName();
 
     /**
      * Maximum size in bytes to write to a socket at a time.
@@ -61,11 +73,14 @@ public class MessageThreadWriter {
      */
     private byte[] outBytes;
 
+    private final Object queueLock = new Object();
+    
     class QueueEntry {
         private int messageNo;
         private int score;
         public Class<? extends IMessage> messageClass;
         public InputStream messageStream;
+        public MessageFuture future;
     }
 
     PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>(11, new Comparator<QueueEntry>() {
@@ -76,22 +91,33 @@ public class MessageThreadWriter {
         }
     });
 
+    private Set<Integer> canceled = new HashSet<Integer>();
+
     private OutputStream outStream;
 
     private Messenger messenger;
-    
-    public MessageThreadWriter(Messenger messenger, OutputStream outStream) {
+
+    public ConnectionWriter(Messenger messenger, OutputStream outStream) {
         this.outStream = outStream;
         this.messenger = messenger;
         this.outBytes = new byte[messenger.getSendPacketSize()];
     }
 
-    public void enqueue(int messageNo, IMessage message) throws IOException {
+    public void cancel(int messageNo) throws IOException {
+        //to cancel a message, we replace the message stream with a canceled
+        // packet
+        synchronized(this.queueLock) {
+            this.canceled.add(messageNo);
+        }
+    }
+
+    public int enqueue(int messageNo, IMessage message, MessageFuture future) throws IOException {
         QueueEntry qe = new QueueEntry();
         qe.messageNo     = messageNo;
         qe.score         = computeMessageScore(messageNo, message);
         qe.messageClass  = message.getClass();
         qe.messageStream = messenger.serializeMessage(message);
+        qe.future        = future;
         if (LogUtil.isLogAvailable()) {
             //precompute the expected queue size...this is because the writer thread may quickly pick
             // up the queue item which, while swell, means the debug output may be confusing
@@ -102,6 +128,7 @@ public class MessageThreadWriter {
                         + newExpectedQueueSize + " entries in the queue");
         }
         queue.add(qe);
+        return qe.messageNo;
     }
 
     /**
@@ -130,6 +157,52 @@ public class MessageThreadWriter {
         return !queue.isEmpty();
     }
 
+    private QueueEntry nextQueueEntry() {
+        QueueEntry qe;
+        synchronized(queueLock) {
+            qe = queue.poll();
+        }
+        return qe;
+    }
+
+    private QueueEntry removeQueueEntry(int messageNo) {
+        QueueEntry found = null;
+        synchronized(queueLock) {
+            for (QueueEntry qe : queue) {
+                if (qe.messageNo == messageNo) {
+                    found = qe;
+                    break;
+                }
+            }
+            if (found != null) {
+                queue.remove(found);
+            }
+        }
+        return found;
+    }
+
+    private void processCanceled() throws IOException {
+        Set<Integer> canceled = new HashSet<Integer>();
+        synchronized(queueLock) {
+            canceled.addAll(this.canceled);
+            this.canceled.clear();
+        }
+        for (int messageNo : canceled) {
+            QueueEntry found = removeQueueEntry(messageNo);
+            if (found != null) {
+                if (LogUtil.isLogAvailable()) {
+                    Log.d(TAG, "Message " + messageNo + " canceled");
+                }
+                PacketFormat cancelPacket = new PacketFormat(messageNo, new byte[0]);
+                cancelPacket.addControlCode(ControlCode.Cancelled);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                cancelPacket.serialize(baos);
+                found.messageStream = new ByteArrayInputStream(baos.toByteArray());
+                found.score = messageNo * CANCEL_TRANSFER_SCORE_MULTIPLIER;
+                queue.add(found);
+            }
+        }
+    }
     /**
      * Write one message (or part of a message) to the connected output stream.
      * 
@@ -144,7 +217,11 @@ public class MessageThreadWriter {
      * @throws IOException
      */
     public void writeOne() throws IOException {
-        QueueEntry qe = queue.poll();
+        //process canceled entires first
+        processCanceled();
+
+        //then process the next entry to be sent
+        QueueEntry qe = nextQueueEntry();
         if (qe != null) {
             int read = qe.messageStream.read(outBytes);
             if (LogUtil.isLogAvailable()) {
@@ -160,6 +237,7 @@ public class MessageThreadWriter {
                 }
                 queue.add(qe);
             } else {
+                qe.future.setFinished(true);
                 //otherwise, we're done
                 if (LogUtil.isLogAvailable()) {
                     Log.i(TAG, "Message " + qe.messageNo + " finished writing");

@@ -17,7 +17,7 @@
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.thelastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net.bt;
 
 import android.bluetooth.BluetoothDevice;
 
