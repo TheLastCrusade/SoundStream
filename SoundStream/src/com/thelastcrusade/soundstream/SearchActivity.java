@@ -28,14 +28,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SearchView;
+import android.view.View;
+import android.widget.ListAdapter;
+import android.widget.TextView;
 
-/**
- * @author reid
- *
- */
+
 public class SearchActivity extends FragmentActivity {
     
     private static final String TAG = SearchActivity.class.getSimpleName();
@@ -46,6 +46,8 @@ public class SearchActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_frame);
+        View resultsBar = findViewById(R.id.results_bar);
+        resultsBar.setVisibility(View.VISIBLE);
         
         ActionBar bar = getActionBar();
         bar.show();
@@ -57,9 +59,10 @@ public class SearchActivity extends FragmentActivity {
         }
         
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-            .add(R.id.content, getMusicLibraryFragment(query)).commit();
+            MusicLibraryFragment fragment = getMusicLibraryFragment(query);
+            getSupportFragmentManager().beginTransaction().add(R.id.content, fragment).commit();
         }
+        
     }
     
     @Override
