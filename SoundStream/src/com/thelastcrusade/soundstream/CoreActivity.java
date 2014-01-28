@@ -36,6 +36,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.GoogleAnalytics;
@@ -188,7 +190,14 @@ public class CoreActivity extends SlidingFragmentActivity implements Trackable {
         
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchActivity.class)));
-            searchView.setIconifiedByDefault(true);
+            searchView.setIconified(true);
+            searchView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.setFocusable(true);
+                    v.requestFocusFromTouch();
+                }
+            });
             
             if (isConnectActive()) {
                 searchItem.setVisible(false);

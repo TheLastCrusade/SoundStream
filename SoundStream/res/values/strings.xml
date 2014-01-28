@@ -104,6 +104,8 @@
 	
 	<!-- search things -->
 	<string name="search_hint">Search Music</string>
+	<string name="search">Search</string>
+	<string name="results">Results</string>
 
 	<!-- Crash reporting -->
 	<string name="crash_dialog_title">That\'s not right…</string>
