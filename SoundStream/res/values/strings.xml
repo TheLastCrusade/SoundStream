@@ -48,6 +48,7 @@
     <string name="music_label">Music</string>
     <string name="network_label">Network</string>
     <string name="removed_label">Removed:</string>
+    <string name="results_label">Results</string>
 
     
     <!--  fragment titles -->

@@ -34,8 +34,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
-import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.SearchActivity;
 import com.thelastcrusade.soundstream.model.SongMetadata;
@@ -51,7 +51,6 @@ import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.thelastcrusade.soundstream.util.MusicListAdapter;
 import com.thelastcrusade.soundstream.util.SongGestureListener;
-import com.thelastcrusade.soundstream.util.Toaster;
 
 public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getSimpleName();
@@ -62,6 +61,8 @@ public class MusicLibraryFragment extends MusicListFragment {
     private ServiceLocator<MusicLibraryService> musicLibraryServiceLocator;
     
     private MusicAdapter mMusicAdapter;
+    
+    private View headerView;
     
     private volatile String mQuery;
 
@@ -137,9 +138,7 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
-        
-        setListAdapter(mMusicAdapter);
-                
+ 
         if (getArguments() != null) {
             String query = getArguments().getString(SearchActivity.QUERY_KEY);
             if (query != null) {
@@ -147,6 +146,9 @@ public class MusicLibraryFragment extends MusicListFragment {
                 //Most of the time the music library service will not be bound
                 // so this will not update the list
                 mMusicAdapter.updateMusicFromQuery(mQuery);
+                
+                headerView = inflater.inflate(R.layout.search_counter, container, false);
+            
             } else {
                 Log.w(TAG, "Fragment recieved arguments but no query");
             }
@@ -163,7 +165,25 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         return v;
     }
-
+    
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (getArguments() != null && headerView != null) {
+            String query = getArguments().getString(SearchActivity.QUERY_KEY);
+            if (query != null) {
+                TextView resultsCounter = (TextView)headerView.findViewById(R.id.results_count);
+                resultsCounter.setText(""+mMusicAdapter.getCount());
+                getListView().addHeaderView(headerView);
+            
+            } else {
+                Log.w(TAG, "Fragment recieved arguments but no query");
+            }
+        }
+        
+        setListAdapter(mMusicAdapter);
+    }
+    
     @Override
     public void onStart() {
         super.onStart();
