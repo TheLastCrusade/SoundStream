@@ -34,6 +34,7 @@ import android.util.Log;
 import com.thelastcrusade.soundstream.net.message.IFileMessage;
 import com.thelastcrusade.soundstream.net.message.IMessage;
 import com.thelastcrusade.soundstream.net.message.MessageFormat;
+import com.thelastcrusade.soundstream.net.wire.PacketFormat.ControlCode;
 import com.thelastcrusade.soundstream.util.InputBuffer;
 import com.thelastcrusade.soundstream.util.LogUtil;
 
@@ -43,6 +44,9 @@ import com.thelastcrusade.soundstream.util.LogUtil;
  * to allow multiple messages to be in transit at a time.  This means that control messages can be sent
  * while also transmitting large amounts of file data, which with proper prioritization should enable
  * the application to feel responsive and still accomplish the job of moving music around the network.
+ * 
+ * This class is meant to be instantiated for each connection, to avoid conflicts with packet number
+ * and other state representation.
  * 
  * See MessageFormat and PacketFormat for specific information about those formats.
  * 
@@ -62,6 +66,8 @@ public class Messenger {
     @SuppressLint("UseSparseArrays")
     private Map<Integer, WireRecvOutputStream> activeTransfers  = new HashMap<Integer, WireRecvOutputStream>();
     private List<IMessage>                     receivedMessages = new LinkedList<IMessage>();
+    @SuppressLint("UseSparseArrays")
+    private Map<Integer, Long>                 canceledMessages = new HashMap<Integer, Long>();
 
     /**
      * Maximum size in bytes to read from a socket at a time.
@@ -72,14 +78,26 @@ public class Messenger {
 
     private static final int MAX_WRITE_SIZE_BYTES = 4096;
 
+    //default is 1 hour, which should be plenty of time
+    private static final int CANCELED_MESSAGES_TTL_MINUTES_DEFAULT = 60;
+
     private int sendPacketSize;
 
     private int nextMessageNo = 0;
 
     private File tempFolder;
+
+    private int canceledMessagesTtlMinutes;
     
+    private static final Object activeTransferLock = new Object();
+
     public Messenger(File tempFolder) {
+        this(tempFolder, CANCELED_MESSAGES_TTL_MINUTES_DEFAULT);
+    }
+
+    public Messenger(File tempFolder, int canceledMessagesTtlMinutes) {
         this.tempFolder     = tempFolder;
+        this.canceledMessagesTtlMinutes = canceledMessagesTtlMinutes;
         this.sendPacketSize = MAX_WRITE_SIZE_BYTES;
     }
     
@@ -128,7 +146,7 @@ public class Messenger {
      * @throws Exception If the message class does not exist, or is not defined properly, or
      * if the stream closes prematurely.
      */
-    public boolean deserializeMessage(InputStream input) throws Exception {
+    public boolean deserializeMessage(InputStream input) throws IOException {
         boolean processed = false;
         int read = 0;
         do {
@@ -176,22 +194,40 @@ public class Messenger {
             // to exit the loop when we've run out of full packets in our buffer
             while (inputBuffer.size() > 0) {
                 packet.deserialize(inputBuffer.getInputStream());
+                
                 //consume this message in the input buffer
+                //NOTE: only happens on successful deserialize (e.g. it doesnt throw a MessageNotCompleteException
                 inputBuffer.consume();
     
-                WireRecvOutputStream transfer = this.activeTransfers.get(packet.getMessageNo());
-                if (transfer == null) {
-                    transfer = new WireRecvOutputStream(this.tempFolder);
-                    this.activeTransfers.put(packet.getMessageNo(), transfer);
+                //debugging measure...discard future packets for canceled message
+                if (shouldDiscardPacket(packet)) {
+                    if (LogUtil.isLogAvailable() && Log.isLoggable(TAG, Log.DEBUG)) {
+                        Log.d(TAG, "Packet for canceled message (number " + packet.getMessageNo() + ") discarded");
+                    }
+                    continue;
                 }
-                
-                transfer.write(packet.getBytes());
-                received = transfer.attemptReceive();
-                //if we've received the full message, remove it from our active
-                // transfer array and add the underlying message to the received messages list
-                if (received) {
-                    this.activeTransfers.remove(packet.getMessageNo());
-                    this.receivedMessages.add(transfer.getReceivedMessage());
+
+                synchronized (activeTransferLock) {
+                    WireRecvOutputStream transfer = this.activeTransfers.get(packet.getMessageNo());
+                    if (transfer == null) {
+                        transfer = new WireRecvOutputStream(this.tempFolder);
+                        this.activeTransfers.put(packet.getMessageNo(), transfer);
+                    }
+                    //canceled implies the message is totally gone (no chance of restarting)
+                    if (packet.isControlCodeSet(ControlCode.Cancelled)) {
+                        if (LogUtil.isLogAvailable()) {
+                            Log.d(TAG, "Cancellation received for message (number " + packet.getMessageNo() + ")");
+                        }
+                        cancelMessage(packet.getMessageNo());
+                    } else {
+                        transfer.write(packet.getBytes());
+                        received = transfer.attemptReceive();
+                        //if we've received the full message, remove it from our active
+                        // transfer array and add the underlying message to the received messages list
+                        if (received) {
+                            receiveMessage(packet.getMessageNo());
+                        }
+                    } 
                 }
             }
         } catch (MessageNotCompleteException ex) {
@@ -258,9 +294,51 @@ public class Messenger {
         return totalRead;
     }
 
-    ///TODO
+    /**
+     * Test if we should discard this packet.  Currently, this occurs only when
+     * we've received a packet for a canceled message.
+     * 
+     * @param packet
+     * @return
+     */
+    private boolean shouldDiscardPacket(PacketFormat packet) {
+        return this.canceledMessages.containsKey(packet.getMessageNo());
+    }
+
+    private void cancelMessage(int messageNo) {
+        this.activeTransfers.remove(messageNo);
+        this.canceledMessages.put(messageNo, System.currentTimeMillis());
+    }
+
+    /**
+     * @param canceledMessagesTtlMinutes
+     */
+    public void clearExpiredCanceledMessages() {
+        double msPerMin = 60000.0;
+        @SuppressLint("UseSparseArrays")
+        Map<Integer, Long> toKeep = new HashMap<Integer, Long>();
+        for (Map.Entry<Integer, Long> entry : this.canceledMessages.entrySet()) {
+            if ((System.currentTimeMillis() - entry.getValue()) / msPerMin <= this.canceledMessagesTtlMinutes) {
+                toKeep.put(entry.getKey(), entry.getValue());
+            }
+        }
+        this.canceledMessages = toKeep;
+    }
+
     public void clearReceivedMessages() {
         receivedMessages = new LinkedList<IMessage>();
+    }
+    
+    private void receiveMessage(int messageNo) {
+        WireRecvOutputStream transfer = this.activeTransfers.remove(messageNo);
+        this.receivedMessages.add(transfer.getReceivedMessage());
+    }
+
+    /**
+     * @return
+     */
+    public int getActiveTransferCount() {
+        return this.activeTransfers.size();
     }
 
     /**
@@ -278,4 +356,5 @@ public class Messenger {
     public int getSendPacketSize() {
         return this.sendPacketSize;
     }
+
 }

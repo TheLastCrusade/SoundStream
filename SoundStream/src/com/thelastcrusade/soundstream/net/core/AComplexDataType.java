@@ -18,6 +18,7 @@
  */
 package com.thelastcrusade.soundstream.net.core;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,8 +34,10 @@ import java.nio.ByteBuffer;
  */
 public class AComplexDataType {
 
-    public static final int SIZEOF_INTEGER = 4;
+    public static final int SIZEOF_BOOLEAN = 1;
 
+    public static final int SIZEOF_INTEGER = 4;
+    
     protected void writeByte(byte theByte, OutputStream output)
             throws IOException {
         output.write(theByte);
@@ -51,15 +54,33 @@ public class AComplexDataType {
 
     protected byte[] readBytes(InputStream input, int length)
             throws IOException {
-        if (length <= 0) {
+        //length == 0 allows sending control codes only
+        if (length < 0) {
             throw new RuntimeException("Length is invalid: " + length);
         }
         // TODO: protection for laaaaaarge byte lengths
         byte[] bytes = new byte[length];
-        input.read(bytes);
+        int read = input.read(bytes);
+        //if we didn't read all we expected, throw an EOF exception.
+        if (read != length) {
+            throw new EOFException();
+        }
         return bytes;
     }
 
+    protected void writeBoolean(boolean bool, OutputStream output)
+            throws IOException {
+        ByteBuffer bb = ByteBuffer.allocate(SIZEOF_BOOLEAN);
+        bb.put((byte)(bool ? 1 : 0));
+        output.write(bb.array());
+    }
+
+    protected boolean readBoolean(InputStream input) throws IOException {
+        byte[] in = readBytes(input, SIZEOF_BOOLEAN);
+        ByteBuffer bb = ByteBuffer.wrap(in);
+        return bb.get() != 1;        
+    }
+    
     protected void writeInteger(int integer, OutputStream output)
             throws IOException {
         ByteBuffer bb = ByteBuffer.allocate(SIZEOF_INTEGER);
@@ -68,10 +89,7 @@ public class AComplexDataType {
     }
 
     protected int readInteger(InputStream input) throws IOException {
-        byte[] in = new byte[SIZEOF_INTEGER];
-        for (int ii = 0; ii < SIZEOF_INTEGER; ii++) {
-            in[ii] = (byte) input.read();
-        }
+        byte[] in = readBytes(input, SIZEOF_INTEGER);
         ByteBuffer bb = ByteBuffer.wrap(in);
         return bb.getInt();
     }

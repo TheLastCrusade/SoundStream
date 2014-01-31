@@ -41,7 +41,9 @@ import com.thelastcrusade.soundstream.service.ConnectionService;
  * If we want to implement functionality to allow us to cycle bluetooth on, run code, and then
  * turn it off, we can do so by creating an internal runnable that runs the supplied code, then
  * disables the bluetooth adapter.
- * 
+ *
+ * TODO: this should be generalized to any connection service connection (e.g. WithConnectionEnabled)
+ * luckily, it mostly is...the only thing that needs to be generalized/abstracted is the messages to the user
  * @author Jesse Rosalia
  *
  */

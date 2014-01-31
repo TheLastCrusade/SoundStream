@@ -16,16 +16,43 @@
  * You should have received a copy of the GNU General Public License
  * along with SoundStream.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.thelastcrusade.soundstream.net;
+package com.thelastcrusade.soundstream.net.message;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class UnableToCreateSocketException extends IOException {
+/**
+ * @author theJenix
+ *
+ */
+public class CancelSongMessage extends ADataMessage {
 
-    private static final long serialVersionUID = 1L;
+    private long songId;
+    
+    /**
+     * Default constructor, required for Messenger.  All other users should use
+     * the other constructor.
+     * 
+     */
+    public CancelSongMessage() {
+    }
 
-    public UnableToCreateSocketException(Throwable tr) {
-        super(tr);
+    public CancelSongMessage(long songId) {
+        this.songId = songId;
+    }
+
+    @Override
+    public void deserialize(InputStream input) throws IOException {
+        this.songId = readLong(input);
+    }
+
+    @Override
+    public void serialize(OutputStream output) throws IOException {
+        writeLong(this.songId, output);
+    }
+
+    public long getSongId() {
+        return songId;
     }
 }

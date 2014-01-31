@@ -35,14 +35,15 @@ import android.util.Log;
 
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.model.FoundGuest;
-import com.thelastcrusade.soundstream.net.AcceptThread;
-import com.thelastcrusade.soundstream.net.BluetoothDiscoveryHandler;
-import com.thelastcrusade.soundstream.net.BluetoothNotEnabledException;
-import com.thelastcrusade.soundstream.net.BluetoothNotSupportedException;
-import com.thelastcrusade.soundstream.net.ConnectThread;
-import com.thelastcrusade.soundstream.net.MessageThread;
+import com.thelastcrusade.soundstream.net.MessageFuture;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch;
 import com.thelastcrusade.soundstream.net.MessageThreadMessageDispatch.IMessageHandler;
+import com.thelastcrusade.soundstream.net.bt.AcceptThread;
+import com.thelastcrusade.soundstream.net.bt.BluetoothConnection;
+import com.thelastcrusade.soundstream.net.bt.BluetoothDiscoveryHandler;
+import com.thelastcrusade.soundstream.net.bt.BluetoothNotEnabledException;
+import com.thelastcrusade.soundstream.net.bt.BluetoothNotSupportedException;
+import com.thelastcrusade.soundstream.net.bt.ConnectThread;
 import com.thelastcrusade.soundstream.net.message.ConnectGuestsMessage;
 import com.thelastcrusade.soundstream.net.message.FindNewGuestsMessage;
 import com.thelastcrusade.soundstream.net.message.FoundGuestsMessage;
@@ -86,6 +87,7 @@ public class ConnectionService extends Service {
     public static final String ACTION_GUEST_DISCONNECTED   = ConnectionService.class.getName() + ".action.GuestDisconected";
 
     public static final String ACTION_HOST_CONNECTED       = ConnectionService.class.getName() + ".action.HostConnected";
+    public static final String ACTION_HOST_DISBANDED       = ConnectionService.class.getName() + ".action.HostDisbanded";
     public static final String ACTION_HOST_DISCONNECTED    = ConnectionService.class.getName() + ".action.HostDisconnected";
 
     public static final String ACTION_ADAPTER_ENABLED      = ConnectionService.class.getName() + ".action.AdapterEnabled";
@@ -105,7 +107,7 @@ public class ConnectionService extends Service {
 
     private BluetoothAdapter    adapter;
     private List<ConnectThread> pendingConnections = new ArrayList<ConnectThread>();
-    private List<MessageThread> guests             = new ArrayList<MessageThread>();
+    private List<BluetoothConnection> guests             = new ArrayList<BluetoothConnection>();
     private MessageThreadMessageDispatch     messageDispatch;
     private ServiceLocator<MessagingService> messagingServiceLocator;
     private BluetoothDiscoveryHandler        bluetoothDiscoveryHandler;
@@ -114,7 +116,7 @@ public class ConnectionService extends Service {
 
     private BroadcastRegistrar broadcastRegistrar;
 
-    private MessageThread host;
+    private BluetoothConnection host;
 
     @Override
     public void onCreate() {
@@ -287,7 +289,7 @@ public class ConnectionService extends Service {
                     List<FoundGuest> foundGuests = intent.getParcelableArrayListExtra(ConnectionService.EXTRA_GUESTS);
                     FoundGuestsMessage msg = new FoundGuestsMessage(foundGuests);
                     try {
-                        MessageThread initiatorGuest = findMessageThreadByAddress(discoveryInitiatorAddress);
+                        BluetoothConnection initiatorGuest = findMessageThreadByAddress(discoveryInitiatorAddress);
                         if (initiatorGuest != null) {
                             initiatorGuest.write(msg);
                         } else {
@@ -330,12 +332,12 @@ public class ConnectionService extends Service {
      * @param remoteAddr
      * @return
      */
-    private MessageThread findMessageThreadByAddress(String address) {
+    private BluetoothConnection findMessageThreadByAddress(String address) {
         // look up the message thread that manages the connection to the remote
         // device
         BluetoothDevice remoteDevice = adapter.getRemoteDevice(address);
-        MessageThread found = null;
-        for (MessageThread thread : this.guests) {
+        BluetoothConnection found = null;
+        for (BluetoothConnection thread : this.guests) {
             if (thread.isRemoteDevice(remoteDevice)) {
                 found = thread;
                 break;
@@ -353,25 +355,30 @@ public class ConnectionService extends Service {
     protected void onConnectedGuest(final BluetoothSocket socket) {
         Log.w(TAG, "Connected to server");
 
-        //create the message thread, which will be responsible for reading and writing messages
-        MessageThread newMessageThread = new MessageThread(this, socket, this.messageDispatch) {
+        try {
+            //create the message thread, which will be responsible for reading and writing messages
+            BluetoothConnection newMessageThread = new BluetoothConnection(this, socket, this.messageDispatch) {
+    
+                @Override
+                public void onDisconnected() {
+                    guests.remove(this);
+                    new LocalBroadcastIntent(ACTION_GUEST_DISCONNECTED)
+                        .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
+                        .send(ConnectionService.this);
+                }
 
-            @Override
-            public void onDisconnected() {
-                guests.remove(this);
-                new LocalBroadcastIntent(ACTION_GUEST_DISCONNECTED)
-                    .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
-                    .send(ConnectionService.this);
-            }
-        };
-        newMessageThread.start();
-        this.guests.add(newMessageThread);
-
-        //announce that we're connected
-        new LocalBroadcastIntent(ACTION_GUEST_CONNECTED)
-            .putExtra(EXTRA_GUEST_NAME,    socket.getRemoteDevice().getName())
-            .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
-            .send(this);
+            };
+            newMessageThread.start();
+            this.guests.add(newMessageThread);
+    
+            //announce that we're connected
+            new LocalBroadcastIntent(ACTION_GUEST_CONNECTED)
+                .putExtra(EXTRA_GUEST_NAME,    socket.getRemoteDevice().getName())
+                .putExtra(EXTRA_GUEST_ADDRESS, socket.getRemoteDevice().getAddress())
+                .send(this);
+        } catch (IOException e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     public void findNewGuests() {
@@ -406,7 +413,7 @@ public class ConnectionService extends Service {
     public void broadcastMessageToGuests(IMessage msg) {
         if (isGuestConnected()) {
             try {
-                for (MessageThread guest : this.guests) {
+                for (BluetoothConnection guest : this.guests) {
                     guest.write(msg);
                 }
             } catch (IOException e) {
@@ -419,10 +426,10 @@ public class ConnectionService extends Service {
     }
 
     public void sendMessageToGuest(String address, IMessage msg) {
-        MessageThread fan = findMessageThreadByAddress(address);
-        if (fan != null) {
+        BluetoothConnection guest = findMessageThreadByAddress(address);
+        if (guest != null) {
             try {
-                fan.write(msg);
+                guest.write(msg);
             } catch (IOException e) {
                 Log.wtf(TAG, e);
                 Toaster.eToast(this, "Unable to enqueue message " + msg.getClass().getSimpleName());
@@ -432,10 +439,11 @@ public class ConnectionService extends Service {
         }
     }
 
-    public void sendMessageToHost(IMessage msg) {
+    public MessageFuture sendMessageToHost(IMessage msg) {
+        MessageFuture future = null;
         if (isHostConnected()) {
             try {
-                this.host.write(msg);
+                future = this.host.write(msg);
             } catch (IOException e) {
                 Log.wtf(TAG, e);
                 Toaster.eToast(this, "Unable to enqueue message " + msg.getClass().getSimpleName());
@@ -443,26 +451,32 @@ public class ConnectionService extends Service {
         } else {
             Toaster.eToast(this, R.string.no_host_connected);
         }
+        return future;
     }
 
     public boolean isHostConnected() {
         return this.host != null;
     }
 
+    public void disbandHost() {
+        disconnectAllGuests();
+        new LocalBroadcastIntent(ACTION_HOST_DISBANDED).send(ConnectionService.this);
+    }
+
     public void disconnectAllGuests() {
         //copy the contents into separate array...the cancel/disconnect procedure
         // will remove each thread from the guests array, and this will avoid
         // a ConcurrentModificationException
-        List<MessageThread> toCancel = new ArrayList<MessageThread>(this.guests);
+        List<BluetoothConnection> toCancel = new ArrayList<BluetoothConnection>(this.guests);
         Log.d(TAG, String.format("Disconnecting %d guests...", toCancel.size()));
-        for (MessageThread thread : toCancel) {
-            thread.cancel();
+        for (BluetoothConnection thread : toCancel) {
+            thread.disconnect();
         }
     }
 
     public void disconnectHost() {
         if (host != null) {
-            host.cancel();
+            host.disconnect();
         }
     }
 
@@ -558,25 +572,36 @@ public class ConnectionService extends Service {
         BluetoothUtils.disableDiscovery(this);
 
         //create the message thread for handling this connection
-        this.host = new MessageThread(this, socket, this.messageDispatch) {
-
-            @Override
-            public void onDisconnected() {
-                host = null;
-                new LocalBroadcastIntent(ACTION_HOST_DISCONNECTED).send(ConnectionService.this);
-            }
-        };
-        this.host.start();
-
-        //announce that we're connected
-        new LocalBroadcastIntent(ACTION_HOST_CONNECTED).send(this);
+        try {
+            this.host = new BluetoothConnection(this, socket, this.messageDispatch) {
+    
+                @Override
+                public void onDisconnected() {
+                    host = null;
+                    new LocalBroadcastIntent(ACTION_HOST_DISCONNECTED).send(ConnectionService.this);
+                }
+            };
+            this.host.start();
+    
+            //announce that we're connected
+            new LocalBroadcastIntent(ACTION_HOST_CONNECTED).send(this);
+        } catch (IOException e) {
+            Log.wtf(TAG, e);
+        }
     }
 
     /**
      * @return
      */
     public boolean isNetworkEnabled() {
-        return adapter.isEnabled();
+        return adapter != null && adapter.isEnabled();
+    }
+
+    /**
+     * @return
+     */
+    public boolean isNetworkSupported() {
+        return adapter != null;
     }
 
     /**

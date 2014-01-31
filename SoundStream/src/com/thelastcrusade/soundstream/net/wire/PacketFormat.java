@@ -42,9 +42,19 @@ import com.thelastcrusade.soundstream.net.core.ISerializable;
  */
 public class PacketFormat extends AComplexDataType implements ISerializable {
 
-    public  static int HEADER_LEN = 2 * SIZEOF_INTEGER;
+    //an enumeration of control codes...the ordinal value is used as bit positions
+    // in controlCodes where 1 indicates that code is present
+    public enum ControlCode {
+        Cancelled //2^0 => 0x1
+        ;
+
+        public int bitPosition() {
+            return (int)Math.pow(2, this.ordinal());
+        }
+    }
 
     private int packetLength;
+    private int controlCodes;
     private int messageNo;
     private byte[] bytes;
 
@@ -56,39 +66,75 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      * @param nextBytes
      */
     public PacketFormat(int messageNo, byte[] bytes) {
-        this.packetLength = bytes.length + SIZEOF_INTEGER; //for message no
+        this.packetLength = bytes.length + PacketFormat.getOverhead() - PacketFormat.getLengthOverhead(); //for message no
         this.messageNo = messageNo;
         this.bytes = bytes;
+    }
+
+    public static int getControlCodeOverhead() {
+        return SIZEOF_INTEGER;
     }
 
     public static int getLengthOverhead() {
         return SIZEOF_INTEGER;
     }
+
     public static int getMessageNoOverhead() {
         return SIZEOF_INTEGER;
     }
 
     public static int getOverhead() {
-        return HEADER_LEN;
+        return getControlCodeOverhead() + getLengthOverhead() + getMessageNoOverhead();
+    }
+
+    public static int getOverheadWithoutLength() {
+        return getOverhead() - getLengthOverhead();
+    }
+
+    /**
+     * @param input
+     * @param lengthOverhead
+     * @throws MessageNotCompleteException 
+     * @throws IOException 
+     */
+    private void checkAvailable(InputStream input, int required) throws IOException, MessageNotCompleteException {
+        if (input.available() < required) {
+            throw new MessageNotCompleteException();
+        }
     }
 
     @Override
     public void deserialize(InputStream input) throws IOException, MessageNotCompleteException {
+        checkAvailable(input, getLengthOverhead());
         this.packetLength     = readInteger(input);
-        if (input.available() < this.packetLength) {
-            throw new MessageNotCompleteException();
-        }
-        this.messageNo = readInteger(input);
-        this.bytes     = readBytes(input, this.packetLength - SIZEOF_INTEGER);
+        checkAvailable(input, this.packetLength);
+
+        this.controlCodes = readInteger(input);
+        this.messageNo    = readInteger(input);
+        this.bytes        = readBytes(input, this.packetLength - getOverheadWithoutLength());
     }
+
 
     @Override
     public void serialize(OutputStream output) throws IOException {
-        writeInteger(packetLength,   output);
-        writeInteger(this.messageNo, output);
-        writeBytes(  this.bytes,     output);
+        writeInteger(packetLength,        output);
+        writeInteger(this.controlCodes,   output);
+        writeInteger(this.messageNo,      output);
+        writeBytes(  this.bytes,          output);
     }
     
+    public void addControlCode(ControlCode code) {
+        this.controlCodes |= code.bitPosition();
+    }
+
+    public void clearControlCodes() {
+        this.controlCodes = 0;
+    }
+    
+    public boolean isControlCodeSet(ControlCode code) {
+        return (this.controlCodes & code.bitPosition()) != 0;
+    }
+
     /**
      * @return the bytes
      */
@@ -107,5 +153,5 @@ public class PacketFormat extends AComplexDataType implements ISerializable {
      */
     public int getPacketLength() {
         return packetLength;
-    }
+    }    
 }

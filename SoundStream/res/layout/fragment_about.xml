@@ -242,11 +242,11 @@
             	/>
 	       
 	    	<TextView
-               android:id="@+id/thanks_ABS"
+               android:id="@+id/thanks_appcompat"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_marginLeft="10dp"
-               android:text="@string/thanks_ABS"
+               android:text="@string/thanks_appcompat"
                android:textColor="@color/link_blue"
                android:layout_below="@id/brought_to_you_by"
                android:textSize="16sp"
@@ -259,7 +259,7 @@
                android:layout_marginLeft="10dp"
                android:text="@string/thanks_SlidingMenu"
                android:textColor="@color/link_blue"
-               android:layout_below="@id/thanks_ABS"
+               android:layout_below="@id/thanks_appcompat"
                android:textSize="16sp"
                />
 	    </RelativeLayout>
