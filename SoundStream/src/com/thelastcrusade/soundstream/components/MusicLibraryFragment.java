@@ -139,6 +139,8 @@ public class MusicLibraryFragment extends MusicListFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
  
+        setListAdapter(mMusicAdapter);
+        
         if (getArguments() != null) {
             String query = getArguments().getString(SearchActivity.QUERY_KEY);
             if (query != null) {
@@ -152,6 +154,9 @@ public class MusicLibraryFragment extends MusicListFragment {
             } else {
                 Log.w(TAG, "Fragment recieved arguments but no query");
             }
+        }
+        else{
+            mQuery = null;
         }
         
         //Since most of the time the service will not be bound here set
@@ -169,19 +174,21 @@ public class MusicLibraryFragment extends MusicListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getArguments() != null && headerView != null) {
-            String query = getArguments().getString(SearchActivity.QUERY_KEY);
-            if (query != null) {
-                TextView resultsCounter = (TextView)headerView.findViewById(R.id.results_count);
-                resultsCounter.setText(""+mMusicAdapter.getCount());
-                getListView().addHeaderView(headerView);
-            
-            } else {
-                Log.w(TAG, "Fragment recieved arguments but no query");
-            }
-        }
-        
-        setListAdapter(mMusicAdapter);
+        Log.i(TAG, "Music Adapter Count " + mMusicAdapter.getCount());
+//        if (getArguments() != null && headerView != null) {
+////            String query = getArguments().getString(SearchActivity.QUERY_KEY);
+//            if (mQuery != null) {
+//                TextView resultsCounter = (TextView)headerView.findViewById(R.id.results_count);
+//                Log.i(TAG, "Music Adapter Count " + mMusicAdapter.getCount());
+//                resultsCounter.setText(""+mMusicAdapter.getCount());
+//                getListView().addHeaderView(headerView);
+//            
+//            } else {
+//                Log.w(TAG, "Fragment recieved arguments but no query");
+//            }
+//        }
+//        
+//        setListAdapter(mMusicAdapter);
     }
     
     @Override
