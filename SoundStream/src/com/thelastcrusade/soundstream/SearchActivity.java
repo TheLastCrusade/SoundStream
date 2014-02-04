@@ -46,8 +46,6 @@ public class SearchActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_frame);
-        View resultsBar = findViewById(R.id.results_bar);
-        resultsBar.setVisibility(View.VISIBLE);
         
         ActionBar bar = getActionBar();
         bar.show();

@@ -26,6 +26,7 @@ import java.util.TimerTask;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
@@ -34,6 +35,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.thelastcrusade.soundstream.R;
@@ -139,7 +142,9 @@ public class MusicLibraryFragment extends MusicListFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
  
-        setListAdapter(mMusicAdapter);
+        setListAdapter(null);
+        
+      
         
         if (getArguments() != null) {
             String query = getArguments().getString(SearchActivity.QUERY_KEY);
@@ -149,7 +154,22 @@ public class MusicLibraryFragment extends MusicListFragment {
                 // so this will not update the list
                 mMusicAdapter.updateMusicFromQuery(mQuery);
                 
-                headerView = inflater.inflate(R.layout.search_counter, container, false);
+                
+                headerView = inflater.inflate(R.layout.search_counter,null);
+                headerView.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, ListView.LayoutParams.WRAP_CONTENT));
+                
+
+                mMusicAdapter.registerDataSetObserver(new DataSetObserver() {
+                    @Override
+                    public void onChanged() {
+                      super.onChanged();
+                      TextView resultsCounter = (TextView)headerView.findViewById(R.id.results_count);
+//                      Log.i(TAG, "Music Adapter Count on observed change" + mMusicAdapter.getCount());
+                      resultsCounter.setText(""+mMusicAdapter.getCount());
+//                      Log.i(TAG, "Results Counter text " + resultsCounter.getText());
+                    }
+                });
+                
             
             } else {
                 Log.w(TAG, "Fragment recieved arguments but no query");
@@ -170,31 +190,21 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         return v;
     }
-    
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.i(TAG, "Music Adapter Count " + mMusicAdapter.getCount());
-//        if (getArguments() != null && headerView != null) {
-////            String query = getArguments().getString(SearchActivity.QUERY_KEY);
-//            if (mQuery != null) {
-//                TextView resultsCounter = (TextView)headerView.findViewById(R.id.results_count);
-//                Log.i(TAG, "Music Adapter Count " + mMusicAdapter.getCount());
-//                resultsCounter.setText(""+mMusicAdapter.getCount());
-//                getListView().addHeaderView(headerView);
-//            
-//            } else {
-//                Log.w(TAG, "Fragment recieved arguments but no query");
-//            }
-//        }
-//        
-//        setListAdapter(mMusicAdapter);
-    }
+  
     
     @Override
     public void onStart() {
         super.onStart();
 //        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
+    }
+    
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(headerView != null){
+            getListView().addHeaderView(headerView);
+        }
+        setListAdapter(mMusicAdapter);
     }
 
     @Override
@@ -340,13 +350,13 @@ public class MusicLibraryFragment extends MusicListFragment {
         @Deprecated
         private void updateMusicFromLibrary() {
             this.updateMusic(getMusicLibraryFromService());
-            notifyDataSetChanged();
+//            notifyDataSetChanged();
         }
         
         private void updateMusicFromQuery(String query) {
             if (query != null) {
                 this.updateMusic(getMusicLibraryFromQuery(query));
-                notifyDataSetChanged();    
+//                notifyDataSetChanged();    
             } else {
                 updateMusicFromLibrary();
             }

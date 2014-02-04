@@ -27,6 +27,7 @@
         android:id="@+id/results_label"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:padding="6dp"
         android:text="@string/results_label"
         android:layout_alignParentLeft="true"
         />
@@ -35,6 +36,7 @@
         android:id="@+id/results_count"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:padding="6dp"
         android:layout_alignParentRight="true"
         />
     
