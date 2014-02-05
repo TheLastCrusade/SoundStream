@@ -65,7 +65,7 @@ public class MusicLibraryFragment extends MusicListFragment {
     
     private MusicAdapter mMusicAdapter;
     
-    private View headerView;
+    private View mHeaderView;
     
     private volatile String mQuery;
 
@@ -155,15 +155,15 @@ public class MusicLibraryFragment extends MusicListFragment {
                 mMusicAdapter.updateMusicFromQuery(mQuery);
                 
                 
-                headerView = inflater.inflate(R.layout.search_counter,null);
-                headerView.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, ListView.LayoutParams.WRAP_CONTENT));
+                mHeaderView = inflater.inflate(R.layout.search_counter,null);
+                mHeaderView.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, ListView.LayoutParams.WRAP_CONTENT));
                 
 
                 mMusicAdapter.registerDataSetObserver(new DataSetObserver() {
                     @Override
                     public void onChanged() {
                       super.onChanged();
-                      TextView resultsCounter = (TextView)headerView.findViewById(R.id.results_count);
+                      TextView resultsCounter = (TextView)mHeaderView.findViewById(R.id.results_count);
 //                      Log.i(TAG, "Music Adapter Count on observed change" + mMusicAdapter.getCount());
                       resultsCounter.setText(""+mMusicAdapter.getCount());
 //                      Log.i(TAG, "Results Counter text " + resultsCounter.getText());
@@ -201,8 +201,8 @@ public class MusicLibraryFragment extends MusicListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(headerView != null){
-            getListView().addHeaderView(headerView);
+        if(mHeaderView != null){
+            getListView().addHeaderView(mHeaderView);
         }
         setListAdapter(mMusicAdapter);
     }
