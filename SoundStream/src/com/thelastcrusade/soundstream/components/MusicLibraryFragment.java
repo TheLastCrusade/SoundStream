@@ -339,13 +339,11 @@ public class MusicLibraryFragment extends MusicListFragment {
         @Deprecated
         private void updateMusicFromLibrary() {
             this.updateMusic(getMusicLibraryFromService());
-//            notifyDataSetChanged();
         }
         
         private void updateMusicFromQuery(String query) {
             if (query != null) {
-                this.updateMusic(getMusicLibraryFromQuery(query));
-//                notifyDataSetChanged();    
+                this.updateMusic(getMusicLibraryFromQuery(query));  
             } else {
                 updateMusicFromLibrary();
             }
