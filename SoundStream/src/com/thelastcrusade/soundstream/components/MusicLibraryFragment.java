@@ -142,9 +142,8 @@ public class MusicLibraryFragment extends MusicListFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
  
+        //for 2.3 compatibility
         setListAdapter(null);
-        
-      
         
         if (getArguments() != null) {
             String query = getArguments().getString(SearchActivity.QUERY_KEY);
@@ -164,13 +163,9 @@ public class MusicLibraryFragment extends MusicListFragment {
                     public void onChanged() {
                       super.onChanged();
                       TextView resultsCounter = (TextView)mHeaderView.findViewById(R.id.results_count);
-//                      Log.i(TAG, "Music Adapter Count on observed change" + mMusicAdapter.getCount());
                       resultsCounter.setText(""+mMusicAdapter.getCount());
-//                      Log.i(TAG, "Results Counter text " + resultsCounter.getText());
                     }
                 });
-                
-            
             } else {
                 Log.w(TAG, "Fragment recieved arguments but no query");
             }
@@ -190,17 +185,11 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         return v;
     }
-  
-    
-    @Override
-    public void onStart() {
-        super.onStart();
-//        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
-    }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //null when there was no query passed to the fragment
         if(mHeaderView != null){
             getListView().addHeaderView(mHeaderView);
         }
