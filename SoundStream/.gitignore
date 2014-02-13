@@ -22,6 +22,12 @@ local.properties
 *.iws
 .idea/
 
+#Eclipse
+local.properties
+.settings/
+.classpath
+.project
+
 # Newrelic things
 ant.properties
 assets/newrelic.properties
