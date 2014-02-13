@@ -26,6 +26,7 @@ import java.util.TimerTask;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
@@ -34,8 +35,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
-import com.thelastcrusade.soundstream.CoreActivity;
 import com.thelastcrusade.soundstream.R;
 import com.thelastcrusade.soundstream.SearchActivity;
 import com.thelastcrusade.soundstream.model.SongMetadata;
@@ -51,7 +54,6 @@ import com.thelastcrusade.soundstream.util.BroadcastRegistrar;
 import com.thelastcrusade.soundstream.util.IBroadcastActionHandler;
 import com.thelastcrusade.soundstream.util.MusicListAdapter;
 import com.thelastcrusade.soundstream.util.SongGestureListener;
-import com.thelastcrusade.soundstream.util.Toaster;
 
 public class MusicLibraryFragment extends MusicListFragment {
     private final String TAG = MusicLibraryFragment.class.getSimpleName();
@@ -62,6 +64,8 @@ public class MusicLibraryFragment extends MusicListFragment {
     private ServiceLocator<MusicLibraryService> musicLibraryServiceLocator;
     
     private MusicAdapter mMusicAdapter;
+    
+    private View mHeaderView;
     
     private volatile String mQuery;
 
@@ -137,9 +141,10 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.list, container, false);
+ 
+        //for 2.3 compatibility
+        setListAdapter(null);
         
-        setListAdapter(mMusicAdapter);
-                
         if (getArguments() != null) {
             String query = getArguments().getString(SearchActivity.QUERY_KEY);
             if (query != null) {
@@ -147,9 +152,26 @@ public class MusicLibraryFragment extends MusicListFragment {
                 //Most of the time the music library service will not be bound
                 // so this will not update the list
                 mMusicAdapter.updateMusicFromQuery(mQuery);
+                
+                
+                mHeaderView = inflater.inflate(R.layout.search_counter,null);
+                mHeaderView.setLayoutParams(new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT, ListView.LayoutParams.WRAP_CONTENT));
+                
+
+                mMusicAdapter.registerDataSetObserver(new DataSetObserver() {
+                    @Override
+                    public void onChanged() {
+                      super.onChanged();
+                      TextView resultsCounter = (TextView)mHeaderView.findViewById(R.id.results_count);
+                      resultsCounter.setText(""+mMusicAdapter.getCount());
+                    }
+                });
             } else {
                 Log.w(TAG, "Fragment recieved arguments but no query");
             }
+        }
+        else{
+            mQuery = null;
         }
         
         //Since most of the time the service will not be bound here set
@@ -163,11 +185,15 @@ public class MusicLibraryFragment extends MusicListFragment {
         
         return v;
     }
-
+    
     @Override
-    public void onStart() {
-        super.onStart();
-//        ((CoreActivity)getActivity()).getTracker().sendView(TAG);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        //null when there was no query passed to the fragment
+        if(mHeaderView != null){
+            getListView().addHeaderView(mHeaderView);
+        }
+        setListAdapter(mMusicAdapter);
     }
 
     @Override
@@ -313,13 +339,11 @@ public class MusicLibraryFragment extends MusicListFragment {
         @Deprecated
         private void updateMusicFromLibrary() {
             this.updateMusic(getMusicLibraryFromService());
-            notifyDataSetChanged();
         }
         
         private void updateMusicFromQuery(String query) {
             if (query != null) {
-                this.updateMusic(getMusicLibraryFromQuery(query));
-                notifyDataSetChanged();    
+                this.updateMusic(getMusicLibraryFromQuery(query));  
             } else {
                 updateMusicFromLibrary();
             }
