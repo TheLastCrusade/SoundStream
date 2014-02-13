@@ -28,3 +28,8 @@ assets/newrelic.properties
 /local.properties
 /AndroidManifest.xml.bak
 /.nrwork
+
+# Gradle
+.build
+build/
+.gradle

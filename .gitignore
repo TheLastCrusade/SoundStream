@@ -6,3 +6,8 @@ third_party/
 
 # Nuisance files
 .DS_Store
+*~
+*\#
+
+# Gradle
+.gradle
