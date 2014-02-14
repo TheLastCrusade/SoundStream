@@ -9,7 +9,7 @@ buildscript {
 }
 
 apply plugin: 'android'
-//apply plugin: 'eclipse'
+apply plugin: 'eclipse'
 
     repositories {
         mavenCentral()
