@@ -79,16 +79,14 @@
     <!-- about things -->
     <string name="about">About</string>
     <string name="meet_label">Meet the Team</string>
-    <string name="team">Reid Baker\nDavid Greenhalgh\nElizabeth Johnson\nJesse Rosalia\nTaylor Wrobel</string>
+    <string name="team">Reid Baker\nDavid Greenhalgh\nElizabeth Johnson\nJesse Rosalia</string>
     <string name="thanks_label">Special Thanks</string>
-    <string name="thanks_appcompat"><u>AppCompat</u></string>
     <string name="thanks_SlidingMenu"><u>SlidingMenu</u></string>
     <string name="thanks_Troy">Troy Peace - a super sponsor, without whom none of this would be possible</string>
     <string name="contact_us_label">Contact Us</string>
     <string name="repo_link_text"><u>Our GitHub repo</u></string>
     <string name="repo_link">https://github.com/TheLastCrusade/SoundStream</string>
     <string name="sliding_menu_link">https://github.com/jfeinstein10/SlidingMenu</string>
-    <string name="appcompat_link">http://developer.android.com/tools/support-library/features.html</string>
     <string name="beta_help_instructions">SoundStream is currently in beta, so if you run into an issue, email us at:</string>
     <string name="email_link_text"><u>SoundStreamHelp@gmail.com</u></string>
     <string name="email_support_address">SoundStreamHelp@gmail.com</string>
@@ -99,7 +97,7 @@
     <string name="welcome">Welcome to SoundStream!\n\nFor some basic instructions and hints, press Next.</string>
 	<string name="welcome_connection">Create a new network by pressing Create, or join an existing network by pressing Join and asking a friend to let you in.</string>
 	<string name="welcome_music">Add music to your playlist through the Music Library page.\n\nIf there is no music there, check out the SoundStream wiki for information on how to add music to your phone.</string>
-	<string name="welcome_network">To view information about the network, go the the Network page.\n\n From there you can add members to the network, disconnect, or switch networks. </string>
+	<string name="welcome_network">To view information about the network, go the Network page.\n\n From there you can add members to the network, disconnect, or switch networks. </string>
 	<string name="instructions_label">Instructions</string>
 	<string name="instructions">View the startup instructions again</string>
 	
