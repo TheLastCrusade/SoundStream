@@ -12,8 +12,16 @@ third_party/
 # Gradle
 .gradle
 
-# Intellij
-.idea/
+# IntelliJ project files
 *.iml
+*.ipr
+*.iws
+.idea/
 local.properties
 
+#Eclipse
+local.properties
+project.properties
+.settings/
+.classpath
+.project

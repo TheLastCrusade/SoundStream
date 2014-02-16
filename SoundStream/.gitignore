@@ -13,22 +13,6 @@ bin/
 gen/
 lint.xml
 
-# Local configuration file (sdk path, etc)
-local.properties
-
-# IntelliJ project files
-*.iml
-*.ipr
-*.iws
-.idea/
-
-#Eclipse
-local.properties
-project.properties
-.settings/
-.classpath
-.project
-
 # Newrelic things
 ant.properties
 assets/newrelic.properties
