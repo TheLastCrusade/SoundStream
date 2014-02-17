@@ -14,3 +14,14 @@ Users define one phone as the *Host* device - the mobile device connected to the
 
 Please direct support questions to SoundStreamHelp@gmail.com and all other questions to ContactLastCrusade@gmail.com!
 
+## Special thanks to all that have contributed in the past
+Github:
+dgreenhalgh
+reidbaker
+theJenix
+ejohnson44
+bryansills
+
+Twitter:
+@kdietze3 
+
