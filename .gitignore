@@ -6,3 +6,22 @@ third_party/
 
 # Nuisance files
 .DS_Store
+*~
+*\#
+
+# Gradle
+.gradle
+
+# IntelliJ project files
+*.iml
+*.ipr
+*.iws
+.idea/
+local.properties
+
+#Eclipse
+local.properties
+project.properties
+.settings/
+.classpath
+.project
