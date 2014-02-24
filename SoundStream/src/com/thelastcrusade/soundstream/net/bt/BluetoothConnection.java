@@ -95,17 +95,18 @@ public abstract class BluetoothConnection extends Thread {
         // or other exception, we need to move this flag to a member variable.
         // See ConnectionWriteThread for an example.
         boolean running = true;
-        while (running) {
-            try {
+        try {
+            while (running) {
                 this.reader.readAvailable(receiver);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                running = false;
-                stopWriteThread();
-                //cancel and notify the handlers that the connection is dead
-                disconnect();
             }
+        } catch (IOException e) {
+            //in this case, an io exception probably means the connection was dropped correctly.
+            Log.w(TAG, "", e);
+        } finally {
+            running = false;
+            stopWriteThread();
+            //cancel and notify the handlers that the connection is dead
+            disconnect();
         }
     }
  
@@ -130,7 +131,7 @@ public abstract class BluetoothConnection extends Thread {
         try {
             this.socket.close();
         } catch (IOException e) {
-            
+            //NOTE: we're disconnecting...we don't really care about the error here.
         } finally {
             //before we exit, notify the launcher thread that the connection is dead
             onDisconnected();
