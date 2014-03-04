@@ -273,7 +273,8 @@ public class PlaylistFragment extends MusicListFragment{
         public void updateMusic(List<PlaylistEntry> metadataList) {
             super.updateMusic(metadataList);
             if(metadataList.size() == 0){
-                Toaster.iToast(getActivity(),R.string.no_songs_in_playlist);
+                //This is commented out because when host disbands this crashes all guestsg
+//                Toaster.iToast(getActivity(),R.string.no_songs_in_playlist);
             }
         }
     }
