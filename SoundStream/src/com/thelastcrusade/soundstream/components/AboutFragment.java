@@ -19,9 +19,11 @@
 package com.thelastcrusade.soundstream.components;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -45,24 +47,31 @@ public class AboutFragment extends Fragment implements ITitleable {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_about, container, false);
         
-        final TextView 
-        	repoLinkText = (TextView)v.findViewById(R.id.repo_link),
-        	SlidingMenuLinkText = (TextView)v.findViewById(R.id.thanks_SlidingMenu),
-        	emailLinkText = (TextView)v.findViewById(R.id.email_link);
-        
-        listenToHttpLink(repoLinkText, getString(R.string.repo_link));
-        listenToHttpLink(SlidingMenuLinkText, getString(R.string.sliding_menu_link));
-        
-        emailLinkText.setOnClickListener(new AdapterView.OnClickListener() {
+        final TextView repoLinkTextView = (TextView)v.findViewById(R.id.repo_link);
+        final TextView slidingMenuLinkTextView = (TextView)v.findViewById(R.id.thanks_sliding_menu);
+        final TextView emailLinkTextView = (TextView)v.findViewById(R.id.email_link);
+        final TextView versionTextView = (TextView)v.findViewById(R.id.version_text);
 
-			@Override
-			public void onClick(View v) {
-				Intent emailIntent = new Intent(
-						Intent.ACTION_SENDTO, 
-						Uri.fromParts("mailto", getString(R.string.email_support_address), null));
-				emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject_tag));
-				startActivity(Intent.createChooser(emailIntent, "Send email..."));
-			}
+        try {
+            String version = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
+            versionTextView.setText(version);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("AboutFragment", e.getMessage());
+        }
+
+        listenToHttpLink(repoLinkTextView, getString(R.string.repo_link));
+        listenToHttpLink(slidingMenuLinkTextView, getString(R.string.sliding_menu_link));
+        
+        emailLinkTextView.setOnClickListener(new AdapterView.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent emailIntent = new Intent(
+                        Intent.ACTION_SENDTO,
+                        Uri.fromParts("mailto", getString(R.string.email_support_address), null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject_tag));
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+            }
         });
         
         v.findViewById(R.id.instructions_text).setOnClickListener(new OnClickListener() {

@@ -66,7 +66,45 @@
 	            />
 	        
 	    </RelativeLayout>
-	
+
+        <!-- Version -->
+        <RelativeLayout
+            android:id="@+id/version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            >
+
+
+            <TextView
+                android:id="@+id/version_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/version_label"
+                android:textSize="18sp"
+                />
+
+            <View
+                android:id="@+id/version_line"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="10dp"
+                android:layout_below="@id/version_label"
+                android:background="@color/accent_blue"
+                />
+
+            <TextView
+                android:id="@+id/version_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/version_line"
+                android:layout_marginLeft="10dp"
+                android:textSize="16sp"
+                android:text="@string/version_default"
+                />
+
+        </RelativeLayout>
 	
 	    <!-- Meet the Crusaders -->
 	    <RelativeLayout
@@ -242,11 +280,11 @@
             	/>
 
            <TextView
-               android:id="@+id/thanks_SlidingMenu"
+               android:id="@+id/thanks_sliding_menu"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
                android:layout_marginLeft="10dp"
-               android:text="@string/thanks_SlidingMenu"
+               android:text="@string/thanks_sliding_menu"
                android:textColor="@color/link_blue"
                android:layout_below="@id/brought_to_you_by"
                android:textSize="16sp"
