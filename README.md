@@ -17,10 +17,16 @@ Please direct support questions to SoundStreamHelp@gmail.com and all other quest
 ## Special thanks to all that have contributed in the past
 Github:
 [David Greenhalgh](https://github.com/dgreenhalgh)
+
 [Reid Baker](https://github.com/reidbaker)
+
 [Jesse Rosalia](https://github.com/theJenix)
+
 [Elizabeth Johnson](https://github.com/ejohnson44)
+
 [Taylor Wrobel](https://github.com/twrobel3)
+
 [Bryan Sills](https://github.com/bryansills)
+
 [Kevin Dietze](https://github.com/kdietze3)
 
