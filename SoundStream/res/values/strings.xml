@@ -81,7 +81,7 @@
     <string name="meet_label">Meet the Team</string>
     <string name="team">Reid Baker\nDavid Greenhalgh\nElizabeth Johnson\nJesse Rosalia</string>
     <string name="thanks_label">Special Thanks</string>
-    <string name="thanks_SlidingMenu"><u>SlidingMenu</u></string>
+    <string name="thanks_sliding_menu"><u>SlidingMenu</u></string>
     <string name="thanks_Troy">Troy Peace - a super sponsor, without whom none of this would be possible</string>
     <string name="contact_us_label">Contact Us</string>
     <string name="repo_link_text"><u>Our GitHub repo</u></string>
@@ -93,6 +93,8 @@
     <string name="email_subject_tag">[SoundStream Beta]</string>
     <string name="credit_label">Credit</string>
     <string name="brought_to_you_by">SoundStream is built on top of the following fine open source projects:</string>
+    <string name="version_label">Version</string>
+    <string name="version_default">default</string>
 
     <string name="welcome">Welcome to SoundStream!\n\nFor some basic instructions and hints, press Next.</string>
 	<string name="welcome_connection">Create a new network by pressing Create, or join an existing network by pressing Join and asking a friend to let you in.</string>
